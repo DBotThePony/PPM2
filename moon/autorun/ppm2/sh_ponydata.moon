@@ -89,11 +89,18 @@ PPM2.RACE_PEGASUS = 1
 PPM2.RACE_UNICORN = 2
 PPM2.RACE_ALICORN = 3
 
+PPM2.AGE_FILLY = 0
+PPM2.AGE_ADULT = 1
+PPM2.AGE_MATURE = 2
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @Setup()
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
+
+    -- Reserved - they can be accessed/used/changed, but they do not do anything
+    @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)
 
     @NetworkVar('EyelashType',      (-> math.Clamp(net.ReadFloat(), PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
