@@ -61,18 +61,41 @@ PPM2.EyelashTypes = {
     'Default', 'Double', 'Coy', 'Full', 'Mess', 'None'
 }
 
+PPM2.BodyDetails = {
+    'None', 'Leg gradient', 'Lines', 'Stripes', 'Head stripes'
+    'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
+    'Hooves big rnd', 'Hooves small rnd', 'Spots 1'
+}
+
+PPM2.BodyDetailsEnum = {
+    'NONE', 'GRADIENT', 'LINES', 'STRIPES', 'HSTRIPES'
+    'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
+    'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS'
+}
+
 PPM2.MIN_EYELASHES = 0
 PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
+
+PPM2.MIN_DETAIL = 0
+PPM2.MAX_DETAIL = #PPM2.BodyDetails - 1
 
 PPM2.GENDER_FEMALE = 0
 PPM2.GENDER_MALE = 1
 
+PPM2.MAX_BODY_DETAILS = 8
+
+PPM2.RACE_EARTH = 0
+PPM2.RACE_PEGASUS = 1
+PPM2.RACE_UNICORN = 2
+PPM2.RACE_ALICORN = 3
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @Setup()
-    @NetworkVar('Gender',           (-> net.ReadUInt(4)),     ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
+    @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
+    @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
 
-    @NetworkVar('EyelashType',      (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('EyelashType',      (-> math.Clamp(net.ReadFloat(), PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     @NetworkVar('TailType',         (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('ManeType',         (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
@@ -116,12 +139,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('EyeWidth',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
 
+    for i = 1, PPM2.MAX_BODY_DETAILS
+        @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+
     new: (ent = NULL) =>
         @ent = ent
         ent.__PPM2_PonyData = @
-
-    new: (data) =>
-        @SetupData(data) if data
-    
-    SetupData: (data) =>
+        @entID = ent\EntIndex()
+    EntIndex: => @entID
 
