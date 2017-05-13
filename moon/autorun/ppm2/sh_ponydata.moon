@@ -6,7 +6,7 @@
 -- you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
 --
---     http\//www.apache.org/licenses/LICENSE-2.0
+--     http://www.apache.org/licenses/LICENSE-2.0
 --
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
@@ -109,37 +109,17 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('ManeTypeLower',    (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     @NetworkVar('EyeBackground',    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-    @NetworkVar('EyeIris',          net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-    -- Down gradient i guess
-    @NetworkVar('EyeIris2',         net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    @NetworkVar('EyeHole',          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
+    @NetworkVar('EyeIris',          net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
+    @NetworkVar('EyeIris2',         net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
     @NetworkVar('EyeIrisLine1',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('EyeIrisLine2',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-    -- Marshmallow body color
     @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
 
-    -- wtf
-    @NetworkVar('TailColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('TailColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('TailColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('TailColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('TailColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('TailColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    
-    -- wtf
-    @NetworkVar('LowerManeColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('LowerManeColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('LowerManeColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('LowerManeColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('LowerManeColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('LowerManeColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    
-    -- ok it is a color invasion
-    @NetworkVar('UpperManeColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('UpperManeColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('UpperManeColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('UpperManeColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('UpperManeColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('UpperManeColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    for i = 1, 6
+        @NetworkVar("TailColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
     @NetworkVar('EyeLines',         net.ReadBool, net.ReadBool,              true)
     @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
