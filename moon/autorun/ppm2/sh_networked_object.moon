@@ -171,7 +171,7 @@ class NetworkedObject
 		id = net.ReadUInt(16)
 		obj = @NW_Objects[id]
 		return unless obj
-		obj\Remove()
+		obj\Remove(true)
 		@OnNetworkedDeleteCallback(obj, ply, len)
 	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
 	
@@ -201,7 +201,7 @@ class NetworkedObject
 	GetNetworkID: => @netID
 	NetworkID: => @netID
 	NetID: => @netID
-	Remove: =>
+	Remove: (byClient = false) =>
 		@@NW_Objects[@netID] = nil
 		@valid = false
 		if CLIENT and @isLocal and @NETWORKED and @@NW_ClientsideCreation
@@ -211,7 +211,7 @@ class NetworkedObject
 		elseif SERVER and @NETWORKED
 			net.Start(@@NW_Remove)
 			net.WriteUInt(@netID)
-			if not IsValid(@NW_Player)
+			if not IsValid(@NW_Player) or not byClient
 				net.Broadcast()
 			else
 				net.SendOmit(@NW_Player)
