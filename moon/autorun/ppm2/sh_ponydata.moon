@@ -16,11 +16,16 @@
 --
 
 class PonyDataInstance extends PPM2.NetworkedObject
+	@MAX_WEIGHT = 1.3
+	@MIN_WEIGHT = 0.7
+	@Setup()
+	@NetworkVar('Weight', (-> math.Clamp(net.ReadFloat(), @MIN_WEIGHT, @MAX_WEIGHT)))
+
 	new: (data) =>
 		@SetupData(data) if data
 	
 	SetupData: (data) =>
 
 
-class PonyDataController extends PPM2.NetworkedObject
+class PonyDataController
 	new: (ply = NULL, instance) =>

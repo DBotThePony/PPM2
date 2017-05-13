@@ -61,13 +61,13 @@ class NetworkChangeState
 
 class NetworkedObject
 	@Setup = =>
-		@NW_Vars = {}
+		@NW_Vars = {} if @NW_Vars == nil
 		@NW_VarsTable = {}
 		@NW_Objects = {}
 		@NW_Waiting = {}
 		@NW_WaitID = -1
 		@NW_Setup = true
-		@NW_NextVarID = -1
+		@NW_NextVarID = -1 if @NW_NextVarID == nil
 		@NW_Create = "PPM2.NW.Created.#{@__name}"
 		@NW_Modify = "PPM2.NW.Modified.#{@__name}"
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
@@ -92,8 +92,7 @@ class NetworkedObject
 			return unless obj
 			obj.NETWORKED = true
 			obj.netID = netID
-	@__inherited = (child) => child.Setup(child)
-	@Setup()
+	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
 		strName = "_NW_#{getName}"
