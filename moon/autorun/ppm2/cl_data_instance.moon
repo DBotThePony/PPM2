@@ -40,9 +40,9 @@ class PonyDataInstance
     }
 
     for i = 1, 6
-        @PONY_DATA["TailColor#{i}"] =       -> Color(255, 255, 255)
-        @PONY_DATA["LowerManeColor#{i}"] =  -> Color(255, 255, 255)
-        @PONY_DATA["UpperManeColor#{i}"] =  -> Color(255, 255, 255)
+        @PONY_DATA["tail_color_#{i}"] =         -> Color(255, 255, 255)
+        @PONY_DATA["lower_mane_color_#{i}"] =   -> Color(255, 255, 255)
+        @PONY_DATA["upper_mane_color_#{i}"] =   -> Color(255, 255, 255)
 
     new: (filename, data) =>
         @SetFilename(filename)
