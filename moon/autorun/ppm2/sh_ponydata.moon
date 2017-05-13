@@ -15,17 +15,113 @@
 -- limitations under the License.
 --
 
-class PonyDataInstance extends PPM2.NetworkedObject
-	@MAX_WEIGHT = 1.3
-	@MIN_WEIGHT = 0.7
-	@Setup()
-	@NetworkVar('Weight', (-> math.Clamp(net.ReadFloat(), @MIN_WEIGHT, @MAX_WEIGHT)))
+PPM2.MIN_WEIGHT = 0.7
+PPM2.MAX_WEIGHT = 1.3
 
-	new: (data) =>
-		@SetupData(data) if data
-	
-	SetupData: (data) =>
+PPM2.MIN_TAIL_SIZE = 0.6
+PPM2.MAX_TAIL_SIZE = 1.7 -- i luv big tails
 
+PPM2.MIN_IRIS = 0.7
+PPM2.MAX_IRIS = 1.3
 
-class PonyDataController
-	new: (ply = NULL, instance) =>
+PPM2.MIN_PUPIL_SIZE = 0.2
+PPM2.MAX_PUPIL_SIZE = 1
+
+PPM2.AvaliableTails = {
+    'MAILCALL'
+    'FLOOFEH'
+    'ADVENTUROUS'
+    'SHOWBOAT'
+    'ASSERTIVE' 
+    'BOLD'
+    'STUMPY'
+    'SPEEDSTER'
+    'EDGY'
+    'RADICAL' 
+    'BOOKWORM'
+    'BUMPKIN'
+    'POOFEH'
+    'CURLY'
+    'NONE'
+}
+
+PPM2.AvaliableUpperManes = {
+    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
+    'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
+    'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'NONE'
+}
+
+PPM2.AvaliableLowerManes = {
+    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+    'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
+    'BOOKWORM', 'BUMPKIN', 'CURLY', 'NONE'
+}
+
+PPM2.EyelashTypes = {
+    'Default', 'Double', 'Coy', 'Full', 'Mess', 'None'
+}
+
+PPM2.MIN_EYELASHES = 0
+PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
+
+PPM2.GENDER_FEMALE = 0
+PPM2.GENDER_MALE = 1
+
+class NetworkedPonyData extends PPM2.NetworkedObject
+    @Setup()
+    @NetworkVar('Gender',           (-> net.ReadUInt(4)),     ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
+    @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
+
+    @NetworkVar('EyelashType',      (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+
+    @NetworkVar('TailType',         (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('ManeType',         (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('ManeTypeLower',    (-> net.ReadUInt(8)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+
+    @NetworkVar('EyeBackground',    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    @NetworkVar('EyeIris',          net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    -- Down gradient i guess
+    @NetworkVar('EyeIris2',         net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    @NetworkVar('EyeIrisLine1',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    @NetworkVar('EyeIrisLine2',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    -- Marshmallow body color
+    @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+
+    -- wtf
+    @NetworkVar('TailColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('TailColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('TailColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('TailColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('TailColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('TailColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    
+    -- wtf
+    @NetworkVar('LowerManeColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('LowerManeColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('LowerManeColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('LowerManeColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('LowerManeColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('LowerManeColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    
+    -- ok it is a color invasion
+    @NetworkVar('UpperManeColor1',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('UpperManeColor2',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('UpperManeColor3',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('UpperManeColor4',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('UpperManeColor5',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    @NetworkVar('UpperManeColor6',        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+    
+    @NetworkVar('EyeLines',         net.ReadBool, net.ReadBool,              true)
+    @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
+    @NetworkVar('EyeWidth',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
+    @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
+
+    new: (ent = NULL) =>
+        @ent = ent
+        ent.__PPM2_PonyData = @
+
+    new: (data) =>
+        @SetupData(data) if data
+    
+    SetupData: (data) =>
+
