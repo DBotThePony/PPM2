@@ -16,8 +16,9 @@
 --
 
 class NetworkChangeState
-	new: (key = '', newValue, obj, len = 24, ply = NULL) =>
+	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
 		@key = key
+		@keyValid = keyValid
 		@oldValue = obj[key]
 		@newValue = newValue
 		@ply = ply
@@ -31,9 +32,12 @@ class NetworkChangeState
 	GetPlayer: => @ply
 	ChangedByClient: => IsValid(@ply)
 	ChangedByPlayer: => IsValid(@ply)
-	GetKey: => @key
-	GetVariable: => @key
-	GetVar: => @key
+	GetKey: => @keyValid
+	GetVariable: => @keyValid
+	GetVar: => @keyValid
+	GetKeyInternal: => @key
+	GetVariableInternal: => @key
+	GetVarInternal: => @key
 	GetNewValue: => @newValue
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
@@ -91,11 +95,29 @@ class NetworkedObject
 	@__inherited = (child) => child.Setup(child)
 	@Setup()
 
-	@AddNetworkVar = (strName = 'var', readFunc = (->), writeFunc = (->)) =>
+	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
+		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
-		tab = {:strName, :readFunc, :writeFunc, id: @NW_NextVarID}
+		id = @NW_NextVarID
+		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id}
 		table.insert(@NW_Vars, tab)
-		@NW_VarsTable[@NW_NextVarID] = tab
+		@NW_VarsTable[id] = tab
+		@__base[strName] = defValue
+		@__base["Get#{getName}"] = => @[strName]
+		@__base["Set#{getName}"] = (val = defValue, networkNow = true) =>
+			oldVal = @[strName]
+			@[strName] = val
+			@SetLocalChange(getName, oldVal, val)
+			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation or SERVER)
+				net.Start(@@NW_Modify)
+				net.WriteUInt(@GetNetworkID(), 16)
+				net.WriteUInt(id, 8)
+				writeFunc(@[strName])
+				if CLIENT
+					net.SendToServer()
+				else
+					net.Broadcast()
+	@NetworkVar = (...) => @AddNetworkVar(...)
 	
 	@NW_ClientsideCreation = false
 	@NW_RemoveOnPlayerLeave = true
@@ -130,11 +152,17 @@ class NetworkedObject
 		varID = net.ReadUInt(8)
 		varData = @NW_VarsTable[varID]
 		return unless varData
-		{:strName, :readFunc} = varData
+		{:strName, :getName, :readFunc, :writeFunc} = varData
 		newVal = readFunc()
-		state = NetworkChangeState(strName, newVal, obj, len, ply)
+		state = NetworkChangeState(strName, getName, newVal, obj, len, ply)
 		state\Apply()
 		obj\NetworkDataChanges(state)
+		if SERVER
+			net.Start(@NW_Modify)
+			net.WriteUInt(id, 16)
+			net.WriteUInt(varID, 8)
+			writeFunc(newVal)
+			net.SendOmit(ply)
 		@OnNetworkedModifyCallback(state)
 	@OnNetworkedModifyCallback = (state) => -- Override
 	
@@ -189,6 +217,7 @@ class NetworkedObject
 				net.SendOmit(@NW_Player)
 	
 	NetworkDataChanges: (state) => -- Override
+	SetLocalChange: (key, oldVal, newVal) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
 		data = @@ReadNetworkData()
 		states = [NetworkChangeState(key, newVal, @, len, ply) for key, newVal in pairs data]
@@ -197,6 +226,9 @@ class NetworkedObject
 			@NetworkDataChanges(state) unless silent
 	
 	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@NW_Vars
+
+	SendVar: (Var = '') =>
+		return if @[Var] == nil
 	
 	Create: =>
 		return if @NETWORKED
