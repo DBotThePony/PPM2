@@ -79,6 +79,15 @@ class NetworkedObject
 		net.Receive @NW_Create, (len = 0, ply = NULL) -> @OnNetworkedCreated(ply, len)
 		net.Receive @NW_Modify, (len = 0, ply = NULL) -> @OnNetworkedModify(ply, len)
 		net.Receive @NW_Remove, (len = 0, ply = NULL) -> @OnNetworkedDelete(ply, len)
+		net.Receive @NW_ReceiveID, (len = 0, ply = NULL) ->
+			return if SERVER
+			waitID = net.ReadUInt(16)
+			netID = net.ReadUInt(16)
+			obj = @NW_Waiting[netID]
+			@NW_Waiting[netID] = nil
+			return unless obj
+			obj.NETWORKED = true
+			obj.netID = netID
 	@__inherited = (child) => child.Setup(child)
 	@Setup()
 
@@ -95,12 +104,14 @@ class NetworkedObject
 		if CLIENT
 			netID = net.ReadUInt(16)
 			obj = @NW_Objects[netID] or @(netID)
+			obj.NETWORKED = true
 			obj\ReadNetworkData()
 			@OnNetworkedCreatedCallback(obj, ply, len)
 		else
 			waitID = net.ReadUInt(16)
 			obj = @()
 			obj.NW_Player = ply
+			obj.NETWORKED = ply
 			obj\ReadNetworkData()
 			obj\Create()
 			net.Start(@NW_ReceiveID)
@@ -133,6 +144,7 @@ class NetworkedObject
 		obj = @NW_Objects[id]
 		return unless obj
 		obj\Remove()
+		@OnNetworkedDeleteCallback(obj, ply, len)
 	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
 	
 	@ReadNetworkData = =>
@@ -164,10 +176,17 @@ class NetworkedObject
 	Remove: =>
 		@@NW_Objects[@netID] = nil
 		@valid = false
-		if @isLocal and @NETWORKED and @@NW_ClientsideCreation
+		if CLIENT and @isLocal and @NETWORKED and @@NW_ClientsideCreation
 			net.Start(@@NW_Remove)
 			net.WriteUInt(@netID)
 			net.SendToServer()
+		elseif SERVER and @NETWORKED
+			net.Start(@@NW_Remove)
+			net.WriteUInt(@netID)
+			if not IsValid(@NW_Player)
+				net.Broadcast()
+			else
+				net.SendOmit(@NW_Player)
 	
 	NetworkDataChanges: (state) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
@@ -187,7 +206,7 @@ class NetworkedObject
 			net.Start(@@NW_Create)
 			net.WriteUInt(@netID)
 			@WriteNetworkData()
-			if IsValid(@NW_Player)
+			if not IsValid(@NW_Player)
 				net.Broadcast()
 			else
 				net.SendOmit(@NW_Player)
