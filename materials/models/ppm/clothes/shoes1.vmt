@@ -1,0 +1,14 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/ppm/clothes/shoes1"
+	"$bumpmap" "models/ppm/clothes/mask1"
+
+	"$model" "1"
+	"$phong" "1"
+	"$phongexponent" "0.1"
+	"$phongboost" "0.7"
+	"$phongalbedotint" "1"
+	"$phongtint" "[0.85 .64 0.42]"
+	"$phongfresnelranges"	"[0.5 6 10]"
+
+}
