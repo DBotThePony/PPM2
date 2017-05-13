@@ -1,0 +1,18 @@
+{
+	"title"		:	"PPM/2",
+	"type"		:	"tool",
+	"tags"		:	[],
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn*",
+		"*.git*",
+		".gitlab-ci.yml",
+		"moon*",
+		"build.sh",
+		"README.md",
+		"lint.sh",
+		"LICENSE"
+	]
+}
