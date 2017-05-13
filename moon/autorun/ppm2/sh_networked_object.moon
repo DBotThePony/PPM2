@@ -60,18 +60,25 @@ class NetworkedObject
 		@NW_Vars = {}
 		@NW_VarsTable = {}
 		@NW_Objects = {}
+		@NW_Waiting = {}
+		@NW_WaitID = -1
 		@NW_Setup = true
 		@NW_NextVarID = -1
 		@NW_Create = "PPM2.NW.Created.#{@__name}"
 		@NW_Modify = "PPM2.NW.Modified.#{@__name}"
+		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
+		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
 		@NW_NextObjectID = -1
 
 		if SERVER
 			util.AddNetworkString(@NW_Create)
 			util.AddNetworkString(@NW_Modify)
+			util.AddNetworkString(@NW_Remove)
+			util.AddNetworkString(@NW_ReceiveID)
 		
 		net.Receive @NW_Create, (len = 0, ply = NULL) -> @OnNetworkedCreated(ply, len)
 		net.Receive @NW_Modify, (len = 0, ply = NULL) -> @OnNetworkedModify(ply, len)
+		net.Receive @NW_Remove, (len = 0, ply = NULL) -> @OnNetworkedDelete(ply, len)
 	@__inherited = (child) => child.Setup(child)
 	@Setup()
 
@@ -84,9 +91,24 @@ class NetworkedObject
 	@NW_ClientsideCreation = false
 	@NW_RemoveOnPlayerLeave = true
 	@OnNetworkedCreated = (ply = NULL, len = 0) =>
-		return if not @NW_ClientsideCreation and IsValid(ply)
-		@OnNetworkedCreatedCallback(ply, len)
-	@OnNetworkedCreatedCallback = (ply = NULL, len = 0) => -- Override
+		return if SERVER and not @NW_ClientsideCreation
+		if CLIENT
+			netID = net.ReadUInt(16)
+			obj = @NW_Objects[netID] or @(netID)
+			obj\ReadNetworkData()
+			@OnNetworkedCreatedCallback(obj, ply, len)
+		else
+			waitID = net.ReadUInt(16)
+			obj = @()
+			obj.NW_Player = ply
+			obj\ReadNetworkData()
+			obj\Create()
+			net.Start(@NW_ReceiveID)
+			net.WriteUInt(waitID, 16)
+			net.WriteUInt(obj.netID)
+			net.Send(ply)
+			@OnNetworkedCreatedCallback(obj, ply, len)
+	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
 
 	@OnNetworkedModify = (ply = NULL, len = 0) =>
 		return if not @NW_ClientsideCreation and IsValid(ply)
@@ -105,12 +127,21 @@ class NetworkedObject
 		@OnNetworkedModifyCallback(state)
 	@OnNetworkedModifyCallback = (state) => -- Override
 	
+	@OnNetworkedDelete = (ply = NULL, len = 0) =>
+		return if not @NW_ClientsideCreation and IsValid(ply)
+		id = net.ReadUInt(16)
+		obj = @NW_Objects[id]
+		return unless obj
+		obj\Remove()
+	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
+	
 	@ReadNetworkData = =>
 		output = {strName, readFunc() for {:strName, :readFunc} in *@NW_Vars}
 		return output
 
-	new: (netID = @@NW_NextObjectID) =>
+	new: (netID = @@NW_NextObjectID, localObject = false) =>
 		@valid = true
+		@NETWORKED = false
 
 		if SERVER
 			@netID = @@NW_NextObjectID
@@ -119,19 +150,53 @@ class NetworkedObject
 			@netID = netID
 		
 		@@NW_Objects[@netID] = @
+		@NW_Player = NULL
+		@isLocal = localObject
+		@NW_Player = LocalPlayer() if localObject
 	
 	IsValid: => @valid
+	IsNetworked: => @NETWORKED
+	IsLocal: => @isLocal
+	IsLocalObject: => @isLocal
+	GetNetworkID: => @netID
+	NetworkID: => @netID
+	NetID: => @netID
 	Remove: =>
 		@@NW_Objects[@netID] = nil
 		@valid = false
+		if @isLocal and @NETWORKED and @@NW_ClientsideCreation
+			net.Start(@@NW_Remove)
+			net.WriteUInt(@netID)
+			net.SendToServer()
 	
 	NetworkDataChanges: (state) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
 		data = @@ReadNetworkData()
-		oldData = [{k, @[k], v} for k, v in pairs data]
-		states = [NetworkChangeState(key, newVal, @, len, ply) for {key, oldVal, newVal} in *oldData]
+		states = [NetworkChangeState(key, newVal, @, len, ply) for key, newVal in pairs data]
 		for state in *states
 			state\Apply()
 			@NetworkDataChanges(state) unless silent
+	
+	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@NW_Vars
+	
+	Create: =>
+		return if @NETWORKED
+		return if CLIENT and not @@NW_ClientsideCreation
+		@NETWORKED = true
+		if SERVER
+			net.Start(@@NW_Create)
+			net.WriteUInt(@netID)
+			@WriteNetworkData()
+			if IsValid(@NW_Player)
+				net.Broadcast()
+			else
+				net.SendOmit(@NW_Player)
+		else
+			@NW_WaitID += 1
+			net.Start(@@NW_Create)
+			net.WriteUInt(@NW_WaitID, 16)
+			@WriteNetworkData()
+			net.SendToServer()
+			@@NW_Waiting[@NW_WaitID] = @
 
 PPM2.NetworkedObject = NetworkedObject
