@@ -66,27 +66,36 @@ class PonyTextureController
         @CompileTextures() if compile
         @ApplyTextures() if compile and apply
     GetBody: =>
-        if @data\GetGender() == PPM2.GENDER_FEMALE
+        if @networkedData\GetGender() == PPM2.GENDER_FEMALE
             return @FemaleMaterial
         else
             return @MaleMaterial
     CompileTextures: =>
         @CompileBody()
     ApplyTextures: =>
-        @ent\SetSubMaterial(3, @GetBody())
+        @ent\SetSubMaterial(3, "!#{@GetBody()\GetName()}")
+    
+    @QUAD_POS_CONST = Vector(256, 256, 0)
+    @QUAD_FACE_CONST = Vector(0, 0, -1)
+    @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (rt, oldW, oldH, r, g, b, texID) =>
         render.PushRenderTarget(rt)
         render.OverrideAlphaWriteEnable(true, true)
-        render.SetViewPort(0, 0, 512, 512)
+        render.SuppressEngineLighting(true)
+        render.ResetModelLighting(1, 1, 1)
+        cam.IgnoreZ(true)
+        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
         surface.SetTexture(texID)
-        surface.DrawTexturedRect(0, 0, 512, 512)
+        surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        render.DrawQuadEasy(@@QUAD_POS_CONST, @@QUAD_FACE_CONST, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, Color(r, g, b), -90) 
 
         for i = 1, PPM2.MAX_BODY_DETAILS
-            detailID = @data["GetBodyDetail#{i}"]()
+            detailID = @networkedData["GetBodyDetail#{i}"](@networkedData)
             detailID += 1
             mat = PPM2.BodyDetailsMaterials[detailID]
             continue if not mat
@@ -94,35 +103,28 @@ class PonyTextureController
             surface.DrawTexturedRect(0, 0, 512, 512)
 
         cam.End2D()
-
+        render.SuppressEngineLighting(false)
+        cam.IgnoreZ(false)
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         return rt
     CompileBody: =>
         textureMale = {
-            'name': "PPM2.#{@id}.Body.Male"
-            'shader': 'VertexLitGeneric'
+            'name': "PPM2.#{@id}.Body.m"
+            'shader': 'UnlitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
 
-                '$model': '1'
-                '$phong': '1'
-                '$basemapalphaphongmask': '1'
-                '$phongexponent': '6'
-                '$phongboost': '0.05'
-                '$phongalbedotint': '1'
-                '$phongtint': '[1 .95 .95]'
-                '$phongfresnelranges': '[0.5 6 10]'
-                
-                '$rimlight': 1
-                '$rimlightexponent': 2
-                '$rimlightboost': 1
+                '$ignorez': 1
+                '$vertexcolor': 1
+                '$vertexalpha': 1
+                '$nolod': 1
             }
         }
 
         textureFemale = {
-            'name': "PPM2.#{@id}.Body.Female"
-            'shader': 'VertexLitGeneric'
+            'name': "PPM2.#{@id}.Body.f"
+            'shader': 'UnlitGeneric'
             'data': {k, v for k, v in pairs textureMale.data}
         }
 
@@ -134,7 +136,7 @@ class PonyTextureController
         PPM2.ApplyMaterialData(@MaleMaterial, textureMale.data)
         PPM2.ApplyMaterialData(@FemaleMaterial, textureFemale.data)
 
-        {:r, :g, :b} = @data\GetBodyColor()
+        {:r, :g, :b} = @networkedData\GetBodyColor()
         oldW, oldH = ScrW(), ScrH()
 
         Target = GetRenderTarget("#{textureMale.name}_RenderTargetMale", 512, 512, false)
