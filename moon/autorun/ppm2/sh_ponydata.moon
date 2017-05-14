@@ -102,8 +102,19 @@ PPM2.AGE_FILLY = 0
 PPM2.AGE_ADULT = 1
 PPM2.AGE_MATURE = 2
 
+PPM2.BODYGROUP_SKELETON = 0
+PPM2.BODYGROUP_GENDER = 1
+PPM2.BODYGROUP_HORN = 2
+PPM2.BODYGROUP_WINGS = 3
+PPM2.BODYGROUP_MANE_UPPER = 4
+PPM2.BODYGROUP_MANE_LOWER = 5
+PPM2.BODYGROUP_TAIL = 6
+PPM2.BODYGROUP_CMARK = 7
+PPM2.BODYGROUP_EYELASH = 8
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
+
     @Setup()
     @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
@@ -128,15 +139,18 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
 
     for i = 1, 6
-        @NetworkVar("ManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("TailColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-
+        @NetworkVar("ManeColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("ManeDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("TailColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("TailDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        
         -- Reserved - they can be accessed/used/changed, but they do not do anything
         @NetworkVar("LowerManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         -----
     
     @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
+    @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
     @NetworkVar('EyeWidth',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
@@ -155,21 +169,50 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent = ent
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
+    
+    @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
+    @TAIL_UPDATE_TRIGGER = {'TailType': true}
+    for i = 1, 6
+        @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["DownManeDetail#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeDetail#{i}"] = true
+        @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
+        @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
+        @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
     UpdateTextureController: (key) =>
         return if SERVER
         textureController = @GetTextureController()
         switch key
             when 'BodyColor'
                 textureController\CompileBody()
+        if @@MANE_UPDATE_TRIGGER[key]
+            textureController\CompileHair()
+        if @@TAIL_UPDATE_TRIGGER[key]
+            textureController\CompileTail()
+    
+    GenericDataChange: (state) =>
+        switch state\GetKey()
+            when 'ManeType'
+                @ent\SetBodygroup(PPM2.BODYGROUP_MANE_UPPER, @GetManeType())
+            when 'ManeTypeLower'
+                @ent\SetBodygroup(PPM2.BODYGROUP_MANE_LOWER, @GetManeTypeLower())
+            when 'TailType'
+                @ent\SetBodygroup(PPM2.BODYGROUP_TAIL, @GetTailType())
     SetLocalChange: (state) =>
         if CLIENT
             @UpdateTextureController(state\GetKey())
+        @GenericDataChange(state)
     NetworkDataChanges: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
         
         if CLIENT
             @UpdateTextureController(state\GetKey())
+        
+        @GenericDataChange(state)
     GetTextureController: =>
         return if SERVER
         @textureController = PPM2.PonyTextureController(@ent, @) if not @textureController

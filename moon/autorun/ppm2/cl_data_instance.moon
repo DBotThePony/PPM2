@@ -204,6 +204,34 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        @PONY_DATA["mane_detail_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "ManeDetailColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["tail_detail_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "TailDetailColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
         @PONY_DATA["tail_color_#{i}"] = {
             default: (-> Color(255, 255, 255))
             getFunc: "TailColor#{i}"

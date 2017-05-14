@@ -75,7 +75,7 @@ class NetworkedObject
 		@NW_Modify = "PPM2.NW.Modified.#{@__name}"
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
 		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
-		@NW_NextObjectID = -1
+		@NW_NextObjectID = 0
 
 		if SERVER
 			util.AddNetworkString(@NW_Create)
