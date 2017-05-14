@@ -105,7 +105,7 @@ PPM2.AGE_MATURE = 2
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
     @Setup()
-    @NetworkVar('Entity', net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
@@ -113,7 +113,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     -- Reserved - they can be accessed/used/changed, but they do not do anything
     @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)
 
-    @NetworkVar('EyelashType',      (-> math.Clamp(net.ReadFloat(), PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('EyelashType',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     @NetworkVar('TailType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_TAILS, PPM2.MAX_TAILS)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('ManeType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)),     ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
@@ -132,13 +132,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("LowerManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
-    @NetworkVar('EyeLines',         net.ReadBool, net.ReadBool,              true)
+    @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
     @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
     @NetworkVar('EyeWidth',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
 
     for i = 1, PPM2.MAX_BODY_DETAILS
-        @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+        @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     new: (netID, ent) =>
         if ent
