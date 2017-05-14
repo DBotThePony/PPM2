@@ -115,6 +115,17 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    @EYE_OVAL = Material('models/ppm/partrender/eye_oval.png')
+    @EYE_GRAD = Material('models/ppm/partrender/eye_grad.png')
+    @EYE_EFFECT = Material('models/ppm/partrender/eye_effect.png')
+    @EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection.png')
+
+    @EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1.png')
+    @EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1.png')
+
+    @EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2.png')
+    @EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2.png')
+
     @NEXT_GENERATED_ID = 10000
 
     new: (ent = NULL, data, compile = true) =>
@@ -146,22 +157,33 @@ class PonyTextureController
             return @TailColor2Material
         else
             return @TailColor1Material
+    GetEye: (left = false) =>
+        if left
+            return @EyeMaterialL
+        else
+            return @EyeMaterialR
     CompileTextures: =>
         @CompileBody()
         @CompileHair()
         @CompileTail()
+        @CompileEye(false)
+        @CompileEye(true)
         @compiled = true
     
     PreDraw: =>
         return unless @compiled
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetHair(2))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetHair(1))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetHair(1))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetHair(1))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetHair(2))
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1, @GetTail(2))
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(1))
     
     PostDraw: =>
         return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
@@ -421,5 +443,100 @@ class PonyTextureController
         @TailColor2Material\SetTexture('$basetexture', rt)
 
         return @TailColor1Material, @TailColor2Material
+    CompileEye: (left = false) =>
+        prefix = left and 'l' or 'r'
+        prefixUpper = left and 'L' or 'R'
+        EyeBackground = @networkedData\GetEyeBackground()
+        EyeHole = @networkedData\GetEyeHole()
+        HoleWidth = @networkedData\GetHoleWidth()
+        IrisSize = @networkedData\GetIrisSize() * .7
+        EyeIris1 = @networkedData\GetEyeIris1()
+        EyeIris2 = @networkedData\GetEyeIris2()
+        EyeIrisLine1 = @networkedData\GetEyeIrisLine1()
+        EyeIrisLine2 = @networkedData\GetEyeIrisLine2()
+        EyeLines = @networkedData\GetEyeLines()
+        HoleSize = @networkedData\GetHoleSize()
+        oldW, oldH = ScrW(), ScrH()
+
+        textureData = {
+            'name': "PPM2.#{@id}.Eye.#{prefix}2"
+            'shader': 'eyes'
+            'data': {
+                '$iris': 'models/ppm/base/face/p_base'
+                '$irisframe': '0'
+                
+                '$ambientoccltexture': 'models/ppm/base/face/black'
+                '$envmap': 'models/ppm/base/face/black'
+                '$corneatexture': 'models/ppm/base/face/white'
+                '$lightwarptexture': 'models/ppm/clothes/lightwarp'
+                
+                '$eyeballradius': '3.7'
+                '$ambientocclcolor': '[0.3 0.3 0.3]'
+                '$dilation': '0.5'
+                '$glossiness': '1'
+                '$parallaxstrength': '0.1'
+                '$corneabumpstrength': '0.1'
+
+                '$halflambert': '1'
+                '$nodecal': '1'
+
+                '$raytracesphere': '1'
+                '$spheretexkillcombo': '0'
+                '$eyeorigin': '[0 0 0]'
+                '$irisu': '[0 1 0 0]'
+                '$irisv': '[0 0 1 0]'
+                '$entityorigin': '4.0'
+            }
+        }
+
+        @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+        rt = GetRenderTarget("#{textureData.name}_RenderTarget", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        render.PushRenderTarget(rt)
+        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        {:r, :g, :b} = EyeBackground
+        render.Clear(r, g, b, 255, true, true)
+        cam.Start2D()
+        surface.SetDrawColor(r, g, b)
+        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        surface.SetDrawColor(EyeIris1)
+        surface.SetMaterial(@@EYE_OVAL)
+        IrisPos = @@QUAD_SIZE_CONST / 2 - @@QUAD_SIZE_CONST * IrisSize / 2
+        IrisQuadSize = @@QUAD_SIZE_CONST * IrisSize
+        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+
+        surface.SetDrawColor(EyeIris2)
+        surface.SetMaterial(@@EYE_GRAD)
+        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+
+        if EyeLines
+            surface.SetDrawColor(EyeIrisLine1)
+            surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
+            surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+
+            surface.SetDrawColor(EyeIrisLine2)
+            surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
+            surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+        
+        surface.SetDrawColor(EyeHole)
+        surface.SetMaterial(@@EYE_OVAL)
+        HoleQuadSize = @@QUAD_SIZE_CONST * IrisSize * HoleSize
+        HolePos = @@QUAD_SIZE_CONST / 2
+        surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2, HoleQuadSize * HoleWidth, HoleQuadSize)
+
+        surface.SetDrawColor(255, 255, 255)
+        surface.SetMaterial(@@EYE_EFFECT)
+        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+
+        surface.SetDrawColor(255, 255, 255, 127)
+        surface.SetMaterial(@@EYE_REFLECTION)
+        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+        @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
 
 PPM2.PonyTextureController = PonyTextureController

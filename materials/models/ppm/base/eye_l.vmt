@@ -1,4 +1,3 @@
- 
 "eyes"
 { 
  "$Iris"               "models/ppm/base/face/p_luna"     // Iris color in RGB with cornea noise in A

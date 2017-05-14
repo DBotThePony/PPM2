@@ -24,6 +24,9 @@ PPM2.MAX_TAIL_SIZE = 1.7 -- i luv big tails
 PPM2.MIN_IRIS = 0.7
 PPM2.MAX_IRIS = 1.3
 
+PPM2.MIN_HOLE = 0.1
+PPM2.MAX_HOLE = .95
+
 PPM2.MIN_PUPIL_SIZE = 0.2
 PPM2.MAX_PUPIL_SIZE = 1
 
@@ -152,7 +155,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
-    @NetworkVar('EyeWidth',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
+    @NetworkVar('HoleSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)), net.WriteFloat, .8)
+    @NetworkVar('HoleWidth',        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
 
     for i = 1, PPM2.MAX_BODY_DETAILS
@@ -172,6 +176,17 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
+    @EYE_UPDATE_TRIGGER = {
+        'EyeWidth': true
+        'IrisSize': true
+        'EyeLines': true
+        'EyeBackground': true
+        'EyeIrisLine1': true
+        'EyeIrisLine2': true
+        'EyeIris1': true
+        'EyeHole': true
+    }
+
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
@@ -192,7 +207,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             textureController\CompileHair()
         if @@TAIL_UPDATE_TRIGGER[key]
             textureController\CompileTail()
-    
+        if @@EYE_UPDATE_TRIGGER[key]
+            textureController\CompileEye(true)
+            textureController\CompileEye(false)
     GenericDataChange: (state) =>
         switch state\GetKey()
             when 'ManeType'

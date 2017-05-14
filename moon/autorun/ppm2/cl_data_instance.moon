@@ -78,10 +78,16 @@ class PonyDataInstance
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
         }
 
-        'eye_width': {
+        'hole_width': {
             default: (-> 1)
-            getFunc: 'EyeWidth'
+            getFunc: 'HoleWidth'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+        }
+
+        'eye_hole_size': {
+            default: (-> .8)
+            getFunc: 'HoleSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
         }
 
         'eye_bg': {
