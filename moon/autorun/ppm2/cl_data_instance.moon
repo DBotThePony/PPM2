@@ -18,52 +18,278 @@
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
     @PONY_DATA = {
-        'age':                  -> PPM2.AGE_ADULT
-        'race':                 -> PPM2.RACE_EARTH
-        'gender':               -> PPM2.GENDER_FEMALE
-        'weight':               -> 1
-        'eyelash':              -> 0
-        'tail':                 -> 0
-        'mane':                 -> 0
-        'manelower':            -> 0
-        'tailsize':             -> 1
-        'eye_iris_size':        -> 1
-        'eye_width':            -> 1
-        'eye_bg':               -> Color(255, 255, 255)
-        'eye_hole':             -> Color(0, 0, 0)
-        'eye_iris1':            -> Color(200, 200, 200)
-        'eye_iris2':            -> Color(200, 200, 200)
-        'eye_irisline1':        -> Color(255, 255, 255)
-        'eye_irisline2':        -> Color(255, 255, 255)
-        'body':                 -> Color(255, 255, 255)
-        'eye_lines':            -> true
+        'age': {
+            default: (-> PPM2.AGE_ADULT)
+            getFunc: 'Age'
+            fix: (arg = PPM2.AGE_ADULT) -> math.Clamp(tonumber(arg) or PPM2.AGE_ADULT, 0, 2)
+        }
+        
+        'race': {
+            default: (-> PPM2.RACE_EARTH)
+            getFunc: 'Race'
+            fix: (arg = PPM2.RACE_EARTH) -> math.Clamp(tonumber(arg) or PPM2.RACE_EARTH, 0, 3)
+        }
+
+        'gender': {
+            default: (-> PPM2.GENDER_FEMALE)
+            getFunc: 'Gender'
+            fix: (arg = PPM2.GENDER_FEMALE) -> math.Clamp(tonumber(arg) or PPM2.GENDER_FEMALE, 0, 1)
+        }
+
+        'weight': {
+            default: (-> 1)
+            getFunc: 'Weight'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)
+        }
+
+        'eyelash': {
+            default: (-> 0)
+            getFunc: 'EyelashType'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)
+        }
+        
+        'tail': {
+            default: (-> 0)
+            getFunc: 'TailType'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS, PPM2.MAX_TAILS)
+        }
+
+        'mane': {
+            default: (-> 0)
+            getFunc: 'ManeType'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)
+        }
+
+        'manelower': {
+            default: (-> 0)
+            getFunc: 'ManeTypeLower'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)
+        }
+
+        'tailsize': {
+            default: (-> 1)
+            getFunc: 'TailSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)
+        }
+
+        'eye_iris_size': {
+            default: (-> 1)
+            getFunc: 'EyeIrisSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
+        }
+
+        'eye_width': {
+            default: (-> 1)
+            getFunc: 'EyeWidth'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+        }
+
+        'eye_bg': {
+            default: (-> Color(255, 255, 255))
+            getFunc: 'EyeBackground'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'eye_hole': {
+            default: (-> Color(0, 0, 0))
+            getFunc: 'EyeHole'
+            fix: (arg = Color(0, 0, 0)) ->
+                if type(arg) ~= 'table'
+                    return Color(0, 0, 0)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(0, 0, 0)
+        }
+
+        'eye_iris1': {
+            default: (-> Color(200, 200, 200))
+            getFunc: 'EyeIris1'
+            fix: (arg = Color(200, 200, 200)) ->
+                if type(arg) ~= 'table'
+                    return Color(200, 200, 200)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(200, 200, 200)
+        }
+
+        'eye_iris2': {
+            default: (-> Color(200, 200, 200))
+            getFunc: 'EyeIris2'
+            fix: (arg = Color(200, 200, 200)) ->
+                if type(arg) ~= 'table'
+                    return Color(200, 200, 200)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(200, 200, 200)
+        }
+
+        'eye_irisline1': {
+            default: (-> Color(255, 255, 255))
+            getFunc: 'EyeIrisLine1'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'eye_irisline2': {
+            default: (-> Color(255, 255, 255))
+            getFunc: 'EyeIrisLine2'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'body': {
+            default: (-> Color(255, 255, 255))
+            getFunc: 'BodyColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'eye_lines': {
+            default: (-> true)
+            getFunc: 'EyeLines'
+            fix: (arg = true) -> tobool(arg)
+        }
     }
 
     for i = 1, 6
-        @PONY_DATA["tail_color_#{i}"] =         -> Color(255, 255, 255)
-        @PONY_DATA["lower_mane_color_#{i}"] =   -> Color(255, 255, 255)
-        @PONY_DATA["upper_mane_color_#{i}"] =   -> Color(255, 255, 255)
+        @PONY_DATA["tail_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "TailColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
 
-    new: (filename, data) =>
+        @PONY_DATA["lower_mane_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "LowerManeColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["upper_mane_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "UpperManeColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+    
+    @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
+    @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
+
+    for key, {:getFunc} in pairs @PONY_DATA
+        @__base["Get#{getFunc}"] = => @dataTable[key]
+		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
+			oldVal = @dataTable[key]
+			@dataTable[key] = val
+            @ValueChanges(key, oldVal, val, ...)
+
+    new: (filename, data, readIfExists = true) =>
         @SetFilename(filename)
         @valid = @isOpen
         @rawData = data
-        --if data
-    
+        @dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
+        if data
+            @SetupData(data)
+        elseif @exists and readIfExists
+            @ReadFromDisk()
+    SetupData: (data, doSave = false) =>
+        for key, value in pairs data
+            key = key\lower()
+            map = @@PONY_DATA_MAPPING[key]
+            continue unless map
+            @dataTable[key] = @@PONY_DATA[map].fix(value)
+    ValueChanges: (key, oldVal, newVal, saveNow = @exists) =>
     SetFilename: (filename) =>
         @filename = filename
+        @filenameFull = "#{filename}.txt"
+        @fpath = "#{@DATA_DIR}#{filename}.txt"
+        @fpathBackup = "#{@DATA_DIR}#{filename}.bak.txt"
+        @fpathFull = "data/#{@DATA_DIR}#{filename}.txt"
         @isOpen = @filename ~= nil
-        @exists = file.Exists("#{@DATA_DIR}#{filename}", 'DATA')
+        @exists = file.Exists(@fpath, 'DATA')
+        return @exists
     IsValid: => @valid
     Exists: => @exists
     FileExists: => @exists
     IsExists: => @exists
-
-    Serealize: =>
-
-
-    Save: =>
-        error('Create file first with Create()') unless @exists
-
+    GetFileName: => @filename
+    GetFileNameFull: => @filenameFull
+    GetFilePath: => @fpath
+    GetFullFilePath: => @fpathFull
+    Serealize: => util.TableToJSON(@dataTable)
+    ReadFromDisk: =>
+        return false unless @exists
+        fRead = file.Read(@fpath, 'DATA')
+        return false if not fRead or fRead == ''
+        readTable = util.JSONToTable(fRead)
+        return false unless readTable
+        @SetupData(readTable, false)
+        return true
+    Save: (doBackup = true) =>
+        if doBackup and @exists
+            fRead = file.Read(@fpath, 'DATA')
+            file.Write(@fpathBackup, fRead)
+        fCreate = @Serealize()
+        file.Write(@fpath, fCreate)
+        @exists = true
 
 PPM2.PonyDataInstance = PonyDataInstance
