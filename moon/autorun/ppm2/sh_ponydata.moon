@@ -105,6 +105,7 @@ PPM2.AGE_MATURE = 2
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
     @Setup()
+    @NetworkVar('Entity', net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
@@ -139,11 +140,20 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     for i = 1, PPM2.MAX_BODY_DETAILS
         @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
-    new: (ent = NULL) =>
+    new: (netID, ent) =>
+        if ent
+            @SetEntity(ent)
+            @SetupEntity(ent)
+        super(netID)
+    EntIndex: => @entID
+    SetupEntity: (ent) =>
+        return unless IsValid(ent)
         @ent = ent
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
-    EntIndex: => @entID
+    NetworkDataChanges: (state) =>
+        if state\GetKey() == 'Entity' and IsValid(@GetEntity())
+            @SetupEntity(@GetEntity())
     ApplyTextures: =>
         return if SERVER
         if @textureController
@@ -151,3 +161,4 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             return
         @textureController = PPM2.PonyTextureController(@ent, @)
 
+PPM2.NetworkedPonyData = NetworkedPonyData

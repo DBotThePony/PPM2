@@ -175,7 +175,7 @@ class NetworkedObject
 	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
 	
 	@ReadNetworkData = =>
-		output = {strName, readFunc() for {:strName, :readFunc} in *@NW_Vars}
+		output = {strName, {getName, readFunc()} for {:getName, :strName, :readFunc} in *@NW_Vars}
 		return output
 
 	new: (netID = @@NW_NextObjectID, localObject = false) =>
@@ -205,11 +205,11 @@ class NetworkedObject
 		@valid = false
 		if CLIENT and @isLocal and @NETWORKED and @@NW_ClientsideCreation
 			net.Start(@@NW_Remove)
-			net.WriteUInt(@netID)
+			net.WriteUInt(@netID, 16)
 			net.SendToServer()
 		elseif SERVER and @NETWORKED
 			net.Start(@@NW_Remove)
-			net.WriteUInt(@netID)
+			net.WriteUInt(@netID, 16)
 			if not IsValid(@NW_Player) or not byClient
 				net.Broadcast()
 			else
@@ -219,12 +219,12 @@ class NetworkedObject
 	SetLocalChange: (key, oldVal, newVal) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
 		data = @@ReadNetworkData()
-		states = [NetworkChangeState(key, newVal, @, len, ply) for key, newVal in pairs data]
+		states = [NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
 		for state in *states
 			state\Apply()
 			@NetworkDataChanges(state) unless silent
 	
-	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@NW_Vars
+	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
 
 	SendVar: (Var = '') =>
 		return if @[Var] == nil
@@ -235,7 +235,7 @@ class NetworkedObject
 		@NETWORKED = true
 		if SERVER
 			net.Start(@@NW_Create)
-			net.WriteUInt(@netID)
+			net.WriteUInt(@netID, 16)
 			@WriteNetworkData()
 			if not IsValid(@NW_Player)
 				net.Broadcast()
