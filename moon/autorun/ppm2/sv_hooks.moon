@@ -16,9 +16,12 @@
 --
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
-    return if @GetPonyData()
     timer.Simple 0.5, ->
         return unless @IsValid()
         return unless @IsPony()
+        if @GetPonyData()
+            @GetPonyData()\ApplyBodygroups()
+            return
+        
         net.Start('PPM2.RequestPonyData')
         net.Send(@)

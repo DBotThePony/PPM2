@@ -197,19 +197,43 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
+    
     UpdateTextureController: (key) =>
         return if SERVER
         textureController = @GetTextureController()
         switch key
             when 'BodyColor'
                 textureController\CompileBody()
-        if @@MANE_UPDATE_TRIGGER[key]
-            textureController\CompileHair()
-        if @@TAIL_UPDATE_TRIGGER[key]
-            textureController\CompileTail()
-        if @@EYE_UPDATE_TRIGGER[key]
-            textureController\CompileEye(true)
-            textureController\CompileEye(false)
+                textureController\CompileWings()
+                textureController\CompileHorn()
+            else
+                if @@MANE_UPDATE_TRIGGER[key]
+                    textureController\CompileHair()
+                elseif @@TAIL_UPDATE_TRIGGER[key]
+                    textureController\CompileTail()
+                elseif @@EYE_UPDATE_TRIGGER[key]
+                    textureController\CompileEye(true)
+                    textureController\CompileEye(false)
+    
+    ApplyBodygroups: =>
+        @ent\SetBodygroup(PPM2.BODYGROUP_MANE_UPPER, @GetManeType())
+        @ent\SetBodygroup(PPM2.BODYGROUP_MANE_LOWER, @GetManeTypeLower())
+        @ent\SetBodygroup(PPM2.BODYGROUP_TAIL, @GetTailType())
+        @ent\SetBodygroup(PPM2.BODYGROUP_EYELASH, @GetEyelashType())
+        @ent\SetBodygroup(PPM2.BODYGROUP_GENDER, @GetGender())
+        switch @GetRace()
+            when PPM2.RACE_EARTH
+                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
+                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
+            when PPM2.RACE_PEGASUS
+                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
+                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
+            when PPM2.RACE_UNICORN
+                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
+                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
+            when PPM2.RACE_ALICORN
+                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
+                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
     GenericDataChange: (state) =>
         switch state\GetKey()
             when 'ManeType'
@@ -218,6 +242,24 @@ class NetworkedPonyData extends PPM2.NetworkedObject
                 @ent\SetBodygroup(PPM2.BODYGROUP_MANE_LOWER, @GetManeTypeLower())
             when 'TailType'
                 @ent\SetBodygroup(PPM2.BODYGROUP_TAIL, @GetTailType())
+            when 'EyelashType'
+                @ent\SetBodygroup(PPM2.BODYGROUP_EYELASH, @GetEyelashType())
+            when 'Gender'
+                @ent\SetBodygroup(PPM2.BODYGROUP_GENDER, @GetGender())
+            when 'Race'
+                switch @GetRace()
+                    when PPM2.RACE_EARTH
+                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
+                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
+                    when PPM2.RACE_PEGASUS
+                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
+                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
+                    when PPM2.RACE_UNICORN
+                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
+                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
+                    when PPM2.RACE_ALICORN
+                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
+                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
     SetLocalChange: (state) =>
         if CLIENT
             @UpdateTextureController(state\GetKey())
