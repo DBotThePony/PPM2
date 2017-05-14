@@ -128,9 +128,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
 
     for i = 1, 6
+        @NetworkVar("ManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("TailColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+
+        -- Reserved - they can be accessed/used/changed, but they do not do anything
         @NetworkVar("LowerManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        -----
     
     @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
     @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)

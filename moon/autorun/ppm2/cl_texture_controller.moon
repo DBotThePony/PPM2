@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
--- Texture indexes
+-- Texture indexes (-1)
 -- 1    =   models/ppm/base/eye_l
 -- 2    =   models/ppm/base/eye_r
 -- 3    =   models/ppm/base/body
@@ -52,18 +52,35 @@ PPM2.ApplyMaterialData = (mat, matData) ->
                 mat\SetFloat(k, v) if math.floor(v) ~= v
 
 class PonyTextureController
+    @MAT_INDEX_EYE_LEFT = 0
+    @MAT_INDEX_EYE_RIGHT = 1
+    @MAT_INDEX_BODY = 2
+    @MAT_INDEX_HORN = 3
+    @MAT_INDEX_WINGS = 4
+    @MAT_INDEX_HAIR_COLOR1 = 5
+    @MAT_INDEX_HAIR_COLOR2 = 6
+    @MAT_INDEX_TAIL_COLOR1 = 7
+    @MAT_INDEX_TAIL_COLOR2 = 8
+    @MAT_INDEX_CMARK = 9
+    @MAT_INDEX_EYELASHES = 10
+
     @BODY_TEX_ID_FEMALE = surface.GetTextureID('models/ppm/base/body')
     @BODY_TEX_ID_MALE = surface.GetTextureID('models/ppm/base/bodym')
 
     @BODY_MATERIAL_MALE = Material('models/ppm/base/render/bodym')
     @BODY_MATERIAL_FEMALE = Material('models/ppm/base/render/bodyf')
 
-    new: (ent = NULL, data, compile = true, apply = true) =>
+    @NEXT_GENERATED_ID = 10000
+
+    new: (ent = NULL, data, compile = true) =>
         @ent = ent
         @networkedData = data
         @id = ent\EntIndex()
+        if @id == -1
+            @id = @@NEXT_GENERATED_ID
+            @@NEXT_GENERATED_ID += 1
+        @compiled = false
         @CompileTextures() if compile
-        @ApplyTextures() if compile and apply
     GetBody: =>
         if @networkedData\GetGender() == PPM2.GENDER_FEMALE
             return @FemaleMaterial
@@ -71,8 +88,15 @@ class PonyTextureController
             return @MaleMaterial
     CompileTextures: =>
         @CompileBody()
-    ApplyTextures: =>
-        @ent\SetSubMaterial(3, "!#{@GetBody()\GetName()}")
+        @compiled = true
+    
+    PreDraw: =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, mat)
+    
+    PostDraw: =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
     
     @QUAD_POS_CONST = Vector(0, 0, 0)
     @QUAD_FACE_CONST = Vector(0, 0, -1)
