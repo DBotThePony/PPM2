@@ -251,12 +251,13 @@ class PonyDataInstance
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
 
-    for key, {:getFunc} in pairs @PONY_DATA
+    for key, {:getFunc, :fix} in pairs @PONY_DATA
         @__base["Get#{getFunc}"] = => @dataTable[key]
 		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
+            newVal = fix(val)
 			oldVal = @dataTable[key]
-			@dataTable[key] = val
-            @ValueChanges(key, oldVal, val, ...)
+			@dataTable[key] = newVal
+            @ValueChanges(key, oldVal, newVal, ...)
 
     new: (filename, data, readIfExists = true) =>
         @SetFilename(filename)
@@ -274,6 +275,10 @@ class PonyDataInstance
             continue unless map
             @dataTable[key] = @@PONY_DATA[map].fix(value)
     ValueChanges: (key, oldVal, newVal, saveNow = @exists) =>
+        if @nwObj
+            {:getFunc} = @@PONY_DATA[key]
+            @nwObj["Set#{getFunc}"](@nwObj, newVal)
+        @Save() if saveNow
     SetFilename: (filename) =>
         @filename = filename
         @filenameFull = "#{filename}.txt"
@@ -283,6 +288,7 @@ class PonyDataInstance
         @isOpen = @filename ~= nil
         @exists = file.Exists(@fpath, 'DATA')
         return @exists
+    SetNetworkData: (nwObj) => @nwObj = nwObj
     IsValid: => @valid
     Exists: => @exists
     FileExists: => @exists

@@ -155,9 +155,21 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent = ent
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
+    UpdateTextureController: (key) =>
+        return if SERVER
+        textureController = @GetTextureController()
+        switch key
+            when 'BodyColor'
+                textureController\CompileBody()
+    SetLocalChange: (key) =>
+        if CLIENT
+            @UpdateTextureController(key)
     NetworkDataChanges: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
+        
+        if CLIENT
+            @UpdateTextureController(state\GetKey())
     GetTextureController: =>
         return if SERVER
         @textureController = PPM2.PonyTextureController(@ent, @) if not @textureController

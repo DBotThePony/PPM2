@@ -22,3 +22,4 @@ net.Receive 'PPM2.RequestPonyData', ->
     for key, value in pairs instance\GetAsNetworked()
         newData["Set#{key}"](newData, value)
     newData\Create()
+    instance\SetNetworkData(newData)
