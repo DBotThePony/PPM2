@@ -92,7 +92,7 @@ class PonyTextureController
     
     PreDraw: =>
         return unless @compiled
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, mat)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
     
     PostDraw: =>
         return unless @compiled
@@ -158,6 +158,7 @@ class PonyTextureController
 
         @MaleMaterial = CreateMaterial(textureMale.name, textureMale.shader, textureMale.data)
         @FemaleMaterial = CreateMaterial(textureFemale.name, textureFemale.shader, textureFemale.data)
+
         {:r, :g, :b} = @networkedData\GetBodyColor()
         oldW, oldH = ScrW(), ScrH()
 

@@ -121,7 +121,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('EyeBackground',    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('EyeHole',          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
-    @NetworkVar('EyeIris',          net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
+    @NetworkVar('EyeIris1',         net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
     @NetworkVar('EyeIris2',         net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
     @NetworkVar('EyeIrisLine1',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('EyeIrisLine2',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
@@ -158,11 +158,16 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     NetworkDataChanges: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
-    ApplyTextures: =>
+    GetTextureController: =>
         return if SERVER
-        if @textureController
-            @textureController\ApplyTextures()
-            return
-        @textureController = PPM2.PonyTextureController(@ent, @)
+        @textureController = PPM2.PonyTextureController(@ent, @) if not @textureController
+        return @textureController
 
 PPM2.NetworkedPonyData = NetworkedPonyData
+
+entMeta = FindMetaTable('Entity')
+entMeta.GetPonyData = =>
+    if @__PPM2_PonyData and @__PPM2_PonyData\GetEntity() ~= @
+        @__PPM2_PonyData\SetEntity(@)
+        @__PPM2_PonyData\SetupEntity(@) if CLIENT
+    return @__PPM2_PonyData

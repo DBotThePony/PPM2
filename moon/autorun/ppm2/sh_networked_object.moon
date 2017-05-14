@@ -137,7 +137,7 @@ class NetworkedObject
 			obj\Create()
 			net.Start(@NW_ReceiveID)
 			net.WriteUInt(waitID, 16)
-			net.WriteUInt(obj.netID)
+			net.WriteUInt(obj.netID, 16)
 			net.Send(ply)
 			@OnNetworkedCreatedCallback(obj, ply, len)
 	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
@@ -242,11 +242,11 @@ class NetworkedObject
 			else
 				net.SendOmit(@NW_Player)
 		else
-			@NW_WaitID += 1
+			@@NW_WaitID += 1
 			net.Start(@@NW_Create)
-			net.WriteUInt(@NW_WaitID, 16)
+			net.WriteUInt(@@NW_WaitID, 16)
 			@WriteNetworkData()
 			net.SendToServer()
-			@@NW_Waiting[@NW_WaitID] = @
+			@@NW_Waiting[@@NW_WaitID] = @
 
 PPM2.NetworkedObject = NetworkedObject

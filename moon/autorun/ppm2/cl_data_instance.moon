@@ -74,7 +74,7 @@ class PonyDataInstance
 
         'eye_iris_size': {
             default: (-> 1)
-            getFunc: 'EyeIrisSize'
+            getFunc: 'IrisSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
         }
 
@@ -190,6 +190,20 @@ class PonyDataInstance
     }
 
     for i = 1, 6
+        @PONY_DATA["mane_color_#{i}"] = {
+            default: (-> Color(255, 255, 255))
+            getFunc: "ManeColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
         @PONY_DATA["tail_color_#{i}"] = {
             default: (-> Color(255, 255, 255))
             getFunc: "TailColor#{i}"
@@ -204,6 +218,7 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        -- Reserved - they can be accessed/used/changed, but they do not do anything
         @PONY_DATA["lower_mane_color_#{i}"] = {
             default: (-> Color(255, 255, 255))
             getFunc: "LowerManeColor#{i}"
@@ -231,6 +246,7 @@ class PonyDataInstance
                     else
                         return Color(255, 255, 255)
         }
+        ------
     
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
@@ -261,9 +277,9 @@ class PonyDataInstance
     SetFilename: (filename) =>
         @filename = filename
         @filenameFull = "#{filename}.txt"
-        @fpath = "#{@DATA_DIR}#{filename}.txt"
-        @fpathBackup = "#{@DATA_DIR}#{filename}.bak.txt"
-        @fpathFull = "data/#{@DATA_DIR}#{filename}.txt"
+        @fpath = "#{@@DATA_DIR}#{filename}.txt"
+        @fpathBackup = "#{@@DATA_DIR}#{filename}.bak.txt"
+        @fpathFull = "data/#{@@DATA_DIR}#{filename}.txt"
         @isOpen = @filename ~= nil
         @exists = file.Exists(@fpath, 'DATA')
         return @exists
@@ -275,7 +291,8 @@ class PonyDataInstance
     GetFileNameFull: => @filenameFull
     GetFilePath: => @fpath
     GetFullFilePath: => @fpathFull
-    Serealize: => util.TableToJSON(@dataTable)
+    Serealize: (prettyPrint = true) => util.TableToJSON(@dataTable, prettyPrint)
+    GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
     ReadFromDisk: =>
         return false unless @exists
         fRead = file.Read(@fpath, 'DATA')
@@ -293,3 +310,11 @@ class PonyDataInstance
         @exists = true
 
 PPM2.PonyDataInstance = PonyDataInstance
+
+PPM2.MainDataInstance = nil
+PPM2.GetMainData = ->
+    if not PPM2.MainDataInstance
+        PPM2.MainDataInstance = PonyDataInstance('_current')
+        if not PPM2.MainDataInstance\FileExists()
+            PPM2.MainDataInstance\Save()
+    return PPM2.MainDataInstance
