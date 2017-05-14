@@ -161,9 +161,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         switch key
             when 'BodyColor'
                 textureController\CompileBody()
-    SetLocalChange: (key) =>
+    SetLocalChange: (state) =>
         if CLIENT
-            @UpdateTextureController(key)
+            @UpdateTextureController(state\GetKey())
     NetworkDataChanges: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())

@@ -29,9 +29,11 @@ class NetworkChangeState
 		@objID = obj.netID
 		@len = len
 		@rlen = len - 24 -- ID - 16 bits, variable id - 8 bits
+		@networkChange = true
 	GetPlayer: => @ply
-	ChangedByClient: => IsValid(@ply)
-	ChangedByPlayer: => IsValid(@ply)
+	ChangedByClient: => not @networkChange or IsValid(@ply)
+	ChangedByPlayer: => not @networkChange or IsValid(@ply)
+	ChangedByServer: => not @networkChange or not IsValid(@ply)
 	GetKey: => @keyValid
 	GetVariable: => @keyValid
 	GetVar: => @keyValid
@@ -55,6 +57,7 @@ class NetworkChangeState
 	GetNetworkedObject: => @obj
 	GetLength: => @rlen
 	GetRealLength: => @len
+	ChangedByNetwork: => @networkChange
 
 	Revert: => @obj[@key] = @oldValue
 	Apply: => @obj[@key] = @newValue
@@ -106,7 +109,9 @@ class NetworkedObject
 		@__base["Set#{getName}"] = (val = defValue, networkNow = true) =>
 			oldVal = @[strName]
 			@[strName] = val
-			@SetLocalChange(getName, oldVal, val)
+			state = NetworkChangeState(strName, getName, newVal, @)
+			state.networkChange = false
+			@SetLocalChange(state)
 			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation or SERVER)
 				net.Start(@@NW_Modify)
 				net.WriteUInt(@GetNetworkID(), 16)
@@ -216,7 +221,7 @@ class NetworkedObject
 				net.SendOmit(@NW_Player)
 	
 	NetworkDataChanges: (state) => -- Override
-	SetLocalChange: (key, oldVal, newVal) => -- Override
+	SetLocalChange: (state) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
 		data = @@ReadNetworkData()
 		states = [NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
