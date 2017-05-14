@@ -144,4 +144,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
     EntIndex: => @entID
+    ApplyTextures: =>
+        return if SERVER
+        if @textureController
+            @textureController\ApplyTextures()
+            return
+        @textureController = PPM2.PonyTextureController(@ent, @)
 

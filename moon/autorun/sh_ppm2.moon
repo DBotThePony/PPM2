@@ -17,6 +17,11 @@
 
 export PPM2
 
+player_manager.AddValidModel('ppm2_pony', 'models/ppm/player_default_base.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_pony', 'models/ppm/player_default_base.mdl')
+player_manager.AddValidModel('ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
+
 PPM2 = PPM2 or {}
 
 include 'autorun/ppm2/sh_networked_object.lua'
@@ -24,7 +29,9 @@ include 'autorun/ppm2/sh_ponydata.lua'
 
 if CLIENT
 	include 'autorun/ppm2/cl_data_instance.lua'
+	include 'autorun/ppm2/cl_texture_controller.lua'
 else
 	AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
 	AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
 	AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
+	AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
