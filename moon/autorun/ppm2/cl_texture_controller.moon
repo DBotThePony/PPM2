@@ -79,10 +79,6 @@ class PonyTextureController
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
         render.PushRenderTarget(rt)
-        render.OverrideAlphaWriteEnable(true, true)
-        render.SuppressEngineLighting(true)
-        render.ResetModelLighting(1, 1, 1)
-        cam.IgnoreZ(true)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         render.Clear(r, g, b, 255, true, true)
@@ -102,8 +98,6 @@ class PonyTextureController
             surface.DrawTexturedRect(0, 0, 512, 512)
 
         cam.End2D()
-        render.SuppressEngineLighting(false)
-        cam.IgnoreZ(false)
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         return rt
