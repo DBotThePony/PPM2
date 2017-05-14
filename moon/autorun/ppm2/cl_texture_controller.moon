@@ -298,7 +298,7 @@ class PonyTextureController
 
         @HornMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @HornMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-        @HornMaterial\SetVector('$alpha', Vector(1, 1, 1))
+        @HornMaterial\SetFloat('$alpha', 1)
 
         return @HornMaterial
     CompileWings: =>
@@ -327,7 +327,7 @@ class PonyTextureController
 
         @WingsMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @WingsMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-        @WingsMaterial\SetVector('$alpha', Vector(1, 1, 1))
+        @WingsMaterial\SetFloat('$alpha', 1)
 
         return @WingsMaterial
     CompileHair: =>
