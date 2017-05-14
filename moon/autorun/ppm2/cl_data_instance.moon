@@ -120,7 +120,7 @@ class PonyDataInstance
 
         'eye_iris1': {
             default: (-> Color(200, 200, 200))
-            getFunc: 'EyeIris1'
+            getFunc: 'EyeIrisTop'
             fix: (arg = Color(200, 200, 200)) ->
                 if type(arg) ~= 'table'
                     return Color(200, 200, 200)
@@ -134,7 +134,7 @@ class PonyDataInstance
 
         'eye_iris2': {
             default: (-> Color(200, 200, 200))
-            getFunc: 'EyeIris2'
+            getFunc: 'EyeIrisBottom'
             fix: (arg = Color(200, 200, 200)) ->
                 if type(arg) ~= 'table'
                     return Color(200, 200, 200)

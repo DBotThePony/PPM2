@@ -449,9 +449,9 @@ class PonyTextureController
         EyeBackground = @networkedData\GetEyeBackground()
         EyeHole = @networkedData\GetEyeHole()
         HoleWidth = @networkedData\GetHoleWidth()
-        IrisSize = @networkedData\GetIrisSize() * .7
-        EyeIris1 = @networkedData\GetEyeIris1()
-        EyeIris2 = @networkedData\GetEyeIris2()
+        IrisSize = @networkedData\GetIrisSize() * .75
+        EyeIris1 = @networkedData\GetEyeIrisTop()
+        EyeIris2 = @networkedData\GetEyeIrisBottom()
         EyeIrisLine1 = @networkedData\GetEyeIrisLine1()
         EyeIrisLine2 = @networkedData\GetEyeIrisLine2()
         EyeLines = @networkedData\GetEyeLines()
