@@ -29,7 +29,6 @@
 -- 11   =   models/ppm/base/eyelashes
 
 PPM2.BodyDetailsMaterials = {
-    nil
     Material('models/ppm/partrender/body_leggrad1.png')
     Material('models/ppm/partrender/body_lines1.png')
     Material('models/ppm/partrender/body_stripes1.png')
@@ -56,8 +55,8 @@ class PonyTextureController
     @BODY_TEX_ID_FEMALE = surface.GetTextureID('models/ppm/base/body')
     @BODY_TEX_ID_MALE = surface.GetTextureID('models/ppm/base/bodym')
 
-    @BODY_MATERIAL_MALE = Material('models/ppm/base/bodym')
-    @BODY_MATERIAL_FEMALE = Material('models/ppm/base/bodyf')
+    @BODY_MATERIAL_MALE = Material('models/ppm/base/render/bodym')
+    @BODY_MATERIAL_FEMALE = Material('models/ppm/base/render/bodyf')
 
     new: (ent = NULL, data, compile = true, apply = true) =>
         @ent = ent
@@ -75,10 +74,10 @@ class PonyTextureController
     ApplyTextures: =>
         @ent\SetSubMaterial(3, "!#{@GetBody()\GetName()}")
     
-    @QUAD_POS_CONST = Vector(256, 256, 0)
+    @QUAD_POS_CONST = Vector(0, 0, 0)
     @QUAD_FACE_CONST = Vector(0, 0, -1)
     @QUAD_SIZE_CONST = 512
-    __compileBodyInternal: (rt, oldW, oldH, r, g, b, texID) =>
+    __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
         render.PushRenderTarget(rt)
         render.OverrideAlphaWriteEnable(true, true)
         render.SuppressEngineLighting(true)
@@ -89,15 +88,15 @@ class PonyTextureController
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
-        surface.SetTexture(texID)
-        surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        render.DrawQuadEasy(@@QUAD_POS_CONST, @@QUAD_FACE_CONST, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, Color(r, g, b), -90) 
+        surface.SetMaterial(bodyMat)
+        surface.DrawTexturedRect(0, 0, 512, 512)
 
         for i = 1, PPM2.MAX_BODY_DETAILS
             detailID = @networkedData["GetBodyDetail#{i}"](@networkedData)
-            detailID += 1
             mat = PPM2.BodyDetailsMaterials[detailID]
+            print mat, detailID
             continue if not mat
             surface.SetMaterial(mat)
             surface.DrawTexturedRect(0, 0, 512, 512)
@@ -110,21 +109,19 @@ class PonyTextureController
         return rt
     CompileBody: =>
         textureMale = {
-            'name': "PPM2.#{@id}.Body.m"
-            'shader': 'UnlitGeneric'
+            'name': "PPM2.#{@id}.Body.vmale10"
+            'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
 
-                '$ignorez': 1
-                '$vertexcolor': 1
-                '$vertexalpha': 1
-                '$nolod': 1
+                '$color': '{255 255 255}'
+                '$color2': '{255 255 255}'
             }
         }
 
         textureFemale = {
-            'name': "PPM2.#{@id}.Body.f"
-            'shader': 'UnlitGeneric'
+            'name': "PPM2.#{@id}.Body.vfemale10"
+            'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureMale.data}
         }
 
@@ -133,16 +130,16 @@ class PonyTextureController
         @MaleMaterial = CreateMaterial(textureMale.name, textureMale.shader, textureMale.data)
         @FemaleMaterial = CreateMaterial(textureFemale.name, textureFemale.shader, textureFemale.data)
 
-        PPM2.ApplyMaterialData(@MaleMaterial, textureMale.data)
-        PPM2.ApplyMaterialData(@FemaleMaterial, textureFemale.data)
+        --PPM2.ApplyMaterialData(@MaleMaterial, textureMale.data)
+        --PPM2.ApplyMaterialData(@FemaleMaterial, textureFemale.data)
 
         {:r, :g, :b} = @networkedData\GetBodyColor()
         oldW, oldH = ScrW(), ScrH()
 
-        Target = GetRenderTarget("#{textureMale.name}_RenderTargetMale", 512, 512, false)
-        @BodyTextureMale = @__compileBodyInternal(Target, oldW, oldH, r, g, b, @@BODY_TEX_ID_MALE)
-        Target = GetRenderTarget("#{textureFemale.name}_RenderTargetFemale", 512, 512, false)
-        @BodyTextureFemale = @__compileBodyInternal(Target, oldW, oldH, r, g, b, @@BODY_TEX_ID_FEMALE)
+        Target = GetRenderTarget("#{textureMale.name}_RenderTargetMale", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        @BodyTextureMale = @__compileBodyInternal(Target, oldW, oldH, r, g, b, @@BODY_MATERIAL_MALE)
+        Target = GetRenderTarget("#{textureFemale.name}_RenderTargetFemale", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        @BodyTextureFemale = @__compileBodyInternal(Target, oldW, oldH, r, g, b, @@BODY_MATERIAL_FEMALE)
 
         @MaleMaterial\SetTexture('$basetexture', @BodyTextureMale)
         @FemaleMaterial\SetTexture('$basetexture', @BodyTextureFemale)
