@@ -19,8 +19,15 @@ export PPM2
 
 player_manager.AddValidModel('ppm2_pony', 'models/ppm/player_default_base.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_pony', 'models/ppm/player_default_base.mdl')
+
+player_manager.AddValidModel('ppm2_pony_cppm', 'models/cppm/player_default_base.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_pony_cppm', 'models/cppm/player_default_base.mdl')
+
 player_manager.AddValidModel('ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
+
+player_manager.AddValidModel('ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 
 PPM2 = PPM2 or {}
 
@@ -31,12 +38,18 @@ entMeta.IsPony = =>
             return true
         when 'models/ppm/player_default_base_nj.mdl'
             return true
+        when 'models/cppm/player_default_base.mdl'
+            return true
+        when 'models/cppm/player_default_base_nj.mdl'
+            return true
         else
             return false
 entMeta.HasPonyModel = entMeta.IsPony
 
 include 'autorun/ppm2/sh_networked_object.lua'
 include 'autorun/ppm2/sh_ponydata.lua'
+include 'autorun/ppm2/sh_hooks.lua'
+include 'autorun/ppm2/sh_bodygroup_controller.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
@@ -47,6 +60,8 @@ if CLIENT
 else
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
+    AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
+    AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
     AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_draw.lua'

@@ -105,16 +105,6 @@ PPM2.AGE_FILLY = 0
 PPM2.AGE_ADULT = 1
 PPM2.AGE_MATURE = 2
 
-PPM2.BODYGROUP_SKELETON = 0
-PPM2.BODYGROUP_GENDER = 1
-PPM2.BODYGROUP_HORN = 2
-PPM2.BODYGROUP_WINGS = 3
-PPM2.BODYGROUP_MANE_UPPER = 4
-PPM2.BODYGROUP_MANE_LOWER = 5
-PPM2.BODYGROUP_TAIL = 6
-PPM2.BODYGROUP_CMARK = 7
-PPM2.BODYGROUP_EYELASH = 8
-
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
 
@@ -164,15 +154,18 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     new: (netID, ent) =>
         if ent
+            @modelCached = ent\GetModel()
             @SetEntity(ent)
             @SetupEntity(ent)
         super(netID)
     EntIndex: => @entID
     SetupEntity: (ent) =>
         return unless IsValid(ent)
+        @modelCached = ent\GetModel()
         @ent = ent
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
+        @ModelChanges(@modelCached, @modelCached)
     
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
@@ -214,52 +207,21 @@ class NetworkedPonyData extends PPM2.NetworkedObject
                 elseif @@EYE_UPDATE_TRIGGER[key]
                     textureController\CompileEye(true)
                     textureController\CompileEye(false)
-    
-    ApplyBodygroups: =>
-        @ent\SetBodygroup(PPM2.BODYGROUP_MANE_UPPER, @GetManeType())
-        @ent\SetBodygroup(PPM2.BODYGROUP_MANE_LOWER, @GetManeTypeLower())
-        @ent\SetBodygroup(PPM2.BODYGROUP_TAIL, @GetTailType())
-        @ent\SetBodygroup(PPM2.BODYGROUP_EYELASH, @GetEyelashType())
-        @ent\SetBodygroup(PPM2.BODYGROUP_GENDER, @GetGender())
-        switch @GetRace()
-            when PPM2.RACE_EARTH
-                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
-                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
-            when PPM2.RACE_PEGASUS
-                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
-                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
-            when PPM2.RACE_UNICORN
-                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
-                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
-            when PPM2.RACE_ALICORN
-                @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
-                @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
+    GetBodygroupController: =>
+        if not @bodygroups
+            @modelCached = @modelCached or @ent\GetModel()
+            cls = PPM2.GetBodugroupController(@modelCached)
+            @bodygroups = cls(@)
+        @bodygroups.ent = @ent
+        return @bodygroups
+    ModelChanges: (old = @ent\GetModel(), new = old) =>
+        @modelCached = new
+        @bodygroups = nil
+        timer.Simple 0.5, -> @GetBodygroupController()\ApplyBodygroups() if IsValid(@ent)
     GenericDataChange: (state) =>
-        switch state\GetKey()
-            when 'ManeType'
-                @ent\SetBodygroup(PPM2.BODYGROUP_MANE_UPPER, @GetManeType())
-            when 'ManeTypeLower'
-                @ent\SetBodygroup(PPM2.BODYGROUP_MANE_LOWER, @GetManeTypeLower())
-            when 'TailType'
-                @ent\SetBodygroup(PPM2.BODYGROUP_TAIL, @GetTailType())
-            when 'EyelashType'
-                @ent\SetBodygroup(PPM2.BODYGROUP_EYELASH, @GetEyelashType())
-            when 'Gender'
-                @ent\SetBodygroup(PPM2.BODYGROUP_GENDER, @GetGender())
-            when 'Race'
-                switch @GetRace()
-                    when PPM2.RACE_EARTH
-                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
-                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
-                    when PPM2.RACE_PEGASUS
-                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 1)
-                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
-                    when PPM2.RACE_UNICORN
-                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
-                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 1)
-                    when PPM2.RACE_ALICORN
-                        @ent\SetBodygroup(PPM2.BODYGROUP_HORN, 0)
-                        @ent\SetBodygroup(PPM2.BODYGROUP_WINGS, 0)
+        @GetBodygroupController()\StateChange(state) if @ent
+    ApplyBodygroups: =>
+        @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) =>
         if CLIENT
             @UpdateTextureController(state\GetKey())
