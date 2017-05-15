@@ -29,14 +29,14 @@ class PonyDataInstance
         'race': {
             default: (-> PPM2.RACE_EARTH)
             getFunc: 'Race'
-            enum: {'EARTH', 'PEGASUS', 'UNICORN', 'ALICORN'}
+            enum: [tp for tp in *PPM2.RACE_ENUMS]
             fix: (arg = PPM2.RACE_EARTH) -> math.Clamp(tonumber(arg) or PPM2.RACE_EARTH, 0, 3)
         }
 
         'gender': {
             default: (-> PPM2.GENDER_FEMALE)
             getFunc: 'Gender'
-            enum: {'FEMALE', 'MALE'}
+            enum: [tp for tp in *PPM2.AGE_ENUMS]
             fix: (arg = PPM2.GENDER_FEMALE) -> math.Clamp(tonumber(arg) or PPM2.GENDER_FEMALE, 0, 1)
         }
 
