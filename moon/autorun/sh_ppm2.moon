@@ -53,6 +53,7 @@ include 'autorun/ppm2/sh_bodygroup_controller.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
+    file.CreateDir('ppm2/backups')
     include 'autorun/ppm2/cl_data_instance.lua'
     include 'autorun/ppm2/cl_texture_controller.lua'
     include 'autorun/ppm2/cl_draw.lua'

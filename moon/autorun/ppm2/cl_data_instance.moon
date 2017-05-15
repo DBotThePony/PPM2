@@ -17,22 +17,26 @@
 
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
+    @DATA_DIR_BACKUP = "ppm2/backup/"
     @PONY_DATA = {
         'age': {
             default: (-> PPM2.AGE_ADULT)
             getFunc: 'Age'
+            enum: {'FILLY', 'ADULT', 'MATURE'}
             fix: (arg = PPM2.AGE_ADULT) -> math.Clamp(tonumber(arg) or PPM2.AGE_ADULT, 0, 2)
         }
         
         'race': {
             default: (-> PPM2.RACE_EARTH)
             getFunc: 'Race'
+            enum: {'EARTH', 'PEGASUS', 'UNICORN', 'ALICORN'}
             fix: (arg = PPM2.RACE_EARTH) -> math.Clamp(tonumber(arg) or PPM2.RACE_EARTH, 0, 3)
         }
 
         'gender': {
             default: (-> PPM2.GENDER_FEMALE)
             getFunc: 'Gender'
+            enum: {'FEMALE', 'MALE'}
             fix: (arg = PPM2.GENDER_FEMALE) -> math.Clamp(tonumber(arg) or PPM2.GENDER_FEMALE, 0, 1)
         }
 
@@ -45,24 +49,28 @@ class PonyDataInstance
         'eyelash': {
             default: (-> 0)
             getFunc: 'EyelashType'
+            enum: [tp\upper() for tp in *PPM2.EyelashTypes]
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)
         }
         
         'tail': {
             default: (-> 0)
             getFunc: 'TailType'
+            enum: [tp for tp in *PPM2.AvaliableTails] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS, PPM2.MAX_TAILS)
         }
 
         'mane': {
             default: (-> 0)
             getFunc: 'ManeType'
+            enum: [tp for tp in *PPM2.AvaliableUpperManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)
         }
 
         'manelower': {
             default: (-> 0)
             getFunc: 'ManeTypeLower'
+            enum: [tp for tp in *PPM2.AvaliableLowerManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)
         }
 
@@ -285,15 +293,31 @@ class PonyDataInstance
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
 
-    for key, {:getFunc, :fix} in pairs @PONY_DATA
+    for key, data in pairs @PONY_DATA
+        continue unless data.enum
+        data.enum = [en\upper() for en in *data.enum]
+        data.enumMapping = {}
+        data.enumMappingBackward = {}
+        i = -1
+        for enumVal in *data.enum
+            i += 1
+            data.enumMapping[i] = enumVal
+            data.enumMappingBackward[enumVal] = i
+    for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping} in pairs @PONY_DATA
         @__base["Get#{getFunc}"] = => @dataTable[key]
+        if enumMapping
+            @__base["Get#{getFunc}Enum"] = => enumMapping[@dataTable[key]] or enumMapping[0] or @dataTable[key]
+            @__base["GetEnum#{getFunc}"] = @__base["Get#{getFunc}Enum"]
 		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
+            if type(val) == 'string' and enumMappingBackward
+                newVal = enumMappingBackward[val\upper()]
+                val = newVal if newVal
             newVal = fix(val)
 			oldVal = @dataTable[key]
 			@dataTable[key] = newVal
             @ValueChanges(key, oldVal, newVal, ...)
 
-    new: (filename, data, readIfExists = true) =>
+    new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
         @SetFilename(filename)
         @valid = @isOpen
         @rawData = data
@@ -301,13 +325,40 @@ class PonyDataInstance
         if data
             @SetupData(data)
         elseif @exists and readIfExists
-            @ReadFromDisk()
-    SetupData: (data, doSave = false) =>
+            @ReadFromDisk(force, doBackup)
+    
+    @ERR_MISSING_PARAMETER = 4
+    @ERR_MISSING_CONTENT = 5
+    SetupData: (data, doSave = false, force = false, doBackup = true) =>
+        if doBackup or not force
+            makeBackup = false
+            for key, value in pairs data
+                key = key\lower()
+                map = @@PONY_DATA_MAPPING[key]
+                if not map
+                    return @@ERR_MISSING_PARAMETER if not force
+                    makeBackup = true
+                    break
+                mapData = @@PONY_DATA[map]
+                if mapData.enum
+                    if type(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or type(value) == 'number' and not mapData.enumMapping[value]
+                        return @@ERR_MISSING_CONTENT if not force
+                        makeBackup = true
+                        break
+            if doBackup and makeBackup and @exists
+                bkName = "#{@@DATA_DIR_BACKUP}#{filename}_bak_#{os.date('%S_%M_%H.%d.%m.%Y', os.time())}.txt"
+                fRead = file.Read(@fpath, 'DATA')
+                file.Write(@fpathBackup, fRead)
+        
         for key, value in pairs data
             key = key\lower()
             map = @@PONY_DATA_MAPPING[key]
             continue unless map
-            @dataTable[key] = @@PONY_DATA[map].fix(value)
+            mapData = @@PONY_DATA[map]
+            if mapData.enum and type(value) == 'string'
+                @dataTable[key] = mapData.fix(mapData.enumMappingBackward[value\upper()])
+            else
+                @dataTable[key] = mapData.fix(value)
     ValueChanges: (key, oldVal, newVal, saveNow = @exists) =>
         if @nwObj
             {:getFunc} = @@PONY_DATA[key]
@@ -331,16 +382,33 @@ class PonyDataInstance
     GetFileNameFull: => @filenameFull
     GetFilePath: => @fpath
     GetFullFilePath: => @fpathFull
-    Serealize: (prettyPrint = true) => util.TableToJSON(@dataTable, prettyPrint)
+    SerealizeValue: (valID = '') =>
+        map = @@PONY_DATA[valID]
+        return unless map
+        val = @dataTable[valID]
+        if map.enum
+            return map.enumMapping[val] or map.enumMapping[map.default()]
+        elseif map.serealize
+            return map.serealize(val)
+        else
+            return val
+    Serealize: (prettyPrint = true) =>
+        serTab = {key, @SerealizeValue(key) for key, val in pairs @dataTable}
+        util.TableToJSON(serTab, prettyPrint)
     GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
-    ReadFromDisk: =>
-        return false unless @exists
+
+    @READ_SUCCESS = 0
+    @ERR_FILE_NOT_EXISTS = 1
+    @ERR_FILE_EMPTY = 2
+    @ERR_FILE_CORRUPT = 3
+    ReadFromDisk: (force = false, doBackup = true) =>
+        return @@ERR_FILE_NOT_EXISTS unless @exists
         fRead = file.Read(@fpath, 'DATA')
-        return false if not fRead or fRead == ''
+        return @@ERR_FILE_EMPTY if not fRead or fRead == ''
         readTable = util.JSONToTable(fRead)
-        return false unless readTable
-        @SetupData(readTable, false)
-        return true
+        return @@ERR_FILE_CORRUPT unless readTable
+        @SetupData(readTable, false, force)
+        return @SetupData(readTable, false, force, doBackup) or @@READ_SUCCESS
     Save: (doBackup = true) =>
         if doBackup and @exists
             fRead = file.Read(@fpath, 'DATA')
@@ -354,7 +422,7 @@ PPM2.PonyDataInstance = PonyDataInstance
 PPM2.MainDataInstance = nil
 PPM2.GetMainData = ->
     if not PPM2.MainDataInstance
-        PPM2.MainDataInstance = PonyDataInstance('_current')
+        PPM2.MainDataInstance = PonyDataInstance('_current', nil, true, true)
         if not PPM2.MainDataInstance\FileExists()
             PPM2.MainDataInstance\Save()
     return PPM2.MainDataInstance
