@@ -15,19 +15,53 @@
 -- limitations under the License.
 --
 
+WATCH_WEAPONS = {}
+
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
     for ply in *player.GetAll()
         ply.__cachedIsPony = ply\IsPony()
+        if ply.__ppm2_weapon_hit and not ply.__cachedIsPony
+            wep\SetNoDraw(false) for wep in *ply\GetWeapons()
+            ply.__ppm2_weapon_hit = false
+    
+    for i, wep in pairs WATCH_WEAPONS
+        if not IsValid(wep)
+            WATCH_WEAPONS[wep] = nil
+            continue
+        if not IsValid(wep\GetOwner())
+            WATCH_WEAPONS[wep] = nil
+            wep\SetNoDraw(false)
+
+PPM2.PostDrawOpaqueRenderables = (a, b) ->
+    return if a or b
+    lply = LocalPlayer()
+
+    for ply in *player.GetAll()
+        if ply.__cachedIsPony
+            wep = ply\GetActiveWeapon()
+            if IsValid(wep)
+                ply.__ppm2_weapon_hit = true
+                wep\SetNoDraw(ply ~= lply or lply\ShouldDrawLocalPlayer())
+                WATCH_WEAPONS[wep\EntIndex()] = wep
+
+            if ply\GetPonyData() and not ply\Alive()
+                data = ply\GetPonyData()
+                rag = ply\GetRagdollEntity()
+                if IsValid(rag)
+                    rag\SetNoDraw(true)
+                    renderController = data\GetRenderController()
+                    if renderController
+                        renderController\PreDraw()
+                        rag\DrawModel()
+                        renderController\PostDraw()
 
 PPM2.PrePlayerDraw = =>
-    return unless @Alive()
     return unless @GetPonyData()
     return unless @__cachedIsPony
     data = @GetPonyData()
     renderController = data\GetRenderController()
     renderController\PreDraw() if renderController
 PPM2.PostPlayerDraw = =>
-    return unless @Alive()
     return unless @GetPonyData()
     return unless @__cachedIsPony
     data = @GetPonyData()
@@ -36,3 +70,4 @@ PPM2.PostPlayerDraw = =>
 
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw
+hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables
