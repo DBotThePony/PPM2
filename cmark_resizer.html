@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <style>
+            html, body {
+                background: transparent;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            #mainimage {
+                max-width: 512;
+                height: auto;
+                width: 100%;
+                max-height: 512;
+            }
+
+            #imgdiv {
+                width: 512;
+                height: 512;
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+        </style>
+        <script>
+            window.onload = function() {
+                var img = document.getElementById('mainimage');
+                if (img.naturalWidth < img.naturalHeight) {
+                    img.style.setProperty('height', '100%');
+                    img.style.setProperty('width', 'auto');
+                }
+
+                img.style.setProperty('margin-top', (512 - img.height) / 2);
+            };
+        </script>
+    </head>
+    <body>
+        <div id='imgdiv'>
+            <img src='https://dbot.serealia.ca/smiles/ponies/mlp-bmsleep.png' id='mainimage' />
+        </div>
+    </body>
+</html>

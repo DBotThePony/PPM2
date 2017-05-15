@@ -668,6 +668,51 @@ class PonyTextureController
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+    @BuildCMarkHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
+        return "<html>
+                    <head>
+                        <style>
+                            html, body {
+                                background: transparent;
+                                margin: 0;
+                                padding: 0;
+                                overflow: hidden;
+                            }
+
+                            #mainimage {
+                                max-width: #{width * .66};
+                                height: auto;
+                                width: 100%;
+                                max-height: #{height * .66};
+                            }
+
+                            #imgdiv {
+                                width: #{width};
+                                height: #{height};
+                                overflow: hidden;
+                                margin: 0;
+                                padding: 0;
+                                text-align: center;
+                            }
+                        </style>
+                        <script>
+                            window.onload = function() {
+                                var img = document.getElementById('mainimage');
+                                if (img.naturalWidth < img.naturalHeight) {
+                                    img.style.setProperty('height', '100%');
+                                    img.style.setProperty('width', 'auto');
+                                }
+
+                                img.style.setProperty('margin-top', (#{height} - img.height) / 2);
+                            };
+                        </script>
+                    </head>
+                    <body>
+                        <div id='imgdiv'>
+                            <img src='#{url}' id='mainimage' />
+                        </div>
+                    </body>
+                </html>"
     CompileCMark: =>
         textureData = {
             'name': "PPM2.#{@id}.CMark"
@@ -686,12 +731,31 @@ class PonyTextureController
         
         URL = @GetData()\GetCMarkURL()
 
-        if URL == ''
+        if URL == '' or not URL\find('^https?://')
             mark = PPM2.DefaultCutiemarksMaterials[@GetData()\GetCMarkType() + 1]
             @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
         else
-            rt = GetRenderTarget("PPM2_#{@id}_CMark", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-            rt\Download()
+            panel = vgui.Create('DHTML')
+            timer.Simple 4, -> panel\Remove() if IsValid(panel)
+            panel\SetVisible(false)
+            panel\SetSize(@@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2)
+            panel\SetHTML(@@BuildCMarkHTML(URL, @@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2))
+            panel\Refresh()
+            panel.ConsoleMessage = ->
+            hookID = "PPM2.#{@id}.CMarkDL"
+            hook.Add 'Think', hookID, ->
+                if not IsValid(panel)
+                    hook.Remove 'Think', hookID
+                    return
+                if not panel\IsLoading()
+                    panel\UpdateHTMLTexture()
+                    htmlmat = panel\GetHTMLMaterial()
+                    return if not htmlmat
+                    texture = htmlmat\GetTexture('$basetexture')
+                    texture\Download()
+                    @CMarkTexture\SetTexture('$basetexture', texture)
+                    hook.Remove 'Think', hookID
+                    timer.Simple 0, -> panel\Remove() if IsValid(panel)
         
         return @CMarkTexture
 
