@@ -152,6 +152,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     new: (netID, ent) =>
+        @recomputeTextures = true
         if ent
             @modelCached = ent\GetModel()
             @SetEntity(ent)
@@ -165,6 +166,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
+        if @recomputeTextures and CLIENT
+            @GetTextureController()\CompileTextures()
+            @recomputeTextures = false
     
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
@@ -191,7 +195,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
     
     UpdateTextureController: (key) =>
-        return if SERVER
+        return if SERVER or not @ent
         textureController = @GetTextureController()
         switch key
             when 'BodyColor'
@@ -207,16 +211,19 @@ class NetworkedPonyData extends PPM2.NetworkedObject
                     textureController\CompileEye(true)
                     textureController\CompileEye(false)
     GetBodygroupController: =>
-        if not @bodygroups
+        if not @bodygroups or @modelBodygroups ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()
             cls = PPM2.GetBodugroupController(@modelCached)
             @bodygroups = cls(@)
+            @modelBodygroups = @modelCached
         @bodygroups.ent = @ent
         return @bodygroups
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
-        @bodygroups = nil
-        timer.Simple 0.5, -> @GetBodygroupController()\ApplyBodygroups() if IsValid(@ent)
+        timer.Simple 0.5, ->
+            return unless IsValid(@ent)
+            @GetBodygroupController()\ApplyBodygroups()
+            @GetTextureController()\CompileTextures() if CLIENT
     GenericDataChange: (state) =>
         @GetBodygroupController()\StateChange(state) if @ent
     ApplyBodygroups: =>
@@ -235,7 +242,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @GenericDataChange(state)
     GetTextureController: =>
         return if SERVER
-        @textureController = PPM2.PonyTextureController(@ent, @) if not @textureController
+        if not @textureController or @modelCached ~= @modelTexture
+            cls = PPM2.GetTextureController(@modelCached)
+            @modelTexture = @modelCached
+            @textureController = cls(@)
+        @textureController.ent = @ent
         return @textureController
 
 PPM2.NetworkedPonyData = NetworkedPonyData

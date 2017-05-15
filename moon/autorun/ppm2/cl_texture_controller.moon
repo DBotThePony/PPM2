@@ -83,7 +83,15 @@ PPM2.ApplyMaterialData = (mat, matData) ->
                 mat\SetInt(k, v) if math.floor(v) == v
                 mat\SetFloat(k, v) if math.floor(v) ~= v
 
+PPM2.AvaliableTextureControllers = {}
+
 class PonyTextureController
+    @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
+    @__inherited: (child) =>
+        @MODELS_HASH = {mod, true for mod in *child.MODELS}
+        PPM2.AvaliableTextureControllers[mod] = child for mod in *child.MODELS
+    @__inherited(@)
+
     @MAT_INDEX_EYE_LEFT = 0
     @MAT_INDEX_EYE_RIGHT = 1
     @MAT_INDEX_BODY = 2
@@ -128,10 +136,10 @@ class PonyTextureController
 
     @NEXT_GENERATED_ID = 10000
 
-    new: (ent = NULL, data, compile = true) =>
-        @ent = ent
+    new: (data, compile = true) =>
+        @ent = data.ent
         @networkedData = data
-        @id = ent\EntIndex()
+        @id = @ent\EntIndex()
         if @id == -1
             @id = @@NEXT_GENERATED_ID
             @@NEXT_GENERATED_ID += 1
@@ -602,3 +610,4 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
 
 PPM2.PonyTextureController = PonyTextureController
+PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.AvaliableTextureControllers[model\lower()] or PonyTextureController
