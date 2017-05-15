@@ -17,7 +17,7 @@
 
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
-    @DATA_DIR_BACKUP = "ppm2/backup/"
+    @DATA_DIR_BACKUP = "ppm2/backups/"
     @PONY_DATA = {
         'age': {
             default: -> PPM2.AGE_ADULT
@@ -347,13 +347,13 @@ class PonyDataInstance
         @rawData = data
         @dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
         if data
-            @SetupData(data)
+            @SetupData(data, true)
         elseif @exists and readIfExists
             @ReadFromDisk(force, doBackup)
     
     @ERR_MISSING_PARAMETER = 4
     @ERR_MISSING_CONTENT = 5
-    SetupData: (data, doSave = false, force = false, doBackup = true) =>
+    SetupData: (data, force = false, doBackup = false) =>
         if doBackup or not force
             makeBackup = false
             for key, value in pairs data
@@ -370,9 +370,9 @@ class PonyDataInstance
                         makeBackup = true
                         break
             if doBackup and makeBackup and @exists
-                bkName = "#{@@DATA_DIR_BACKUP}#{filename}_bak_#{os.date('%S_%M_%H.%d.%m.%Y', os.time())}.txt"
+                bkName = "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.txt"
                 fRead = file.Read(@fpath, 'DATA')
-                file.Write(@fpathBackup, fRead)
+                file.Write(bkName, fRead)
         
         for key, value in pairs data
             key = key\lower()
@@ -431,8 +431,7 @@ class PonyDataInstance
         return @@ERR_FILE_EMPTY if not fRead or fRead == ''
         readTable = util.JSONToTable(fRead)
         return @@ERR_FILE_CORRUPT unless readTable
-        @SetupData(readTable, false, force)
-        return @SetupData(readTable, false, force, doBackup) or @@READ_SUCCESS
+        return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
     Save: (doBackup = true) =>
         if doBackup and @exists
             fRead = file.Read(@fpath, 'DATA')
