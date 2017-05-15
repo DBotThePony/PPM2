@@ -76,6 +76,31 @@ PPM2.BodyDetailsEnum = {
     'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS'
 }
 
+PPM2.DefaultCutiemarks = {
+    '8ball', 'dice', 'magichat',
+    'magichat02', 'record', 'microphone',
+    'bits', 'checkered', 'lumps',
+    'mirror', 'camera', 'magnifier',
+    'padlock', 'binaryfile', 'floppydisk',
+    'cube', 'bulb', 'battery',
+    'deskfan', 'flames', 'alarm',
+    'myon', 'beer', 'berryglass',
+    'roadsign', 'greentree', 'seasons',
+    'palette', 'palette02', 'palette03',
+    'lightningstone', 'partiallycloudy', 'thunderstorm',
+    'storm', 'stoppedwatch', 'twistedclock',
+    'surfboard', 'surfboard02', 'star',
+    'ussr', 'vault', 'anarchy',
+    'suit', 'deathscythe', 'shoop',
+    'smiley', 'dawsome', 'weegee'
+}
+
+do
+    i = -1
+    for mark in *PPM2.DefaultCutiemarks
+        i += 1
+        PPM2["CMARK_#{mark\upper()}"] = i
+
 PPM2.MIN_EYELASHES = 0
 PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
 
@@ -90,6 +115,9 @@ PPM2.MAX_LOWER_MANES = #PPM2.AvaliableLowerManes - 1
 
 PPM2.MIN_DETAIL = 0
 PPM2.MAX_DETAIL = #PPM2.BodyDetails - 1
+
+PPM2.MIN_CMARK = 0
+PPM2.MAX_CMARK = #PPM2.DefaultCutiemarks - 1
 
 PPM2.GENDER_FEMALE = 0
 PPM2.GENDER_MALE = 1
@@ -145,10 +173,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     
     @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
-    @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)), net.WriteFloat, 1)
-    @NetworkVar('HoleSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)), net.WriteFloat, .8)
+    @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')
+    @NetworkVar('CMarkType',        (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_CMARK, PPM2.MAX_CMARK)),           ((arg = 4) -> net.WriteUInt(arg, 8)), 4)
+    @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
+    @NetworkVar('HoleSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
     @NetworkVar('HoleWidth',        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
-    @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)), net.WriteFloat, 1)
+    @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)),   net.WriteFloat, 1)
 
     for i = 1, PPM2.MAX_BODY_DETAILS
         @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)

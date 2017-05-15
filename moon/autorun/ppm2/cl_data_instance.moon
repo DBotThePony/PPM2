@@ -20,86 +20,110 @@ class PonyDataInstance
     @DATA_DIR_BACKUP = "ppm2/backup/"
     @PONY_DATA = {
         'age': {
-            default: (-> PPM2.AGE_ADULT)
+            default: -> PPM2.AGE_ADULT
             getFunc: 'Age'
             enum: {'FILLY', 'ADULT', 'MATURE'}
             fix: (arg = PPM2.AGE_ADULT) -> math.Clamp(tonumber(arg) or PPM2.AGE_ADULT, 0, 2)
         }
         
         'race': {
-            default: (-> PPM2.RACE_EARTH)
+            default: -> PPM2.RACE_EARTH
             getFunc: 'Race'
-            enum: [tp for tp in *PPM2.RACE_ENUMS]
+            enum: [arg for arg in *PPM2.RACE_ENUMS]
             fix: (arg = PPM2.RACE_EARTH) -> math.Clamp(tonumber(arg) or PPM2.RACE_EARTH, 0, 3)
         }
 
         'gender': {
-            default: (-> PPM2.GENDER_FEMALE)
+            default: -> PPM2.GENDER_FEMALE
             getFunc: 'Gender'
-            enum: [tp for tp in *PPM2.AGE_ENUMS]
+            enum: [arg for arg in *PPM2.AGE_ENUMS]
             fix: (arg = PPM2.GENDER_FEMALE) -> math.Clamp(tonumber(arg) or PPM2.GENDER_FEMALE, 0, 1)
         }
 
         'weight': {
-            default: (-> 1)
+            default: -> 1
             getFunc: 'Weight'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)
         }
 
         'eyelash': {
-            default: (-> 0)
+            default: -> 0
             getFunc: 'EyelashType'
-            enum: [tp\upper() for tp in *PPM2.EyelashTypes]
+            enum: [arg for arg in *PPM2.EyelashTypes]
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)
         }
         
         'tail': {
-            default: (-> 0)
+            default: -> 0
             getFunc: 'TailType'
-            enum: [tp for tp in *PPM2.AvaliableTails] -- fast copy
+            enum: [arg for arg in *PPM2.AvaliableTails] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS, PPM2.MAX_TAILS)
         }
 
         'mane': {
-            default: (-> 0)
+            default: -> 0
             getFunc: 'ManeType'
-            enum: [tp for tp in *PPM2.AvaliableUpperManes] -- fast copy
+            enum: [arg for arg in *PPM2.AvaliableUpperManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)
         }
 
         'manelower': {
-            default: (-> 0)
+            default: -> 0
             getFunc: 'ManeTypeLower'
-            enum: [tp for tp in *PPM2.AvaliableLowerManes] -- fast copy
+            enum: [arg for arg in *PPM2.AvaliableLowerManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)
         }
 
         'tailsize': {
-            default: (-> 1)
+            default: -> 1
             getFunc: 'TailSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)
         }
 
         'eye_iris_size': {
-            default: (-> 1)
+            default: -> 1
             getFunc: 'IrisSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
         }
 
         'hole_width': {
-            default: (-> 1)
+            default: -> 1
             getFunc: 'HoleWidth'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
         }
 
         'eye_hole_size': {
-            default: (-> .8)
+            default: -> .8
             getFunc: 'HoleSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
         }
 
+        'cmark': {
+            default: -> true
+            getFunc: 'CMark'
+            fix: (arg = true) -> tobool(arg)
+        }
+
+        'cmark_type': {
+            default: -> 4
+            getFunc: 'CMarkType'
+            enum: [arg for arg in *PPM2.DefaultCutiemarks]
+            fix: (arg = 4) -> math.Clamp(tonumber(arg) or 4, PPM2.MIN_CMARK, PPM2.MAX_CMARK)
+        }
+
+        'cmark_url': {
+            default: -> ''
+            getFunc: 'CMarkURL'
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
+
         'eye_bg': {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: 'EyeBackground'
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -113,7 +137,7 @@ class PonyDataInstance
         }
 
         'eye_hole': {
-            default: (-> Color(0, 0, 0))
+            default: -> Color(0, 0, 0)
             getFunc: 'EyeHole'
             fix: (arg = Color(0, 0, 0)) ->
                 if type(arg) ~= 'table'
@@ -127,7 +151,7 @@ class PonyDataInstance
         }
 
         'eye_iris1': {
-            default: (-> Color(200, 200, 200))
+            default: -> Color(200, 200, 200)
             getFunc: 'EyeIrisTop'
             fix: (arg = Color(200, 200, 200)) ->
                 if type(arg) ~= 'table'
@@ -141,7 +165,7 @@ class PonyDataInstance
         }
 
         'eye_iris2': {
-            default: (-> Color(200, 200, 200))
+            default: -> Color(200, 200, 200)
             getFunc: 'EyeIrisBottom'
             fix: (arg = Color(200, 200, 200)) ->
                 if type(arg) ~= 'table'
@@ -155,7 +179,7 @@ class PonyDataInstance
         }
 
         'eye_irisline1': {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: 'EyeIrisLine1'
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -169,7 +193,7 @@ class PonyDataInstance
         }
 
         'eye_irisline2': {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: 'EyeIrisLine2'
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -183,7 +207,7 @@ class PonyDataInstance
         }
 
         'body': {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: 'BodyColor'
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -197,7 +221,7 @@ class PonyDataInstance
         }
 
         'eye_lines': {
-            default: (-> true)
+            default: -> true
             getFunc: 'EyeLines'
             fix: (arg = true) -> tobool(arg)
         }
@@ -205,7 +229,7 @@ class PonyDataInstance
 
     for i = 1, 6
         @PONY_DATA["mane_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "ManeColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -219,7 +243,7 @@ class PonyDataInstance
         }
 
         @PONY_DATA["mane_detail_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "ManeDetailColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -233,7 +257,7 @@ class PonyDataInstance
         }
 
         @PONY_DATA["tail_detail_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "TailDetailColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -247,7 +271,7 @@ class PonyDataInstance
         }
 
         @PONY_DATA["tail_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "TailColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -262,7 +286,7 @@ class PonyDataInstance
 
         -- Reserved - they can be accessed/used/changed, but they do not do anything
         @PONY_DATA["lower_mane_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "LowerManeColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -276,7 +300,7 @@ class PonyDataInstance
         }
 
         @PONY_DATA["upper_mane_color_#{i}"] = {
-            default: (-> Color(255, 255, 255))
+            default: -> Color(255, 255, 255)
             getFunc: "UpperManeColor#{i}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
@@ -295,7 +319,7 @@ class PonyDataInstance
 
     for key, data in pairs @PONY_DATA
         continue unless data.enum
-        data.enum = [en\upper() for en in *data.enum]
+        data.enum = [arg\upper() for arg in *data.enum]
         data.enumMapping = {}
         data.enumMappingBackward = {}
         i = -1

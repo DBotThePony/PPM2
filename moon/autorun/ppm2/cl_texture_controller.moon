@@ -74,6 +74,8 @@ PPM2.TailDetailsMaterials = {
     [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
 }
 
+PPM2.DefaultCutiemarksMaterials = [Material("models/ppm/cmarks/#{mark}") for mark in *PPM2.DefaultCutiemarks]
+
 PPM2.ApplyMaterialData = (mat, matData) ->
     for k, v in pairs matData
         switch type(v)
@@ -167,6 +169,12 @@ class PonyTextureController
                 @CompileBody()
                 @CompileWings()
                 @CompileHorn()
+            when 'CMark'
+                @CompileCMark()
+            when 'CMarkType'
+                @CompileCMark()
+            when 'CMarkURL'
+                @CompileCMark()
             else
                 if @@MANE_UPDATE_TRIGGER[key]
                     @CompileHair()
@@ -185,13 +193,16 @@ class PonyTextureController
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
-    GetData: => @networkedData
+    GetData: =>
+        @ent = @networkedData\GetEntity()
+        return @networkedData
     GetEntity: => @ent
     GetBody: =>
-        if @networkedData\GetGender() == PPM2.GENDER_FEMALE
+        if @GetData()\GetGender() == PPM2.GENDER_FEMALE
             return @FemaleMaterial
         else
             return @MaleMaterial
+    GetCMark: => @CMarkTexture
     GetHair: (index = 1) =>
         if index == 2
             return @HairColor2Material
@@ -220,6 +231,7 @@ class PonyTextureController
         @CompileTail()
         @CompileHorn()
         @CompileWings()
+        @CompileCMark()
         @CompileEye(false)
         @CompileEye(true)
         @compiled = true
@@ -235,6 +247,7 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetHair(2))
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1, @GetTail(1))
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
     
     PostDraw: =>
         return unless @compiled
@@ -247,11 +260,13 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
     
     @QUAD_POS_CONST = Vector(0, 0, 0)
     @QUAD_FACE_CONST = Vector(0, 0, -1)
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
+        rt\Download()
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
@@ -309,7 +324,7 @@ class PonyTextureController
         @MaleMaterial = CreateMaterial(textureMale.name, textureMale.shader, textureMale.data)
         @FemaleMaterial = CreateMaterial(textureFemale.name, textureFemale.shader, textureFemale.data)
 
-        {:r, :g, :b} = @networkedData\GetBodyColor()
+        {:r, :g, :b} = @GetData()\GetBodyColor()
         oldW, oldH = ScrW(), ScrH()
 
         TargetMale = GetRenderTarget("PPM2_#{@id}_Body_Male_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
@@ -344,7 +359,7 @@ class PonyTextureController
 
         @HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        {:r, :g, :b} = @networkedData\GetBodyColor()
+        {:r, :g, :b} = @GetData()\GetBodyColor()
 
         @HornMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @HornMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -373,7 +388,7 @@ class PonyTextureController
 
         @WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        {:r, :g, :b} = @networkedData\GetBodyColor()
+        {:r, :g, :b} = @GetData()\GetBodyColor()
 
         @WingsMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @WingsMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -419,15 +434,15 @@ class PonyTextureController
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         -- First mane pass
-        {:r, :g, :b} = @networkedData\GetManeColor1()
+        {:r, :g, :b} = @GetData()\GetManeColor1()
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
         surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        maneTypeUpper = @networkedData\GetManeType()
+        maneTypeUpper = @GetData()\GetManeType()
         if PPM2.UpperManeDetailsMaterials[maneTypeUpper]
-            {:r, :g, :b} = @networkedData\GetManeDetailColor1()
+            {:r, :g, :b} = @GetData()\GetManeDetailColor1()
             surface.SetDrawColor(r, g, b)
             for mat in *PPM2.UpperManeDetailsMaterials[maneTypeUpper]
                 continue if type(mat) == 'number'
@@ -445,15 +460,15 @@ class PonyTextureController
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @networkedData\GetManeColor2()
+        {:r, :g, :b} = @GetData()\GetManeColor2()
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
         surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        maneTypeLower = @networkedData\GetManeTypeLower()
+        maneTypeLower = @GetData()\GetManeTypeLower()
         if PPM2.DownManeDetailsMaterials[maneTypeLower]
-            {:r, :g, :b} = @networkedData\GetManeDetailColor2()
+            {:r, :g, :b} = @GetData()\GetManeDetailColor2()
             surface.SetDrawColor(r, g, b)
             for mat in *PPM2.DownManeDetailsMaterials[maneTypeLower]
                 continue if type(mat) == 'number'
@@ -501,10 +516,11 @@ class PonyTextureController
 
         -- First tail pass
         rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt\Download()
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @networkedData\GetTailColor1()
+        {:r, :g, :b} = @GetData()\GetTailColor1()
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
@@ -513,9 +529,9 @@ class PonyTextureController
         surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
         surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        tailType = @networkedData\GetTailType()
+        tailType = @GetData()\GetTailType()
         if PPM2.TailDetailsMaterials[tailType]
-            {:r, :g, :b} = @networkedData\GetTailDetailColor1()
+            {:r, :g, :b} = @GetData()\GetTailDetailColor1()
             surface.SetDrawColor(r, g, b)
             for mat in *PPM2.TailDetailsMaterials[tailType]
                 continue if type(mat) == 'number'
@@ -529,10 +545,11 @@ class PonyTextureController
 
         -- Second tail pass
         rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt\Download()
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @networkedData\GetTailColor2()
+        {:r, :g, :b} = @GetData()\GetTailColor2()
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
@@ -542,7 +559,7 @@ class PonyTextureController
         surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         if PPM2.TailDetailsMaterials[tailType]
-            {:r, :g, :b} = @networkedData\GetTailDetailColor2()
+            {:r, :g, :b} = @GetData()\GetTailDetailColor2()
             surface.SetDrawColor(r, g, b)
             for mat in *PPM2.TailDetailsMaterials[tailType]
                 continue if type(mat) == 'number'
@@ -558,16 +575,16 @@ class PonyTextureController
     CompileEye: (left = false) =>
         prefix = left and 'l' or 'r'
         prefixUpper = left and 'L' or 'R'
-        EyeBackground = @networkedData\GetEyeBackground()
-        EyeHole = @networkedData\GetEyeHole()
-        HoleWidth = @networkedData\GetHoleWidth()
-        IrisSize = @networkedData\GetIrisSize() * .75
-        EyeIris1 = @networkedData\GetEyeIrisTop()
-        EyeIris2 = @networkedData\GetEyeIrisBottom()
-        EyeIrisLine1 = @networkedData\GetEyeIrisLine1()
-        EyeIrisLine2 = @networkedData\GetEyeIrisLine2()
-        EyeLines = @networkedData\GetEyeLines()
-        HoleSize = @networkedData\GetHoleSize()
+        EyeBackground = @GetData()\GetEyeBackground()
+        EyeHole = @GetData()\GetEyeHole()
+        HoleWidth = @GetData()\GetHoleWidth()
+        IrisSize = @GetData()\GetIrisSize() * .75
+        EyeIris1 = @GetData()\GetEyeIrisTop()
+        EyeIris2 = @GetData()\GetEyeIrisBottom()
+        EyeIrisLine1 = @GetData()\GetEyeIrisLine1()
+        EyeIrisLine2 = @GetData()\GetEyeIrisLine2()
+        EyeLines = @GetData()\GetEyeLines()
+        HoleSize = @GetData()\GetHoleSize()
         oldW, oldH = ScrW(), ScrH()
 
         textureData = {
@@ -604,6 +621,7 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         rt = GetRenderTarget("PPM2_#{@id}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt\Download()
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
@@ -650,6 +668,36 @@ class PonyTextureController
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+    CompileCMark: =>
+        textureData = {
+            'name': "PPM2.#{@id}.CMark"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite'
+                '$alpha': '0'
+                '$translucent': '1'
+            }
+        }
+
+        @CMarkTexture = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+        unless @GetData()\GetCMark()
+            @CMarkTexture\SetTexture('$basetexture', 'models/debug/debugwhite')
+            @CMarkTexture\SetFloat('$alpha', 0)
+            return @CMarkTexture
+        @CMarkTexture\SetFloat('$alpha', 1)
+
+        URL = @GetData()\GetCMarkURL()
+
+        if URL == ''
+            mark = PPM2.DefaultCutiemarksMaterials[@GetData()\GetCMarkType() + 1]
+            @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
+        else
+            rt = GetRenderTarget("PPM2_#{@id}_CMark", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+        
+        return @CMarkTexture
+
 
 PPM2.PonyTextureController = PonyTextureController
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController
