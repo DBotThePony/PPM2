@@ -76,6 +76,7 @@ PPM2.TailDetailsMaterials = {
 
 PPM2.DefaultCutiemarksMaterials = [Material("models/ppm/cmarks/#{mark}") for mark in *PPM2.DefaultCutiemarks]
 
+PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
 PPM2.ApplyMaterialData = (mat, matData) ->
     for k, v in pairs matData
         switch type(v)
@@ -135,6 +136,8 @@ class PonyTextureController
     @EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2.png')
     @EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2.png')
 
+    @PONY_SOCKS = Material('models/ppm/texclothes/pony_socks.png')
+
     @NEXT_GENERATED_ID = 10000
 
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
@@ -169,6 +172,10 @@ class PonyTextureController
                 @CompileBody()
                 @CompileWings()
                 @CompileHorn()
+            when 'Socks'
+                @CompileBody()
+            when 'Bodysuit'
+                @CompileBody()
             when 'CMark'
                 @CompileCMark()
             when 'CMarkType'
@@ -282,7 +289,19 @@ class PonyTextureController
             detailID = @networkedData["GetBodyDetail#{i}"](@networkedData)
             mat = PPM2.BodyDetailsMaterials[detailID]
             continue if not mat
+            surface.SetDrawColor(@networkedData["GetBodyDetailColor#{i}"](@networkedData))
             surface.SetMaterial(mat)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        
+        if @GetData()\GetSocks()
+            surface.SetDrawColor(255, 255, 255)
+            surface.SetMaterial(@@PONY_SOCKS)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        
+        suitType = @GetData()\GetBodysuit()
+        if PPM2.AvaliablePonySuitsMaterials[suitType]
+            surface.SetDrawColor(255, 255, 255)
+            surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
             surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         cam.End2D()

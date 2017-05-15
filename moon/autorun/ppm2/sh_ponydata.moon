@@ -95,6 +95,8 @@ PPM2.DefaultCutiemarks = {
     'smiley', 'dawsome', 'weegee'
 }
 
+PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOLTS_LIGHT', 'WONDERBOLTS_FULL', 'WONDERBOLTS_LIGHT'}
+
 do
     i = -1
     for mark in *PPM2.DefaultCutiemarks
@@ -118,6 +120,9 @@ PPM2.MAX_DETAIL = #PPM2.BodyDetails - 1
 
 PPM2.MIN_CMARK = 0
 PPM2.MAX_CMARK = #PPM2.DefaultCutiemarks - 1
+
+PPM2.MIN_SUIT = 0
+PPM2.MAX_SUIT = #PPM2.AvaliablePonySuits - 1
 
 PPM2.GENDER_FEMALE = 0
 PPM2.GENDER_MALE = 1
@@ -180,8 +185,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('HoleWidth',        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)),   net.WriteFloat, 1)
 
+    @NetworkVar('Bodysuit',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SUIT, PPM2.MAX_SUIT)),             ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('Socks',            net.ReadBool, net.WriteBool,              false)
+
     for i = 1, PPM2.MAX_BODY_DETAILS
         @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+        @NetworkVar("BodyDetailColor#{i}", net.ReadColor, net.WriteColor, Color(140, 50, 100))
 
     new: (netID, ent) =>
         @recomputeTextures = true

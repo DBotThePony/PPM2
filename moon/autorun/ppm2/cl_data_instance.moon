@@ -225,6 +225,19 @@ class PonyDataInstance
             getFunc: 'EyeLines'
             fix: (arg = true) -> tobool(arg)
         }
+
+        'socks': {
+            default: -> false
+            getFunc: 'Socks'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'suit': {
+            default: -> 0
+            getFunc: 'Bodysuit'
+            enum: [arg for arg in *PPM2.AvaliablePonySuits]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_SUIT, PPM2.MAX_SUIT)
+        }
     }
 
     for i = 1, 6
@@ -282,6 +295,27 @@ class PonyDataInstance
                         return Color(r, g, b, a)
                     else
                         return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["body_detail_color_#{i}"] = {
+            default: -> Color(140, 50, 100)
+            getFunc: "BodyDetailColor#{i}"
+            fix: (arg = Color(140, 50, 100)) ->
+                if type(arg) ~= 'table'
+                    return Color(140, 50, 100)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(140, 50, 100)
+        }
+
+        @PONY_DATA["body_detail_#{i}"] = {
+            default: -> 0
+            getFunc: "BodyDetail#{i}"
+            enum: [arg for arg in *PPM2.BodyDetailsEnum]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)
         }
 
         -- Reserved - they can be accessed/used/changed, but they do not do anything
