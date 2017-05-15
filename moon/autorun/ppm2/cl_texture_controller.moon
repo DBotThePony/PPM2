@@ -83,13 +83,12 @@ PPM2.ApplyMaterialData = (mat, matData) ->
                 mat\SetInt(k, v) if math.floor(v) == v
                 mat\SetFloat(k, v) if math.floor(v) ~= v
 
-PPM2.AvaliableTextureControllers = {}
-
 class PonyTextureController
+    @AVALIABLE_CONTROLLERS = {}
     @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
     @__inherited: (child) =>
-        @MODELS_HASH = {mod, true for mod in *child.MODELS}
-        PPM2.AvaliableTextureControllers[mod] = child for mod in *child.MODELS
+        child.MODELS_HASH = {mod, true for mod in *child.MODELS}
+        @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
     @__inherited(@)
 
     @MAT_INDEX_EYE_LEFT = 0
@@ -136,15 +135,58 @@ class PonyTextureController
 
     @NEXT_GENERATED_ID = 10000
 
-    new: (data, compile = true) =>
-        @ent = data.ent
-        @networkedData = data
+    @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
+    @TAIL_UPDATE_TRIGGER = {'TailType': true}
+    @EYE_UPDATE_TRIGGER = {
+        'EyeWidth': true
+        'IrisSize': true
+        'EyeLines': true
+        'EyeBackground': true
+        'EyeIrisLine1': true
+        'EyeIrisLine2': true
+        'EyeIris1': true
+        'EyeHole': true
+    }
+
+    for i = 1, 6
+        @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["DownManeDetail#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeDetail#{i}"] = true
+        @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
+        @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
+        @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
+    
+    DataChanges: (state) =>
+        return if not @ent
+        key = state\GetKey()
+        switch key
+            when 'BodyColor'
+                @CompileBody()
+                @CompileWings()
+                @CompileHorn()
+            else
+                if @@MANE_UPDATE_TRIGGER[key]
+                    @CompileHair()
+                elseif @@TAIL_UPDATE_TRIGGER[key]
+                    @CompileTail()
+                elseif @@EYE_UPDATE_TRIGGER[key]
+                    @CompileEye(true)
+                    @CompileEye(false)
+
+    new: (controller, compile = true) =>
+        @ent = controller\GetEntity()
+        @networkedData = controller\GetData()
         @id = @ent\EntIndex()
         if @id == -1
             @id = @@NEXT_GENERATED_ID
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
+    GetData: => @networkedData
+    GetEntity: => @ent
     GetBody: =>
         if @networkedData\GetGender() == PPM2.GENDER_FEMALE
             return @FemaleMaterial
@@ -610,4 +652,4 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
 
 PPM2.PonyTextureController = PonyTextureController
-PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.AvaliableTextureControllers[model\lower()] or PonyTextureController
+PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController

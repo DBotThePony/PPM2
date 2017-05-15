@@ -160,6 +160,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @SetEntity(ent)
             @SetupEntity(ent)
         super(netID)
+    GetModel: => @modelCached
     EntIndex: => @entID
     SetupEntity: (ent) =>
         return unless IsValid(ent)
@@ -169,49 +170,33 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
         if @recomputeTextures and CLIENT
-            @GetTextureController()\CompileTextures()
+            @GetRenderController()\CompileTextures()
             @recomputeTextures = false
-    
-    @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
-    @TAIL_UPDATE_TRIGGER = {'TailType': true}
-    @EYE_UPDATE_TRIGGER = {
-        'EyeWidth': true
-        'IrisSize': true
-        'EyeLines': true
-        'EyeBackground': true
-        'EyeIrisLine1': true
-        'EyeIrisLine2': true
-        'EyeIris1': true
-        'EyeHole': true
-    }
+    ModelChanges: (old = @ent\GetModel(), new = old) =>
+        @modelCached = new
+        timer.Simple 0.5, ->
+            return unless IsValid(@ent)
+            @GetBodygroupController()\ApplyBodygroups()
+            @GetRenderController()\ModelChanges(old, new) if CLIENT
+    GenericDataChange: (state) =>
+        if state\GetKey() == 'Entity' and IsValid(@GetEntity())
+            @SetupEntity(@GetEntity())
+        
+        @GetBodygroupController()\DataChanges(state) if @ent
 
-    for i = 1, 6
-        @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["DownManeDetail#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeDetail#{i}"] = true
-        @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
-        @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
-        @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
-    
-    UpdateTextureController: (key) =>
-        return if SERVER or not @ent
-        textureController = @GetTextureController()
-        switch key
-            when 'BodyColor'
-                textureController\CompileBody()
-                textureController\CompileWings()
-                textureController\CompileHorn()
-            else
-                if @@MANE_UPDATE_TRIGGER[key]
-                    textureController\CompileHair()
-                elseif @@TAIL_UPDATE_TRIGGER[key]
-                    textureController\CompileTail()
-                elseif @@EYE_UPDATE_TRIGGER[key]
-                    textureController\CompileEye(true)
-                    textureController\CompileEye(false)
+        if CLIENT
+            @GetRenderController()\DataChanges(state)
+    ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
+    SetLocalChange: (state) => @GenericDataChange(state)
+    NetworkDataChanges: (state) => @GenericDataChange(state)
+    GetRenderController: =>
+        return if SERVER
+        if not @renderController or @modelCached ~= @modelRender
+            cls = PPM2.GetRenderController(@modelCached)
+            @modelRender = @modelCached
+            @renderController = cls(@)
+        @renderController.ent = @ent
+        return @renderController
     GetBodygroupController: =>
         if not @bodygroups or @modelBodygroups ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()
@@ -220,36 +205,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @modelBodygroups = @modelCached
         @bodygroups.ent = @ent
         return @bodygroups
-    ModelChanges: (old = @ent\GetModel(), new = old) =>
-        @modelCached = new
-        timer.Simple 0.5, ->
-            return unless IsValid(@ent)
-            @GetBodygroupController()\ApplyBodygroups()
-            @GetTextureController()\CompileTextures() if CLIENT
-    GenericDataChange: (state) =>
-        @GetBodygroupController()\StateChange(state) if @ent
-    ApplyBodygroups: =>
-        @GetBodygroupController()\ApplyBodygroups() if @ent
-    SetLocalChange: (state) =>
-        if CLIENT
-            @UpdateTextureController(state\GetKey())
-        @GenericDataChange(state)
-    NetworkDataChanges: (state) =>
-        if state\GetKey() == 'Entity' and IsValid(@GetEntity())
-            @SetupEntity(@GetEntity())
-        
-        if CLIENT
-            @UpdateTextureController(state\GetKey())
-        
-        @GenericDataChange(state)
-    GetTextureController: =>
-        return if SERVER
-        if not @textureController or @modelCached ~= @modelTexture
-            cls = PPM2.GetTextureController(@modelCached)
-            @modelTexture = @modelCached
-            @textureController = cls(@)
-        @textureController.ent = @ent
-        return @textureController
 
 PPM2.NetworkedPonyData = NetworkedPonyData
 

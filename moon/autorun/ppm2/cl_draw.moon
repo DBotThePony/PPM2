@@ -24,16 +24,15 @@ PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()
     return unless @__cachedIsPony
     data = @GetPonyData()
-    texController = data\GetTextureController()
-    texController\PreDraw()
+    renderController = data\GetRenderController()
+    renderController\PreDraw() if renderController
 PPM2.PostPlayerDraw = =>
     return unless @Alive()
     return unless @GetPonyData()
     return unless @__cachedIsPony
     data = @GetPonyData()
-    texController = data\GetTextureController()
-    texController\PostDraw()
+    renderController = data\GetRenderController()
+    renderController\PostDraw() if renderController
 
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw
-

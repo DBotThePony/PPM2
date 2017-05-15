@@ -58,6 +58,7 @@ if CLIENT
     include 'autorun/ppm2/cl_texture_controller.lua'
     include 'autorun/ppm2/cl_draw.lua'
     include 'autorun/ppm2/cl_networking.lua'
+    include 'autorun/ppm2/cl_render_controller.lua'
 else
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
@@ -67,5 +68,6 @@ else
     AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_draw.lua'
     AddCSLuaFile 'autorun/ppm2/cl_networking.lua'
+    AddCSLuaFile 'autorun/ppm2/cl_render_controller.lua'
     include 'autorun/ppm2/sv_networking.lua'
     include 'autorun/ppm2/sv_hooks.lua'

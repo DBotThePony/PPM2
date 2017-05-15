@@ -25,13 +25,12 @@ PPM2.BODYGROUP_TAIL = 6
 PPM2.BODYGROUP_CMARK = 7
 PPM2.BODYGROUP_EYELASH = 8
 
-PPM2.AvaliableBodygroupControllers = {}
-
 class DefaultBodygroupController
+    @AVALIABLE_CONTROLLERS = {}
     @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl'}
     @__inherited: (child) =>
-        @MODELS_HASH = {mod, true for mod in *child.MODELS}
-        PPM2.AvaliableBodygroupControllers[mod] = child for mod in *child.MODELS
+        child.MODELS_HASH = {mod, true for mod in *child.MODELS}
+        @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
     @__inherited(@)
 
     @BODYGROUP_SKELETON = 0
@@ -71,7 +70,7 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
         @ApplyRace()
-    StateChange: (state) =>
+    DataChanges: (state) =>
         switch state\GetKey()
             when 'ManeType'
                 @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @controller\GetManeType())
@@ -109,4 +108,4 @@ class CPPMBodygroupController extends DefaultBodygroupController
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController
 
-PPM2.GetBodugroupController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.AvaliableBodygroupControllers[model\lower()] or DefaultBodygroupController
+PPM2.GetBodugroupController = (model = 'models/ppm/player_default_base.mdl') -> DefaultBodygroupController.AVALIABLE_CONTROLLERS[model\lower()] or DefaultBodygroupController
