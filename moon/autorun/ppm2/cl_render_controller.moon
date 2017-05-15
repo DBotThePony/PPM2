@@ -30,24 +30,20 @@ class PonyRenderController
         @modelCached = data\GetModel()
         @CompileTextures()
     GetEntity: => @ent
-    GetModel: => @modelCached
+    GetData: => @networkedData
+    GetModel: => @networkedData\GetModel()
 
     PreDraw: =>
         @GetTextureController()\PreDraw()
     PostDraw: =>
         @GetTextureController()\PostDraw()
 
-    ModelChanges: (old = @ent\GetModel(), new = old) =>
-        @modelCached = new
-        timer.Simple 0.5, -> @CompileTextures() if IsValid(@ent)
     DataChanges: (state) =>
         return if not @ent
         @GetTextureController()\DataChanges(state)
-    GetData: => @networkedData
     GetTextureController: =>
-        if not @renderController or @modelCached ~= @modelRender
+        if not @renderController
             cls = PPM2.GetTextureController(@modelCached)
-            @modelRender = @modelCached
             @renderController = cls(@)
         @renderController.ent = @ent
         return @renderController

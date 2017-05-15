@@ -207,7 +207,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         timer.Simple 0.5, ->
             return unless IsValid(@ent)
             @GetBodygroupController()\ApplyBodygroups()
-            @GetRenderController()\ModelChanges(old, new) if CLIENT
+            @GetRenderController() if CLIENT
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
