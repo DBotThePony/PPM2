@@ -673,8 +673,7 @@ class PonyTextureController
             'name': "PPM2.#{@id}.CMark"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/debug/debugwhite'
-                '$alpha': '0'
+                '$basetexture': 'models/ppm/partrender/null'
                 '$translucent': '1'
             }
         }
@@ -682,11 +681,9 @@ class PonyTextureController
         @CMarkTexture = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         unless @GetData()\GetCMark()
-            @CMarkTexture\SetTexture('$basetexture', 'models/debug/debugwhite')
-            @CMarkTexture\SetFloat('$alpha', 0)
+            @CMarkTexture\SetTexture('$basetexture', 'models/ppm/partrender/null')
             return @CMarkTexture
-        @CMarkTexture\SetFloat('$alpha', 1)
-
+        
         URL = @GetData()\GetCMarkURL()
 
         if URL == ''
