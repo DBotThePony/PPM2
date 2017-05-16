@@ -764,19 +764,23 @@ class PonyTextureController
             panel\Refresh()
             panel.ConsoleMessage = ->
             hookID = "PPM2.#{@id}.CMarkDL"
+
             hook.Add 'Think', hookID, ->
                 if not IsValid(panel)
                     hook.Remove 'Think', hookID
                     return
                 if not panel\IsLoading()
-                    panel\UpdateHTMLTexture()
-                    htmlmat = panel\GetHTMLMaterial()
-                    return if not htmlmat
-                    texture = htmlmat\GetTexture('$basetexture')
-                    texture\Download()
-                    @CMarkTexture\SetTexture('$basetexture', texture)
                     hook.Remove 'Think', hookID
-                    timer.Simple 0, -> panel\Remove() if IsValid(panel)
+                    timer.Simple 0.3, ->
+                        return unless IsValid(panel)
+                        panel\UpdateHTMLTexture()
+                        htmlmat = panel\GetHTMLMaterial()
+                        return if not htmlmat
+                        texture = htmlmat\GetTexture('$basetexture')
+                        texture\Download()
+                        @CMarkTexture\SetTexture('$basetexture', texture)
+                        hook.Remove 'Think', hookID
+                        timer.Simple 0, -> panel\Remove() if IsValid(panel)
         
         return @CMarkTexture
 
