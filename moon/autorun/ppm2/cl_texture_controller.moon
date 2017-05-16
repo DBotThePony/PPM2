@@ -799,6 +799,50 @@ class PonyTextureController
         
         return @CMarkTexture, @CMarkTextureGUI
 
+-- [ 1] = "models/ppm/base/cmark"
+-- [ 2] = "models/ppm/base/eyelashes"
+-- [ 3] = "models/ppm/base/tongue"
+-- [ 4] = "models/ppm/base/body"
+-- [ 5] = "models/ppm/base/teeth"
+-- [ 6] = "models/ppm/base/eye_l"
+-- [ 7] = "models/ppm/base/eye_r"
+-- [ 8] = "models/ppm/base/mouth"
+-- [ 9] = "models/ppm/base/horn"
+-- [10] = "models/ppm/base/wings"
 
+class NewPonyTextureController extends PonyTextureController
+    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+
+    @MAT_INDEX_CMARK = 0
+    @MAT_INDEX_EYELASHES = 1
+    @MAT_INDEX_TONGUE = 2
+    @MAT_INDEX_BODY = 3
+    @MAT_INDEX_TEETH = 4
+    @MAT_INDEX_EYE_LEFT = 5
+    @MAT_INDEX_EYE_RIGHT = 6
+    @MAT_INDEX_MOUNTH = 7
+    @MAT_INDEX_HORN = 8
+    @MAT_INDEX_WINGS = 9
+
+    PreDraw: (ent = @ent) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+    
+    PostDraw: (ent = @ent) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+
+
+PPM2.NewPonyTextureController = NewPonyTextureController
 PPM2.PonyTextureController = PonyTextureController
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController

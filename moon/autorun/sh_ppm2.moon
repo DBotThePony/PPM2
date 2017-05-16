@@ -29,7 +29,10 @@ list.Set('PlayerOptionsModel', 'ppm2_ponynj', 'models/ppm/player_default_base_nj
 player_manager.AddValidModel('ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 
-player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'ppm2_pony', 'ppm2_pony_cppm', 'ppm2_ponynj', 'ppm2_ponynj_cppm'}
+player_manager.AddValidModel('ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
+
+player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'ppm2_pony', 'ppm2_pony_cppm', 'ppm2_ponynj', 'ppm2_ponynj_cppm', 'ppm2_pony_new'}
 
 PPM2 = PPM2 or {}
 
@@ -37,6 +40,8 @@ entMeta = FindMetaTable('Entity')
 entMeta.IsPony = =>
     switch @GetModel()
         when 'models/ppm/player_default_base.mdl'
+            return true
+        when 'models/ppm/player_default_base_new.mdl'
             return true
         when 'models/ppm/player_default_base_nj.mdl'
             return true
