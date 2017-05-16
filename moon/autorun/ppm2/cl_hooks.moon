@@ -99,10 +99,7 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 
 RequestPonyData = ->
     instance = PPM2.GetMainData()
-    newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
-    newData\SetEntity(LocalPlayer())
-    for key, value in pairs instance\GetAsNetworked()
-        newData["Set#{key}"](newData, value)
+    newData = instance\CreateNetworkObject()
     newData\Create()
     instance\SetNetworkData(newData)
 

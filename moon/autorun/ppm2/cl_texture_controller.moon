@@ -210,6 +210,8 @@ class PonyTextureController
         else
             return @MaleMaterial
     GetCMark: => @CMarkTexture
+    GetGUICMark: => @CMarkTextureGUI
+    GetCMarkGUI: => @CMarkTextureGUI
     GetHair: (index = 1) =>
         if index == 2
             return @HairColor2Material
@@ -744,17 +746,29 @@ class PonyTextureController
             }
         }
 
+        textureDataGUI = {
+            'name': "PPM2.#{@id}.CMark.GUI"
+            'shader': 'UnlitGeneric'
+            'data': {
+                '$basetexture': 'models/ppm/partrender/null'
+                '$translucent': '1'
+            }
+        }
+
         @CMarkTexture = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
         unless @GetData()\GetCMark()
             @CMarkTexture\SetTexture('$basetexture', 'models/ppm/partrender/null')
-            return @CMarkTexture
+            @CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm/partrender/null')
+            return @CMarkTexture, @CMarkTextureGUI
         
         URL = @GetData()\GetCMarkURL()
 
         if URL == '' or not URL\find('^https?://')
             mark = PPM2.DefaultCutiemarksMaterials[@GetData()\GetCMarkType() + 1]
             @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
+            @CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
         else
             panel = vgui.Create('DHTML')
             timer.Simple 4, -> panel\Remove() if IsValid(panel)
@@ -779,10 +793,11 @@ class PonyTextureController
                         texture = htmlmat\GetTexture('$basetexture')
                         texture\Download()
                         @CMarkTexture\SetTexture('$basetexture', texture)
+                        @CMarkTextureGUI\SetTexture('$basetexture', texture)
                         hook.Remove 'Think', hookID
                         timer.Simple 0, -> panel\Remove() if IsValid(panel)
         
-        return @CMarkTexture
+        return @CMarkTexture, @CMarkTextureGUI
 
 
 PPM2.PonyTextureController = PonyTextureController

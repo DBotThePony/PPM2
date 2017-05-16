@@ -375,11 +375,41 @@ class PonyDataInstance
 			@dataTable[key] = newVal
             @ValueChanges(key, oldVal, newVal, ...)
 
+    Copy: (fileName = @filename) =>
+        copyOfData = for key, val in pairs @dataTable
+            switch type(val)
+                when 'number'
+                    val
+                when 'string'
+                    val
+                when 'table'
+                    {:r, :g, :b} = val
+                    if r and g and b
+                        Color(r, g, b)
+                    else
+                        continue
+        newData = @@(fileName, copyOfData, false)
+        return newData
+    CreateCustomNetworkObject: (ply = LocalPlayer(), ...) =>
+        newData = PPM2.NetworkedPonyData(nil, ply)
+        newData\SetEntity(ply)
+        @ApplyDataToObject(newData, ...)
+        return newData
+    CreateNetworkObject: (...) =>
+        newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
+        newData\SetEntity(LocalPlayer())
+        @ApplyDataToObject(newData, ...)
+        return newData
+    ApplyDataToObject: (target, ...) => target["Set#{key}"](target, value, ...) for key, value in pairs @GetAsNetworked()
+    CreateController: (...) => @CreateNetworkObject(...)
+    CreateCustomController: (...) => @CreateCustomNetworkObject(...)
+
     new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
         @SetFilename(filename)
         @valid = @isOpen
         @rawData = data
         @dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
+        @saveOnChange = true
         if data
             @SetupData(data, true)
         elseif @exists and readIfExists
@@ -387,6 +417,10 @@ class PonyDataInstance
     
     @ERR_MISSING_PARAMETER = 4
     @ERR_MISSING_CONTENT = 5
+
+    GetSaveOnChange: => @saveOnChange
+    SaveOnChange: => @saveOnChange
+    SetSaveOnChange: (val = true) => @saveOnChange = val
     SetupData: (data, force = false, doBackup = false) =>
         if doBackup or not force
             makeBackup = false
@@ -417,7 +451,7 @@ class PonyDataInstance
                 @dataTable[key] = mapData.fix(mapData.enumMappingBackward[value\upper()])
             else
                 @dataTable[key] = mapData.fix(value)
-    ValueChanges: (key, oldVal, newVal, saveNow = @exists) =>
+    ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
         if @nwObj
             {:getFunc} = @@PONY_DATA[key]
             @nwObj["Set#{getFunc}"](@nwObj, newVal)
@@ -432,6 +466,19 @@ class PonyDataInstance
         @exists = file.Exists(@fpath, 'DATA')
         return @exists
     SetNetworkData: (nwObj) => @nwObj = nwObj
+    SetPonyData: (nwObj) => @nwObj = nwObj
+    SetPonyDataController: (nwObj) => @nwObj = nwObj
+    SetPonyController: (nwObj) => @nwObj = nwObj
+    SetController: (nwObj) => @nwObj = nwObj
+    SetDataController: (nwObj) => @nwObj = nwObj
+
+    GetNetworkData: => @nwObj
+    GetPonyData: => @nwObj
+    GetPonyDataController: => @nwObj
+    GetPonyController: => @nwObj
+    GetController: => @nwObj
+    GetDataController: => @nwObj
+
     IsValid: => @valid
     Exists: => @exists
     FileExists: => @exists
@@ -466,12 +513,14 @@ class PonyDataInstance
         readTable = util.JSONToTable(fRead)
         return @@ERR_FILE_CORRUPT unless readTable
         return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
+    SaveAs: (path = @fpath) =>
+        fCreate = @Serealize()
+        file.Write(path, fCreate)
     Save: (doBackup = true) =>
         if doBackup and @exists
             fRead = file.Read(@fpath, 'DATA')
             file.Write(@fpathBackup, fRead)
-        fCreate = @Serealize()
-        file.Write(@fpath, fCreate)
+        @SaveAs(@fpath)
         @exists = true
 
 PPM2.PonyDataInstance = PonyDataInstance
