@@ -1,0 +1,18 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/VN_mlp/common/teeth"
+
+	"$phong" "1"
+	"$phongexponent" "20"
+	"$phongboost" ".1"	
+	"$phongfresnelranges"	"[.3 1 8]"
+	"$halflambert" "0"
+	"$basemapalphaphongmask" "1"
+	"$lightwarptexture" "models/VN_mlp/common/lightwarp"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "4"	
+	"$rimlightboost" "2"
+
+	"$ambientocclusion" "1"
+}
