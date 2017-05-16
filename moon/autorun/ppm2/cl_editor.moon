@@ -15,11 +15,12 @@
 -- limitations under the License.
 --
 
-net.Receive 'PPM2.RequestPonyData', ->
-    instance = PPM2.GetMainData()
-    newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
-    newData\SetEntity(LocalPlayer())
-    for key, value in pairs instance\GetAsNetworked()
-        newData["Set#{key}"](newData, value)
-    newData\Create()
-    instance\SetNetworkData(newData)
+PPM2.OpenEditor = ->
+    frame = vgui.Create('DFrame')
+    self = frame
+    @SetSize(ScrW() - 25, ScrH() - 25)
+    @Center()
+    @MakePopup()
+    @SetTitle('PPM2 Pony Editor')
+
+    @menus = vgui.Create('DPropertySheet', @)

@@ -56,18 +56,23 @@ if CLIENT
     file.CreateDir('ppm2/backups')
     include 'autorun/ppm2/cl_data_instance.lua'
     include 'autorun/ppm2/cl_texture_controller.lua'
-    include 'autorun/ppm2/cl_draw.lua'
-    include 'autorun/ppm2/cl_networking.lua'
+    include 'autorun/ppm2/cl_hooks.lua'
     include 'autorun/ppm2/cl_render_controller.lua'
+    include 'autorun/ppm2/cl_editor.lua'
+
+    for ent in *ents.GetAll()
+        if ent.isPonyLegsModel
+            ent\Remove()
 else
+    util.AddNetworkString('PPM2.RequestPonyData')
+
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
     AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
     AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_draw.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_networking.lua'
+    AddCSLuaFile 'autorun/ppm2/cl_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/cl_render_controller.lua'
-    include 'autorun/ppm2/sv_networking.lua'
+    AddCSLuaFile 'autorun/ppm2/cl_editor.lua'
     include 'autorun/ppm2/sv_hooks.lua'

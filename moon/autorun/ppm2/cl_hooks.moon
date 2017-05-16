@@ -76,3 +76,16 @@ hook.Add 'RenderScreenspaceEffects', 'PPM2.RenderScreenspaceEffects', ->
 
     if @__cachedIsPony and @GetPonyData() and @Alive()
         @GetPonyData()\GetRenderController()\DrawLegs()
+
+
+RequestPonyData = ->
+    instance = PPM2.GetMainData()
+    newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
+    newData\SetEntity(LocalPlayer())
+    for key, value in pairs instance\GetAsNetworked()
+        newData["Set#{key}"](newData, value)
+    newData\Create()
+    instance\SetNetworkData(newData)
+
+net.Receive 'PPM2.RequestPonyData', RequestPonyData
+
