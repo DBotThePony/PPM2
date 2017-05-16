@@ -56,13 +56,17 @@ class PonyRenderController
         @legUpdateFrame = 0
         @legClipDot = 0
         @duckOffsetHack = @@LEG_CLIP_OFFSET_STAND
+        @legsClipPlane = @@LEG_CLIP_VECTOR
         return @legsModel
     
     @LEG_SHIFT_CONST = 24
+    @LEG_SHIFT_CONST_VEHICLE = 14
+    @LEG_Z_CONST = 0
+    @LEG_Z_CONST_VEHICLE = 20
     @LEG_ANIM_SPEED_CONST = 2
     @LEG_CLIP_OFFSET_STAND = 28
     @LEG_CLIP_OFFSET_DUCK = 12
-    @LEG_CLIP_OFFSET_VEHICLE = 20
+    @LEG_CLIP_OFFSET_VEHICLE = 11
 
     UpdateLegs: =>
         return unless IsValid(@legsModel)
@@ -94,13 +98,24 @@ class PonyRenderController
         if ply\InVehicle()
             veh = ply\GetVehicle()
             vehAng = veh\GetAngles()
-            vehPos = veh\GetPos()
+            eyepos = EyePos()
             vehAng\RotateAroundAxis(vehAng\Up(), 90)
+
+            clipAng = Angle(vehAng.p, vehAng.y, vehAng.r)
+            clipAng\RotateAroundAxis(clipAng\Right(), -90)
+
+            @legsClipPlane = clipAng\Forward()
             @legsModel\SetRenderAngles(vehAng)
-            @legsModel\SetRenderOrigin(vehPos)
-            {:x, :y, :z} = vehPos
-            @legClipPlanePos = Vector(x, y, z + @@LEG_CLIP_OFFSET_VEHICLE)
+
+            legClipPlanePos = Vector(0, 0, @@LEG_CLIP_OFFSET_VEHICLE)
+            legClipPlanePos\Rotate(vehAng)
+            @legClipPlanePos = eyepos - legClipPlanePos
+            
+            drawPos = Vector(@@LEG_SHIFT_CONST_VEHICLE, 0, @@LEG_Z_CONST_VEHICLE)
+            drawPos\Rotate(vehAng)
+            @legsModel\SetRenderOrigin(eyepos - drawPos)
         else
+            @legsClipPlane = @@LEG_CLIP_VECTOR
             eangles = EyeAngles()
             yaw = eangles.y - ply\GetPoseParameter('head_yaw') * 180 + 90
             newAng = Angle(0, yaw, 0)
@@ -108,7 +123,7 @@ class PonyRenderController
             sin, cos = math.sin(rad), math.cos(rad)
             pos = ply\GetPos()
             {:x, :y, :z} = pos
-            newPos = Vector(x - cos * @@LEG_SHIFT_CONST, y - sin * @@LEG_SHIFT_CONST, z)
+            newPos = Vector(x - cos * @@LEG_SHIFT_CONST, y - sin * @@LEG_SHIFT_CONST, z + @@LEG_Z_CONST)
             if ply\Crouching()
                 @duckOffsetHack = @@LEG_CLIP_OFFSET_DUCK
             else
@@ -117,7 +132,7 @@ class PonyRenderController
             @legClipPlanePos = Vector(x, y, z + @duckOffsetHack)
             @legsModel\SetRenderAngles(newAng)
             @legsModel\SetRenderOrigin(newPos)
-        @legClipDot = @@LEG_CLIP_VECTOR\Dot(@legClipPlanePos)
+        @legClipDot = @legsClipPlane\Dot(@legClipPlanePos)
     
     @LEG_CLIP_VECTOR = Vector(0, 0, -1)
     DrawLegs: (start3D = true) =>
@@ -127,7 +142,7 @@ class PonyRenderController
         @UpdateLegs()
 
         oldClip = render.EnableClipping(true)
-        render.PushCustomClipPlane(@@LEG_CLIP_VECTOR, @legClipDot)
+        render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
         cam.Start3D() if start3D
 
         @PreDraw()
