@@ -158,6 +158,12 @@ class PonyRenderController
     PostDraw: (ent = @ent) =>
         @GetTextureController()\PostDraw(ent)
 
+    @ARMS_MATERIAL_INDEX = 0
+    PreDrawArms: (ent) =>
+        render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
+    PostDrawArms: (ent) =>
+        render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX)
+
     DataChanges: (state) =>
         return if not @ent
         @GetTextureController()\DataChanges(state)

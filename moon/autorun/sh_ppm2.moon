@@ -29,6 +29,8 @@ list.Set('PlayerOptionsModel', 'ppm2_ponynj', 'models/ppm/player_default_base_nj
 player_manager.AddValidModel('ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 
+player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'ppm2_pony', 'ppm2_pony_cppm', 'ppm2_ponynj', 'ppm2_ponynj_cppm'}
+
 PPM2 = PPM2 or {}
 
 entMeta = FindMetaTable('Entity')

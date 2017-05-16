@@ -77,6 +77,25 @@ hook.Add 'RenderScreenspaceEffects', 'PPM2.RenderScreenspaceEffects', ->
     if @__cachedIsPony and @GetPonyData() and @Alive()
         @GetPonyData()\GetRenderController()\DrawLegs()
 
+SHOULD_DRAW_VIEWMODEL = CreateConVar('cl_ppm2_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
+
+hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
+    return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
+    return unless IsValid(arms)
+    return unless ply.__cachedIsPony
+    return unless ply\Alive()
+    data = ply\GetPonyData()
+    return unless data
+    data\GetRenderController()\PreDrawArms()
+    arms.__ppm2_draw = true
+
+hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
+    return unless IsValid(arms)
+    return unless arms.__ppm2_draw
+    data = ply\GetPonyData()
+    return unless data
+    data\GetRenderController()\PostDrawArms()
+    arms.__ppm2_draw = false
 
 RequestPonyData = ->
     instance = PPM2.GetMainData()
