@@ -550,12 +550,13 @@ class PonyTextureController
 
         tailType = @GetData()\GetTailType()
         if PPM2.TailDetailsMaterials[tailType]
-            {:r, :g, :b} = @GetData()\GetTailDetailColor1()
-            surface.SetDrawColor(r, g, b)
+            i = 1
             for mat in *PPM2.TailDetailsMaterials[tailType]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
+                surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                i += 1
 
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
@@ -578,12 +579,13 @@ class PonyTextureController
         surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         if PPM2.TailDetailsMaterials[tailType]
-            {:r, :g, :b} = @GetData()\GetTailDetailColor2()
-            surface.SetDrawColor(r, g, b)
+            i = 1
             for mat in *PPM2.TailDetailsMaterials[tailType]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
+                surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                i += 1
 
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
