@@ -243,7 +243,7 @@ class PonyTextureController
         @CompileEye(true)
         @compiled = true
     
-    PreDraw: =>
+    PreDraw: (ent = @ent) =>
         return unless @compiled
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
@@ -256,7 +256,7 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
     
-    PostDraw: =>
+    PostDraw: (ent = @ent) =>
         return unless @compiled
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)

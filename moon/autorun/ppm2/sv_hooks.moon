@@ -15,10 +15,16 @@
 -- limitations under the License.
 --
 
+PPM2.PLAYER_VIEW_OFFSET = 64 * .7
+PPM2.PLAYER_VIEW_OFFSET_DUCK = 28 * 1.2
+
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     timer.Simple 0.5, ->
         return unless @IsValid()
         return unless @IsPony()
+
+        @SetViewOffset(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET))
+        @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
         if @GetPonyData()
             @GetPonyData()\ApplyBodygroups()
             return

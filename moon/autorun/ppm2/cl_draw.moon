@@ -71,3 +71,8 @@ PPM2.PostPlayerDraw = =>
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, -2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, -2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
+hook.Add 'RenderScreenspaceEffects', 'PPM2.RenderScreenspaceEffects', ->
+    self = LocalPlayer()
+
+    if @__cachedIsPony and @GetPonyData() and @Alive()
+        @GetPonyData()\GetRenderController()\DrawLegs()
