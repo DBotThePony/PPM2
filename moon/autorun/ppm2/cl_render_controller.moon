@@ -39,11 +39,10 @@ class PonyRenderController
         @CreateLegs() if not IsValid()
         return @legsModel
     CreateLegs: =>
+        return NULL if @ent ~= LocalPlayer()
         for ent in *ents.GetAll()
             if ent.isPonyLegsModel
                 ent\Remove()
-        
-        return NULL if @ent ~= LocalPlayer()
         @legsModel = ClientsideModel(@modelCached)
         with @legsModel
             .isPonyLegsModel = true
