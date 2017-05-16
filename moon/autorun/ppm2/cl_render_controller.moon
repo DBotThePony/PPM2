@@ -63,7 +63,7 @@ class PonyRenderController
     @LEG_SHIFT_CONST_VEHICLE = 14
     @LEG_Z_CONST = 0
     @LEG_Z_CONST_VEHICLE = 20
-    @LEG_ANIM_SPEED_CONST = 2
+    @LEG_ANIM_SPEED_CONST = 1
     @LEG_CLIP_OFFSET_STAND = 28
     @LEG_CLIP_OFFSET_DUCK = 12
     @LEG_CLIP_OFFSET_VEHICLE = 11
@@ -87,7 +87,7 @@ class PonyRenderController
         
         with @legsModel
             \FrameAdvance(ctime - @lastLegUpdate)
-            \SetPlaybackRate(@@LEG_ANIM_SPEED_CONST)
+            \SetPlaybackRate(@@LEG_ANIM_SPEED_CONST * ply\GetPlaybackRate())
             @lastLegUpdate = ctime
             \SetPoseParameter('move_x',       (ply\GetPoseParameter('move_x')     * 2) - 1)
             \SetPoseParameter('move_y',       (ply\GetPoseParameter('move_y')     * 2) - 1)
