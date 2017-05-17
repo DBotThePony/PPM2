@@ -143,7 +143,14 @@ class NewBodygroupController extends DefaultBodygroupController
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
             \AddEffects(EF_BONEMERGE)
         
-        timer.Simple 2, -> @controller\SetUpperManeModel(@maneModelUP)
+        if SERVER
+            timer.Simple .5, ->
+                return unless IsValid(@maneModelUP)
+                @controller\SetUpperManeModel(@maneModelUP)
+                @ent\SetNWEntity('PPM2.UpperManeModel', @maneModelUP) if IsValid(@ent)
+        else
+            @controller\SetUpperManeModel(@maneModelUP)
+            
         return @maneModelUP
     CreateLowerManeModel: =>
         @maneModelLower\Remove() if IsValid(@maneModelLower)
@@ -172,7 +179,14 @@ class NewBodygroupController extends DefaultBodygroupController
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
             \AddEffects(EF_BONEMERGE)
         
-        timer.Simple 2, -> @controller\SetLowerManeModel(@maneModelLower)
+        if SERVER
+            timer.Simple .5, ->
+                return unless IsValid(@maneModelLower)
+                @controller\SetLowerManeModel(@maneModelLower) 
+                @ent\SetNWEntity('PPM2.LowerManeModel', @maneModelLower) if IsValid(@ent)
+        else
+            @controller\SetLowerManeModel(@maneModelLower) 
+
         return @maneModelLower
     CreateTailModel: =>
         @tailModel\Remove() if IsValid(@tailModel)
@@ -201,7 +215,14 @@ class NewBodygroupController extends DefaultBodygroupController
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
             \AddEffects(EF_BONEMERGE)
         
-        timer.Simple 2, -> @controller\SetTailModel(@tailModel)
+        if SERVER
+            timer.Simple .5, ->
+                return unless IsValid(@tailModel)
+                @controller\SetTailModel(@tailModel)
+                @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent)
+        else
+            @controller\SetTailModel(@tailModel)
+        
         return @tailModel
     
     CreateUpperManeModelIfNotExists: =>
