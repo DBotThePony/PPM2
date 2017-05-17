@@ -94,6 +94,10 @@ class PonyTextureController
         @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
     @__inherited(@)
 
+    @UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.UpperManeDetailsMaterials}
+    @LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.DownManeDetailsMaterials}
+    @TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.TailDetailsMaterials}
+
     @MAT_INDEX_EYE_LEFT = 0
     @MAT_INDEX_EYE_RIGHT = 1
     @MAT_INDEX_BODY = 2
@@ -416,6 +420,10 @@ class PonyTextureController
         @WingsMaterial\SetFloat('$alpha', 1)
 
         return @WingsMaterial
+    
+    GetManeType: => @GetData()\GetManeType()
+    GetManeTypeLower: => @GetData()\GetManeTypeLower()
+    GetTailType: => @GetData()\GetTailType()
     CompileHair: =>
         textureFirst = {
             'name': "PPM2.#{@id}.Mane.1"
@@ -461,11 +469,11 @@ class PonyTextureController
         surface.SetDrawColor(r, g, b)
         surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        maneTypeUpper = @GetData()\GetManeType()
-        if PPM2.UpperManeDetailsMaterials[maneTypeUpper]
+        maneTypeUpper = @GetManeType()
+        if @@UPPER_MANE_MATERIALS[maneTypeUpper]
             {:r, :g, :b} = @GetData()\GetManeDetailColor1()
             surface.SetDrawColor(r, g, b)
-            for mat in *PPM2.UpperManeDetailsMaterials[maneTypeUpper]
+            for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -487,11 +495,11 @@ class PonyTextureController
         surface.SetDrawColor(r, g, b)
         surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        maneTypeLower = @GetData()\GetManeTypeLower()
-        if PPM2.DownManeDetailsMaterials[maneTypeLower]
+        maneTypeLower = @GetManeTypeLower()
+        if @@LOWER_MANE_MATERIALS[maneTypeLower]
             {:r, :g, :b} = @GetData()\GetManeDetailColor2()
             surface.SetDrawColor(r, g, b)
-            for mat in *PPM2.DownManeDetailsMaterials[maneTypeLower]
+            for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -550,10 +558,10 @@ class PonyTextureController
         surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
         surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        tailType = @GetData()\GetTailType()
-        if PPM2.TailDetailsMaterials[tailType]
+        tailType = @GetTailType()
+        if @@TAIL_DETAIL_MATERIALS[tailType]
             i = 1
-            for mat in *PPM2.TailDetailsMaterials[tailType]
+            for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
                 surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -580,9 +588,9 @@ class PonyTextureController
         surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
         surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        if PPM2.TailDetailsMaterials[tailType]
+        if @@TAIL_DETAIL_MATERIALS[tailType]
             i = 1
-            for mat in *PPM2.TailDetailsMaterials[tailType]
+            for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
                 continue if type(mat) == 'number'
                 surface.SetMaterial(mat)
                 surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -813,6 +821,10 @@ class PonyTextureController
 class NewPonyTextureController extends PonyTextureController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
 
+    @UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @UPPER_MANE_MATERIALS}
+    @LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @LOWER_MANE_MATERIALS}
+    @TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @TAIL_DETAIL_MATERIALS}
+
     @MAT_INDEX_CMARK = 0
     @MAT_INDEX_EYELASHES = 1
     @MAT_INDEX_TONGUE = 2
@@ -839,6 +851,10 @@ class NewPonyTextureController extends PonyTextureController
                 @CompileHair()
             when 'TailTypeNew'
                 @CompileTail()
+
+    GetManeType: => @GetData()\GetManeTypeNew()
+    GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
+    GetTailType: => @GetData()\GetTailTypeNew()
 
     PreDrawMane: (ent = @ent, entMane) =>
         return unless @compiled
