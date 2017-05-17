@@ -182,6 +182,11 @@ class PonyTextureController
         @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
     
+    @BODY_UPDATE_TRIGGER = {}
+    for i = 1, PPM2.MAX_BODY_DETAILS
+        @BODY_UPDATE_TRIGGER["BodyDetail#{i}"] = true
+        @BODY_UPDATE_TRIGGER["BodyDetailColor#{i}"] = true
+    
     DataChanges: (state) =>
         return if not @ent
         key = state\GetKey()
@@ -208,6 +213,8 @@ class PonyTextureController
                 elseif @@EYE_UPDATE_TRIGGER[key]
                     @CompileEye(true)
                     @CompileEye(false)
+                elseif @@BODY_UPDATE_TRIGGER[key]
+                    @CompileBody()
 
     new: (controller, compile = true) =>
         @ent = controller\GetEntity()

@@ -24,6 +24,8 @@ class PonyDataInstance
             getFunc: 'Age'
             enum: {'FILLY', 'ADULT', 'MATURE'}
             fix: (arg = PPM2.AGE_ADULT) -> math.Clamp(tonumber(arg) or PPM2.AGE_ADULT, 0, 2)
+            min: 0
+            max: 2
         }
         
         'race': {
@@ -31,6 +33,8 @@ class PonyDataInstance
             getFunc: 'Race'
             enum: [arg for arg in *PPM2.RACE_ENUMS]
             fix: (arg = PPM2.RACE_EARTH) -> math.Clamp(tonumber(arg) or PPM2.RACE_EARTH, 0, 3)
+            min: 0
+            max: 3
         }
 
         'gender': {
@@ -38,12 +42,16 @@ class PonyDataInstance
             getFunc: 'Gender'
             enum: [arg for arg in *PPM2.AGE_ENUMS]
             fix: (arg = PPM2.GENDER_FEMALE) -> math.Clamp(tonumber(arg) or PPM2.GENDER_FEMALE, 0, 1)
+            min: 0
+            max: 1
         }
 
         'weight': {
             default: -> 1
             getFunc: 'Weight'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)
+            min: PPM2.MIN_WEIGHT
+            max: PPM2.MAX_WEIGHT
         }
 
         'eyelash': {
@@ -51,6 +59,8 @@ class PonyDataInstance
             getFunc: 'EyelashType'
             enum: [arg for arg in *PPM2.EyelashTypes]
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)
+            min: PPM2.MIN_EYELASHES
+            max: PPM2.MAX_EYELASHES
         }
         
         'tail': {
@@ -58,6 +68,8 @@ class PonyDataInstance
             getFunc: 'TailType'
             enum: [arg for arg in *PPM2.AvaliableTails] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS, PPM2.MAX_TAILS)
+            min: PPM2.MIN_TAILS
+            max: PPM2.MAX_TAILS
         }
         
         'tail_new': {
@@ -65,6 +77,8 @@ class PonyDataInstance
             getFunc: 'TailTypeNew'
             enum: [arg for arg in *PPM2.AvaliableTailsNew] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS_NEW, PPM2.MAX_TAILS_NEW)
+            min: PPM2.MIN_TAILS_NEW
+            max: PPM2.MAX_TAILS_NEW
         }
 
         'mane': {
@@ -72,6 +86,8 @@ class PonyDataInstance
             getFunc: 'ManeType'
             enum: [arg for arg in *PPM2.AvaliableUpperManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)
+            min: PPM2.MIN_UPPER_MANES
+            max: PPM2.MAX_UPPER_MANES
         }
 
         'mane_new': {
@@ -79,6 +95,8 @@ class PonyDataInstance
             getFunc: 'ManeTypeNew'
             enum: [arg for arg in *PPM2.AvaliableUpperManesNew] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW)
+            min: PPM2.MIN_UPPER_MANES_NEW
+            max: PPM2.MAX_UPPER_MANES_NEW
         }
 
         'manelower': {
@@ -86,6 +104,8 @@ class PonyDataInstance
             getFunc: 'ManeTypeLower'
             enum: [arg for arg in *PPM2.AvaliableLowerManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)
+            min: PPM2.MIN_LOWER_MANES
+            max: PPM2.MAX_LOWER_MANES
         }
 
         'manelower_new': {
@@ -93,30 +113,40 @@ class PonyDataInstance
             getFunc: 'ManeTypeLowerNew'
             enum: [arg for arg in *PPM2.AvaliableLowerManesNew] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW)
+            min: PPM2.MIN_LOWER_MANES_NEW
+            max: PPM2.MAX_LOWER_MANES_NEW
         }
 
         'tailsize': {
             default: -> 1
             getFunc: 'TailSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)
+            min: PPM2.MIN_TAIL_SIZE
+            max: PPM2.MAX_TAIL_SIZE
         }
 
         'eye_iris_size': {
             default: -> 1
             getFunc: 'IrisSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
+            min: PPM2.MIN_IRIS
+            max: PPM2.MAX_IRIS
         }
 
         'hole_width': {
             default: -> 1
             getFunc: 'HoleWidth'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+            min: PPM2.MIN_PUPIL_SIZE
+            max: PPM2.MAX_PUPIL_SIZE
         }
 
         'eye_hole_size': {
             default: -> .8
             getFunc: 'HoleSize'
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
+            min: PPM2.MIN_HOLE
+            max: PPM2.MAX_HOLE
         }
 
         'cmark': {
@@ -130,6 +160,8 @@ class PonyDataInstance
             getFunc: 'CMarkType'
             enum: [arg for arg in *PPM2.DefaultCutiemarks]
             fix: (arg = 4) -> math.Clamp(tonumber(arg) or 4, PPM2.MIN_CMARK, PPM2.MAX_CMARK)
+            min: PPM2.MIN_CMARK
+            max: PPM2.MAX_CMARK
         }
 
         'cmark_url': {
@@ -153,6 +185,8 @@ class PonyDataInstance
             default: -> 1
             getFunc: 'DerpEyesStrength'
             fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+            min: PPM2.MIN_DERP_STRENGTH
+            max: PPM2.MAX_DERP_STRENGTH
         }
 
         'eye_bg': {
@@ -276,6 +310,8 @@ class PonyDataInstance
             getFunc: 'Bodysuit'
             enum: [arg for arg in *PPM2.AvaliablePonySuits]
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_SUIT, PPM2.MAX_SUIT)
+            min: PPM2.MIN_SUIT
+            max: PPM2.MAX_SUIT
         }
     }
 
@@ -374,6 +410,8 @@ class PonyDataInstance
             default: -> 1
             getFunc: "IrisSize#{publicName}"
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
+            min: PPM2.MIN_IRIS
+            max: PPM2.MAX_IRIS
         }
 
         @PONY_DATA["eye_derp_#{internal}"] = {
@@ -386,6 +424,24 @@ class PonyDataInstance
             default: -> 1
             getFunc: "DerpEyesStrength#{publicName}"
             fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+            min: PPM2.MIN_DERP_STRENGTH
+            max: PPM2.MAX_DERP_STRENGTH
+        }
+
+        @PONY_DATA["hole_width_#{internal}"] = {
+            default: -> 1
+            getFunc: "HoleWidth#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+            min: PPM2.MIN_PUPIL_SIZE
+            max: PPM2.MAX_PUPIL_SIZE
+        }
+
+        @PONY_DATA["eye_hole_size#{internal}"] = {
+            default: -> .8
+            getFunc: "HoleSize#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
+            min: PPM2.MIN_HOLE
+            max: PPM2.MAX_HOLE
         }
 
     for i = 1, 6
@@ -445,27 +501,6 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
-        @PONY_DATA["body_detail_color_#{i}"] = {
-            default: -> Color(140, 50, 100)
-            getFunc: "BodyDetailColor#{i}"
-            fix: (arg = Color(140, 50, 100)) ->
-                if type(arg) ~= 'table'
-                    return Color(140, 50, 100)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(140, 50, 100)
-        }
-
-        @PONY_DATA["body_detail_#{i}"] = {
-            default: -> 0
-            getFunc: "BodyDetail#{i}"
-            enum: [arg for arg in *PPM2.BodyDetailsEnum]
-            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)
-        }
-
         -- Reserved - they can be accessed/used/changed, but they do not do anything
         @PONY_DATA["lower_mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
@@ -496,6 +531,30 @@ class PonyDataInstance
         }
         ------
     
+    for i = 1, PPM2.MAX_BODY_DETAILS
+        @PONY_DATA["body_detail_color_#{i}"] = {
+            default: -> Color(140, 50, 100)
+            getFunc: "BodyDetailColor#{i}"
+            fix: (arg = Color(140, 50, 100)) ->
+                if type(arg) ~= 'table'
+                    return Color(140, 50, 100)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(140, 50, 100)
+        }
+
+        @PONY_DATA["body_detail_#{i}"] = {
+            default: -> 0
+            getFunc: "BodyDetail#{i}"
+            enum: [arg for arg in *PPM2.BodyDetailsEnum]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)
+            min: PPM2.MIN_DETAIL
+            max: PPM2.MAX_DETAIL
+        }
+    
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
 
@@ -509,8 +568,18 @@ class PonyDataInstance
             i += 1
             data.enumMapping[i] = enumVal
             data.enumMappingBackward[enumVal] = i
-    for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping} in pairs @PONY_DATA
+    for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping, :enum, :min, :max} in pairs @PONY_DATA
         @__base["Get#{getFunc}"] = => @dataTable[key]
+        @__base["GetMin#{getFunc}"] = => min if min
+        @__base["GetMax#{getFunc}"] = => max if max
+        @__base["Enum#{getFunc}"] = => enum if enum
+        @__base["Get#{getFunc}Types"] = => enum if enum
+
+        @["GetMin#{getFunc}"] = => min if min
+        @["GetMax#{getFunc}"] = => max if max
+        @["GetEnum#{getFunc}"] = => enum if enum
+        @["Enum#{getFunc}"] = => enum if enum
+
         if enumMapping
             @__base["Get#{getFunc}Enum"] = => enumMapping[@dataTable[key]] or enumMapping[0] or @dataTable[key]
             @__base["GetEnum#{getFunc}"] = @__base["Get#{getFunc}Enum"]
@@ -524,18 +593,17 @@ class PonyDataInstance
             @ValueChanges(key, oldVal, newVal, ...)
 
     Copy: (fileName = @filename) =>
-        copyOfData = for key, val in pairs @dataTable
+        copyOfData = {}
+        for key, val in pairs @dataTable
             switch type(val)
                 when 'number'
-                    val
+                    copyOfData[key] = val
                 when 'string'
-                    val
+                    copyOfData[key] = val
                 when 'table'
                     {:r, :g, :b} = val
                     if r and g and b
-                        Color(r, g, b)
-                    else
-                        continue
+                        copyOfData[key] = Color(r, g, b)
         newData = @@(fileName, copyOfData, false)
         return newData
     CreateCustomNetworkObject: (ply = LocalPlayer(), ...) =>
@@ -633,7 +701,9 @@ class PonyDataInstance
     FileExists: => @exists
     IsExists: => @exists
     GetFileName: => @filename
+    GetFilename: => @filename
     GetFileNameFull: => @filenameFull
+    GetFilenameFull: => @filenameFull
     GetFilePath: => @fpath
     GetFullFilePath: => @fpathFull
     SerealizeValue: (valID = '') =>

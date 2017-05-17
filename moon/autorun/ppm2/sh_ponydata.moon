@@ -46,23 +46,16 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('ManeTypeNew',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('ManeTypeLowerNew', (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
-    @NetworkVar('EyeBackground',    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-    @NetworkVar('EyeHole',          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
-    @NetworkVar('EyeIrisTop',       net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
-    @NetworkVar('EyeIrisBottom',    net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
-    @NetworkVar('EyeIrisLine1',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-    @NetworkVar('EyeIrisLine2',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
 
     @NetworkVar('SeparateEyes',     net.ReadBool, net.WriteBool,              false)
-    for publicName in *{'Left', 'Right'}
+    for publicName in *{'', 'Left', 'Right'}
         @NetworkVar("EyeBackground#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
         @NetworkVar("EyeHole#{publicName}",          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
         @NetworkVar("EyeIrisTop#{publicName}",       net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
         @NetworkVar("EyeIrisBottom#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
         @NetworkVar("EyeIrisLine1#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
         @NetworkVar("EyeIrisLine2#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-        @NetworkVar("BodyColor#{publicName}",        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
         @NetworkVar("EyeLines#{publicName}",         net.ReadBool, net.WriteBool,                           true)
         @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
         @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
@@ -81,15 +74,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         -----
     
-    @NetworkVar('EyeLines',         net.ReadBool, net.WriteBool,              true)
-    @NetworkVar('DerpEyes',         net.ReadBool, net.WriteBool,              false)
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')
     @NetworkVar('CMarkType',        (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_CMARK, PPM2.MAX_CMARK)),           ((arg = 4) -> net.WriteUInt(arg, 8)), 4)
-    @NetworkVar('IrisSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
-    @NetworkVar('DerpEyesStrength', (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
-    @NetworkVar('HoleSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
-    @NetworkVar('HoleWidth',        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
     @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)),   net.WriteFloat, 1)
 
     @NetworkVar('Bodysuit',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SUIT, PPM2.MAX_SUIT)),             ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
