@@ -54,6 +54,7 @@ entMeta.IsPony = =>
 entMeta.HasPonyModel = entMeta.IsPony
 
 include 'autorun/ppm2/sh_networked_object.lua'
+include 'autorun/ppm2/sh_registry.lua'
 include 'autorun/ppm2/sh_ponydata.lua'
 include 'autorun/ppm2/sh_hooks.lua'
 include 'autorun/ppm2/sh_bodygroup_controller.lua'
@@ -77,6 +78,7 @@ else
     util.AddNetworkString('PPM2.SendTailModel')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
+    AddCSLuaFile 'autorun/ppm2/sh_registry.lua'
     AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
     AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
