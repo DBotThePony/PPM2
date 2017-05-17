@@ -132,7 +132,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         
         @GetBodygroupController()\DataChanges(state) if @ent
 
-        if CLIENT
+        if CLIENT and @ent
             @GetWeightController()\DataChanges(state)
             @GetRenderController()\DataChanges(state)
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent

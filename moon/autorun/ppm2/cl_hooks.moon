@@ -103,7 +103,11 @@ UpdateWeight = ->
     return if not ent\GetPonyData()
     ent\GetPonyData()\GetWeightController()\UpdateWeight()
 
-net.Receive 'PPM2.RequestPonyData', -> RunConsoleCommand('ppm2_reload')
+lastDataSend = 0
+net.Receive 'PPM2.RequestPonyData', ->
+    lastDataSend = 0
+    RunConsoleCommand('ppm2_reload')
+
 net.Receive 'PPM2.UpdateWeight', UpdateWeight
 
 concommand.Add 'ppm2_require', ->
@@ -111,7 +115,6 @@ concommand.Add 'ppm2_require', ->
     net.SendToServer()
     print '[PPM2] Requesting pony data...'
 
-lastDataSend = 0
 concommand.Add 'ppm2_reload', ->
     return if lastDataSend > RealTime()
     lastDataSend = RealTime() + 10
