@@ -86,7 +86,7 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
     return unless ply\Alive()
     data = ply\GetPonyData()
     return unless data
-    data\GetRenderController()\PreDrawArms()
+    data\GetRenderController()\PreDrawArms(arms)
     arms.__ppm2_draw = true
 
 hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
@@ -94,7 +94,7 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
     return unless arms.__ppm2_draw
     data = ply\GetPonyData()
     return unless data
-    data\GetRenderController()\PostDrawArms()
+    data\GetRenderController()\PostDrawArms(arms)
     arms.__ppm2_draw = false
 
 UpdateWeight = ->

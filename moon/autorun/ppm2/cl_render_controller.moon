@@ -161,6 +161,12 @@ class PonyRenderController
 
     @ARMS_MATERIAL_INDEX = 0
     PreDrawArms: (ent) =>
+        if ent and not @armsWeightSetup
+            @armsWeightSetup = true
+            weight = @GetData()\GetWeight()
+            vec = Vector(weight, weight, weight)
+            for i = 1, 13
+                ent\ManipulateBoneScale(i, vec)
         render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
     PostDrawArms: (ent) =>
         render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX)
@@ -170,6 +176,7 @@ class PonyRenderController
         @GetTextureController()\DataChanges(state)
         switch state\GetKey()
             when 'Weight'
+                @armsWeightSetup = false
                 @GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
     GetTextureController: =>
         if not @renderController
