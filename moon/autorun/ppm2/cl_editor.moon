@@ -202,7 +202,7 @@ PANEL_SETTINGS_BASE = {
         box = vgui.Create('DColorMixer', collapse)
         collapse.box = box
         with box
-            \SetSize(250, 180)
+            \SetSize(250, 250)
 			\SetTooltip("#{name}\nData value: #{option}")
             \SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             .ValueChanged = (pnl, newVal = Color(0, 0, 0)) ->
@@ -215,7 +215,7 @@ PANEL_SETTINGS_BASE = {
             \SetContents(box)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
-            \SetSize(250, 180)
+            \SetSize(250, 250)
             \SetLabel(name)
             \SetExpanded(false)
         return box, collapse
