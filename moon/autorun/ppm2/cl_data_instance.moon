@@ -259,6 +259,12 @@ class PonyDataInstance
             fix: (arg = true) -> tobool(arg)
         }
 
+        'separate_eyes': {
+            default: -> false
+            getFunc: 'SeparateEyes'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'socks': {
             default: -> false
             getFunc: 'Socks'
@@ -272,6 +278,115 @@ class PonyDataInstance
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_SUIT, PPM2.MAX_SUIT)
         }
     }
+
+    for {internal, publicName} in *{{'left', 'Left'}, {'right', 'Right'}}
+        @PONY_DATA["eye_bg_#{internal}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "EyeBackground#{publicName}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["eye_hole_#{internal}"] = {
+            default: -> Color(0, 0, 0)
+            getFunc: "EyeHole#{publicName}"
+            fix: (arg = Color(0, 0, 0)) ->
+                if type(arg) ~= 'table'
+                    return Color(0, 0, 0)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(0, 0, 0)
+        }
+
+        @PONY_DATA["eye_iris1_#{internal}"] = {
+            default: -> Color(200, 200, 200)
+            getFunc: "EyeIrisTop#{publicName}"
+            fix: (arg = Color(200, 200, 200)) ->
+                if type(arg) ~= 'table'
+                    return Color(200, 200, 200)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(200, 200, 200)
+        }
+
+        @PONY_DATA["eye_iris2_#{internal}"] = {
+            default: -> Color(200, 200, 200)
+            getFunc: "EyeIrisBottom#{publicName}"
+            fix: (arg = Color(200, 200, 200)) ->
+                if type(arg) ~= 'table'
+                    return Color(200, 200, 200)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(200, 200, 200)
+        }
+
+        @PONY_DATA["eye_irisline1_#{internal}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "EyeIrisLine1#{publicName}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["eye_irisline2_#{internal}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "EyeIrisLine2#{publicName}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["eye_lines_#{internal}"] = {
+            default: -> true
+            getFunc: "EyeLines#{publicName}"
+            fix: (arg = true) -> tobool(arg)
+        }
+
+        @PONY_DATA["eye_iris_size_#{internal}"] = {
+            default: -> 1
+            getFunc: "IrisSize#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
+        }
+
+        @PONY_DATA["eye_derp_#{internal}"] = {
+            default: -> false
+            getFunc: "DerpEyes#{publicName}"
+            fix: (arg = true) -> tobool(arg)
+        }
+
+        @PONY_DATA["eye_derp_strength_#{internal}"]= {
+            default: -> 1
+            getFunc: "DerpEyesStrength#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+        }
 
     for i = 1, 6
         @PONY_DATA["mane_color_#{i}"] = {

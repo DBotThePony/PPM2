@@ -54,6 +54,22 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('EyeIrisLine2',     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
 
+    @NetworkVar('SeparateEyes',     net.ReadBool, net.WriteBool,              false)
+    for publicName in *{'Left', 'Right'}
+        @NetworkVar("EyeBackground#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeHole#{publicName}",          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
+        @NetworkVar("EyeIrisTop#{publicName}",       net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
+        @NetworkVar("EyeIrisBottom#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
+        @NetworkVar("EyeIrisLine1#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeIrisLine2#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+        @NetworkVar("BodyColor#{publicName}",        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeLines#{publicName}",         net.ReadBool, net.WriteBool,                           true)
+        @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
+        @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
+        @NetworkVar("HoleWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
+        @NetworkVar("HoleSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
+        @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
+
     for i = 1, 6
         @NetworkVar("ManeColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("ManeDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))

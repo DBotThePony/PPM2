@@ -99,6 +99,7 @@ class NetworkedObject
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
 		strName = "_NW_#{getName}"
+		error("No more free slots! Can't add #{getName} to the table") if @NW_NextVarID > 254
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
 		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id}

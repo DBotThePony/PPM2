@@ -159,6 +159,18 @@ class PonyTextureController
         'DerpEyes': true
     }
 
+    for publicName in *{'Left', 'Right'}
+        @EYE_UPDATE_TRIGGER["EyeWidth#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeLines#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeBackground#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeIrisLine1#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeIrisLine2#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeIris1#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeHole#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["DerpEyesStrength#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["DerpEyes#{publicName}"] = true
+
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
@@ -606,18 +618,23 @@ class PonyTextureController
     CompileEye: (left = false) =>
         prefix = left and 'l' or 'r'
         prefixUpper = left and 'L' or 'R'
-        EyeBackground = @GetData()\GetEyeBackground()
-        EyeHole = @GetData()\GetEyeHole()
-        HoleWidth = @GetData()\GetHoleWidth()
-        IrisSize = @GetData()\GetIrisSize() * .75
-        EyeIris1 = @GetData()\GetEyeIrisTop()
-        EyeIris2 = @GetData()\GetEyeIrisBottom()
-        EyeIrisLine1 = @GetData()\GetEyeIrisLine1()
-        EyeIrisLine2 = @GetData()\GetEyeIrisLine2()
-        EyeLines = @GetData()\GetEyeLines()
-        HoleSize = @GetData()\GetHoleSize()
-        DerpEyes = @GetData()\GetDerpEyes()
-        DerpEyesStrength = @GetData()\GetDerpEyesStrength()
+
+        separated = @GetData()\GetSeparateEyes()
+        prefixData = ''
+        prefixData = left and 'Left' or 'Right' if separated
+
+        EyeBackground = @GetData()["GetEyeBackground#{prefixData}"](@GetData())
+        EyeHole = @GetData()["GetEyeHole#{prefixData}"](@GetData())
+        HoleWidth = @GetData()["GetHoleWidth#{prefixData}"](@GetData())
+        IrisSize = @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
+        EyeIris1 = @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
+        EyeIris2 = @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
+        EyeIrisLine1 = @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
+        EyeIrisLine2 = @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
+        EyeLines = @GetData()["GetEyeLines#{prefixData}"](@GetData())
+        HoleSize = @GetData()["GetHoleSize#{prefixData}"](@GetData())
+        DerpEyes = @GetData()["GetDerpEyes#{prefixData}"](@GetData())
+        DerpEyesStrength = @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
         oldW, oldH = ScrW(), ScrH()
 
         shiftX, shiftY = 0, 0
