@@ -155,6 +155,8 @@ class PonyTextureController
         'EyeIrisLine2': true
         'EyeIris1': true
         'EyeHole': true
+        'DerpEyesStrength': true
+        'DerpEyes': true
     }
 
     for i = 1, 6
@@ -275,8 +277,6 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
     
-    @QUAD_POS_CONST = Vector(0, 0, 0)
-    @QUAD_FACE_CONST = Vector(0, 0, -1)
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
         rt\Download()
@@ -616,7 +616,13 @@ class PonyTextureController
         EyeIrisLine2 = @GetData()\GetEyeIrisLine2()
         EyeLines = @GetData()\GetEyeLines()
         HoleSize = @GetData()\GetHoleSize()
+        DerpEyes = @GetData()\GetDerpEyes()
+        DerpEyesStrength = @GetData()\GetDerpEyesStrength()
         oldW, oldH = ScrW(), ScrH()
+
+        shiftX, shiftY = 0, 0
+        shiftY += DerpEyesStrength * .15 * @@QUAD_SIZE_CONST if DerpEyes and left
+        shiftY -= DerpEyesStrength * .15 * @@QUAD_SIZE_CONST if DerpEyes and not left
 
         textureData = {
             'name': "PPM2.#{@id}.Eye.#{prefix}"
@@ -666,34 +672,34 @@ class PonyTextureController
         surface.SetMaterial(@@EYE_OVAL)
         IrisPos = @@QUAD_SIZE_CONST / 2 - @@QUAD_SIZE_CONST * IrisSize / 2
         IrisQuadSize = @@QUAD_SIZE_CONST * IrisSize
-        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
         surface.SetDrawColor(EyeIris2)
         surface.SetMaterial(@@EYE_GRAD)
-        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
         if EyeLines
             surface.SetDrawColor(EyeIrisLine1)
             surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
-            surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
             surface.SetDrawColor(EyeIrisLine2)
             surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
-            surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
         
         surface.SetDrawColor(EyeHole)
         surface.SetMaterial(@@EYE_OVAL)
         HoleQuadSize = @@QUAD_SIZE_CONST * IrisSize * HoleSize
         HolePos = @@QUAD_SIZE_CONST / 2
-        surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2, HoleQuadSize * HoleWidth, HoleQuadSize)
+        surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
 
         surface.SetDrawColor(255, 255, 255)
         surface.SetMaterial(@@EYE_EFFECT)
-        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
         surface.SetDrawColor(255, 255, 255, 127)
         surface.SetMaterial(@@EYE_REFLECTION)
-        surface.DrawTexturedRect(IrisPos, IrisPos, IrisQuadSize, IrisQuadSize)
+        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)

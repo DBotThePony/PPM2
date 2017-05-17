@@ -143,6 +143,18 @@ class PonyDataInstance
                     return ''
         }
 
+        'eye_derp': {
+            default: -> false
+            getFunc: 'DerpEyes'
+            fix: (arg = true) -> tobool(arg)
+        }
+
+        'eye_derp_strength': {
+            default: -> 1
+            getFunc: 'DerpEyesStrength'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+        }
+
         'eye_bg': {
             default: -> Color(255, 255, 255)
             getFunc: 'EyeBackground'
