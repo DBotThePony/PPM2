@@ -44,5 +44,13 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
             net.Broadcast()
             return
         
-        net.Start('PPM2.RequestPonyData')
-        net.Send(@)
+        timer.Simple 10, ->
+            net.Start('PPM2.RequestPonyData')
+            net.Send(@)
+
+net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
+    return if not IsValid(ply)
+    for ent in *ents.GetAll()
+        data = ent\GetPonyData()
+        continue if not data
+        data\NetworkTo(ply)

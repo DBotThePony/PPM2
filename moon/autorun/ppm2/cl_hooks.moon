@@ -97,18 +97,30 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
     data\GetRenderController()\PostDrawArms()
     arms.__ppm2_draw = false
 
-RequestPonyData = ->
-    instance = PPM2.GetMainData()
-    newData = instance\CreateNetworkObject()
-    newData\Create()
-    instance\SetNetworkData(newData)
-
 UpdateWeight = ->
     ent = net.ReadEntity()
     return if not IsValid(ent)
     return if not ent\GetPonyData()
     ent\GetPonyData()\GetWeightController()\UpdateWeight()
 
-net.Receive 'PPM2.RequestPonyData', RequestPonyData
+net.Receive 'PPM2.RequestPonyData', -> RunConsoleCommand('ppm2_reload')
 net.Receive 'PPM2.UpdateWeight', UpdateWeight
 
+concommand.Add 'ppm2_require', ->
+    net.Start('PPM2.Require')
+    net.SendToServer()
+    print '[PPM2] Requesting pony data...'
+
+lastDataSend = 0
+concommand.Add 'ppm2_reload', ->
+    return if lastDataSend > RealTime()
+    lastDataSend = RealTime() + 10
+    instance = PPM2.GetMainData()
+    newData = instance\CreateNetworkObject()
+    newData\Create()
+    instance\SetNetworkData(newData)
+    print '[PPM2] Sending pony data to server...'
+
+hook.Add 'KeyPress', 'PPM2.RequireData', ->
+    hook.Remove 'KeyPress', 'PPM2.RequireData'
+    RunConsoleCommand('ppm2_require')

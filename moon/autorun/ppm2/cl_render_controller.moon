@@ -154,8 +154,6 @@ class PonyRenderController
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
 
-    PreDrawTranslucent: (ent = @ent) =>
-    PostDrawTranslucent: (ent = @ent) =>
     PreDraw: (ent = @ent) =>
         @GetTextureController()\PreDraw(ent)
     PostDraw: (ent = @ent) =>

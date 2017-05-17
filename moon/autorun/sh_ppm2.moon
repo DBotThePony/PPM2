@@ -74,10 +74,8 @@ if CLIENT
             ent\Remove()
 else
     util.AddNetworkString('PPM2.RequestPonyData')
-    util.AddNetworkString('PPM2.SendManeModel')
-    util.AddNetworkString('PPM2.SendManeModelLower')
-    util.AddNetworkString('PPM2.SendTailModel')
     util.AddNetworkString('PPM2.UpdateWeight')
+    util.AddNetworkString('PPM2.Require')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_registry.lua'

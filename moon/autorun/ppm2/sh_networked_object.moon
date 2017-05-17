@@ -261,5 +261,10 @@ class NetworkedObject
 			@WriteNetworkData()
 			net.SendToServer()
 			@@NW_Waiting[@@NW_WaitID] = @
+	NetworkTo: (targets = {}) =>
+		net.Start(@@NW_Create)
+		net.WriteUInt(@netID, 16)
+		@WriteNetworkData()
+		net.Send(targets)
 
 PPM2.NetworkedObject = NetworkedObject
