@@ -58,6 +58,7 @@ include 'autorun/ppm2/sh_registry.lua'
 include 'autorun/ppm2/sh_ponydata.lua'
 include 'autorun/ppm2/sh_hooks.lua'
 include 'autorun/ppm2/sh_bodygroup_controller.lua'
+include 'autorun/ppm2/sh_weight_controller.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
@@ -76,12 +77,14 @@ else
     util.AddNetworkString('PPM2.SendManeModel')
     util.AddNetworkString('PPM2.SendManeModelLower')
     util.AddNetworkString('PPM2.SendTailModel')
+    util.AddNetworkString('PPM2.UpdateWeight')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_registry.lua'
     AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
     AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/sh_weight_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
     AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_hooks.lua'

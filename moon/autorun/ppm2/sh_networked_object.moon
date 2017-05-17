@@ -41,6 +41,7 @@ class NetworkChangeState
 	GetVariableInternal: => @key
 	GetVarInternal: => @key
 	GetNewValue: => @newValue
+	GetValue: => @newValue
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
@@ -110,7 +111,7 @@ class NetworkedObject
 		@__base["Set#{getName}"] = (val = defValue, networkNow = true) =>
 			oldVal = @[strName]
 			@[strName] = val
-			state = NetworkChangeState(strName, getName, newVal, @)
+			state = NetworkChangeState(strName, getName, val, @)
 			state.networkChange = false
 			@SetLocalChange(state)
 			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation or SERVER)

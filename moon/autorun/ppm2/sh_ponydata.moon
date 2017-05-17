@@ -123,7 +123,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         timer.Simple 0.5, ->
             return unless IsValid(@ent)
             @GetBodygroupController()\ApplyBodygroups()
-            @GetRenderController() if CLIENT
+            if CLIENT
+                @GetRenderController()
+                @GetWeightController()
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
@@ -131,6 +133,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @GetBodygroupController()\DataChanges(state) if @ent
 
         if CLIENT
+            @GetWeightController()\DataChanges(state)
             @GetRenderController()\DataChanges(state)
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
@@ -143,6 +146,14 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @renderController = cls(@)
         @renderController.ent = @ent
         return @renderController
+    GetWeightController: =>
+        return if SERVER
+        if not @weightController or @modelCached ~= @modelWeight
+            cls = PPM2.GetPonyWeightController(@modelCached)
+            @modelWeight = @modelCached
+            @weightController = cls(@)
+        @weightController.ent = @ent
+        return @weightController
     GetBodygroupController: =>
         if not @bodygroups or @modelBodygroups ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()

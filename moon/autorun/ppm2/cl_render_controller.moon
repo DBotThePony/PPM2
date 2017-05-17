@@ -49,6 +49,8 @@ class PonyRenderController
             \SetNoDraw(true)
             .__PPM2_PonyData = @GetData()
         
+        @GetData()\GetWeightController()\UpdateWeight(@legsModel)
+
         @lastLegUpdate = CurTime()
         @legClipPlanePos = Vector(0, 0, 0)
         @legBGSetup = CurTime()
@@ -168,6 +170,9 @@ class PonyRenderController
     DataChanges: (state) =>
         return if not @ent
         @GetTextureController()\DataChanges(state)
+        switch state\GetKey()
+            when 'Weight'
+                @GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
     GetTextureController: =>
         if not @renderController
             cls = PPM2.GetTextureController(@modelCached)

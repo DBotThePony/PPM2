@@ -103,5 +103,12 @@ RequestPonyData = ->
     newData\Create()
     instance\SetNetworkData(newData)
 
+UpdateWeight = ->
+    ent = net.ReadEntity()
+    return if not IsValid(ent)
+    return if not ent\GetPonyData()
+    ent\GetPonyData()\GetWeightController()\UpdateWeight()
+
 net.Receive 'PPM2.RequestPonyData', RequestPonyData
+net.Receive 'PPM2.UpdateWeight', UpdateWeight
 
