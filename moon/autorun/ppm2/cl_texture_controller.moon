@@ -824,6 +824,42 @@ class NewPonyTextureController extends PonyTextureController
     @MAT_INDEX_HORN = 8
     @MAT_INDEX_WINGS = 9
 
+    @MAT_INDEX_HAIR_COLOR1 = 0
+    @MAT_INDEX_HAIR_COLOR2 = 1
+
+    @MAT_INDEX_TAIL_COLOR1 = 0
+    @MAT_INDEX_TAIL_COLOR2 = 1
+
+    DataChanges: (state) =>
+        super(state)
+        switch state\GetKey()
+            when 'ManeTypeNew'
+                @CompileHair()
+            when 'ManeTypeLowerNew'
+                @CompileHair()
+            when 'TailTypeNew'
+                @CompileTail()
+
+    PreDrawMane: (ent = @ent, entMane) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
+
+    PostDrawMane: (ent = @ent, entMane) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
+
+    PreDrawTail: (ent = @ent, entTail) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetTail(1))
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetTail(2))
+
+    PostDrawTail: (ent = @ent, entTail) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
+
     PreDraw: (ent = @ent) =>
         return unless @compiled
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))

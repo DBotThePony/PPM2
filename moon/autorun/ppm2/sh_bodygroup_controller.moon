@@ -47,6 +47,11 @@ class DefaultBodygroupController
         @ent = controller.ent
         @entID = controller.entID
         @controller = controller
+    
+    GetData: => @controller
+    GetEntity: => @ent
+    GetEntityID: => @entID
+    GetDataID: => @entID
 
     ApplyRace: =>
         switch @controller\GetRace()
@@ -104,6 +109,165 @@ class CPPMBodygroupController extends DefaultBodygroupController
             when PPM2.RACE_ALICORN
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 2)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 3)
+
+class NewBodygroupController extends DefaultBodygroupController
+    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+
+    @ATTACHMENT_EYES = 4
+    @ATTACHMENT_EYES_NAME = 'eyes'
+
+    CreateUpperManeModel: =>
+        @maneModelUP\Remove() if IsValid(@maneModelUP)
+
+        for ent in *ents.GetAll()
+            if ent.isManeModel and ent.upperMane and ent.manePlayer == @ent
+                ent\Remove()
+
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
+
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @maneModelUP = ents.Create('prop_dynamic') if SERVER
+        @maneModelUP = ClientsideModel(model) if CLIENT
+        with @maneModelUP
+            .isManeModel = true
+            .upperMane = true
+            .manePlayer = @ent
+            \SetModel(model)
+            \SetPos(@ent\GetPos())
+            \Spawn()
+            \Activate()
+            \SetBodygroup(0, bodygroupID)
+            \SetParent(@ent)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \AddEffects(EF_BONEMERGE)
+        
+        timer.Simple 2, -> @controller\SetUpperManeModel(@maneModelUP)
+        return @maneModelUP
+    CreateLowerManeModel: =>
+        @maneModelLower\Remove() if IsValid(@maneModelLower)
+
+        for ent in *ents.GetAll()
+            if ent.isManeModel and ent.lowerMane and ent.manePlayer == @ent
+                ent\Remove()
+
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeLowerNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
+
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @maneModelLower = ents.Create('prop_dynamic') if SERVER
+        @maneModelLower = ClientsideModel(model) if CLIENT
+        with @maneModelLower
+            .isManeModel = true
+            .lowerMane = true
+            .manePlayer = @ent
+            \SetModel(model)
+            \SetPos(@ent\GetPos())
+            \Spawn()
+            \Activate()
+            \SetBodygroup(0, bodygroupID)
+            \SetParent(@ent)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \AddEffects(EF_BONEMERGE)
+        
+        timer.Simple 2, -> @controller\SetLowerManeModel(@maneModelLower)
+        return @maneModelLower
+    CreateTailModel: =>
+        @tailModel\Remove() if IsValid(@tailModel)
+
+        for ent in *ents.GetAll()
+            if ent.isManeModel and ent.isTail and ent.manePlayer == @ent
+                ent\Remove()
+
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetTailTypeNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
+
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @tailModel = ents.Create('prop_dynamic') if SERVER
+        @tailModel = ClientsideModel(model) if CLIENT
+        with @tailModel
+            .isManeModel = true
+            .isTail = true
+            .manePlayer = @ent
+            \SetModel(model)
+            \SetPos(@ent\GetPos())
+            \Spawn()
+            \Activate()
+            \SetBodygroup(0, bodygroupID)
+            \SetParent(@ent)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \AddEffects(EF_BONEMERGE)
+        
+        timer.Simple 2, -> @controller\SetTailModel(@tailModel)
+        return @tailModel
+    
+    CreateUpperManeModelIfNotExists: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateUpperManeModel() if not IsValid(@maneModelUP)
+        return @maneModelUP
+    CreateLowerManeModelIfNotExists: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateLowerManeModel() if not IsValid(@maneModelLower)
+        return @maneModelLower
+    CreateTailModelIfNotExists: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateTailModel() if not IsValid(@tailModel)
+        return @tailModel
+
+    UpdateUpperMane: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateUpperManeModelIfNotExists()
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
+        @maneModelUP\SetModel(model)
+        @maneModelUP\SetBodygroup(0, bodygroupID)
+        return @maneModelUP
+    UpdateLowerMane: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateLowerManeModelIfNotExists()
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeLowerNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
+        @maneModelLower\SetModel(model)
+        @maneModelLower\SetBodygroup(0, bodygroupID)
+        return @maneModelLower
+    UpdateTailModel: =>
+        return if CLIENT and @controller\IsGoingToNetwork()
+        @CreateTailModelIfNotExists()
+        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetTailTypeNew())
+        modelID = "0" .. modelID if modelID < 10
+        model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
+        @tailModel\SetModel(model)
+        @tailModel\SetBodygroup(0, bodygroupID)
+        return @tailModel
+
+    ApplyBodygroups: =>
+        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
+        @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+        @ApplyRace()
+        @CreateUpperManeModel()
+        @CreateLowerManeModel()
+        @CreateTailModel()
+
+    DataChanges: (state) =>
+        switch state\GetKey()
+            when 'EyelashType'
+                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
+            when 'Gender'
+                @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+            when 'ManeTypeNew'
+                @UpdateUpperMane()
+            when 'ManeTypeLowerNew'
+                @UpdateLowerMane()
+            when 'TailTypeNew'
+                @UpdateTailModel()
+            when 'Race'
+                @ApplyRace()
+
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController

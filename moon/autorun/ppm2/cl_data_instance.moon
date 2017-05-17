@@ -59,6 +59,13 @@ class PonyDataInstance
             enum: [arg for arg in *PPM2.AvaliableTails] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS, PPM2.MAX_TAILS)
         }
+        
+        'tail_new': {
+            default: -> 0
+            getFunc: 'TailTypeNew'
+            enum: [arg for arg in *PPM2.AvaliableTailsNew] -- fast copy
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_TAILS_NEW, PPM2.MAX_TAILS_NEW)
+        }
 
         'mane': {
             default: -> 0
@@ -67,11 +74,25 @@ class PonyDataInstance
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)
         }
 
+        'mane_new': {
+            default: -> 0
+            getFunc: 'ManeTypeNew'
+            enum: [arg for arg in *PPM2.AvaliableUpperManesNew] -- fast copy
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW)
+        }
+
         'manelower': {
             default: -> 0
             getFunc: 'ManeTypeLower'
             enum: [arg for arg in *PPM2.AvaliableLowerManes] -- fast copy
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)
+        }
+
+        'manelower_new': {
+            default: -> 0
+            getFunc: 'ManeTypeLowerNew'
+            enum: [arg for arg in *PPM2.AvaliableLowerManesNew] -- fast copy
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW)
         }
 
         'tailsize': {
@@ -395,14 +416,15 @@ class PonyDataInstance
         newData\SetEntity(ply)
         @ApplyDataToObject(newData, ...)
         return newData
-    CreateNetworkObject: (...) =>
+    CreateNetworkObject: (gointToNetwork = true, ...) =>
         newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
+        newData\SetIsGoingToNetwork(gointToNetwork)
         newData\SetEntity(LocalPlayer())
         @ApplyDataToObject(newData, ...)
         return newData
     ApplyDataToObject: (target, ...) => target["Set#{key}"](target, value, ...) for key, value in pairs @GetAsNetworked()
-    CreateController: (...) => @CreateNetworkObject(...)
-    CreateCustomController: (...) => @CreateCustomNetworkObject(...)
+    CreateController: (...) => @CreateNetworkObject(false, ...)
+    CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
 
     new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
         @SetFilename(filename)

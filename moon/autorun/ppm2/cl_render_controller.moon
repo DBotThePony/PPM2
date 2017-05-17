@@ -152,6 +152,8 @@ class PonyRenderController
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
 
+    PreDrawTranslucent: (ent = @ent) =>
+    PostDrawTranslucent: (ent = @ent) =>
     PreDraw: (ent = @ent) =>
         @GetTextureController()\PreDraw(ent)
     PostDraw: (ent = @ent) =>
@@ -173,7 +175,58 @@ class PonyRenderController
         @renderController.ent = @ent
         return @renderController
 
+class NewPonyRenderController extends PonyRenderController
+    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+
+    new: (data) =>
+        @upperManeModel = data\GetUpperManeModel()
+        @lowerManeModel = data\GetLowerManeModel()
+        @tailModel = data\GetTailModel()
+        @upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
+        @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
+        @tailModel\SetNoDraw(true) if IsValid(@tailModel)
+        @IGNORE_DRAW = false
+        super(data)
+    
+    DataChanges: (state) =>
+        return if not @ent
+        switch state\GetKey()
+            when 'UpperManeModel'
+                @upperManeModel = @GetData()\GetUpperManeModel()
+                @upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
+            when 'LowerManeMode'
+                @lowerManeModel = @GetData()\GetLowerManeModel()
+                @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
+            when 'TailModel'
+                @tailModel = @GetData()\GetTailModel()
+                @tailModel\SetNoDraw(true) if IsValid(@tailModel)
+        super(state)
+    
+    PreDraw: (ent = @ent) =>
+        return if @IGNORE_DRAW
+        super(ent)
+
+    PostDraw: (ent = @ent) =>
+        return if @IGNORE_DRAW
+        textures = @GetTextureController()
+        @IGNORE_DRAW = true
+        if IsValid(@upperManeModel)
+            textures\PreDrawMane()
+            @upperManeModel\DrawModel()
+            textures\PostDrawMane()
+        if IsValid(@lowerManeModel)
+            textures\PreDrawMane()
+            @lowerManeModel\DrawModel()
+            textures\PostDrawMane()
+        if IsValid(@tailModel)
+            textures\PreDrawTail()
+            @tailModel\DrawModel()
+            textures\PostDrawTail()
+        @IGNORE_DRAW = false
+        super(ent)
+
 PPM2.PonyRenderController = PonyRenderController
+PPM2.NewPonyRenderController = NewPonyRenderController
 PPM2.GetPonyRenderController = (model = 'models/ppm/player_default_base.mdl') -> PonyRenderController.AVALIABLE_CONTROLLERS[model\lower()] or PonyRenderController
 PPM2.GetPonyRendererController = PPM2.GetPonyRenderController
 PPM2.GetRenderController = PPM2.GetPonyRenderController

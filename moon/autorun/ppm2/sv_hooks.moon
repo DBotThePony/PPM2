@@ -19,6 +19,10 @@ PPM2.PLAYER_VIEW_OFFSET = 64 * .7
 PPM2.PLAYER_VIEW_OFFSET_DUCK = 28 * 1.2
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
+    for ent in *ents.GetAll()
+        if ent.isManeModel and ent.manePlayer == @
+            ent\Remove()
+
     timer.Simple 0.5, ->
         return unless @IsValid()
         return unless @IsPony()

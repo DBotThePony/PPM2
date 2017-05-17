@@ -95,6 +95,24 @@ PPM2.DefaultCutiemarks = {
     'smiley', 'dawsome', 'weegee'
 }
 
+PPM2.AvaliableUpperManesNew = {
+    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
+    'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
+    'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'NONE'
+}
+
+PPM2.AvaliableLowerManesNew = {
+    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+    'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
+    'BOOKWORM', 'BUMPKIN', 'CURLY', 'NONE'
+}
+
+PPM2.AvaliableTailsNew = {
+    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+    'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'EDGY'
+    'RADICAL', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'NONE'
+}
+
 PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOLTS_LIGHT', 'WONDERBOLTS_FULL', 'WONDERBOLTS_LIGHT'}
 
 do
@@ -109,11 +127,20 @@ PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
 PPM2.MIN_TAILS = 0
 PPM2.MAX_TAILS = #PPM2.AvaliableTails - 1
 
+PPM2.MIN_TAILS_NEW = 0
+PPM2.MAX_TAILS_NEW = #PPM2.AvaliableTailsNew - 1
+
 PPM2.MIN_UPPER_MANES = 0
 PPM2.MAX_UPPER_MANES = #PPM2.AvaliableUpperManes - 1
 
 PPM2.MIN_LOWER_MANES = 0
 PPM2.MAX_LOWER_MANES = #PPM2.AvaliableLowerManes - 1
+
+PPM2.MIN_UPPER_MANES_NEW = 0
+PPM2.MAX_UPPER_MANES_NEW = #PPM2.AvaliableUpperManesNew - 1
+
+PPM2.MIN_LOWER_MANES_NEW = 0
+PPM2.MAX_LOWER_MANES_NEW = #PPM2.AvaliableLowerManesNew - 1
 
 PPM2.MIN_DETAIL = 0
 PPM2.MAX_DETAIL = #PPM2.BodyDetails - 1
@@ -140,11 +167,21 @@ PPM2.AGE_ADULT = 1
 PPM2.AGE_MATURE = 2
 PPM2.AGE_ENUMS = {'FILLY', 'ADULT', 'MATURE'}
 
+PPM2.TransformNewModelID = (id = 0) ->
+    bgID = id % 17
+    maneModelID = math.floor(id / 16 - .01) + 1
+    maneModelID = 1 if maneModelID == 0
+    return maneModelID, bgID
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
 
     @Setup()
     @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('UpperManeModel',   net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('LowerManeModel',   net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('TailModel',        net.ReadEntity, net.WriteEntity, NULL)
+    
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
@@ -156,6 +193,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('TailType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_TAILS, PPM2.MAX_TAILS)),                   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('ManeType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)),       ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('ManeTypeLower',    (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)),       ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+
+    @NetworkVar('TailTypeNew',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_TAILS_NEW, PPM2.MAX_TAILS_NEW)),               ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('ManeTypeNew',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('ManeTypeLowerNew', (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
 
     @NetworkVar('EyeBackground',    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
     @NetworkVar('EyeHole',          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))

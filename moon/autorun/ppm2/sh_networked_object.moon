@@ -131,13 +131,15 @@ class NetworkedObject
 			netID = net.ReadUInt(16)
 			obj = @NW_Objects[netID] or @(netID)
 			obj.NETWORKED = true
+			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			@OnNetworkedCreatedCallback(obj, ply, len)
 		else
 			waitID = net.ReadUInt(16)
 			obj = @()
 			obj.NW_Player = ply
-			obj.NETWORKED = ply
+			obj.NETWORKED = true
+			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			obj\Create()
 			net.Start(@NW_ReceiveID)
@@ -186,6 +188,7 @@ class NetworkedObject
 	new: (netID = @@NW_NextObjectID, localObject = false) =>
 		@valid = true
 		@NETWORKED = false
+		@NETWORKED_PREDICT = false
 
 		if SERVER
 			@netID = @@NW_NextObjectID
@@ -200,6 +203,8 @@ class NetworkedObject
 	
 	IsValid: => @valid
 	IsNetworked: => @NETWORKED
+	IsGoingToNetwork: => @NETWORKED_PREDICT
+	SetIsGoingToNetwork: (val = @NETWORKED) => @NETWORKED_PREDICT = val
 	IsLocal: => @isLocal
 	IsLocalObject: => @isLocal
 	GetNetworkID: => @netID
@@ -238,6 +243,7 @@ class NetworkedObject
 		return if @NETWORKED
 		return if CLIENT and not @@NW_ClientsideCreation
 		@NETWORKED = true
+		@NETWORKED_PREDICT = true
 		if SERVER
 			net.Start(@@NW_Create)
 			net.WriteUInt(@netID, 16)
