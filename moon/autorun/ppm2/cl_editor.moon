@@ -362,3 +362,16 @@ PPM2.OpenEditor = ->
     PPM2.EditorFrame = frame
 
 concommand.Add 'ppm2_editor', PPM2.OpenEditor
+
+IconData =
+	title: 'PPM V2.0',
+	icon: 'gui/pped_icon.png',
+	width: 960,
+	height: 700,
+	onewindow: true,
+	init: (icon, window) ->
+		window\Remove()
+		RunConsoleCommand('ppm2_editor')
+
+list.Set('DesktopWindows', 'PPM2', IconData)
+CreateContextMenu() if IsValid(g_ContextMenu)
