@@ -18,6 +18,14 @@
 PPM2.PLAYER_VIEW_OFFSET = 64 * .7
 PPM2.PLAYER_VIEW_OFFSET_DUCK = 28 * 1.2
 
+hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
+    return if not @GetPonyData()
+    data = @GetPonyData()
+    bgController = data\GetBodygroupController()
+    rag = @GetRagdollEntity()
+    return if not IsValid(rag)
+    bgController\MergeModels(rag) if bgController.MergeModels
+
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     for ent in *ents.GetAll()
         if ent.isManeModel and ent.manePlayer == @

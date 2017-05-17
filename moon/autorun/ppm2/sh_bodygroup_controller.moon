@@ -238,6 +238,25 @@ class NewBodygroupController extends DefaultBodygroupController
         @CreateTailModel() if not IsValid(@tailModel)
         return @tailModel
 
+    GetUpperMane: => @maneModelUP or NULL
+    GetLowerMane: => @maneModelLower or NULL
+    GetTail: => @tailModel or NULL
+
+    MergeModels: (targetEnt = NULL) =>
+        return unless IsValid(targetEnt)
+        maneUpper = @CreateUpperManeModelIfNotExists()
+        maneLower = @CreateLowerManeModelIfNotExists()
+        tail = @CreateTailModelIfNotExists()
+        if IsValid(maneUpper)
+            maneUpper\SetParent(targetEnt)
+            maneUpper\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+        if IsValid(maneLower)
+            maneLower\SetParent(targetEnt)
+            maneLower\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+        if IsValid(tail)
+            tail\SetParent(targetEnt)
+            tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+
     UpdateUpperMane: =>
         return if CLIENT and @controller\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
