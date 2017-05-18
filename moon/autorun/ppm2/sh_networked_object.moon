@@ -96,7 +96,9 @@ class NetworkedObject
 			@NW_Waiting[netID] = nil
 			return unless obj
 			obj.NETWORKED = true
+			@NW_Objects[obj.netID] = nil
 			obj.netID = netID
+			@NW_Objects[netID] = obj
 	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
