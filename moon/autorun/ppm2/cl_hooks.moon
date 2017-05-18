@@ -128,3 +128,17 @@ hook.Add 'KeyPress', 'PPM2.RequireData', ->
     hook.Remove 'KeyPress', 'PPM2.RequireData'
     timer.Simple 1, -> RunConsoleCommand('ppm2_reload')
     RunConsoleCommand('ppm2_require')
+
+hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
+    lply = LocalPlayer()
+    lpos = lply\EyePos()
+    for ply in *player.GetAll()
+        if ply ~= lply
+            if ply\GetNWBool('PPM2.InEditor')
+                pos = ply\EyePos()
+                dist = pos\Distance(lpos)
+                if dist < 250
+                    pos.z += 10
+                    alpha = math.Clamp(1 - dist / 250, 0.1, 1)
+                    {:x, :y} = pos\ToScreen()
+                    draw.DrawText('In PPM Editor', 'Default', x, y, color_white, TEXT_ALIGN_CENTER)

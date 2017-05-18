@@ -626,12 +626,19 @@ EditorModels = {
 
 USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
 
-PPM2.EditorFrame\Remove() if IsValid(PPM2.EditorFrame)
+if IsValid(PPM2.EditorFrame)
+    PPM2.EditorFrame\Remove()
+    net.Start('PPM2.EditorStatus')
+    net.WriteBool(false)
+    net.SendToServer()
 PPM2.OpenEditor = ->
     if IsValid(PPM2.EditorFrame)
         PPM2.EditorFrame\SetVisible(true)
         PPM2.EditorFrame\Center()
         PPM2.EditorFrame\MakePopup()
+        net.Start('PPM2.EditorStatus')
+        net.WriteBool(true)
+        net.SendToServer()
         return
     
     frame = vgui.Create('DFrame')
@@ -643,6 +650,11 @@ PPM2.OpenEditor = ->
     @SetTitle('PPM2 Pony Editor')
     @SetDeleteOnClose(false)
     PPM2.EditorFrame = @
+
+    @OnClose = ->
+        net.Start('PPM2.EditorStatus')
+        net.WriteBool(false)
+        net.SendToServer()
 
     @menus = vgui.Create('DPropertySheet', @)
     @menus\Dock(LEFT)

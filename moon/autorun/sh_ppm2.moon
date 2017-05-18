@@ -76,6 +76,7 @@ else
     util.AddNetworkString('PPM2.RequestPonyData')
     util.AddNetworkString('PPM2.UpdateWeight')
     util.AddNetworkString('PPM2.Require')
+    util.AddNetworkString('PPM2.EditorStatus')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_registry.lua'

@@ -63,3 +63,7 @@ net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
         data = ent\GetPonyData()
         continue if not data
         data\NetworkTo(ply)
+
+net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
+    return if not IsValid(ply)
+    ply\SetNWBool('PPM2.InEditor', net.ReadBool())
