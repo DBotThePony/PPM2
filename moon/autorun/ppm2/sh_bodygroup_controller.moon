@@ -138,7 +138,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetPos(@ent\GetPos())
             \Spawn()
             \Activate()
-            \SetBodygroup(0, bodygroupID)
+            \SetBodygroup(1, bodygroupID)
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
@@ -174,7 +174,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetPos(@ent\GetPos())
             \Spawn()
             \Activate()
-            \SetBodygroup(0, bodygroupID)
+            \SetBodygroup(1, bodygroupID)
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
@@ -210,7 +210,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetPos(@ent\GetPos())
             \Spawn()
             \Activate()
-            \SetBodygroup(0, bodygroupID)
+            \SetBodygroup(1, bodygroupID)
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
@@ -264,7 +264,7 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
         @maneModelUP\SetModel(model)
-        @maneModelUP\SetBodygroup(0, bodygroupID)
+        @maneModelUP\SetBodygroup(1, bodygroupID)
         return @maneModelUP
     UpdateLowerMane: =>
         return if CLIENT and @controller\IsGoingToNetwork()
@@ -273,7 +273,7 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
         @maneModelLower\SetModel(model)
-        @maneModelLower\SetBodygroup(0, bodygroupID)
+        @maneModelLower\SetBodygroup(1, bodygroupID)
         return @maneModelLower
     UpdateTailModel: =>
         return if CLIENT and @controller\IsGoingToNetwork()
@@ -282,7 +282,7 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
         @tailModel\SetModel(model)
-        @tailModel\SetBodygroup(0, bodygroupID)
+        @tailModel\SetBodygroup(1, bodygroupID)
         return @tailModel
 
     ApplyBodygroups: =>
