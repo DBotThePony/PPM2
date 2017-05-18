@@ -397,7 +397,7 @@ EditorModels = {
     'NEW': 'models/ppm/player_default_base_new.mdl'
 }
 
-USE_MODEL = CreateConVar('ppm2_editor_model', 'default', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
+USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
 
 PPM2.OpenEditor = ->
     if IsValid(PPM2.EditorFrame)
@@ -450,7 +450,7 @@ PPM2.OpenEditor = ->
     @saveButton = vgui.Create('DButton', @)
     with @saveButton
         \SetText('Save')
-        \SetPos(W - 190, 5)
+        \SetPos(W - 205, 5)
         \SetSize(90, 20)
         .DoClick = -> saveAs()
     

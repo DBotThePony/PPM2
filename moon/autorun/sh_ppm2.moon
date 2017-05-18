@@ -17,20 +17,20 @@
 
 export PPM2
 
-player_manager.AddValidModel('ppm2_pony', 'models/ppm/player_default_base.mdl')
-list.Set('PlayerOptionsModel', 'ppm2_pony', 'models/ppm/player_default_base.mdl')
+player_manager.AddValidModel('ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
+list.Set('PlayerOptionsModel', 'ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
+
+player_manager.AddValidModel('pony', 'models/ppm/player_default_base.mdl')
+list.Set('PlayerOptionsModel', 'pony', 'models/ppm/player_default_base.mdl')
 
 player_manager.AddValidModel('ppm2_pony_cppm', 'models/cppm/player_default_base.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_pony_cppm', 'models/cppm/player_default_base.mdl')
 
-player_manager.AddValidModel('ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
-list.Set('PlayerOptionsModel', 'ppm2_ponynj', 'models/ppm/player_default_base_nj.mdl')
+player_manager.AddValidModel('ponynj', 'models/ppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ponynj', 'models/ppm/player_default_base_nj.mdl')
 
 player_manager.AddValidModel('ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ppm2_ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
-
-player_manager.AddValidModel('ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
-list.Set('PlayerOptionsModel', 'ppm2_pony_new', 'models/ppm/player_default_base_new.mdl')
 
 player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'ppm2_pony', 'ppm2_pony_cppm', 'ppm2_ponynj', 'ppm2_ponynj_cppm', 'ppm2_pony_new'}
 
