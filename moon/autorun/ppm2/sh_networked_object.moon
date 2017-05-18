@@ -77,6 +77,7 @@ class NetworkedObject
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
 		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
 		@NW_NextObjectID = 0
+		@NW_NextObjectID_CL = 2 ^ 28
 
 		if SERVER
 			util.AddNetworkString(@NW_Create)
@@ -186,7 +187,7 @@ class NetworkedObject
 		output = {strName, {getName, readFunc()} for {:getName, :strName, :readFunc} in *@NW_Vars}
 		return output
 
-	new: (netID = @@NW_NextObjectID, localObject = false) =>
+	new: (netID, localObject = false) =>
 		@valid = true
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
@@ -195,7 +196,8 @@ class NetworkedObject
 			@netID = @@NW_NextObjectID
 			@@NW_NextObjectID += 1
 		else
-			@netID = netID
+			@netID = @@NW_NextObjectID_CL
+			@@NW_NextObjectID_CL += 1
 		
 		@@NW_Objects[@netID] = @
 		@NW_Player = NULL
