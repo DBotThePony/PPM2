@@ -328,11 +328,11 @@ EditorPages = {
             @ComboBox('Lower Mane type', 'ManeTypeLower')
             @ComboBox('New Lower Mane type', 'ManeTypeLowerNew')
 
-            @Label('Colors higher than 2 are reserved\n - They would not affect anything\n(they are not shown here)')
             for i = 1, 2
                 @ColorBox("Mane color #{i}", "ManeColor#{i}")
-                @ColorBox("Mane detail color #{i}", "ManeColor#{i}")
                 @ColorBox("Tail color #{i}", "TailColor#{i}")
+            for i = 1, 6
+                @ColorBox("Mane detail color #{i}", "ManeColor#{i}")
                 @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}")
     }
 
@@ -343,6 +343,63 @@ EditorPages = {
             for i = 1, PPM2.MAX_BODY_DETAILS
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+    }
+
+    {
+        'name': 'Cutiemark'
+        'internal': 'cmark'
+        'func': (sheet) =>
+            @CheckBox('Display cutiemark', 'CMark')
+            @ComboBox('Cutiemark type', 'CMarkType')
+            @markDisplay = vgui.Create('EditablePanel', @)
+            with @markDisplay
+                \Dock(TOP)
+                \SetSize(250, 320)
+                .Paint = (pnl, w = 0, h = 0) ->
+                    data = @GetTargetData()
+                    return if not data
+                    controller = data\GetController()
+                    return if not controller
+                    rcontroller = controller\GetRenderController()
+                    return if not rcontroller
+                    tcontroller = rcontroller\GetTextureController()
+                    return if not tcontroller
+                    mat = tcontroller\GetCMarkGUI()
+                    return if not mat
+                    surface.SetDrawColor(0, 0, 0)
+                    surface.DrawRect(0, 0, w, h)
+                    surface.SetDrawColor(255, 255, 255)
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, w, h)
+            
+            @Label('Cutiemark URL image input field\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')\DockMargin(5, 10, 5, 10)
+            @textInput = vgui.Create('DTextEntry', @)
+            with @textInput
+                \Dock(TOP)
+                \DockMargin(5, 10, 5, 10)
+                \SetText(@GetTargetData()\GetCMarkURL())
+                .OnEnter = ->
+                    text = \GetValue()
+                    if text\find('^https?://')
+                        @GetTargetData()\SetCMarkURL(text)
+                        @ValueChanges('CMarkURL', text, @textInput)
+                .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
+                    switch key
+                        when KEY_FIRST
+                            return true
+                        when KEY_NONE
+                            return true
+                        when KEY_TAB
+                            return true
+                        when KEY_ENTER
+                            .OnEnter()
+                            \KillFocus()
+                            return true
+                    timer.Create 'PPM2.EditorCodeChange', 1, 1, ->
+                        return if not IsValid(@textInput)
+                        .OnEnter()
+                table.insert @updateFuncs, ->
+                    \SetText(@GetTargetData()\GetCMarkURL())
     }
 
     {
