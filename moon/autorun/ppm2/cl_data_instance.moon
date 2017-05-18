@@ -632,6 +632,8 @@ class PonyDataInstance
                     copyOfData[key] = val
                 when 'string'
                     copyOfData[key] = val
+                when 'boolean'
+                    copyOfData[key] = val
                 when 'table'
                     {:r, :g, :b} = val
                     if r and g and b
