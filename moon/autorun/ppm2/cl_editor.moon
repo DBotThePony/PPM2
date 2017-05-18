@@ -146,8 +146,10 @@ PANEL_SETTINGS_BASE = {
         @SetKeyboardInputEnabled(true)
         @DockPadding(5, 5, 5, 5)
         @unsavedChanges = false
+        @updateFuncs = {}
     ValueChanges: (valID, newVal, pnl) =>
         @unsavedChanges = true
+        @frame.unsavedChanges = true
         @frame\SetTitle("#{@GetTargetData() and @GetTargetData()\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor; *Unsaved changes*")
     GetShouldSaveData: => @shouldSaveData
     ShouldSaveData: => @shouldSaveData
@@ -155,8 +157,9 @@ PANEL_SETTINGS_BASE = {
     GetTargetData: => @data
     TargetData: => @data
     SetTargetData: (val) => @data = val
+    DoUpdate: => func() for func in *@updateFuncs
     NumSlider: (name = 'Slider', option = '', decimals = 0) =>
-		with vgui.Create('DNumSlider', @)
+		with vgui.Create('DNumSlider', @scroll or @)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
 			\SetTooltip("#{name}\nData value: #{option}")
@@ -175,16 +178,22 @@ PANEL_SETTINGS_BASE = {
                 return if not data
                 data["Set#{option}"](data, newVal, @GetShouldSaveData())
                 @ValueChanges(option, newVal, pnl)
+            table.insert @updateFuncs, ->
+                \SetMin(@GetTargetData()["GetMin#{option}"](@GetTargetData())) if @GetTargetData()
+                \SetMax(@GetTargetData()["GetMax#{option}"](@GetTargetData())) if @GetTargetData()
+                \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+            @scroll\AddItem(_with_0) if IsValid(@scroll)
     Label: (text = '') =>
-        with vgui.Create('DLabel', @)
+        with vgui.Create('DLabel', @scroll or @)
             \SetText(text)
             \Dock(TOP)
             \SetTextColor(color_white)
             \SizeToContents()
             w, h = \GetSize()
             \SetSize(w, h + 5)
+            @scroll\AddItem(_with_0) if IsValid(@scroll)
 	CheckBox: (name = 'Label', option = '') =>
-		with vgui.Create('DCheckBoxLabel', @)
+		with vgui.Create('DCheckBoxLabel', @scroll or @)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
@@ -197,8 +206,11 @@ PANEL_SETTINGS_BASE = {
                 return if not data
                 data["Set#{option}"](data, newVal and 1 or 0, @GetShouldSaveData())
                 @ValueChanges(option, newVal and 1 or 0, pnl)
+            table.insert @updateFuncs, ->
+                \SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+            @scroll\AddItem(_with_0) if IsValid(@scroll)
     ColorBox: (name = 'Colorful Box', option = '') =>
-        collapse = vgui.Create('DCollapsibleCategory', @)
+        collapse = vgui.Create('DCollapsibleCategory', @scroll or @)
         box = vgui.Create('DColorMixer', collapse)
         collapse.box = box
         with box
@@ -211,6 +223,8 @@ PANEL_SETTINGS_BASE = {
                 return if not data
                 data["Set#{option}"](data, newVal, @GetShouldSaveData())
                 @ValueChanges(option, newVal, pnl)
+            table.insert @updateFuncs, ->
+                \SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
         with collapse
             \SetContents(box)
             \Dock(TOP)
@@ -218,9 +232,10 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 250)
             \SetLabel(name)
             \SetExpanded(false)
+        @scroll\AddItem(collapse) if IsValid(@scroll)
         return box, collapse
     ComboBox: (name = 'Combo Box', option = '', choices) =>
-        label = vgui.Create('DLabel', @)
+        label = vgui.Create('DLabel', @scroll or @)
         with label
             \SetText(name)
             \SetTextColor(color_white)
@@ -228,6 +243,7 @@ PANEL_SETTINGS_BASE = {
             \SetSize(0, 20)
             \DockMargin(5, 0, 5, 0)
             \SetMouseInputEnabled(true)
+        @scroll\AddItem(label) if IsValid(@scroll)
         box = vgui.Create('DComboBox', label)
         with box
             \Dock(RIGHT)
@@ -244,7 +260,18 @@ PANEL_SETTINGS_BASE = {
                 return if not data
                 data["Set#{option}"](data, index, @GetShouldSaveData())
                 @ValueChanges(option, index, pnl)
+            table.insert @updateFuncs, ->
+                \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+                if choices
+                    \AddChoice(choice) for choice in *choices
+                else
+                    \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
         return box, label
+    ScrollPanel: =>
+        return @scroll if IsValid(@scroll)
+        @scroll = vgui.Create('DScrollPanel', @)
+        @scroll\Dock(FILL)
+        return @scroll
     Paint: (w = 0, h = 0) =>
 		surface.SetDrawColor(130, 130, 130)
 		surface.DrawRect(0, 0, w, h)
@@ -261,6 +288,7 @@ EditorModels = {
 EditorPages = {
     {
         'name': 'Main'
+        'internal': 'main'
         'func': (sheet) =>
             @CheckBox('Gender', 'Gender')
             @ComboBox('Race', 'Race')
@@ -273,7 +301,9 @@ EditorPages = {
 
     {
         'name': 'Eyes'
+        'internal': 'eyes'
         'func': (sheet) =>
+            @ScrollPanel()
             @CheckBox('Use separated settings for eyes', 'SeparateEyes')
             for publicName in *{'', 'Left', 'Right'}
                 @Label("'#{publicName}' Eye settings")
@@ -295,7 +325,9 @@ EditorPages = {
 
     {
         'name': 'Mane and tail'
+        'internal': 'manetail'
         'func': (sheet) =>
+            @ScrollPanel()
             @Label('"New" types affect only new model')
             @ComboBox('Tail type', 'TailType')
             @ComboBox('New Tail type', 'TailTypeNew')
@@ -316,21 +348,75 @@ EditorPages = {
 
     {
         'name': 'Body details'
+        'internal': 'bodydetail'
         'func': (sheet) =>
             for i = 1, PPM2.MAX_BODY_DETAILS
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
     }
+
+    {
+        'name': 'Files'
+        'internal': 'saves'
+        'func': (sheet) =>
+            @Label('Open file by double click')
+            list = vgui.Create('DListView', @)
+            list\Dock(FILL)
+            list\SetMultiSelect(false)
+            list.DoDoubleClick = (pnl, rowID, line) ->
+                fil = line\GetColumnText(1)
+                if @unsavedChanges
+                    confirm = ->
+                        @frame.data\SetFilename(fil)
+                        @frame.data\ReadFromDisk(true)
+                        @frame.data\UpdateController()
+                        @frame.DoUpdate()
+                        @unsavedChanges = false
+                        @frame.unsavedChanges = false
+                        @frame\SetTitle("#{fil} - PPM2 Pony Editor")
+                    Derma_Query(
+                        "Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
+                        'Unsaved changes!',
+                        'Yas!',
+                        confirm,
+                        'Noh!'
+                    )
+                else
+                    @frame.data\SetFilename(fil)
+                    @frame.data\ReadFromDisk(true)
+                    @frame.data\UpdateController()
+                    @frame.DoUpdate()
+                    @unsavedChanges = false
+                    @frame.unsavedChanges = false
+                    @frame\SetTitle("#{fil} - PPM2 Pony Editor")
+            list\AddColumn('Filename')
+            @rebuildFileList = ->
+                list\Clear()
+                files, dirs = file.Find('ppm2/*', 'DATA')
+                for fil in *files
+                    matchBak = '.bak.txt'
+                    continue if fil\sub(-#matchBak) == matchBak
+                    list\AddLine(fil\sub(1, #fil - 4))
+            @rebuildFileList()
+    }
 }
 
 PPM2.OpenEditor = ->
-    return if IsValid(PPM2.EditorFrame)
+    if IsValid(PPM2.EditorFrame)
+        PPM2.EditorFrame\SetVisible(true)
+        PPM2.EditorFrame\Center()
+        PPM2.EditorFrame\MakePopup()
+        return
+    
     frame = vgui.Create('DFrame')
     self = frame
-    @SetSize(ScrW() - 25, ScrH() - 25)
+    W, H = ScrW() - 25, ScrH() - 25
+    @SetSize(W, H)
     @Center()
     @MakePopup()
     @SetTitle('PPM2 Pony Editor')
+    @SetDeleteOnClose(false)
+    PPM2.EditorFrame = @
 
     @menus = vgui.Create('DPropertySheet', @)
     @menus\Dock(LEFT)
@@ -346,20 +432,55 @@ PPM2.OpenEditor = ->
     copy\SetController(controller)
     frame.controller = controller
     frame.data = copy
+    frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
+
+    saveAs = (callback = (->)) ->
+        confirm = (txt = '') ->
+            txt = txt\Trim()
+            return if txt == ''
+            copy\SetFilename(txt)
+            copy\Save()
+            @unsavedChanges = false
+            @model.unsavedChanges = false
+            @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+            @panels.saves.rebuildFileList()
+            callback(txt)
+        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt', copy\GetFilename(), confirm)
+    
+    @saveButton = vgui.Create('DButton', @)
+    with @saveButton
+        \SetText('Save')
+        \SetPos(W - 190, 5)
+        \SetSize(90, 20)
+        .DoClick = -> saveAs()
+    
+    @wearButton = vgui.Create('DButton', @)
+    with @wearButton
+        \SetText('Apply changes (wear)')
+        \SetPos(W - 350, 5)
+        \SetSize(140, 20)
+        lastWear = 0
+        .DoClick = ->
+            return if RealTime() < lastWear
+            lastWear = RealTime() + 5
+            mainData = PPM2.GetMainData()
+            copy\ApplyDataToObject(mainData, false) -- no save on apply
 
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
     @model\SetController(controller)
     controller\SetupEntity(ent)
 
-    for {:name, :func} in *EditorPages
+    @panels = {}
+
+    for {:name, :func, :internal} in *EditorPages
         pnl = vgui.Create('PPM2SettingsBase', @menus)
         @menus\AddSheet(name, pnl)
         pnl\SetTargetData(copy)
         pnl\Dock(FILL)
         pnl.frame = @
         func(pnl, @menus)
-    PPM2.EditorFrame = frame
+        @panels[internal] = pnl
 
 concommand.Add 'ppm2_editor', PPM2.OpenEditor
 

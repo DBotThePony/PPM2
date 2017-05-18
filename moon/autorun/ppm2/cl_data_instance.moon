@@ -617,7 +617,10 @@ class PonyDataInstance
         newData\SetEntity(LocalPlayer())
         @ApplyDataToObject(newData, ...)
         return newData
-    ApplyDataToObject: (target, ...) => target["Set#{key}"](target, value, ...) for key, value in pairs @GetAsNetworked()
+    ApplyDataToObject: (target, ...) =>
+        for key, value in pairs @GetAsNetworked()
+            target["Set#{key}"](target, value, ...) if target["Get#{key}"](target, value) ~= value
+    UpdateController: (...) => @ApplyDataToObject(@nwObj, ...)
     CreateController: (...) => @CreateNetworkObject(false, ...)
     CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
 
