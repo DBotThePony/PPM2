@@ -116,6 +116,11 @@ class NewBodygroupController extends DefaultBodygroupController
     @ATTACHMENT_EYES = 4
     @ATTACHMENT_EYES_NAME = 'eyes'
 
+    @BODYGROUP_SKELETON = 0
+    @BODYGROUP_GENDER = -1
+    @BODYGROUP_HORN = 1
+    @BODYGROUP_WINGS = 2
+
     CreateUpperManeModel: =>
         @maneModelUP\Remove() if IsValid(@maneModelUP)
 
