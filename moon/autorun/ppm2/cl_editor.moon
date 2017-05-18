@@ -110,6 +110,8 @@ MODEL_BOX_PANEL = {
                 cseq = @EDITOR_SEQUENCES[@editorSeq]
                 @nextSeq = rtime + cseq.time
             @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, @targetAngle, delta)
+            @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
+            @targetAngle.p = math.Clamp(@targetAngle.p, -40, 40)
         else
             if @hold
                 x, y = gui.MousePos()
@@ -124,7 +126,7 @@ MODEL_BOX_PANEL = {
         @distToPony = Lerp(delta * 4, @distToPony, @targetDistToPony)
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
         @vectorPos\Rotate(@angle)
-        @drawAngle = (Vector(0, 0, @PONY_VEC_Z) - @vectorPos)\Angle()
+        @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .5) - @vectorPos)\Angle()
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0)
         surface.DrawRect(0, 0, w, h)
