@@ -28,7 +28,7 @@ class PonyRenderController
         @networkedData = data
         @ent = data.ent
         @modelCached = data\GetModel()
-        @CompileTextures()
+        @CompileTextures() if @ent
         @CreateLegs() if @ent == LocalPlayer()
     GetEntity: => @ent
     GetData: => @networkedData

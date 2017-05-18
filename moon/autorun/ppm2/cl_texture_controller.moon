@@ -146,21 +146,9 @@ class PonyTextureController
 
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
-    @EYE_UPDATE_TRIGGER = {
-        'EyeWidth': true
-        'IrisSize': true
-        'EyeLines': true
-        'EyeBackground': true
-        'EyeIrisLine1': true
-        'EyeIrisLine2': true
-        'EyeIris1': true
-        'EyeHole': true
-        'DerpEyesStrength': true
-        'DerpEyes': true
-        'SeparateEyes': true
-    }
+    @EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
 
-    for publicName in *{'Left', 'Right'}
+    for publicName in *{'', 'Left', 'Right'}
         @EYE_UPDATE_TRIGGER["EyeWidth#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeLines#{publicName}"] = true

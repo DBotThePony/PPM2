@@ -103,9 +103,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
-        if @recomputeTextures and CLIENT
-            @GetRenderController()\CompileTextures()
-            @recomputeTextures = false
+        timer.Simple(0, -> @GetRenderController()\CompileTextures()) if CLIENT
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
         timer.Simple 0.5, ->
