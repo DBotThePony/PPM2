@@ -198,8 +198,8 @@ class NetworkedObject
 			@netID = @@NW_NextObjectID
 			@@NW_NextObjectID += 1
 		else
-			@netID = @@NW_NextObjectID_CL
-			@@NW_NextObjectID_CL += 1
+			netID = -1 if netID == nil
+			@netID = netID
 		
 		@@NW_Objects[@netID] = @
 		@NW_Player = NULL
