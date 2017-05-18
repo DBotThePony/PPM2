@@ -157,6 +157,7 @@ class PonyTextureController
         'EyeHole': true
         'DerpEyesStrength': true
         'DerpEyes': true
+        'SeparateEyes': true
     }
 
     for publicName in *{'Left', 'Right'}
