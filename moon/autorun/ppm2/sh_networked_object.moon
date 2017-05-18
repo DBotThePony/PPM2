@@ -140,7 +140,6 @@ class NetworkedObject
 			waitID = net.ReadUInt(16)
 			obj = @()
 			obj.NW_Player = ply
-			obj.NETWORKED = true
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			obj\Create()
@@ -195,6 +194,7 @@ class NetworkedObject
 		if SERVER
 			@netID = @@NW_NextObjectID
 			@@NW_NextObjectID += 1
+			print @netID
 		else
 			@netID = netID
 		
@@ -250,10 +250,10 @@ class NetworkedObject
 			net.Start(@@NW_Create)
 			net.WriteUInt(@netID, 16)
 			@WriteNetworkData()
-			if not IsValid(@NW_Player)
-				net.Broadcast()
-			else
-				net.SendOmit(@NW_Player)
+			filter = RecipientFilter()
+			filter\AddAllPlayers()
+			filter\RemovePlayer(@NW_Player) if IsValid(@NW_Player)
+			net.Send(filter)
 		else
 			@@NW_WaitID += 1
 			net.Start(@@NW_Create)
