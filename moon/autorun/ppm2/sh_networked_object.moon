@@ -194,7 +194,6 @@ class NetworkedObject
 		if SERVER
 			@netID = @@NW_NextObjectID
 			@@NW_NextObjectID += 1
-			print @netID
 		else
 			@netID = netID
 		
