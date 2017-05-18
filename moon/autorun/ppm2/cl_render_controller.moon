@@ -221,9 +221,14 @@ class NewPonyRenderController extends PonyRenderController
         textures = @GetTextureController()
         @IGNORE_DRAW = true
 
-        @upperManeModel = @ent\GetNWEntity('PPM2.UpperManeModel') if not IsValid(@upperManeModel)
-        @lowerManeModel = @ent\GetNWEntity('PPM2.LowerManeModel') if not IsValid(@lowerManeModel)
-        @tailModel = @ent\GetNWEntity('PPM2.TailModel') if not IsValid(@tailModel)
+        if @GetData()\IsNetworked()
+            @upperManeModel = @ent\GetNWEntity('PPM2.UpperManeModel') if not IsValid(@upperManeModel)
+            @lowerManeModel = @ent\GetNWEntity('PPM2.LowerManeModel') if not IsValid(@lowerManeModel)
+            @tailModel = @ent\GetNWEntity('PPM2.TailModel') if not IsValid(@tailModel)
+
+        @upperManeModel = @GetData()\GetUpperManeModel() if not IsValid(@upperManeModel)
+        @lowerManeModel = @GetData()\GetLowerManeModel() if not IsValid(@lowerManeModel)
+        @tailModel = @GetData()\GetTailModel() if not IsValid(@tailModel)
 
         if IsValid(@upperManeModel)
             @upperManeModel\SetNoDraw(true)

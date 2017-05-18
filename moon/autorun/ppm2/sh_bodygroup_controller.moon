@@ -140,7 +140,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetBodygroup(0, bodygroupID)
             \SetParent(@ent)
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
         if SERVER
@@ -176,7 +176,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetBodygroup(0, bodygroupID)
             \SetParent(@ent)
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
         if SERVER
@@ -212,7 +212,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetBodygroup(0, bodygroupID)
             \SetParent(@ent)
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
         if SERVER
@@ -249,13 +249,13 @@ class NewBodygroupController extends DefaultBodygroupController
         tail = @CreateTailModelIfNotExists()
         if IsValid(maneUpper)
             maneUpper\SetParent(targetEnt)
-            maneUpper\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            maneUpper\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         if IsValid(maneLower)
             maneLower\SetParent(targetEnt)
-            maneLower\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            maneLower\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         if IsValid(tail)
             tail\SetParent(targetEnt)
-            tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME)
+            tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
 
     UpdateUpperMane: =>
         return if CLIENT and @controller\IsGoingToNetwork()

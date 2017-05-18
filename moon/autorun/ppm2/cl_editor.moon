@@ -262,10 +262,6 @@ PANEL_SETTINGS_BASE = {
                 @ValueChanges(option, index, pnl)
             table.insert @updateFuncs, ->
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
-                if choices
-                    \AddChoice(choice) for choice in *choices
-                else
-                    \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
         return box, label
     ScrollPanel: =>
         return @scroll if IsValid(@scroll)
@@ -278,12 +274,6 @@ PANEL_SETTINGS_BASE = {
 }
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
-
-EditorModels = {
-    'DEFAULT': 'models/ppm/player_default_base.mdl'
-    'CPPM': 'models/cppm/player_default_base.mdl'
-    'NEW': 'models/ppm/player_default_base_new.mdl'
-}
 
 EditorPages = {
     {
@@ -401,6 +391,14 @@ EditorPages = {
     }
 }
 
+EditorModels = {
+    'DEFAULT': 'models/ppm/player_default_base.mdl'
+    'CPPM': 'models/cppm/player_default_base.mdl'
+    'NEW': 'models/ppm/player_default_base_new.mdl'
+}
+
+USE_MODEL = CreateConVar('ppm2_editor_model', 'default', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
+
 PPM2.OpenEditor = ->
     if IsValid(PPM2.EditorFrame)
         PPM2.EditorFrame\SetVisible(true)
@@ -427,7 +425,9 @@ PPM2.OpenEditor = ->
 
     copy = PPM2.GetMainData()\Copy()
     ply = LocalPlayer()
-    ent = @model\ResetModel(nil, EditorModels.DEFAULT)
+    editorModelSelect = USE_MODEL\GetString()\upper()
+    editorModelSelect = EditorModels[editorModelSelect] and editorModelSelect or 'DEFAULT'
+    ent = @model\ResetModel(nil, EditorModels[editorModelSelect])
     controller = copy\CreateCustomController(ent)
     copy\SetController(controller)
     frame.controller = controller
@@ -465,6 +465,26 @@ PPM2.OpenEditor = ->
             lastWear = RealTime() + 5
             mainData = PPM2.GetMainData()
             copy\ApplyDataToObject(mainData, false) -- no save on apply
+    @selectModelBox = vgui.Create('DComboBox', @)
+    with @selectModelBox
+        \SetSize(120, 20)
+        \SetPos(W - 475, 5)
+        \SetValue(editorModelSelect)
+        \AddChoice(choice) for choice in *{'default', 'cppm', 'new'}
+        .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+            @SetDeleteOnClose(true)
+            RunConsoleCommand('ppm2_editor_model', value)
+
+            confirm = ->
+                @Close()
+                timer.Simple 0.1, PPM2.OpenEditor
+            Derma_Query(
+                'You should restart editor for applying change.\nRestart now?\nUnsaved data can be lost!',
+                'Editor restart required',
+                'Yas!',
+                confirm,
+                'Noh!'
+            )
 
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
