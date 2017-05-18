@@ -174,12 +174,7 @@ class PonyTextureController
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["DownManeDetailColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["DownManeDetail#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeDetail#{i}"] = true
-        @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
-        @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["ManeDetailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
     
@@ -873,6 +868,17 @@ class NewPonyTextureController extends PonyTextureController
     @MAT_INDEX_TAIL_COLOR1 = 0
     @MAT_INDEX_TAIL_COLOR2 = 1
 
+    @MANE_UPDATE_TRIGGER = {key, value for key, value in pairs @MANE_UPDATE_TRIGGER}
+    @MANE_UPDATE_TRIGGER['ManeTypeNew'] = true
+    @MANE_UPDATE_TRIGGER['SeparateMane'] = true
+    @MANE_UPDATE_TRIGGER['ManeTypeLowerNew'] = true
+    
+    for i = 1, 6
+        @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["LowerManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
+
     DataChanges: (state) =>
         super(state)
         switch state\GetKey()
@@ -887,12 +893,138 @@ class NewPonyTextureController extends PonyTextureController
     GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
     GetTailType: => @GetData()\GetTailTypeNew()
 
-    PreDrawMane: (ent = @ent, entMane) =>
-        return unless @compiled
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
+    CompileHairInternal: (prefix = 'Upper') =>
+        textureFirst = {
+            'name': "PPM2.#{@id}.Mane.1_#{prefix}"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite' 
+                '$model': '1'
+                '$phong': '1'
+                '$basemapalphaphongmask': '1'
+                '$phongexponent': '6'
+                '$phongboost': '0.05'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                
+                '$rimlight': 1
+                '$rimlightexponent': 2
+                '$rimlightboost': 1
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
 
-    PostDrawMane: (ent = @ent, entMane) =>
+        textureSecond = {
+            'name': "PPM2.#{@id}.Mane.2_#{prefix}"
+            'shader': 'VertexLitGeneric'
+            'data': {k, v for k, v in pairs textureFirst.data}
+        }
+
+        HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
+        HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
+        oldW, oldH = ScrW(), ScrH()
+
+        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt\Download()
+        render.PushRenderTarget(rt)
+        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        -- First mane pass
+        {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
+        render.Clear(r, g, b, 255, true, true)
+        cam.Start2D()
+        surface.SetDrawColor(r, g, b)
+        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        maneTypeUpper = @GetManeType()
+        if @@UPPER_MANE_MATERIALS[maneTypeUpper]
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor1"](@GetData())
+            surface.SetDrawColor(r, g, b)
+            for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+                continue if type(mat) == 'number'
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+        HairColor1Material\SetTexture('$basetexture', rt)
+
+        -- Second mane pass
+        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt\Download()
+        render.PushRenderTarget(rt)
+        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
+        render.Clear(r, g, b, 255, true, true)
+        cam.Start2D()
+        surface.SetDrawColor(r, g, b)
+        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        maneTypeLower = @GetManeTypeLower()
+        if @@LOWER_MANE_MATERIALS[maneTypeLower]
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor2"](@GetData())
+            surface.SetDrawColor(r, g, b)
+            for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+                continue if type(mat) == 'number'
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+        HairColor2Material\SetTexture('$basetexture', rt)
+
+        HairColor1Material, HairColor2Material
+
+    CompileHair: =>
+        return super() if not @GetData()\GetSeparateMane()
+        mat1, mat2 = @CompileHairInternal('Upper')
+        mat3, mat4 = @CompileHairInternal('Lower')
+        @UpperManeColor1, @UpperManeColor2 = mat1, mat2
+        @LowerManeColor1, @LowerManeColor2 = mat3, mat4
+        return mat1, mat2, mat3, mat4
+    
+    GetUpperHair: (index = 1) =>
+        if index == 2
+            return @UpperManeColor2
+        else
+            return @UpperManeColor1
+    GetLowerHair: (index = 1) =>
+        if index == 2
+            return @LowerManeColor2
+        else
+            return @LowerManeColor1
+
+    PreDrawUpperMane: (ent = @ent, entMane) =>
+        return unless @compiled
+
+        if not @GetData()\GetSeparateMane()
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
+        else
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHair(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHair(2))
+
+    PostDrawUpperMane: (ent = @ent, entMane) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
+    
+    PreDrawLowerMane: (ent = @ent, entMane) =>
+        return unless @compiled
+
+        if not @GetData()\GetSeparateMane()
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
+        else
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHair(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHair(2))
+
+    PostDrawLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)

@@ -63,16 +63,17 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("HoleSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
         @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
 
+    @NetworkVar('SeparateMane',     net.ReadBool, net.WriteBool,              false)
     for i = 1, 6
         @NetworkVar("ManeColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("ManeDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("TailColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("TailDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        
-        -- Reserved - they can be accessed/used/changed, but they do not do anything
-        @NetworkVar("LowerManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("UpperManeColor#{i}",        net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        -----
+
+        @NetworkVar("LowerManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeDetailColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeDetailColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')

@@ -451,9 +451,21 @@ EditorPages = {
             for i = 1, 2
                 @ColorBox("Mane color #{i}", "ManeColor#{i}")
                 @ColorBox("Tail color #{i}", "TailColor#{i}")
+
             for i = 1, 6
                 @ColorBox("Mane detail color #{i}", "ManeColor#{i}")
                 @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}")
+            
+            @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+            @Label('These options have effect only on new model')
+
+            for i = 1, 2
+                @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}")
+                @ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}")
+
+            for i = 1, 6
+                @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}")
+                @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}")
     }
 
     {

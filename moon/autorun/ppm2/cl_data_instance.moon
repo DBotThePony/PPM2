@@ -299,6 +299,12 @@ class PonyDataInstance
             fix: (arg = false) -> tobool(arg)
         }
 
+        'separate_mane': {
+            default: -> false
+            getFunc: 'SeparateMane'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'socks': {
             default: -> false
             getFunc: 'Socks'
@@ -501,7 +507,6 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
-        -- Reserved - they can be accessed/used/changed, but they do not do anything
         @PONY_DATA["lower_mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "LowerManeColor#{i}"
@@ -529,7 +534,34 @@ class PonyDataInstance
                     else
                         return Color(255, 255, 255)
         }
-        ------
+
+        @PONY_DATA["lower_mane_detail_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "LowerManeDetailColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["upper_mane_detail_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "UpperManeDetailColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
     
     for i = 1, PPM2.MAX_BODY_DETAILS
         @PONY_DATA["body_detail_color_#{i}"] = {

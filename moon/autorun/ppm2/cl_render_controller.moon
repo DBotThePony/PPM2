@@ -232,15 +232,15 @@ class NewPonyRenderController extends PonyRenderController
 
         if IsValid(@upperManeModel)
             @upperManeModel\SetNoDraw(true)
-            textures\PreDrawMane()
+            textures\PreDrawUpperMane()
             @upperManeModel\DrawModel()
-            textures\PostDrawMane()
+            textures\PostDrawUpperMane()
 
         if IsValid(@lowerManeModel)
             @lowerManeModel\SetNoDraw(true)
-            textures\PreDrawMane()
+            textures\PreDrawLowerMane()
             @lowerManeModel\DrawModel()
-            textures\PostDrawMane()
+            textures\PostDrawLowerMane()
 
         if IsValid(@tailModel)
             @tailModel\SetNoDraw(true)
