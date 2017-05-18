@@ -354,7 +354,8 @@ EditorPages = {
             @markDisplay = vgui.Create('EditablePanel', @)
             with @markDisplay
                 \Dock(TOP)
-                \SetSize(250, 320)
+                \SetSize(320, 320)
+                \DockMargin(20, 20, 20, 20)
                 .Paint = (pnl, w = 0, h = 0) ->
                     data = @GetTargetData()
                     return if not data
@@ -383,6 +384,9 @@ EditorPages = {
                     if text\find('^https?://')
                         @GetTargetData()\SetCMarkURL(text)
                         @ValueChanges('CMarkURL', text, @textInput)
+                    else
+                        @GetTargetData()\SetCMarkURL('')
+                        @ValueChanges('CMarkURL', '', @textInput)
                 .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
                     switch key
                         when KEY_FIRST
