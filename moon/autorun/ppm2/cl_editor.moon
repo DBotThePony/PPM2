@@ -536,15 +536,15 @@ EditorPages = {
             list\SetMultiSelect(false)
             list.DoDoubleClick = (pnl, rowID, line) ->
                 fil = line\GetColumnText(1)
+                confirm = ->
+                    @frame.data\SetFilename(fil)
+                    @frame.data\ReadFromDisk(true)
+                    @frame.data\UpdateController()
+                    @frame.DoUpdate()
+                    @unsavedChanges = false
+                    @frame.unsavedChanges = false
+                    @frame\SetTitle("#{fil} - PPM2 Pony Editor")
                 if @unsavedChanges
-                    confirm = ->
-                        @frame.data\SetFilename(fil)
-                        @frame.data\ReadFromDisk(true)
-                        @frame.data\UpdateController()
-                        @frame.DoUpdate()
-                        @unsavedChanges = false
-                        @frame.unsavedChanges = false
-                        @frame\SetTitle("#{fil} - PPM2 Pony Editor")
                     Derma_Query(
                         "Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
                         'Unsaved changes!',
@@ -553,13 +553,7 @@ EditorPages = {
                         'Noh!'
                     )
                 else
-                    @frame.data\SetFilename(fil)
-                    @frame.data\ReadFromDisk(true)
-                    @frame.data\UpdateController()
-                    @frame.DoUpdate()
-                    @unsavedChanges = false
-                    @frame.unsavedChanges = false
-                    @frame\SetTitle("#{fil} - PPM2 Pony Editor")
+                    confirm()
             list\AddColumn('Filename')
             @rebuildFileList = ->
                 list\Clear()
@@ -568,6 +562,46 @@ EditorPages = {
                     matchBak = '.bak.txt'
                     continue if fil\sub(-#matchBak) == matchBak
                     list\AddLine(fil\sub(1, #fil - 4))
+            @rebuildFileList()
+    }
+
+    {
+        'name': 'Old Files'
+        'internal': 'oldsaves'
+        'func': (sheet) =>
+            @Label('!!! It may or may not work. You will be squished.')
+            list = vgui.Create('DListView', @)
+            list\Dock(FILL)
+            list\SetMultiSelect(false)
+            list.DoDoubleClick = (pnl, rowID, line) ->
+                fil = line\GetColumnText(1)
+                confirm = ->
+                    newData = PPM2.ReadFromOldData(fil)
+                    if not newData
+                        Derma_Message('Failed to import.', 'Onoh!', 'Okai ;w;')
+                        return
+                    @frame.data\SetFilename(newData\GetFilename())
+                    newData\ApplyDataToObject(@frame.data, false)
+                    @frame.data\UpdateController()
+                    @frame.DoUpdate()
+                    @unsavedChanges = true
+                    @frame.unsavedChanges = true
+                    @frame\SetTitle("#{newData\GetFilename()} - PPM2 Pony Editor; *Unsaved changes*")
+                if @unsavedChanges
+                    Derma_Query(
+                        "Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
+                        'Unsaved changes!',
+                        'Yas!',
+                        confirm,
+                        'Noh!'
+                    )
+                else
+                    confirm()
+            list\AddColumn('Filename')
+            @rebuildFileList = ->
+                list\Clear()
+                files, dirs = file.Find('ppm/*', 'DATA')
+                list\AddLine(fil\sub(1, #fil - 4)) for fil in *files
             @rebuildFileList()
     }
 }
