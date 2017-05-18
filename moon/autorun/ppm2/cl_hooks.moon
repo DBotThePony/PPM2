@@ -126,6 +126,5 @@ concommand.Add 'ppm2_reload', ->
 
 hook.Add 'KeyPress', 'PPM2.RequireData', ->
     hook.Remove 'KeyPress', 'PPM2.RequireData'
-    RunConsoleCommand('ppm2_reload')
+    timer.Simple 1, -> RunConsoleCommand('ppm2_reload')
     RunConsoleCommand('ppm2_require')
-    

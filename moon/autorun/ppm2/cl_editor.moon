@@ -205,7 +205,7 @@ MODEL_BOX_PANEL = {
             {:p, :y, :r} = @targetAngle
             @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
             @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
-            @targetAngle.p = math.Clamp(@targetAngle.p, -40, 40)
+            @targetAngle.p = math.Clamp(@targetAngle.p, -40, 10)
         else
             if @hold
                 x, y = gui.MousePos()
@@ -213,7 +213,7 @@ MODEL_BOX_PANEL = {
                 @mouseX, @mouseY = x, y
                 {:pitch, :yaw, :roll} = @targetAngle
                 yaw -= deltaX * .5
-                pitch = math.Clamp(pitch - deltaY * .5, -40, 40)
+                pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
                 @targetAngle = Angle(pitch, yaw, roll)
         
         @angle = LerpAngle(delta * 4, @angle, @targetAngle)
@@ -221,15 +221,37 @@ MODEL_BOX_PANEL = {
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
         @vectorPos\Rotate(@angle)
         @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .7) - @vectorPos)\Angle()
+    
+    FLOOR_VECTOR: Vector(0, 0, 20)
+    FLOOR_ANGLE: Vector(0, 0, 1)
+
+    DRAW_WALLS: {
+        {Vector(-4000, 0, 750), Vector(1, 0, 0), 8000, 1600}
+        {Vector(4000, 0, 750), Vector(-1, 0, 0), 8000, 1600}
+        {Vector(0, -4000, 750), Vector(0, 1, 0), 8000, 1600}
+        {Vector(0, 4000, 750), Vector(0, -1, 0), 8000, 1600}
+        {Vector(0, 0, 750), Vector(0, 0, -1), 8000, 8000}
+    }
+
+    WALL_COLOR: Color(98, 189, 176)
+    FLOOR_COLOR: Color(53, 150, 84)
+
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0)
         surface.DrawRect(0, 0, w, h)
         return if not IsValid(@model)
         x, y = @LocalToScreen(0, 0)
         cam.Start3D(@vectorPos, @drawAngle, 90, x, y, w, h)
+
+        render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 4000, 4000, @FLOOR_COLOR)
+
+        for {pos, ang, w, h} in *@DRAW_WALLS
+            render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
+
         @controller\GetRenderController()\PreDraw(@model) if @controller
         @model\DrawModel()
         @controller\GetRenderController()\PostDraw(@model) if @controller
+
         cam.End3D()
 }
 
