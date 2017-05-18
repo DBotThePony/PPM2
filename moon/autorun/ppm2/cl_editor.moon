@@ -222,15 +222,15 @@ MODEL_BOX_PANEL = {
         @vectorPos\Rotate(@angle)
         @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .7) - @vectorPos)\Angle()
     
-    FLOOR_VECTOR: Vector(0, 0, 20)
+    FLOOR_VECTOR: Vector(0, 0, -30)
     FLOOR_ANGLE: Vector(0, 0, 1)
 
     DRAW_WALLS: {
-        {Vector(-4000, 0, 750), Vector(1, 0, 0), 8000, 1600}
-        {Vector(4000, 0, 750), Vector(-1, 0, 0), 8000, 1600}
-        {Vector(0, -4000, 750), Vector(0, 1, 0), 8000, 1600}
-        {Vector(0, 4000, 750), Vector(0, -1, 0), 8000, 1600}
-        {Vector(0, 0, 750), Vector(0, 0, -1), 8000, 8000}
+        {Vector(-4000, 0, 900), Vector(1, 0, 0), 8000, 2000}
+        {Vector(4000, 0, 900), Vector(-1, 0, 0), 8000, 2000}
+        {Vector(0, -4000, 900), Vector(0, 1, 0), 8000, 2000}
+        {Vector(0, 4000, 900), Vector(0, -1, 0), 8000, 2000}
+        {Vector(0, 0, 900), Vector(0, 0, -1), 8000, 8000}
     }
 
     WALL_COLOR: Color(98, 189, 176)
@@ -243,7 +243,7 @@ MODEL_BOX_PANEL = {
         x, y = @LocalToScreen(0, 0)
         cam.Start3D(@vectorPos, @drawAngle, 90, x, y, w, h)
 
-        render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 4000, 4000, @FLOOR_COLOR)
+        render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
 
         for {pos, ang, w, h} in *@DRAW_WALLS
             render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
