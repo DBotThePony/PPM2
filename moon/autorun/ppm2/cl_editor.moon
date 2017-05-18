@@ -253,6 +253,8 @@ MODEL_BOX_PANEL = {
         @controller\GetRenderController()\PostDraw(@model) if @controller
 
         cam.End3D()
+    OnRemove: =>
+        @model\Remove() if IsValid(@model)
 }
 
 vgui.Register('PPM2ModelPanel', MODEL_BOX_PANEL, 'EditablePanel')
