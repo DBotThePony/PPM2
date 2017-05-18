@@ -17,15 +17,69 @@
 
 MODEL_BOX_PANEL = {
     SEQUENCE_STAND: 22
-    SEQUENCE_FORWARD: 316
-    SEQUENCE_WALK: 232
     PONY_VEC_Z: 64 * .7
+
+    SEQUENCES: {
+        'Standing':    22
+        'Moving':      316
+        'Walking':     232
+        'Sit':         202
+        'Swim':        370
+        'Run':         328
+        'Crouch walk': 286
+        'Crouch':      76
+        'Jump':        160
+    }
 
     EDITOR_SEQUENCES: {
         -- idle
         {
             time: 5
-            func: (pos, ang, delta) -> pos, ang
+            func: (dist, ang, delta) -> dist, ang
+        }
+
+        -- Slow move to left
+        {
+            time: 5
+            func: (dist, ang, delta) ->
+                ang.y += delta * 10
+                return dist, ang
+        }
+
+        -- Eyes
+        {
+            time: 5
+            func: (dist, ang, delta) ->
+                return 40, Angle(0, 0, 0)
+        }
+
+        -- Left view
+        {
+            time: 3
+            func: (dist, ang, delta) ->
+                return 80, Angle(0, 90, 0)
+        }
+
+        -- Move to right
+        {
+            time: 7
+            func: (dist, ang, delta) ->
+                ang.y -= 10 * delta
+                return 80, ang
+        }
+
+        -- Eyes (bottom)
+        {
+            time: 5
+            func: (dist, ang, delta) ->
+                return 20, Angle(40, 0, 0)
+        }
+
+        -- Look at top mane
+        {
+            time: 5
+            func: (dist, ang, delta) ->
+                return 50, Angle(-20, 180, 0)
         }
     }
 
@@ -46,6 +100,40 @@ MODEL_BOX_PANEL = {
         @playing = true
         @lastTick = RealTime()
         @SetCursor('none')
+
+        @animButton = vgui.Create('DButton', @)
+        with @animButton
+            \SetSize(120, 20)
+            \SetText('Playing animation')
+            .LastStatus = true
+            .Think = ->
+                if .LastStatus ~= @playing
+                    .LastStatus = @playing
+                    \SetText('Playing Animation') if @playing
+                    \SetText('Play Animation') if not @playing
+            .DoClick = ->
+                @playing = not @playing
+                if @playing
+                    @editorSeq = 1
+                    @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
+                    @ResetPosition()
+
+        @seqButton = vgui.Create('DComboBox', @)
+        with @seqButton
+            \SetSize(120, 20)
+            \SetValue('Standing')
+            SEQUENCES
+            \AddChoice(choice, num) for choice, num in pairs @SEQUENCES
+            .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+                @SetSequence(data)
+    ResetPosition: =>
+        @targetAngle = Angle(0, 0, 0)
+        @targetDistToPony = 100
+        @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
+    
+    PerformLayout: (w = 0, h = 0) =>
+        @animButton\SetPos(w - 130, 10)
+        @seqButton\SetPos(10, 10)
     
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
@@ -63,6 +151,8 @@ MODEL_BOX_PANEL = {
             @playing = true
             if not @oldPlaying
                 @editorSeq = 1
+                @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
+                @ResetPosition()
 
     SetController: (val) => @controller = val
 
@@ -99,6 +189,8 @@ MODEL_BOX_PANEL = {
         @lastTick = rtime
         if IsValid(@model)
             @model\FrameAdvance(delta * @animRate)
+            @model\SetPlaybackRate(1)
+            @model\SetPoseParameter('move_x', 1)
         
         @hold = @IsHovered() if @hold
         
@@ -109,7 +201,9 @@ MODEL_BOX_PANEL = {
                 @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
                 cseq = @EDITOR_SEQUENCES[@editorSeq]
                 @nextSeq = rtime + cseq.time
-            @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, @targetAngle, delta)
+            
+            {:p, :y, :r} = @targetAngle
+            @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
             @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
             @targetAngle.p = math.Clamp(@targetAngle.p, -40, 40)
         else
@@ -126,7 +220,7 @@ MODEL_BOX_PANEL = {
         @distToPony = Lerp(delta * 4, @distToPony, @targetDistToPony)
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
         @vectorPos\Rotate(@angle)
-        @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .5) - @vectorPos)\Angle()
+        @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .7) - @vectorPos)\Angle()
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0)
         surface.DrawRect(0, 0, w, h)
@@ -462,6 +556,7 @@ EditorModels = {
 
 USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
 
+PPM2.EditorFrame\Remove() if IsValid(PPM2.EditorFrame)
 PPM2.OpenEditor = ->
     if IsValid(PPM2.EditorFrame)
         PPM2.EditorFrame\SetVisible(true)
