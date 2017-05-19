@@ -384,11 +384,14 @@ PANEL_SETTINGS_BASE = {
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
         return box, label
     URLInput: (option = '') =>
-        textInput = vgui.Create('DTextEntry', @)
+        textInput = vgui.Create('DTextEntry', @scroll or @)
+        @scroll\AddItem(textInput) if IsValid(@scroll)
         with textInput
             \Dock(TOP)
             \DockMargin(5, 10, 5, 10)
             \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+            \SetKeyboardInputEnabled(true)
+            \SetMouseInputEnabled(true)
             .OnEnter = ->
                 text = \GetValue()
                 if text\find('^https?://')
@@ -505,6 +508,7 @@ EditorPages = {
         'name': 'Body details'
         'internal': 'bodydetail'
         'func': (sheet) =>
+            @ScrollPanel()
             for i = 1, PPM2.MAX_BODY_DETAILS
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
