@@ -270,6 +270,20 @@ class PonyFlexController
         }
 
         {
+            'name': 'body_idle'
+            'autostart': true
+            'repeat': true
+            'time': 2
+            'ids': {'Stomach_Out', 'Stomach_In'}
+            'func': (delta, timeOfAnim) =>
+                In, Out = @GetModifierID(1), @GetModifierID(2)
+                InState, OutState = @GetFlexState(1), @GetFlexState(2)
+                abs = math.abs(0.5 - timeOfAnim)
+                InState\SetModifierWeight(In, abs)
+                OutState\SetModifierWeight(Out, abs)
+        }
+
+        {
             'name': 'health_idle'
             'autostart': true
             'repeat': true
