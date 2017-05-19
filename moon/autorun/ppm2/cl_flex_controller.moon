@@ -288,12 +288,13 @@ class PonyFlexController
             'autostart': true
             'repeat': true
             'time': 5
-            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch'}
+            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O'}
             'func': (delta, timeOfAnim) =>
                 frown = @GetModifierID(1)
                 frownState = @GetFlexState(1)
                 left, right = @GetModifierID(2), @GetModifierID(3)
                 leftState, rightState = @GetFlexState(2), @GetFlexState(3)
+                Mouth_O, Mouth_OState = @GetModifierID(4), @GetFlexState(4)
                 Scrunch = @GetModifierID(4)
                 ScrunchState = @GetFlexState(4)
 
@@ -302,8 +303,9 @@ class PonyFlexController
                 strength = math.Clamp(1.5 - (hp / mhp) * 1.5, 0, 1)
                 frownState\SetModifierWeight(frown, strength)
                 ScrunchState\SetModifierWeight(Scrunch, strength * .5)
-                leftState\SetModifierWeight(left, strength * .3)
-                rightState\SetModifierWeight(right, strength * .3)
+                leftState\SetModifierWeight(left, strength * .1)
+                rightState\SetModifierWeight(right, strength * .1)
+                Mouth_OState\SetModifierWeight(Mouth_O, strength * .8)
         }
 
         {
@@ -317,6 +319,71 @@ class PonyFlexController
                 GrinState = @GetFlexState(1)
                 strength = .5 + math.sin(RealTime() * 2) * .25
                 GrinState\SetModifierWeight(Grin, strength)
+        }
+
+        {
+            'name': 'big_grin'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Grin'}
+            'func': (delta, timeOfAnim) =>
+                Grin = @GetModifierID(1)
+                GrinState = @GetFlexState(1)
+                GrinState\SetModifierWeight(Grin, 1)
+        }
+
+        {
+            'name': 'xd'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Grin', 'Left_Blink', 'Right_Blink', 'JawOpen'}
+            'func': (delta, timeOfAnim) =>
+                Grin = @GetModifierID(1)
+                GrinState = @GetFlexState(1)
+                GrinState\SetModifierWeight(Grin, .6)
+                
+                Left_Blink = @GetModifierID(2)
+                Left_BlinkState = @GetFlexState(2)
+                Left_BlinkState\SetModifierWeight(Left_Blink, .9)
+                
+                Right_Blink = @GetModifierID(3)
+                Right_BlinkState = @GetFlexState(3)
+                Right_BlinkState\SetModifierWeight(Right_Blink, .9)
+                
+                JawOpen = @GetModifierID(4)
+                JawOpenState = @GetFlexState(4)
+                JawOpenState\SetModifierScale(JawOpen, 2)
+                JawOpenState\SetModifierWeight(JawOpen, (timeOfAnim % .1) * 2)
+        }
+
+        {
+            'name': 'cat'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'CatFace'}
+            'func': (delta, timeOfAnim) =>
+                Grin = @GetModifierID(1)
+                GrinState = @GetFlexState(1)
+                GrinState\SetModifierWeight(Grin, 1)
+        }
+
+        {
+            'name': 'ooo'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'Mouth_O2', 'Mouth_O'}
+            'func': (delta, timeOfAnim) =>
+                timeOfAnim *= 2
+                Grin = @GetModifierID(1)
+                GrinState = @GetFlexState(1)
+                GrinState\SetModifierWeight(Grin, timeOfAnim)
+                Grin = @GetModifierID(2)
+                GrinState = @GetFlexState(2)
+                GrinState\SetModifierWeight(Grin, timeOfAnim)
         }
 
         {
@@ -468,9 +535,34 @@ class PonyFlexController
     
     OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
         return if ply ~= @ent or teamOnly or isDead
-        if string.find(text, 'hehehe') or string.find(text, 'hahaha')
-            @StartSequence('greeny')
-        @StartSequence('talk')
+        switch text
+            when 'o'
+                @StartSequence('ooo')
+            when 'O'
+                @StartSequence('ooo')
+            when 'о'
+                @StartSequence('ooo')
+            when 'О'
+                @StartSequence('ooo')
+            when ':3'
+                @StartSequence('cat')
+            when ':з'
+                @StartSequence('cat')
+            when ':D'
+                @StartSequence('big_grin')
+            when ':d'
+                @StartSequence('big_grin')
+            when 'xd'
+                @StartSequence('xd')
+            when 'XD'
+                @StartSequence('xd')
+            when 'xD'
+                @StartSequence('xd')
+            else
+                if string.find(text, 'hehehe') or string.find(text, 'hahaha')
+                    @StartSequence('greeny')
+                else
+                    @StartSequence('talk')
 
     RemoveHooks: =>
         for iHook in *@hooks
