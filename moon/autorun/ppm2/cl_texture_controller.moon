@@ -290,7 +290,7 @@ class PonyTextureController
             return if panel\IsLoading()
             timer.Remove data.timerid
             @SHOULD_WAIT_WEB = true
-            timer.Simple 0.5, ->
+            timer.Simple 1, ->
                 @SHOULD_WAIT_WEB = false
                 return unless IsValid(panel)
                 panel\UpdateHTMLTexture()
@@ -1166,7 +1166,7 @@ class NewPonyTextureController extends PonyTextureController
                 surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-                
+
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
