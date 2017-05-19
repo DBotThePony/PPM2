@@ -87,8 +87,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
 
     for i = 1, PPM2.MAX_BODY_DETAILS
-        @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-        @NetworkVar("BodyDetailColor#{i}", net.ReadColor, net.WriteColor, Color(140, 50, 100))
+        @NetworkVar("BodyDetail#{i}",       (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+        @NetworkVar("BodyDetailColor#{i}",  net.ReadColor,  net.WriteColor, Color(140, 50, 100))
+        @NetworkVar("BodyDetailURL#{i}",    net.ReadString, net.WriteString, '')
 
     new: (netID, ent) =>
         @recomputeTextures = true

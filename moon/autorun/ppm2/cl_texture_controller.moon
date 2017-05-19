@@ -172,6 +172,7 @@ class PonyTextureController
     for i = 1, PPM2.MAX_BODY_DETAILS
         @BODY_UPDATE_TRIGGER["BodyDetail#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailColor#{i}"] = true
+        @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
     
     DataChanges: (state) =>
         return if not @ent
@@ -260,6 +261,7 @@ class PonyTextureController
         if IsValid(data.panel)
             panel = data.panel
             return if panel\IsLoading()
+            timer.Remove data.timerid
             @SHOULD_WAIT_WEB = true
             timer.Simple 0.5, ->
                 @SHOULD_WAIT_WEB = false
@@ -269,12 +271,13 @@ class PonyTextureController
                 return if not htmlmat
                 texture = htmlmat\GetTexture('$basetexture')
                 texture\Download()
-                data.callback(texture)
+                data.callback(texture, panel, htmlmat)
                 table.remove(@HTML_MATERIAL_QUEUE, 1)
                 timer.Simple 0, -> panel\Remove() if IsValid(panel)
             return
         panel = vgui.Create('DHTML')
-        timer.Simple 4, -> panel\Remove() if IsValid(panel)
+        data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
+        timer.Create data.timerid, 4, 0, -> panel\Remove() if IsValid(panel)
         panel\SetVisible(false)
         panel\SetSize(@QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2)
         panel\SetHTML(@BuildURLHTML(data.url, @QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2))
@@ -375,45 +378,14 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS)
     
     @QUAD_SIZE_CONST = 512
-    __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+    __compileBodyInternal: (bType = false) =>
+        prefix = bType and 'Female' or 'Male'
+        prefixUP = bType and 'FEMALE' or 'MALE'
+        urlTextures = {}
+        left = 0
 
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-
-        surface.SetMaterial(bodyMat)
-        surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-
-        for i = 1, PPM2.MAX_BODY_DETAILS
-            detailID = @networkedData["GetBodyDetail#{i}"](@networkedData)
-            mat = PPM2.BodyDetailsMaterials[detailID]
-            continue if not mat
-            surface.SetDrawColor(@networkedData["GetBodyDetailColor#{i}"](@networkedData))
-            surface.SetMaterial(mat)
-            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-        
-        if @GetData()\GetSocks()
-            surface.SetDrawColor(255, 255, 255)
-            surface.SetMaterial(@@PONY_SOCKS)
-            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-        
-        suitType = @GetData()\GetBodysuit()
-        if PPM2.AvaliablePonySuitsMaterials[suitType]
-            surface.SetDrawColor(255, 255, 255)
-            surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
-            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        return rt
-    CompileBody: =>
-        textureMale = {
-            'name': "PPM2.#{@id}.Body.vmale"
+        textureData = {
+            'name': "PPM2.#{@id}.Body.#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
@@ -435,30 +407,72 @@ class PonyTextureController
             }
         }
 
-        textureFemale = {
-            'name': "PPM2.#{@id}.Body.vfemale"
-            'shader': 'VertexLitGeneric'
-            'data': {k, v for k, v in pairs textureMale.data}
-        }
+        textureData.data['$basetexture'] = 'models/ppm/base/body' if not bType
 
-        textureFemale.data['$basetexture'] = 'models/ppm/base/body'
+        @["#{prefix}Material"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        @MaleMaterial = CreateMaterial(textureMale.name, textureMale.shader, textureMale.data)
-        @FemaleMaterial = CreateMaterial(textureFemale.name, textureFemale.shader, textureFemale.data)
+        continueCompilation = ->
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            oldW, oldH = ScrW(), ScrH()
 
-        {:r, :g, :b} = @GetData()\GetBodyColor()
-        oldW, oldH = ScrW(), ScrH()
+            rt = GetRenderTarget("PPM2_#{@id}_Body_#{prefix}_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        TargetMale = GetRenderTarget("PPM2_#{@id}_Body_Male_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        TargetFemale = GetRenderTarget("PPM2_#{@id}_Body_Female_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            surface.SetMaterial(@@["BODY_MATERIAL_#{prefixUP}"])
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i = 1, PPM2.MAX_BODY_DETAILS
+                detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
+                mat = PPM2.BodyDetailsMaterials[detailID]
+                continue if not mat
+                surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            
+            surface.SetDrawColor(255, 255, 255)
+
+            if @GetData()\GetSocks()
+                surface.SetMaterial(@@PONY_SOCKS)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            
+            suitType = @GetData()\GetBodysuit()
+            if PPM2.AvaliablePonySuitsMaterials[suitType]
+                surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            @["#{prefix}Material"]\SetTexture('$basetexture', rt)
         
-        @BodyTextureMale = @__compileBodyInternal(TargetMale, oldW, oldH, r, g, b, @@BODY_MATERIAL_MALE)
-        @BodyTextureFemale = @__compileBodyInternal(TargetFemale, oldW, oldH, r, g, b, @@BODY_MATERIAL_FEMALE)
-
-        @MaleMaterial\SetTexture('$basetexture', @BodyTextureMale)
-        @FemaleMaterial\SetTexture('$basetexture', @BodyTextureFemale)
-
-        return @MaleMaterial, @FemaleMaterial
+        data = @GetData()
+        for i = 1, PPM2.MAX_BODY_DETAILS
+            detailURL = data["GetBodyDetailURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            @@LoadURL detailURL, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+        return @["#{prefix}Material"]
+    CompileBody: =>
+        @__compileBodyInternal(true)
+        @__compileBodyInternal(false)
     CompileHorn: =>
         textureData = {
             'name': "PPM2.#{@id}.Horn"
@@ -874,7 +888,7 @@ class PonyTextureController
             @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
             @CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
         else
-            @@LoadURL URL, (texture) ->
+            @@LoadURL URL, (texture, panel) ->
                 @CMarkTexture\SetTexture('$basetexture', texture)
                 @CMarkTextureGUI\SetTexture('$basetexture', texture)
         

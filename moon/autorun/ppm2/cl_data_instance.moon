@@ -606,6 +606,17 @@ class PonyDataInstance
             min: PPM2.MIN_DETAIL
             max: PPM2.MAX_DETAIL
         }
+
+        @PONY_DATA["body_detail_url_#{i}"] = {
+            default: -> ''
+            getFunc: "BodyDetailURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
     
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA

@@ -383,6 +383,37 @@ PANEL_SETTINGS_BASE = {
             table.insert @updateFuncs, ->
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
         return box, label
+    URLInput: (option = '') =>
+        textInput = vgui.Create('DTextEntry', @)
+        with textInput
+            \Dock(TOP)
+            \DockMargin(5, 10, 5, 10)
+            \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+            .OnEnter = ->
+                text = \GetValue()
+                if text\find('^https?://')
+                    @GetTargetData()["Set#{option}"](@GetTargetData(), text)
+                    @ValueChanges(option, text, textInput)
+                else
+                    @GetTargetData()["Set#{option}"](@GetTargetData(), '')
+                    @ValueChanges(option, '', textInput)
+            .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
+                switch key
+                    when KEY_FIRST
+                        return true
+                    when KEY_NONE
+                        return true
+                    when KEY_TAB
+                        return true
+                    when KEY_ENTER
+                        .OnEnter()
+                        \KillFocus()
+                        return true
+                timer.Create "PPM2.EditorCodeChange.#{option}", 1, 1, ->
+                    return if not IsValid(textInput)
+                    .OnEnter()
+            table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+        return textInput
     ScrollPanel: =>
         return @scroll if IsValid(@scroll)
         @scroll = vgui.Create('DScrollPanel', @)
@@ -477,6 +508,11 @@ EditorPages = {
             for i = 1, PPM2.MAX_BODY_DETAILS
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+
+            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+            for i = 1, PPM2.MAX_BODY_DETAILS
+                @Label("Body detail #{i}")
+                @URLInput("BodyDetailURL#{i}")
     }
 
     {
@@ -508,36 +544,7 @@ EditorPages = {
                     surface.DrawTexturedRect(0, 0, w, h)
             
             @Label('Cutiemark URL image input field\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')\DockMargin(5, 10, 5, 10)
-            @textInput = vgui.Create('DTextEntry', @)
-            with @textInput
-                \Dock(TOP)
-                \DockMargin(5, 10, 5, 10)
-                \SetText(@GetTargetData()\GetCMarkURL())
-                .OnEnter = ->
-                    text = \GetValue()
-                    if text\find('^https?://')
-                        @GetTargetData()\SetCMarkURL(text)
-                        @ValueChanges('CMarkURL', text, @textInput)
-                    else
-                        @GetTargetData()\SetCMarkURL('')
-                        @ValueChanges('CMarkURL', '', @textInput)
-                .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
-                    switch key
-                        when KEY_FIRST
-                            return true
-                        when KEY_NONE
-                            return true
-                        when KEY_TAB
-                            return true
-                        when KEY_ENTER
-                            .OnEnter()
-                            \KillFocus()
-                            return true
-                    timer.Create 'PPM2.EditorCodeChange', 1, 1, ->
-                        return if not IsValid(@textInput)
-                        .OnEnter()
-                table.insert @updateFuncs, ->
-                    \SetText(@GetTargetData()\GetCMarkURL())
+            @URLInput('CMarkURL')
     }
 
     {
