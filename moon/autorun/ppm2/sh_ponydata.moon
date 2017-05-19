@@ -70,13 +70,23 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     for i = 1, 6
         @NetworkVar("ManeColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("ManeDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("ManeURLColor#{i}",         net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("ManeURL#{i}",              net.ReadString, net.WriteString,   '')
+
         @NetworkVar("TailColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("TailDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("TailURLColor#{i}",         net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("TailURL#{i}",              net.ReadString, net.WriteString,   '')
 
         @NetworkVar("LowerManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeURL#{i}",         net.ReadString, net.WriteString,   '')
+        @NetworkVar("LowerManeURLColor#{i}",    net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("LowerManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+
         @NetworkVar("UpperManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeURL#{i}",         net.ReadString, net.WriteString,   '')
         @NetworkVar("UpperManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeURLColor#{i}",    net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')

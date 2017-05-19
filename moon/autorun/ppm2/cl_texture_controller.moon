@@ -167,6 +167,11 @@ class PonyTextureController
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["ManeDetailColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["ManeURLColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["ManeURL#{i}"] = true
+        @MANE_UPDATE_TRIGGER["TailURL#{i}"] = true
+        @MANE_UPDATE_TRIGGER["TailURLColor#{i}"] = true
+
         @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
     
@@ -644,60 +649,90 @@ class PonyTextureController
 
         @HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
-        oldW, oldH = ScrW(), ScrH()
 
-        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        urlTextures = {}
+        left = 0
 
-        -- First mane pass
-        {:r, :g, :b} = @GetData()\GetManeColor1()
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
 
-        maneTypeUpper = @GetManeType()
-        if @@UPPER_MANE_MATERIALS[maneTypeUpper]
-            {:r, :g, :b} = @GetData()\GetManeDetailColor1()
+            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            -- First mane pass
+            {:r, :g, :b} = @GetData()\GetManeColor1()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
-                continue if type(mat) == 'number'
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            maneTypeUpper = @GetManeType()
+            if @@UPPER_MANE_MATERIALS[maneTypeUpper]
+                {:r, :g, :b} = @GetData()\GetManeDetailColor1()
+                surface.SetDrawColor(r, g, b)
+                for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        @HairColor1Material\SetTexture('$basetexture', rt)
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            @HairColor1Material\SetTexture('$basetexture', rt)
 
-        -- Second mane pass
-        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            -- Second mane pass
+            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @GetData()\GetManeColor2()
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-
-        maneTypeLower = @GetManeTypeLower()
-        if @@LOWER_MANE_MATERIALS[maneTypeLower]
-            {:r, :g, :b} = @GetData()\GetManeDetailColor2()
+            {:r, :g, :b} = @GetData()\GetManeColor2()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
-                continue if type(mat) == 'number'
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            maneTypeLower = @GetManeTypeLower()
+            if @@LOWER_MANE_MATERIALS[maneTypeLower]
+                {:r, :g, :b} = @GetData()\GetManeDetailColor2()
+                surface.SetDrawColor(r, g, b)
+                for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        @HairColor2Material\SetTexture('$basetexture', rt)
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            @HairColor2Material\SetTexture('$basetexture', rt)
 
+        data = @GetData()
+        validURLS = for i = 1, 6
+            detailURL = data["GetManeURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
         return @HairColor1Material, @HairColor2Material
     CompileTail: =>
         textureFirst = {
@@ -730,67 +765,97 @@ class PonyTextureController
 
         @TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
-        oldW, oldH = ScrW(), ScrH()
 
-        -- First tail pass
-        rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        urlTextures = {}
+        left = 0
 
-        {:r, :g, :b} = @GetData()\GetTailColor1()
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
 
-        surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
-        surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            -- First tail pass
+            rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        tailType = @GetTailType()
-        if @@TAIL_DETAIL_MATERIALS[tailType]
-            i = 1
-            for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
-                continue if type(mat) == 'number'
+            {:r, :g, :b} = @GetData()\GetTailColor1()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            tailType = @GetTailType()
+            if @@TAIL_DETAIL_MATERIALS[tailType]
+                i = 1
+                for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-                i += 1
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        @TailColor1Material\SetTexture('$basetexture', rt)
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            @TailColor1Material\SetTexture('$basetexture', rt)
 
-        -- Second tail pass
-        rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            -- Second tail pass
+            rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @GetData()\GetTailColor2()
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b} = @GetData()\GetTailColor2()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
-        surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        if @@TAIL_DETAIL_MATERIALS[tailType]
-            i = 1
-            for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
-                continue if type(mat) == 'number'
+            if @@TAIL_DETAIL_MATERIALS[tailType]
+                i = 1
+                for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-                i += 1
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        @TailColor2Material\SetTexture('$basetexture', rt)
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            @TailColor2Material\SetTexture('$basetexture', rt)
 
+        data = @GetData()
+        validURLS = for i = 1, 6
+            detailURL = data["GetTailURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
         return @TailColor1Material, @TailColor2Material
     CompileEye: (left = false) =>
         prefix = left and 'l' or 'r'
@@ -988,6 +1053,11 @@ class NewPonyTextureController extends PonyTextureController
         @MANE_UPDATE_TRIGGER["LowerManeDetailColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeDetailColor#{i}"] = true
 
+        @MANE_UPDATE_TRIGGER["LowerManeURL#{i}"] = true
+        @MANE_UPDATE_TRIGGER["LowerManeURLColor#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeURL#{i}"] = true
+        @MANE_UPDATE_TRIGGER["UpperManeURLColor#{i}"] = true
+
     DataChanges: (state) =>
         super(state)
         switch state\GetKey()
@@ -1033,62 +1103,91 @@ class NewPonyTextureController extends PonyTextureController
 
         HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
-        oldW, oldH = ScrW(), ScrH()
 
-        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        urlTextures = {}
+        left = 0
 
-        -- First mane pass
-        {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
 
-        maneTypeUpper = @GetManeType()
-        if @@UPPER_MANE_MATERIALS[maneTypeUpper]
-            {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor1"](@GetData())
+            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            -- First mane pass
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
-                continue if type(mat) == 'number'
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            maneTypeUpper = @GetManeType()
+            if @@UPPER_MANE_MATERIALS[maneTypeUpper]
+                {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor1"](@GetData())
+                surface.SetDrawColor(r, g, b)
+                for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        HairColor1Material\SetTexture('$basetexture', rt)
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            HairColor1Material\SetTexture('$basetexture', rt)
 
-        -- Second mane pass
-        rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            -- Second mane pass
+            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
-
-        maneTypeLower = @GetManeTypeLower()
-        if @@LOWER_MANE_MATERIALS[maneTypeLower]
-            {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor2"](@GetData())
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
-                continue if type(mat) == 'number'
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            maneTypeLower = @GetManeTypeLower()
+            if @@LOWER_MANE_MATERIALS[maneTypeLower]
+                {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor2"](@GetData())
+                surface.SetDrawColor(r, g, b)
+                for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+                    continue if type(mat) == 'number'
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            HairColor2Material\SetTexture('$basetexture', rt)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        HairColor2Material\SetTexture('$basetexture', rt)
-
-        HairColor1Material, HairColor2Material
-
+        data = @GetData()
+        validURLS = for i = 1, 6
+            detailURL = data["Get#{prefix}ManeURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+        return HairColor1Material, HairColor2Material
     CompileHair: =>
         return super() if not @GetData()\GetSeparateMane()
         mat1, mat2 = @CompileHairInternal('Upper')

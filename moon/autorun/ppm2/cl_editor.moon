@@ -394,7 +394,7 @@ PANEL_SETTINGS_BASE = {
             \DockMargin(5, 10, 5, 10)
             \SetKeyboardInputEnabled(true)
             \SetMouseInputEnabled(true)
-            \SetSize(0, 30)
+            \SetSize(0, 20)
         textInput = vgui.Create('DTextEntry', wrapper)
         @scroll\AddItem(wrapper) if IsValid(@scroll)
         with textInput
@@ -501,8 +501,16 @@ EditorPages = {
                 @ColorBox("Tail color #{i}", "TailColor#{i}")
 
             for i = 1, 6
-                @ColorBox("Mane detail color #{i}", "ManeColor#{i}")
+                @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}")
                 @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}")
+
+            for i = 1, 6
+                @Label("Mane URL Detail #{i} input field")
+                @URLInput("ManeURL#{i}")
+                @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
+                @Label("Tail URL Detail #{i} input field")
+                @URLInput("TailURL#{i}")
+                @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
             
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             @Label('These options have effect only on new model')
@@ -514,6 +522,14 @@ EditorPages = {
             for i = 1, 6
                 @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}")
                 @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}")
+
+            for i = 1, 6
+                @Label("Upper mane URL Detail #{i} input field")
+                @URLInput("UpperManeURL#{i}")
+                @ColorBox("Upper Mane URL detail color #{i}", "UpperManeURLColor#{i}")
+                @Label("Lower mane URL Detail #{i} input field")
+                @URLInput("LowerManeURL#{i}")
+                @ColorBox("Lower Tail URL detail color #{i}", "LowerManeURLColor#{i}")
     }
 
     {

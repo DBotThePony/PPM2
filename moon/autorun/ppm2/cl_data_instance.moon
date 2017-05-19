@@ -555,6 +555,31 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        @PONY_DATA["mane_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "ManeURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["mane_url_#{i}"] = {
+            default: -> ''
+            getFunc: "ManeURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
+
         @PONY_DATA["tail_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "TailDetailColor#{i}"
@@ -567,6 +592,31 @@ class PonyDataInstance
                         return Color(r, g, b, a)
                     else
                         return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["tail_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "TailURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["tail_url_#{i}"] = {
+            default: -> ''
+            getFunc: "TailURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
         }
 
         @PONY_DATA["tail_color_#{i}"] = {
@@ -597,6 +647,31 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        @PONY_DATA["lower_mane_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "LowerManeURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["lower_mane_url_#{i}"] = {
+            default: -> ''
+            getFunc: "LowerManeURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
+
         @PONY_DATA["upper_mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "UpperManeColor#{i}"
@@ -609,6 +684,31 @@ class PonyDataInstance
                         return Color(r, g, b, a)
                     else
                         return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["upper_mane_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "UpperManeURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["upper_mane_url_#{i}"] = {
+            default: -> ''
+            getFunc: "UpperManeURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
         }
 
         @PONY_DATA["lower_mane_detail_color_#{i}"] = {
