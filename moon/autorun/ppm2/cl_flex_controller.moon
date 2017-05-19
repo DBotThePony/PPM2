@@ -222,7 +222,6 @@ class FlexSequence
         return false if @dorepeat
         return RealTime() > @finish
 
-
 class PonyFlexController
     @AVALIABLE_CONTROLLERS = {}
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
@@ -265,13 +264,84 @@ class PonyFlexController
             'func': (delta, timeOfAnim) =>
                 left, right = @GetModifierID(1), @GetModifierID(2)
                 leftState, rightState = @GetFlexState(1), @GetFlexState(2)
-                if not @ent\Alive()
-                    leftState\SetModifierWeight(left, 1)
-                    rightState\SetModifierWeight(right, 1)
-                    return
                 value = math.abs(math.sin(RealTime() * .5) * .15)
                 leftState\SetModifierWeight(left, value)
                 rightState\SetModifierWeight(right, value)
+        }
+
+        {
+            'name': 'health_idle'
+            'autostart': true
+            'repeat': true
+            'time': 5
+            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch'}
+            'func': (delta, timeOfAnim) =>
+                frown = @GetModifierID(1)
+                frownState = @GetFlexState(1)
+                left, right = @GetModifierID(2), @GetModifierID(3)
+                leftState, rightState = @GetFlexState(2), @GetFlexState(3)
+                Scrunch = @GetModifierID(4)
+                ScrunchState = @GetFlexState(4)
+
+                hp, mhp = @ent\Health(), @ent\GetMaxHealth()
+                mhp = 1 if mhp == 0
+                strength = math.Clamp(1.5 - (hp / mhp) * 1.5, 0, 1)
+                frownState\SetModifierWeight(frown, strength)
+                ScrunchState\SetModifierWeight(Scrunch, strength * .5)
+                leftState\SetModifierWeight(left, strength * .3)
+                rightState\SetModifierWeight(right, strength * .3)
+        }
+
+        {
+            'name': 'greeny'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'Grin'}
+            'func': (delta, timeOfAnim) =>
+                Grin = @GetModifierID(1)
+                GrinState = @GetFlexState(1)
+                strength = .5 + math.sin(RealTime() * 2) * .25
+                GrinState\SetModifierWeight(Grin, strength)
+        }
+
+        {
+            'name': 'talk'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
+            'create': =>
+                @talkAnim = for i = 0, 1, 0.05
+                    rand = math.random(1, 100) / 100
+                    if rand <= .25
+                        {1 * rand, 0.4 * rand, 2 * rand, 0}
+                    elseif rand >= .25 and rand < .4
+                        rand *= .8
+                        {2 * rand, .6 * rand, 0, 1 * rand}
+                    elseif rand >= .4 and rand < .75
+                        rand *= .6
+                        {1 * rand, 0, 1 * rand, 2 * rand}
+                    elseif rand >= .75
+                        rand *= .4
+                        {1.5 * rand, 0, 1 * rand, 0}
+            'func': (delta, timeOfAnim) =>
+                JawOpen = @GetModifierID(1)
+                JawOpenState = @GetFlexState(1)
+                Tongue_OutOpen = @GetModifierID(2)
+                Tongue_OutOpenState = @GetFlexState(2)
+                Tongue_UpOpen = @GetModifierID(3)
+                Tongue_UpOpenState = @GetFlexState(3)
+                Tongue_DownOpen = @GetModifierID(4)
+                Tongue_DownOpenState = @GetFlexState(4)
+                cPos = math.floor(timeOfAnim * 20) + 1
+                data = @talkAnim[cPos]
+                return if not data
+                {jaw, out, up, down} = data
+                JawOpenState\SetModifierWeight(JawOpen, jaw)
+                Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
+                Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
+                Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
         }
 
         {
@@ -285,7 +355,6 @@ class PonyFlexController
                 @nextBlinkLength = math.random(50, 75) / 1000
                 @min, @max = @nextBlink, @nextBlink + @nextBlinkLength
             'func': (delta, timeOfAnim) =>
-                return false if not @ent\Alive()
                 if @min > timeOfAnim or @max < timeOfAnim
                     if @blinkHit
                         @blinkHit = false
@@ -332,6 +401,7 @@ class PonyFlexController
         @currentSequences = {}
         @currentSequencesIterable = {}
         @ResetSequences()
+        @Hook('OnPlayerChat', @OnPlayerChat)
     
     StartSequence: (seqID = '') =>
         return @currentSequences[seqID] if @currentSequences[seqID]
@@ -380,6 +450,12 @@ class PonyFlexController
             func(@, ...)
         hook.Add id, @hookID, newFunc
         table.insert(@hooks, id)
+    
+    OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
+        return if ply ~= @ent or teamOnly or isDead
+        if string.find(text, 'hehehe') or string.find(text, 'hahaha')
+            @StartSequence('greeny')
+        @StartSequence('talk')
 
     RemoveHooks: =>
         for iHook in *@hooks
@@ -389,7 +465,7 @@ class PonyFlexController
         return if DISABLE_FLEXES\GetBool()
         if not IsValid(@ent)
             @ent = @GetData().ent
-        return if not IsValid(@ent) or @ent\IsDormant()
+        return if not IsValid(@ent) or @ent\IsDormant() or not @ent\Alive()
         delta = RealTime() - @lastThink
         @lastThink = RealTime()
         state\Think(delta) for state in *@states
