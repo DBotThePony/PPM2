@@ -77,7 +77,7 @@ if CLIENT
             ent\Remove()
 else
     util.AddNetworkString('PPM2.RequestPonyData')
-    util.AddNetworkString('PPM2.UpdateWeight')
+    util.AddNetworkString('PPM2.PlayerRespawn')
     util.AddNetworkString('PPM2.Require')
     util.AddNetworkString('PPM2.EditorStatus')
 

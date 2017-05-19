@@ -39,7 +39,7 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
         @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
         if @GetPonyData()
             @GetPonyData()\ApplyBodygroups()
-            net.Start('PPM2.UpdateWeight')
+            net.Start('PPM2.PlayerRespawn')
             net.WriteEntity(@)
             net.Broadcast()
             return

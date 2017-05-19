@@ -130,6 +130,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     Think: =>
         if CLIENT
             @flexes\Think() if @flexes
+    PlayerRespawn: =>
+        if CLIENT
+            @GetWeightController()\UpdateWeight()
+            @flexes\PlayerRespawn() if @flexes
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)

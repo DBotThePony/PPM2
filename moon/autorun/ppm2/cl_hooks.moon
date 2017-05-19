@@ -97,18 +97,18 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
     data\GetRenderController()\PostDrawArms(arms)
     arms.__ppm2_draw = false
 
-UpdateWeight = ->
+PlayerRespawn = ->
     ent = net.ReadEntity()
     return if not IsValid(ent)
     return if not ent\GetPonyData()
-    ent\GetPonyData()\GetWeightController()\UpdateWeight()
+    ent\GetPonyData()\PlayerRespawn()
 
 lastDataSend = 0
 net.Receive 'PPM2.RequestPonyData', ->
     lastDataSend = 0
     RunConsoleCommand('ppm2_reload')
 
-net.Receive 'PPM2.UpdateWeight', UpdateWeight
+net.Receive 'PPM2.PlayerRespawn', UpdateWeight
 
 concommand.Add 'ppm2_require', ->
     net.Start('PPM2.Require')
