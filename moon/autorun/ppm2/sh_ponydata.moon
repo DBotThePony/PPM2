@@ -123,7 +123,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT
             timer.Simple(0, ->
                 @GetRenderController()\CompileTextures()
-                @CreateFlexController()
             )
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
@@ -133,7 +132,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             if CLIENT
                 @GetRenderController()
                 @GetWeightController()
-                @CreateFlexController()
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
@@ -143,14 +141,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state)
             @GetRenderController()\DataChanges(state)
-            @flexes\DataChanges(state) if @flexes
     Think: =>
-        if CLIENT
-            @flexes\Think() if @flexes
     PlayerRespawn: =>
         if CLIENT
             @GetWeightController()\UpdateWeight()
-            @flexes\PlayerRespawn() if @flexes
+            @GetRenderController()\PlayerRespawn()
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
@@ -178,17 +173,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @modelBodygroups = @modelCached
         @bodygroups.ent = @ent
         return @bodygroups
-    CreateFlexController: =>
-        return if not @ent\IsPlayer()
-        if not @flexes or @modelFlexes ~= @modelCached
-            @modelCached = @modelCached or @ent\GetModel()
-            cls = PPM2.GetFlexController(@modelCached)
-            return if not cls
-            @flexes = cls(@)
-            @modelFlexes = @modelCached
-        @flexes.ent = @ent
-        return @flexes
-    GetFlexController: => @flexes
 
 PPM2.NetworkedPonyData = NetworkedPonyData
 

@@ -32,6 +32,7 @@ class PonyRenderController
         @CompileTextures() if @ent
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
+        @CreateFlexController() if @ent
     GetEntity: => @ent
     GetData: => @networkedData
     GetModel: => @networkedData\GetModel()
@@ -155,10 +156,14 @@ class PonyRenderController
         render.PopCustomClipPlane()
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
+    
+    PlayerRespawn: =>
+        @flexes\PlayerRespawn() if @flexes
 
     PreDraw: (ent = @ent) =>
         return if @IGNORE_DRAW
         @GetTextureController()\PreDraw(ent)
+        @flexes\Think() if @flexes
     PostDraw: (ent = @ent) =>
         return if @IGNORE_DRAW
         textures = @GetTextureController()
@@ -192,6 +197,7 @@ class PonyRenderController
     DataChanges: (state) =>
         return if not @ent
         @GetTextureController()\DataChanges(state)
+        @flexes\DataChanges(state) if @flexes
         switch state\GetKey()
             when 'Weight'
                 @armsWeightSetup = false
@@ -205,6 +211,15 @@ class PonyRenderController
             @renderController = cls(@)
         @renderController.ent = @ent
         return @renderController
+    CreateFlexController: =>
+        return if not @ent\IsPlayer()
+        if not @flexes
+            cls = PPM2.GetFlexController(@modelCached)
+            return if not cls
+            @flexes = cls(@)
+        @flexes.ent = @ent
+        return @flexes
+    GetFlexController: => @flexes
 
 class NewPonyRenderController extends PonyRenderController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
@@ -231,10 +246,6 @@ class NewPonyRenderController extends PonyRenderController
                 @tailModel = @GetData()\GetTailModel()
                 @tailModel\SetNoDraw(true) if IsValid(@tailModel)
         super(state)
-    
-    PreDraw: (ent = @ent) =>
-        return if @IGNORE_DRAW
-        super(ent)
 
     PostDraw: (ent = @ent) =>
         return if @IGNORE_DRAW
