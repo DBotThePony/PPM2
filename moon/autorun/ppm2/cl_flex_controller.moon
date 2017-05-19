@@ -592,7 +592,7 @@ class PonyFlexController
                 @StartSequence('cat')
             when ':з'
                 @StartSequence('cat')
-            when ':D'
+            when ':d'
                 @StartSequence('big_grin')
             when 'xd'
                 @StartSequence('xd')
