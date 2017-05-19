@@ -535,10 +535,8 @@ class PonyFlexController
     
     OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
         return if ply ~= @ent or teamOnly or isDead
-        switch text
+        switch text\lower()
             when 'o'
-                @StartSequence('ooo')
-            when 'O'
                 @StartSequence('ooo')
             when 'о'
                 @StartSequence('ooo')
@@ -550,13 +548,7 @@ class PonyFlexController
                 @StartSequence('cat')
             when ':D'
                 @StartSequence('big_grin')
-            when ':d'
-                @StartSequence('big_grin')
             when 'xd'
-                @StartSequence('xd')
-            when 'XD'
-                @StartSequence('xd')
-            when 'xD'
                 @StartSequence('xd')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
