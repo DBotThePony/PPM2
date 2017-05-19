@@ -54,7 +54,7 @@ class DefaultBodygroupController
     GetDataID: => @entID
 
     ApplyRace: =>
-        switch @controller\GetRace()
+        switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 1)
@@ -68,25 +68,39 @@ class DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 0)
 
+    ResetBodygroups: =>
+        for grp in *@ent\GetBodyGroups()
+            @ent\SetBodygroup(grp.id, 0)
     ApplyBodygroups: =>
-        @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @controller\GetManeType())
-        @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @controller\GetManeTypeLower())
-        @ent\SetBodygroup(@@BODYGROUP_TAIL, @controller\GetTailType())
-        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
-        @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+        @ResetBodygroups()
+        @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
+        @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
+        @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
+        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
+        @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @ApplyRace()
+    
+    @TAIL_BONE1 = 38
+    @TAIL_BONE2 = 39
+    @TAIL_BONE3 = 40
     DataChanges: (state) =>
         switch state\GetKey()
             when 'ManeType'
-                @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @controller\GetManeType())
+                @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
             when 'ManeTypeLower'
-                @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @controller\GetManeTypeLower())
+                @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
             when 'TailType'
-                @ent\SetBodygroup(@@BODYGROUP_TAIL, @controller\GetTailType())
+                @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
+            when 'TailSize'
+                size = state\GetValue()
+                vec = Vector(size, size, size)
+                @ent\ManipulateBoneScale(@@TAIL_BONE1, vec)
+                @ent\ManipulateBoneScale(@@TAIL_BONE2, vec)
+                @ent\ManipulateBoneScale(@@TAIL_BONE3, vec)
             when 'EyelashType'
-                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
+                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
-                @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+                @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
             when 'Race'
                 @ApplyRace()
 
@@ -96,7 +110,7 @@ class CPPMBodygroupController extends DefaultBodygroupController
     new: (...) => super(...)
 
     ApplyRace: =>
-        switch @controller\GetRace()
+        switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 1)
@@ -128,11 +142,11 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isManeModel and ent.upperMane and ent.manePlayer == @ent
                 ent\Remove()
 
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
 
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @maneModelUP = ents.Create('prop_dynamic') if SERVER
         @maneModelUP = ClientsideModel(model) if CLIENT
         with @maneModelUP
@@ -151,10 +165,10 @@ class NewBodygroupController extends DefaultBodygroupController
         if SERVER
             timer.Simple .5, ->
                 return unless IsValid(@maneModelUP)
-                @controller\SetUpperManeModel(@maneModelUP)
+                @GetData()\SetUpperManeModel(@maneModelUP)
                 @ent\SetNWEntity('PPM2.UpperManeModel', @maneModelUP) if IsValid(@ent)
         else
-            @controller\SetUpperManeModel(@maneModelUP)
+            @GetData()\SetUpperManeModel(@maneModelUP)
             
         return @maneModelUP
     CreateLowerManeModel: =>
@@ -164,11 +178,11 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isManeModel and ent.lowerMane and ent.manePlayer == @ent
                 ent\Remove()
 
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeLowerNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
 
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @maneModelLower = ents.Create('prop_dynamic') if SERVER
         @maneModelLower = ClientsideModel(model) if CLIENT
         with @maneModelLower
@@ -187,10 +201,10 @@ class NewBodygroupController extends DefaultBodygroupController
         if SERVER
             timer.Simple .5, ->
                 return unless IsValid(@maneModelLower)
-                @controller\SetLowerManeModel(@maneModelLower) 
+                @GetData()\SetLowerManeModel(@maneModelLower) 
                 @ent\SetNWEntity('PPM2.LowerManeModel', @maneModelLower) if IsValid(@ent)
         else
-            @controller\SetLowerManeModel(@maneModelLower) 
+            @GetData()\SetLowerManeModel(@maneModelLower) 
 
         return @maneModelLower
     CreateTailModel: =>
@@ -200,11 +214,11 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isManeModel and ent.isTail and ent.manePlayer == @ent
                 ent\Remove()
 
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetTailTypeNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
 
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @tailModel = ents.Create('prop_dynamic') if SERVER
         @tailModel = ClientsideModel(model) if CLIENT
         with @tailModel
@@ -223,23 +237,23 @@ class NewBodygroupController extends DefaultBodygroupController
         if SERVER
             timer.Simple .5, ->
                 return unless IsValid(@tailModel)
-                @controller\SetTailModel(@tailModel)
+                @GetData()\SetTailModel(@tailModel)
                 @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent)
         else
-            @controller\SetTailModel(@tailModel)
+            @GetData()\SetTailModel(@tailModel)
         
         return @tailModel
     
     CreateUpperManeModelIfNotExists: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModel() if not IsValid(@maneModelUP)
         return @maneModelUP
     CreateLowerManeModelIfNotExists: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModel() if not IsValid(@maneModelLower)
         return @maneModelLower
     CreateTailModelIfNotExists: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModel() if not IsValid(@tailModel)
         return @tailModel
 
@@ -263,36 +277,38 @@ class NewBodygroupController extends DefaultBodygroupController
             tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
 
     UpdateUpperMane: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
         @maneModelUP\SetModel(model)
         @maneModelUP\SetBodygroup(1, bodygroupID)
         return @maneModelUP
     UpdateLowerMane: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModelIfNotExists()
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetManeTypeLowerNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
         @maneModelLower\SetModel(model)
         @maneModelLower\SetBodygroup(1, bodygroupID)
         return @maneModelLower
     UpdateTailModel: =>
-        return if CLIENT and @controller\IsGoingToNetwork()
+        return if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModelIfNotExists()
-        modelID, bodygroupID = PPM2.TransformNewModelID(@controller\GetTailTypeNew())
+        modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
         @tailModel\SetModel(model)
         @tailModel\SetBodygroup(1, bodygroupID)
+        @tailModel\SetModelScale(@GetData()\GetTailSize())
         return @tailModel
 
     ApplyBodygroups: =>
-        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
-        @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+        @ResetBodygroups()
+        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
+        @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @ApplyRace()
         @CreateUpperManeModel()
         @CreateLowerManeModel()
@@ -301,14 +317,16 @@ class NewBodygroupController extends DefaultBodygroupController
     DataChanges: (state) =>
         switch state\GetKey()
             when 'EyelashType'
-                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @controller\GetEyelashType())
+                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
-                @ent\SetBodygroup(@@BODYGROUP_GENDER, @controller\GetGender())
+                @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
             when 'ManeTypeNew'
                 @UpdateUpperMane()
             when 'ManeTypeLowerNew'
                 @UpdateLowerMane()
             when 'TailTypeNew'
+                @UpdateTailModel()
+            when 'TailSize'
                 @UpdateTailModel()
             when 'Race'
                 @ApplyRace()
