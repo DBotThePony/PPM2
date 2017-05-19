@@ -60,8 +60,6 @@ include 'autorun/ppm2/sh_hooks.lua'
 include 'autorun/ppm2/sh_bodygroup_controller.lua'
 include 'autorun/ppm2/sh_weight_controller.lua'
 
-PPM2.__cachedPlayers = player.GetAll()
-
 if CLIENT
     file.CreateDir('ppm2')
     file.CreateDir('ppm2/backups')

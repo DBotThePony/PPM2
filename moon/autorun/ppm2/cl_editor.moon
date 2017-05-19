@@ -403,10 +403,12 @@ EditorPages = {
             @CheckBox('Gender', 'Gender')
             @ComboBox('Race', 'Race')
             @NumSlider('Weight', 'Weight', 2)
-            @CheckBox('Socks', 'Socks')
+            @CheckBox('Socks (simple texture)', 'Socks')
             @ComboBox('Eyelashes', 'EyelashType')
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
+            @CheckBox('Socks (as model)', 'SocksAsModel')
+            @ColorBox('Socks model color', 'SocksColor')
     }
 
     {

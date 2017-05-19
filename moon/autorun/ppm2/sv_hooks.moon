@@ -28,7 +28,7 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     for ent in *ents.GetAll()
-        if ent.isManeModel and ent.manePlayer == @
+        if ent.isPonyPropModel and ent.manePlayer == @
             ent\Remove()
 
     timer.Simple 0.5, ->

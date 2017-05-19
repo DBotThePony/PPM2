@@ -311,6 +311,26 @@ class PonyDataInstance
             fix: (arg = false) -> tobool(arg)
         }
 
+        'socks_model': {
+            default: -> false
+            getFunc: 'SocksAsModel'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'socks_model_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'SocksColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
         'suit': {
             default: -> 0
             getFunc: 'Bodysuit'

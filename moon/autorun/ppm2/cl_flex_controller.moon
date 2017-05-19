@@ -448,6 +448,7 @@ class PonyFlexController
                 @RemoveHooks()
                 return
             func(@, ...)
+            return nil
         hook.Add id, @hookID, newFunc
         table.insert(@hooks, id)
     
@@ -477,7 +478,7 @@ class PonyFlexController
 
 do
     ppm2_disable_flexes = (cvar, oldval, newval) ->
-        for ply in *PPM2.__cachedPlayers
+        for ply in *player.GetAll()
             data = ply\GetPonyData()
             continue if not data
             flex = data\GetFlexController()

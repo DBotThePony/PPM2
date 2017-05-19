@@ -28,8 +28,10 @@ class PonyRenderController
         @networkedData = data
         @ent = data.ent
         @modelCached = data\GetModel()
+        @IGNORE_DRAW = false
         @CompileTextures() if @ent
         @CreateLegs() if @ent == LocalPlayer()
+        @socksModel = data\GetSocksModel()
     GetEntity: => @ent
     GetData: => @networkedData
     GetModel: => @networkedData\GetModel()
@@ -155,9 +157,25 @@ class PonyRenderController
         render.EnableClipping(oldClip)
 
     PreDraw: (ent = @ent) =>
+        return if @IGNORE_DRAW
         @GetTextureController()\PreDraw(ent)
     PostDraw: (ent = @ent) =>
-        @GetTextureController()\PostDraw(ent)
+        return if @IGNORE_DRAW
+        textures = @GetTextureController()
+        textures\PostDraw(ent)
+
+        @IGNORE_DRAW = true
+        if @GetData()\IsNetworked()
+            @socksModel = @ent\GetNWEntity('PPM2.SocksModel') if not IsValid(@socksModel)
+
+        @socksModel = @GetData()\GetSocksModel() if not IsValid(@socksModel)
+
+        if IsValid(@socksModel)
+            @socksModel\SetNoDraw(true)
+            textures\PreDrawSocks()
+            @socksModel\DrawModel()
+            textures\PostDrawSocks()
+        @IGNORE_DRAW = false
 
     @ARMS_MATERIAL_INDEX = 0
     PreDrawArms: (ent) =>
@@ -178,6 +196,9 @@ class PonyRenderController
             when 'Weight'
                 @armsWeightSetup = false
                 @GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
+            when 'SocksModel'
+                @socksModel = @GetData()\GetSocksModel()
+                @socksModel\SetNoDraw(true) if IsValid(@socksModel)
     GetTextureController: =>
         if not @renderController
             cls = PPM2.GetTextureController(@modelCached)
@@ -195,7 +216,6 @@ class NewPonyRenderController extends PonyRenderController
         @upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
         @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
         @tailModel\SetNoDraw(true) if IsValid(@tailModel)
-        @IGNORE_DRAW = false
         super(data)
     
     DataChanges: (state) =>

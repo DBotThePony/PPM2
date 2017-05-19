@@ -53,6 +53,56 @@ class DefaultBodygroupController
     GetEntityID: => @entID
     GetDataID: => @entID
 
+    @ATTACHMENT_EYES = 4
+    @ATTACHMENT_EYES_NAME = 'eyes'
+
+    CreateSocksModel: =>
+        @socksModel\Remove() if IsValid(@socksModel)
+
+        for ent in *ents.GetAll()
+            if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
+                ent\Remove()
+
+        model = 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
+
+        return if CLIENT and @GetData()\IsGoingToNetwork()
+        @socksModel = ents.Create('prop_dynamic') if SERVER
+        @socksModel = ClientsideModel(model) if CLIENT
+        with @socksModel
+            .isPonyPropModel = true
+            .isSocks = true
+            .manePlayer = @ent
+            \SetModel(model)
+            \SetPos(@ent\GetPos())
+            \Spawn()
+            \Activate()
+            \SetParent(@ent)
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+            \AddEffects(EF_BONEMERGE)
+        
+        if SERVER
+            timer.Simple .5, ->
+                return unless IsValid(@socksModel)
+                @GetData()\SetSocksModel(@socksModel)
+                @ent\SetNWEntity('PPM2.SocksModel', @socksModel) if IsValid(@ent)
+        else
+            @GetData()\SetSocksModel(@socksModel)
+        
+        return @socksModel
+    CreateSocksModelIfNotExists: =>
+        return if CLIENT and @GetData()\IsGoingToNetwork()
+        @CreateSocksModel() if not IsValid(@socksModel)
+        return @socksModel
+    
+    MergeModels: (targetEnt = NULL) =>
+        return unless IsValid(targetEnt)
+        socks = @CreateSocksModelIfNotExists()
+        if IsValid(socks)
+            socks\SetParent(targetEnt)
+            socks\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+    
+    GetSocks: => @socksModel or NULL
+
     ApplyRace: =>
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
@@ -79,6 +129,7 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @ApplyRace()
+        @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
     
     @TAIL_BONE1 = 38
     @TAIL_BONE2 = 39
@@ -101,6 +152,11 @@ class DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
                 @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+            when 'SocksAsModel'
+                if state\GetValue()
+                    @CreateSocksModelIfNotExists()
+                else
+                    @socksModel\Remove() if IsValid(@socksModel)
             when 'Race'
                 @ApplyRace()
 
@@ -127,9 +183,6 @@ class CPPMBodygroupController extends DefaultBodygroupController
 class NewBodygroupController extends DefaultBodygroupController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
 
-    @ATTACHMENT_EYES = 4
-    @ATTACHMENT_EYES_NAME = 'eyes'
-
     @BODYGROUP_SKELETON = 0
     @BODYGROUP_GENDER = -1
     @BODYGROUP_HORN = 1
@@ -139,7 +192,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelUP\Remove() if IsValid(@maneModelUP)
 
         for ent in *ents.GetAll()
-            if ent.isManeModel and ent.upperMane and ent.manePlayer == @ent
+            if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
                 ent\Remove()
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
@@ -150,7 +203,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelUP = ents.Create('prop_dynamic') if SERVER
         @maneModelUP = ClientsideModel(model) if CLIENT
         with @maneModelUP
-            .isManeModel = true
+            .isPonyPropModel = true
             .upperMane = true
             .manePlayer = @ent
             \SetModel(model)
@@ -175,7 +228,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelLower\Remove() if IsValid(@maneModelLower)
 
         for ent in *ents.GetAll()
-            if ent.isManeModel and ent.lowerMane and ent.manePlayer == @ent
+            if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
                 ent\Remove()
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
@@ -186,7 +239,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelLower = ents.Create('prop_dynamic') if SERVER
         @maneModelLower = ClientsideModel(model) if CLIENT
         with @maneModelLower
-            .isManeModel = true
+            .isPonyPropModel = true
             .lowerMane = true
             .manePlayer = @ent
             \SetModel(model)
@@ -211,7 +264,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\Remove() if IsValid(@tailModel)
 
         for ent in *ents.GetAll()
-            if ent.isManeModel and ent.isTail and ent.manePlayer == @ent
+            if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
                 ent\Remove()
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
@@ -222,7 +275,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel = ents.Create('prop_dynamic') if SERVER
         @tailModel = ClientsideModel(model) if CLIENT
         with @tailModel
-            .isManeModel = true
+            .isPonyPropModel = true
             .isTail = true
             .manePlayer = @ent
             \SetModel(model)
@@ -262,6 +315,7 @@ class NewBodygroupController extends DefaultBodygroupController
     GetTail: => @tailModel or NULL
 
     MergeModels: (targetEnt = NULL) =>
+        super(targetEnt)
         return unless IsValid(targetEnt)
         maneUpper = @CreateUpperManeModelIfNotExists()
         maneLower = @CreateLowerManeModelIfNotExists()
@@ -313,6 +367,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @CreateUpperManeModel()
         @CreateLowerManeModel()
         @CreateTailModel()
+        @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
 
     DataChanges: (state) =>
         switch state\GetKey()
@@ -330,6 +385,11 @@ class NewBodygroupController extends DefaultBodygroupController
                 @UpdateTailModel()
             when 'Race'
                 @ApplyRace()
+            when 'SocksAsModel'
+                if state\GetValue()
+                    @CreateSocksModelIfNotExists()
+                else
+                    @socksModel\Remove() if IsValid(@socksModel)
 
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController

@@ -191,6 +191,8 @@ class PonyTextureController
                 @CompileCMark()
             when 'CMarkURL'
                 @CompileCMark()
+            when 'SocksColor'
+                @CompileSocks()
             else
                 if @@MANE_UPDATE_TRIGGER[key]
                     @CompileHair()
@@ -220,6 +222,7 @@ class PonyTextureController
             return @FemaleMaterial
         else
             return @MaleMaterial
+    GetSocks: => @SocksMaterial
     GetCMark: => @CMarkTexture
     GetGUICMark: => @CMarkTextureGUI
     GetCMarkGUI: => @CMarkTextureGUI
@@ -252,6 +255,7 @@ class PonyTextureController
         @CompileHorn()
         @CompileWings()
         @CompileCMark()
+        @CompileSocks()
         @CompileEye(false)
         @CompileEye(true)
         @compiled = true
@@ -281,6 +285,16 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+    
+    @MAT_INDEX_SOCKS = 0
+
+    PreDrawSocks: (ent = @ent, socksEnt) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS, @GetSocks())
+
+    PostDrawSocks: (ent = @ent, socksEnt) =>
+        return unless @compiled
+        render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS)
     
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (rt, oldW, oldH, r, g, b, bodyMat) =>
@@ -396,6 +410,38 @@ class PonyTextureController
         @HornMaterial\SetFloat('$alpha', 1)
 
         return @HornMaterial
+    CompileSocks: =>
+        textureData = {
+            'name': "PPM2.#{@id}.Socks"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
+
+                '$model': '1'
+                '$ambientocclusion': '1'
+                '$lightwarptexture': 'models/props_pony/ppm/ppm_socks/socks_lightwarp'
+                '$phong': '1'
+                '$phongexponent': '5.0'
+                '$phongboost': '0.1'
+                '$phongfresnelranges': '[.25 .5 1]'
+                '$rimlight': '1'
+                '$rimlightexponent': '4.0'
+                '$rimlightboost': '2'
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+                '$cloakPassEnabled': '1'
+            }
+        }
+
+        @SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+        {:r, :g, :b} = @GetData()\GetSocksColor()
+
+        @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+        @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+        @SocksMaterial\SetFloat('$alpha', 1)
+
+        return @SocksMaterial
     CompileWings: =>
         textureData = {
             'name': "PPM2.#{@id}.Wings"

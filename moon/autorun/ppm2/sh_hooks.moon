@@ -16,7 +16,7 @@
 --
 
 timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
-    for ply in *PPM2.__cachedPlayers
+    for ply in *player.GetAll()
         model = ply\GetModel()
         ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
         if ply.__ppm2_lastmodel ~= model
@@ -25,9 +25,7 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
                 data\ModelChanges(ply.__ppm2_lastmodel, model)
                 ply.__ppm2_lastmodel = model
 
-timer.Create 'PPM2.UpdatePlayerList', 0.5, 0, -> PPM2.__cachedPlayers = player.GetAll()
-
 hook.Add 'Think', 'PPM2.Think', ->
-    for ply in *PPM2.__cachedPlayers
+    for ply in *player.GetAll()
         data = ply\GetPonyData()
         data\Think() if data

@@ -29,6 +29,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('UpperManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('LowerManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('TailModel',        net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('SocksModel',       net.ReadEntity, net.WriteEntity, NULL)
 
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
@@ -71,9 +72,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("TailDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
 
         @NetworkVar("LowerManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("LowerManeDetailColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
         @NetworkVar("UpperManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("UpperManeDetailColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
     @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')
@@ -82,6 +83,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('Bodysuit',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SUIT, PPM2.MAX_SUIT)),             ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('Socks',            net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('SocksAsModel',     net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
 
     for i = 1, PPM2.MAX_BODY_DETAILS
         @NetworkVar("BodyDetail#{i}", (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)

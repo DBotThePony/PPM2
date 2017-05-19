@@ -18,7 +18,7 @@
 WATCH_WEAPONS = {}
 
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
-    for ply in *PPM2.__cachedPlayers
+    for ply in *player.GetAll()
         ply.__cachedIsPony = ply\IsPony()
         if ply.__ppm2_weapon_hit and not ply.__cachedIsPony
             wep\SetNoDraw(false) for wep in *ply\GetWeapons()
@@ -36,7 +36,7 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
     return if a or b
     lply = LocalPlayer()
 
-    for ply in *PPM2.__cachedPlayers
+    for ply in *player.GetAll()
         if ply.__cachedIsPony
             wep = ply\GetActiveWeapon()
             if IsValid(wep)
@@ -132,7 +132,7 @@ hook.Add 'KeyPress', 'PPM2.RequireData', ->
 hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
     lply = LocalPlayer()
     lpos = lply\EyePos()
-    for ply in *PPM2.__cachedPlayers
+    for ply in *player.GetAll()
         if ply ~= lply
             if ply\GetNWBool('PPM2.InEditor')
                 pos = ply\EyePos()
