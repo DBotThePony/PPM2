@@ -653,7 +653,7 @@ class PonyDataInstance
         return newData
     ApplyDataToObject: (target, ...) =>
         for key, value in pairs @GetAsNetworked()
-            target["Set#{key}"](target, value, ...) if target["Get#{key}"](target, value) ~= value
+            target["Set#{key}"](target, value, ...)
     UpdateController: (...) => @ApplyDataToObject(@nwObj, ...)
     CreateController: (...) => @CreateNetworkObject(false, ...)
     CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
