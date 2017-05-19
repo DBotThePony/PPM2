@@ -426,6 +426,50 @@ class PonyFlexController
         }
 
         {
+            'name': 'talk_endless'
+            'autostart': false
+            'repeat': true
+            'time': 4
+            'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
+            'create': =>
+                @talkAnim = for i = 0, 1, 0.05
+                    rand = math.random(1, 100) / 100
+                    if rand <= .25
+                        {1 * rand, 0.4 * rand, 2 * rand, 0}
+                    elseif rand >= .25 and rand < .4
+                        rand *= .8
+                        {2 * rand, .6 * rand, 0, 1 * rand}
+                    elseif rand >= .4 and rand < .75
+                        rand *= .6
+                        {1 * rand, 0, 1 * rand, 2 * rand}
+                    elseif rand >= .75
+                        rand *= .4
+                        {1.5 * rand, 0, 1 * rand, 0}
+            'func': (delta, timeOfAnim) =>
+                JawOpen = @GetModifierID(1)
+                JawOpenState = @GetFlexState(1)
+                Tongue_OutOpen = @GetModifierID(2)
+                Tongue_OutOpenState = @GetFlexState(2)
+                Tongue_UpOpen = @GetModifierID(3)
+                Tongue_UpOpenState = @GetFlexState(3)
+                Tongue_DownOpen = @GetModifierID(4)
+                Tongue_DownOpenState = @GetFlexState(4)
+                cPos = math.floor(timeOfAnim * 20) + 1
+                data = @talkAnim[cPos]
+                return if not data
+                {jaw, out, up, down} = data
+                volume = @ent\VoiceVolume() * 6
+                jaw *= volume
+                out *= volume
+                up *= volume
+                down *= volume
+                JawOpenState\SetModifierWeight(JawOpen, jaw)
+                Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
+                Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
+                Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
+        }
+
+        {
             'name': 'eyes_blink'
             'autostart': true
             'repeat': true
@@ -483,6 +527,8 @@ class PonyFlexController
         @currentSequencesIterable = {}
         @ResetSequences()
         @Hook('OnPlayerChat', @OnPlayerChat)
+        @Hook('PlayerStartVoice', @PlayerStartVoice)
+        @Hook('PlayerEndVoice', @PlayerEndVoice)
     
     StartSequence: (seqID = '') =>
         return @currentSequences[seqID] if @currentSequences[seqID]
@@ -555,6 +601,12 @@ class PonyFlexController
                     @StartSequence('greeny')
                 else
                     @StartSequence('talk')
+    PlayerStartVoice: (ply = NULL) =>
+        return if ply ~= @ent
+        @StartSequence('talk_endless')
+    PlayerEndVoice: (ply = NULL) =>
+        return if ply ~= @ent
+        @EndSequence('talk_endless')
 
     RemoveHooks: =>
         for iHook in *@hooks
