@@ -249,7 +249,11 @@ MODEL_BOX_PANEL = {
             render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
 
         @controller\GetRenderController()\PreDraw(@model) if @controller
+        render.SuppressEngineLighting(true)
+        render.ResetModelLighting(1, 1, 1)
+        render.SetColorModulation(1, 1, 1)
         @model\DrawModel()
+        render.SuppressEngineLighting(false)
         @controller\GetRenderController()\PostDraw(@model) if @controller
 
         cam.End3D()
