@@ -162,6 +162,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @bodygroups.ent = @ent
         return @bodygroups
     CreateFlexController: =>
+        return if not @ent\IsPlayer()
         if not @flexes or @modelFlexes ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()
             cls = PPM2.GetFlexController(@modelCached)
