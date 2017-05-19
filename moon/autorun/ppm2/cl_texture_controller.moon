@@ -152,7 +152,7 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["HoleWidth#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeLines#{publicName}"] = true
-        @EYE_UPDATE_TRIGGER["HoleWidth#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleSize#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeBackground#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeIrisTop#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeIrisBottom#{publicName}"] = true
