@@ -93,6 +93,9 @@ PPM2.DefaultCutiemarks = {
     'ussr', 'vault', 'anarchy',
     'suit', 'deathscythe', 'shoop',
     'smiley', 'dawsome', 'weegee'
+    'applej', 'applem', 'bon_bon', 'carrots', 'celestia', 'cloudy', 'custom01', 'custom02', 'derpy', 'firezap',
+    'fluttershy', 'fruits', 'island', 'lyra', 'mine', 'note', 'octavia', 'pankk', 'pinkie_pie', 'rainbow_dash',
+    'rarity', 'rosen', 'sflowers', 'storm', 'time', 'time2', 'trixie', 'twilight', 'waters', 'weer', 'zecora'
 }
 
 PPM2.AvaliableUpperManesNew = {

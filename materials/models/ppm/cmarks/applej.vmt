@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/ppm/cmarks/storm" 
+	"$basetexture" "models/ppm/cmarks/applej" 
 
 	"$translucent" 1
 	"$phong" "1" 
