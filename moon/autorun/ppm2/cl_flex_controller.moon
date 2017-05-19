@@ -571,7 +571,7 @@ class PonyFlexController
         newFunc = (...) ->
             if not IsValid(@ent)
                 @ent = @GetData().ent
-            if not IsValid(@ent) or @GetData() ~= @ent\GetPonyData()
+            if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
                 @RemoveHooks()
                 return
             func(@, ...)
