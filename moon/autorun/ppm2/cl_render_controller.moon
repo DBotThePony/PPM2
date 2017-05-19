@@ -205,6 +205,12 @@ class PonyRenderController
             when 'SocksModel'
                 @socksModel = @GetData()\GetSocksModel()
                 @socksModel\SetNoDraw(true) if IsValid(@socksModel)
+            when 'NoFlex'
+                if state\GetValue()
+                    @flexes\ResetSequences() if @flexes
+                    @flexes = nil
+                else
+                    @CreateFlexController()
     GetTextureController: =>
         if not @renderController
             cls = PPM2.GetTextureController(@modelCached)
@@ -213,6 +219,7 @@ class PonyRenderController
         return @renderController
     CreateFlexController: =>
         return if not @ent\IsPlayer()
+        return if @GetData()\GetNoFlex()
         if not @flexes
             cls = PPM2.GetFlexController(@modelCached)
             return if not cls

@@ -339,6 +339,12 @@ class PonyDataInstance
             fix: (arg = false) -> tobool(arg)
         }
 
+        'noflex': {
+            default: -> false
+            getFunc: 'NoFlex'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'socks_model': {
             default: -> false
             getFunc: 'SocksAsModel'

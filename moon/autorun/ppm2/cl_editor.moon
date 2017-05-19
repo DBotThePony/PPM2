@@ -451,6 +451,7 @@ EditorPages = {
             @ComboBox('Eyelashes', 'EyelashType')
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
+            @CheckBox('No flexes on new model', 'NoFlex')
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
     }

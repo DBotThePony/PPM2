@@ -95,6 +95,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('Bodysuit',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SUIT, PPM2.MAX_SUIT)),             ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('Socks',            net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('NoFlex',           net.ReadBool, net.WriteBool,              false)
     @NetworkVar('SocksAsModel',     net.ReadBool, net.WriteBool,              false)
     @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
 
