@@ -203,6 +203,84 @@ class PonyTextureController
                     @CompileEye(false)
                 elseif @@BODY_UPDATE_TRIGGER[key]
                     @CompileBody()
+        
+    @HTML_MATERIAL_QUEUE = {}
+    @LoadURL: (url = '', callback = (->)) => table.insert(@HTML_MATERIAL_QUEUE, {:url, :callback})
+    @BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
+        return "<html>
+                    <head>
+                        <style>
+                            html, body {
+                                background: transparent;
+                                margin: 0;
+                                padding: 0;
+                                overflow: hidden;
+                            }
+
+                            #mainimage {
+                                max-width: #{width * .66};
+                                height: auto;
+                                width: 100%;
+                                max-height: #{height * .66};
+                            }
+
+                            #imgdiv {
+                                width: #{width};
+                                height: #{height};
+                                overflow: hidden;
+                                margin: 0;
+                                padding: 0;
+                                text-align: center;
+                            }
+                        </style>
+                        <script>
+                            window.onload = function() {
+                                var img = document.getElementById('mainimage');
+                                if (img.naturalWidth < img.naturalHeight) {
+                                    img.style.setProperty('height', '100%');
+                                    img.style.setProperty('width', 'auto');
+                                }
+
+                                img.style.setProperty('margin-top', (#{height} - img.height) / 2);
+                            };
+                        </script>
+                    </head>
+                    <body>
+                        <div id='imgdiv'>
+                            <img src='#{url}' id='mainimage' />
+                        </div>
+                    </body>
+                </html>"
+    
+    @SHOULD_WAIT_WEB = false
+    hook.Add 'Think', 'PPM2.WebMaterialThink', ->
+        return if @SHOULD_WAIT_WEB
+        data = @HTML_MATERIAL_QUEUE[1]
+        return if not data
+        if IsValid(data.panel)
+            panel = data.panel
+            return if panel\IsLoading()
+            @SHOULD_WAIT_WEB = true
+            timer.Simple 0.5, ->
+                @SHOULD_WAIT_WEB = false
+                return unless IsValid(panel)
+                panel\UpdateHTMLTexture()
+                htmlmat = panel\GetHTMLMaterial()
+                return if not htmlmat
+                texture = htmlmat\GetTexture('$basetexture')
+                texture\Download()
+                data.callback(texture)
+                table.remove(@HTML_MATERIAL_QUEUE, 1)
+                timer.Simple 0, -> panel\Remove() if IsValid(panel)
+            return
+        panel = vgui.Create('DHTML')
+        timer.Simple 4, -> panel\Remove() if IsValid(panel)
+        panel\SetVisible(false)
+        panel\SetSize(@QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2)
+        panel\SetHTML(@BuildURLHTML(data.url, @QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2))
+        panel\Refresh()
+        panel.ConsoleMessage = ->
+        data.panel = panel
 
     new: (controller, compile = true) =>
         @ent = controller\GetEntity()
@@ -761,51 +839,7 @@ class PonyTextureController
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
-    @BuildCMarkHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
-        return "<html>
-                    <head>
-                        <style>
-                            html, body {
-                                background: transparent;
-                                margin: 0;
-                                padding: 0;
-                                overflow: hidden;
-                            }
-
-                            #mainimage {
-                                max-width: #{width * .66};
-                                height: auto;
-                                width: 100%;
-                                max-height: #{height * .66};
-                            }
-
-                            #imgdiv {
-                                width: #{width};
-                                height: #{height};
-                                overflow: hidden;
-                                margin: 0;
-                                padding: 0;
-                                text-align: center;
-                            }
-                        </style>
-                        <script>
-                            window.onload = function() {
-                                var img = document.getElementById('mainimage');
-                                if (img.naturalWidth < img.naturalHeight) {
-                                    img.style.setProperty('height', '100%');
-                                    img.style.setProperty('width', 'auto');
-                                }
-
-                                img.style.setProperty('margin-top', (#{height} - img.height) / 2);
-                            };
-                        </script>
-                    </head>
-                    <body>
-                        <div id='imgdiv'>
-                            <img src='#{url}' id='mainimage' />
-                        </div>
-                    </body>
-                </html>"
+    
     CompileCMark: =>
         textureData = {
             'name': "PPM2.#{@id}.CMark"
@@ -840,32 +874,9 @@ class PonyTextureController
             @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
             @CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
         else
-            panel = vgui.Create('DHTML')
-            timer.Simple 4, -> panel\Remove() if IsValid(panel)
-            panel\SetVisible(false)
-            panel\SetSize(@@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2)
-            panel\SetHTML(@@BuildCMarkHTML(URL, @@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2))
-            panel\Refresh()
-            panel.ConsoleMessage = ->
-            hookID = "PPM2.#{@id}.CMarkDL"
-
-            hook.Add 'Think', hookID, ->
-                if not IsValid(panel)
-                    hook.Remove 'Think', hookID
-                    return
-                if not panel\IsLoading()
-                    hook.Remove 'Think', hookID
-                    timer.Simple 0.3, ->
-                        return unless IsValid(panel)
-                        panel\UpdateHTMLTexture()
-                        htmlmat = panel\GetHTMLMaterial()
-                        return if not htmlmat
-                        texture = htmlmat\GetTexture('$basetexture')
-                        texture\Download()
-                        @CMarkTexture\SetTexture('$basetexture', texture)
-                        @CMarkTextureGUI\SetTexture('$basetexture', texture)
-                        hook.Remove 'Think', hookID
-                        timer.Simple 0, -> panel\Remove() if IsValid(panel)
+            @@LoadURL URL, (texture) ->
+                @CMarkTexture\SetTexture('$basetexture', texture)
+                @CMarkTextureGUI\SetTexture('$basetexture', texture)
         
         return @CMarkTexture, @CMarkTextureGUI
 
