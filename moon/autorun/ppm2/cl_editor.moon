@@ -384,11 +384,17 @@ PANEL_SETTINGS_BASE = {
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
         return box, label
     URLInput: (option = '') =>
-        textInput = vgui.Create('DTextEntry', @scroll or @)
-        @scroll\AddItem(textInput) if IsValid(@scroll)
-        with textInput
+        wrapper = vgui.Create('EditablePanel', @scroll or @)
+        with wrapper
             \Dock(TOP)
             \DockMargin(5, 10, 5, 10)
+            \SetKeyboardInputEnabled(true)
+            \SetMouseInputEnabled(true)
+            \SetSize(0, 30)
+        textInput = vgui.Create('DTextEntry', wrapper)
+        @scroll\AddItem(wrapper) if IsValid(@scroll)
+        with textInput
+            \Dock(FILL)
             \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             \SetKeyboardInputEnabled(true)
             \SetMouseInputEnabled(true)
@@ -517,6 +523,7 @@ EditorPages = {
             for i = 1, PPM2.MAX_BODY_DETAILS
                 @Label("Body detail #{i}")
                 @URLInput("BodyDetailURL#{i}")
+                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
     }
 
     {

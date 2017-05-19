@@ -585,17 +585,17 @@ class PonyDataInstance
     
     for i = 1, PPM2.MAX_BODY_DETAILS
         @PONY_DATA["body_detail_color_#{i}"] = {
-            default: -> Color(140, 50, 100)
+            default: -> Color(255, 255, 255)
             getFunc: "BodyDetailColor#{i}"
-            fix: (arg = Color(140, 50, 100)) ->
+            fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
-                    return Color(140, 50, 100)
+                    return Color(255, 255, 255)
                 else
                     {:r, :g, :b, :a} = arg
                     if r and g and b and a
                         return Color(r, g, b, a)
                     else
-                        return Color(140, 50, 100)
+                        return Color(255, 255, 255)
         }
 
         @PONY_DATA["body_detail_#{i}"] = {
@@ -616,6 +616,20 @@ class PonyDataInstance
                     return arg
                 else
                     return ''
+        }
+
+        @PONY_DATA["body_detail_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "BodyDetailURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
         }
     
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}

@@ -172,6 +172,7 @@ class PonyTextureController
     for i = 1, PPM2.MAX_BODY_DETAILS
         @BODY_UPDATE_TRIGGER["BodyDetail#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailColor#{i}"] = true
+        @BODY_UPDATE_TRIGGER["BodyDetailURLColor#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
     
     DataChanges: (state) =>
@@ -206,7 +207,26 @@ class PonyTextureController
                     @CompileBody()
         
     @HTML_MATERIAL_QUEUE = {}
-    @LoadURL: (url = '', callback = (->)) => table.insert(@HTML_MATERIAL_QUEUE, {:url, :callback})
+    @URL_MATERIAL_CACHE = {}
+    @ALREADY_DOWNLOADING = {}
+    @LoadURL: (url, width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST, callback = (->)) =>
+        error('Must specify URL') if not url or url == ''
+        @URL_MATERIAL_CACHE[width] = @URL_MATERIAL_CACHE[width] or {}
+        @URL_MATERIAL_CACHE[width][height] = @URL_MATERIAL_CACHE[width][height] or {}
+        @ALREADY_DOWNLOADING[width] = @ALREADY_DOWNLOADING[width] or {}
+        @ALREADY_DOWNLOADING[width][height] = @ALREADY_DOWNLOADING[width][height] or {}
+        if @ALREADY_DOWNLOADING[width][height][url]
+            for data in *@HTML_MATERIAL_QUEUE
+                if data.url == url
+                    table.insert(data.callbacks, callback)
+                    break
+            return
+        if @URL_MATERIAL_CACHE[width][height][url]
+            callback(@URL_MATERIAL_CACHE[width][height][url].texture, nil, @URL_MATERIAL_CACHE[width][height][url].material)
+            return
+        @ALREADY_DOWNLOADING[width][height][url] = true
+        table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}})
+        print '[PPM2] Queuing to download ' .. url
     @BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
         return "<html>
                     <head>
@@ -219,15 +239,15 @@ class PonyTextureController
                             }
 
                             #mainimage {
-                                max-width: #{width * .66};
+                                max-width: #{width};
                                 height: auto;
                                 width: 100%;
-                                max-height: #{height * .66};
+                                max-height: #{height};
                             }
 
                             #imgdiv {
-                                width: #{width};
-                                height: #{height};
+                                width: #{@QUAD_SIZE_CONST};
+                                height: #{@QUAD_SIZE_CONST};
                                 overflow: hidden;
                                 margin: 0;
                                 padding: 0;
@@ -242,7 +262,7 @@ class PonyTextureController
                                     img.style.setProperty('width', 'auto');
                                 }
 
-                                img.style.setProperty('margin-top', (#{height} - img.height) / 2);
+                                img.style.setProperty('margin-top', (#{@QUAD_SIZE_CONST} - img.height) / 2);
                             };
                         </script>
                     </head>
@@ -271,7 +291,25 @@ class PonyTextureController
                 return if not htmlmat
                 texture = htmlmat\GetTexture('$basetexture')
                 texture\Download()
-                data.callback(texture, panel, htmlmat)
+                newMat = CreateMaterial("PPM2.URLMaterial.#{texture\GetName()}_#{math.random(1, 100000)}", 'UnlitGeneric', {
+                    '$basetexture': 'models/debug/debugwhite'
+                    '$ignorez': 1
+                    '$vertexcolor': 1
+                    '$vertexalpha': 1
+                    '$nolod': 1
+                })
+
+                newMat\SetTexture('$basetexture', texture)
+                @URL_MATERIAL_CACHE[data.width][data.height][data.url] = {
+                    texture: texture
+                    material: newMat
+                }
+
+                @ALREADY_DOWNLOADING[data.width][data.height][data.url] = false
+                print "[PPM2] Finished downloading #{data.url}"
+
+                for callback in *data.callbacks
+                    callback(texture, panel, newMat)
                 table.remove(@HTML_MATERIAL_QUEUE, 1)
                 timer.Simple 0, -> panel\Remove() if IsValid(panel)
             return
@@ -279,8 +317,8 @@ class PonyTextureController
         data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
         timer.Create data.timerid, 4, 0, -> panel\Remove() if IsValid(panel)
         panel\SetVisible(false)
-        panel\SetSize(@QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2)
-        panel\SetHTML(@BuildURLHTML(data.url, @QUAD_SIZE_CONST / 2, @QUAD_SIZE_CONST / 2))
+        panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
+        panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
         panel\Refresh()
         panel.ConsoleMessage = ->
         data.panel = panel
@@ -443,6 +481,8 @@ class PonyTextureController
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
             for i, mat in pairs urlTextures
+                {:r, :g, :b} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b)
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
             
@@ -458,15 +498,19 @@ class PonyTextureController
             @["#{prefix}Material"]\SetTexture('$basetexture', rt)
         
         data = @GetData()
-        for i = 1, PPM2.MAX_BODY_DETAILS
+        validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
             detailURL = data["GetBodyDetailURL#{i}"](data)
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
-            @@LoadURL detailURL, (texture, panel, mat) ->
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
                     continueCompilation()
+        
         if left == 0
             continueCompilation()
         return @["#{prefix}Material"]
@@ -888,7 +932,7 @@ class PonyTextureController
             @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
             @CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
         else
-            @@LoadURL URL, (texture, panel) ->
+            @@LoadURL URL, @@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2, (texture, panel) ->
                 @CMarkTexture\SetTexture('$basetexture', texture)
                 @CMarkTextureGUI\SetTexture('$basetexture', texture)
         
