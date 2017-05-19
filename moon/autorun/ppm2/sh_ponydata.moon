@@ -57,6 +57,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("EyeIrisBottom#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
         @NetworkVar("EyeIrisLine1#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
         @NetworkVar("EyeIrisLine2#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeReflection#{publicName}",    net.ReadColor, net.WriteColor,    Color(255, 255, 255, 127))
+        @NetworkVar("EyeEffect#{publicName}",        net.ReadColor, net.WriteColor,         Color(255, 255, 255))
         @NetworkVar("EyeLines#{publicName}",         net.ReadBool, net.WriteBool,                           true)
         @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
         @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)

@@ -273,6 +273,34 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        'eye_reflection': {
+            default: -> Color(255, 255, 255, 127)
+            getFunc: 'EyeReflection'
+            fix: (arg = Color(255, 255, 255, 127)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255, 127)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255, 127)
+        }
+
+        'eye_effect': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'EyeEffect'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
         'body': {
             default: -> Color(255, 255, 255)
             getFunc: 'BodyColor'
@@ -415,6 +443,34 @@ class PonyDataInstance
         @PONY_DATA["eye_irisline2_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeIrisLine2#{publicName}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["eye_reflection_#{internal}"] = {
+            default: -> Color(255, 255, 255, 127)
+            getFunc: "EyeReflection#{publicName}"
+            fix: (arg = Color(255, 255, 255, 127)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255, 127)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255, 127)
+        }
+
+        @PONY_DATA["eye_effect_#{internal}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "EyeEffect#{publicName}"
             fix: (arg = Color(255, 255, 255)) ->
                 if type(arg) ~= 'table'
                     return Color(255, 255, 255)

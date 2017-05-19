@@ -338,7 +338,7 @@ PANEL_SETTINGS_BASE = {
         box = vgui.Create('DColorMixer', collapse)
         collapse.box = box
         with box
-            \SetSize(250, 250)
+            \SetSize(250, 270)
 			\SetTooltip("#{name}\nData value: #{option}")
             \SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             .ValueChanged = (pnl, newVal = Color(0, 0, 0)) ->
@@ -353,7 +353,7 @@ PANEL_SETTINGS_BASE = {
             \SetContents(box)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
-            \SetSize(250, 250)
+            \SetSize(250, 270)
             \SetLabel(name)
             \SetExpanded(false)
         @scroll\AddItem(collapse) if IsValid(@scroll)
@@ -477,6 +477,8 @@ EditorPages = {
                 @ColorBox("#{publicName} Eye line 1", "EyeIrisLine1#{publicName}")
                 @ColorBox("#{publicName} Eye line 2", "EyeIrisLine2#{publicName}")
                 @ColorBox("#{publicName} Eye line 2", "EyeIrisLine2#{publicName}")
+                @ColorBox("#{publicName} Eye reflection effect", "EyeReflection#{publicName}")
+                @ColorBox("#{publicName} Eye effect", "EyeEffect#{publicName}")
     }
 
     {

@@ -161,6 +161,8 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["EyeHole#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["DerpEyesStrength#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["DerpEyes#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeReflection#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeEffect#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -481,8 +483,8 @@ class PonyTextureController
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
             for i, mat in pairs urlTextures
-                {:r, :g, :b} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
-                surface.SetDrawColor(r, g, b)
+                {:r, :g, :b, :a} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
             
@@ -808,6 +810,8 @@ class PonyTextureController
         EyeIrisLine2 = @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
         EyeLines = @GetData()["GetEyeLines#{prefixData}"](@GetData())
         HoleSize = @GetData()["GetHoleSize#{prefixData}"](@GetData())
+        EyeReflection = @GetData()["GetEyeReflection#{prefixData}"](@GetData())
+        EyeEffect = @GetData()["GetEyeEffect#{prefixData}"](@GetData())
         DerpEyes = @GetData()["GetDerpEyes#{prefixData}"](@GetData())
         DerpEyesStrength = @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
         oldW, oldH = ScrW(), ScrH()
@@ -854,7 +858,7 @@ class PonyTextureController
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b} = EyeBackground
+        {:r, :g, :b, :a} = EyeBackground
         render.Clear(r, g, b, 255, true, true)
         cam.Start2D()
         surface.SetDrawColor(r, g, b)
@@ -885,11 +889,11 @@ class PonyTextureController
         HolePos = @@QUAD_SIZE_CONST / 2
         surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
 
-        surface.SetDrawColor(255, 255, 255)
+        surface.SetDrawColor(EyeEffect)
         surface.SetMaterial(@@EYE_EFFECT)
         surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
-        surface.SetDrawColor(255, 255, 255, 127)
+        surface.SetDrawColor(EyeReflection)
         surface.SetMaterial(@@EYE_REFLECTION)
         surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
