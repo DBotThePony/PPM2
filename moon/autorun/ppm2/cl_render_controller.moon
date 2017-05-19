@@ -161,7 +161,7 @@ class PonyRenderController
         @flexes\PlayerRespawn() if @flexes
 
     PreDraw: (ent = @ent) =>
-        return if @IGNORE_DRAW
+        return false if @IGNORE_DRAW
         @GetTextureController()\PreDraw(ent)
         @flexes\Think() if @flexes
     PostDraw: (ent = @ent) =>

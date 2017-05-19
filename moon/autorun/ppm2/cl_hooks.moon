@@ -60,7 +60,8 @@ PPM2.PrePlayerDraw = =>
     return unless @__cachedIsPony
     data = @GetPonyData()
     renderController = data\GetRenderController()
-    renderController\PreDraw() if renderController
+    status = renderController\PreDraw() if renderController
+    return status if status ~= nil
 PPM2.PostPlayerDraw = =>
     return unless @GetPonyData()
     return unless @__cachedIsPony
@@ -86,7 +87,8 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
     return unless ply\Alive()
     data = ply\GetPonyData()
     return unless data
-    data\GetRenderController()\PreDrawArms(arms)
+    status = data\GetRenderController()\PreDrawArms(arms)
+    return status if status ~= nil
     arms.__ppm2_draw = true
 
 hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
