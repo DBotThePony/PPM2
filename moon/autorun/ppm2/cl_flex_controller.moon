@@ -42,6 +42,8 @@
 -- 24	Throat_Bulge
 -- 
 
+DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
+
 class FlexState
     new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, min = 0, max = 1, useModifiers = true) =>
         @controller = controller
@@ -212,9 +214,8 @@ class FlexSequence
         
         return true
     Stop: =>
-        state = controller\GetFlexState(id)
         for id in *@flexIDsIterable
-            state\ResetModifiers(@name)
+            @GetController()\GetFlexState(id)\ResetModifiers(@name)
         @valid = false
     Remove: => @Stop()
     HasFinished: =>
@@ -268,7 +269,7 @@ class PonyFlexController
                     leftState\SetModifierWeight(left, 1)
                     rightState\SetModifierWeight(right, 1)
                     return
-                value = math.abs(math.sin(RealTime() * .5) * .2)
+                value = math.abs(math.sin(RealTime() * .5) * .15)
                 leftState\SetModifierWeight(left, value)
                 rightState\SetModifierWeight(right, value)
         }
@@ -349,6 +350,11 @@ class PonyFlexController
     ResetSequences: =>
         for seq in *@currentSequencesIterable
             seq\Stop()
+        
+        @currentSequences = {}
+        @currentSequencesIterable = {}
+        state\Think(1000) for state in *@states
+
         for seq in *@@FLEX_SEQUENCES
             continue if not seq.autostart
             @StartSequence(seq.name)
@@ -380,6 +386,7 @@ class PonyFlexController
             hook.Remove iHook, @hookID
 
     Think: =>
+        return if DISABLE_FLEXES\GetBool()
         if not IsValid(@ent)
             @ent = @GetData().ent
         return if not IsValid(@ent) or @ent\IsDormant()
@@ -391,6 +398,16 @@ class PonyFlexController
                 @EndSequence(seq\GetName(), false)
                 break
             seq\Think(delta)
+
+do
+    ppm2_disable_flexes = (cvar, oldval, newval) ->
+        for ply in *PPM2.__cachedPlayers
+            data = ply\GetPonyData()
+            continue if not data
+            flex = data\GetFlexController()
+            continue if not flex
+            flex\ResetSequences()
+    cvars.AddChangeCallback 'ppm2_disable_flexes', ppm2_disable_flexes, 'ppm2_disable_flexes'
 
 PPM2.PonyFlexController = PonyFlexController
 PPM2.GetFlexController = (model = 'models/ppm/player_default_base_new.mdl') -> PonyFlexController.AVALIABLE_CONTROLLERS[model]

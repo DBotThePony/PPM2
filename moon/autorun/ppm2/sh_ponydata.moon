@@ -170,6 +170,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @modelFlexes = @modelCached
         @flexes.ent = @ent
         return @flexes
+    GetFlexController: => @flexes
 
 PPM2.NetworkedPonyData = NetworkedPonyData
 
