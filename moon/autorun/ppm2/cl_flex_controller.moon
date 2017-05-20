@@ -249,31 +249,31 @@ class PonyFlexController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
 
     @FLEX_LIST = {
-        {flex: 'eyes_updown',       scale: 1, speed: 1, active: true}
-        {flex: 'eyes_rightleft',    scale: 1, speed: 1, active: true}
+        {flex: 'eyes_updown',       scale: 1, speed: 1, active: false}
+        {flex: 'eyes_rightleft',    scale: 1, speed: 1, active: false}
         {flex: 'JawOpen',           scale: 1, speed: 1, active: true}
         {flex: 'JawClose',          scale: 1, speed: 1, active: true}
         {flex: 'Smirk',             scale: 1, speed: 1, active: true}
         {flex: 'Frown',             scale: 1, speed: 1, active: true}
-        {flex: 'Stretch',           scale: 1, speed: 1, active: true}
-        {flex: 'Pucker',            scale: 1, speed: 1, active: true}
+        {flex: 'Stretch',           scale: 1, speed: 1, active: false}
+        {flex: 'Pucker',            scale: 1, speed: 1, active: false}
         {flex: 'Grin',              scale: 1, speed: 1, active: true}
         {flex: 'CatFace',           scale: 1, speed: 1, active: true}
         {flex: 'Mouth_O',           scale: 1, speed: 1, active: true}
         {flex: 'Mouth_O2',          scale: 1, speed: 1, active: true}
-        {flex: 'Mouth_Full',        scale: 1, speed: 1, active: true}
+        {flex: 'Mouth_Full',        scale: 1, speed: 1, active: false}
         {flex: 'Tongue_Out',        scale: 1, speed: 1, active: true}
         {flex: 'Tongue_Up',         scale: 1, speed: 1, active: true}
         {flex: 'Tongue_Down',       scale: 1, speed: 1, active: true}
-        {flex: 'NoEyelashes',       scale: 1, speed: 1, active: true}
-        {flex: 'Eyes_Blink',        scale: 1, speed: 1, active: true}
+        {flex: 'NoEyelashes',       scale: 1, speed: 1, active: false}
+        {flex: 'Eyes_Blink',        scale: 1, speed: 1, active: false}
         {flex: 'Left_Blink',        scale: 1, speed: 1, active: true}
         {flex: 'Right_Blink',       scale: 1, speed: 1, active: true}
         {flex: 'Scrunch',           scale: 1, speed: 1, active: true}
-        {flex: 'FatButt',           scale: 1, speed: 1, active: true}
+        {flex: 'FatButt',           scale: 1, speed: 1, active: false}
         {flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
         {flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
-        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: true}
+        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: false}
     }
 
     @FLEX_SEQUENCES = {
