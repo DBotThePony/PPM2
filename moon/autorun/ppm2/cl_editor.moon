@@ -498,7 +498,6 @@ EditorPages = {
                 @ColorBox("#{publicName} Bottom eye iris", "EyeIrisBottom#{publicName}")
                 @ColorBox("#{publicName} Eye line 1", "EyeIrisLine1#{publicName}")
                 @ColorBox("#{publicName} Eye line 2", "EyeIrisLine2#{publicName}")
-                @ColorBox("#{publicName} Eye line 2", "EyeIrisLine2#{publicName}")
                 @ColorBox("#{publicName} Eye reflection effect", "EyeReflection#{publicName}")
                 @ColorBox("#{publicName} Eye effect", "EyeEffect#{publicName}")
     }
