@@ -305,7 +305,7 @@ class PonyFlexController
             'autostart': true
             'repeat': true
             'time': 5
-            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen'}
+            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
             'func': (delta, timeOfAnim) =>
                 frown = @GetModifierID(1)
                 frownState = @GetFlexState(1)
@@ -317,7 +317,8 @@ class PonyFlexController
 
                 hp, mhp = @ent\Health(), @ent\GetMaxHealth()
                 mhp = 1 if mhp == 0
-                strength = math.Clamp(1.5 - (hp / mhp) * 1.5, 0, 1)
+                div = hp / mhp
+                strength = math.Clamp(1.5 - div * 1.5, 0, 1)
                 frownState\SetModifierWeight(frown, strength)
                 ScrunchState\SetModifierWeight(Scrunch, strength * .5)
                 leftState\SetModifierWeight(left, strength * .1)
@@ -331,6 +332,11 @@ class PonyFlexController
                     JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTime() * strength * 3) * .1)
                 else
                     JawOpenState\SetModifierWeight(JawOpen, 0)
+
+                if div >= 2
+                    @SetModifierWeight(7, .5)
+                else
+                    @SetModifierWeight(7, 0)
         }
 
         {
