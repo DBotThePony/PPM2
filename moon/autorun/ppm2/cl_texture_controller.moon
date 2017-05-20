@@ -130,6 +130,12 @@ class PonyTextureController
     })
 
     @EYE_OVAL = Material('models/ppm/partrender/eye_oval.png')
+
+    @EYE_OVALS = {
+        Material('models/ppm/partrender/eye_oval.png')
+        Material('models/ppm/partrender/eye_oval_aperture.png')
+    }
+
     @EYE_GRAD = Material('models/ppm/partrender/eye_grad.png')
     @EYE_EFFECT = Material('models/ppm/partrender/eye_effect.png')
     @EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection.png')
@@ -149,6 +155,7 @@ class PonyTextureController
     @EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
 
     for publicName in *{'', 'Left', 'Right'}
+        @EYE_UPDATE_TRIGGER["EyeType#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleWidth#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeLines#{publicName}"] = true
@@ -886,6 +893,7 @@ class PonyTextureController
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
+        EyeType = @GetData()["GetEyeType#{prefixData}"](@GetData())
         EyeBackground = @GetData()["GetEyeBackground#{prefixData}"](@GetData())
         EyeHole = @GetData()["GetEyeHole#{prefixData}"](@GetData())
         HoleWidth = @GetData()["GetHoleWidth#{prefixData}"](@GetData())
@@ -951,7 +959,7 @@ class PonyTextureController
         surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
         surface.SetDrawColor(EyeIris1)
-        surface.SetMaterial(@@EYE_OVAL)
+        surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
         IrisPos = @@QUAD_SIZE_CONST / 2 - @@QUAD_SIZE_CONST * IrisSize / 2
         IrisQuadSize = @@QUAD_SIZE_CONST * IrisSize
         surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
@@ -970,7 +978,7 @@ class PonyTextureController
             surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
         
         surface.SetDrawColor(EyeHole)
-        surface.SetMaterial(@@EYE_OVAL)
+        surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
         HoleQuadSize = @@QUAD_SIZE_CONST * IrisSize * HoleSize
         HolePos = @@QUAD_SIZE_CONST / 2
         surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)

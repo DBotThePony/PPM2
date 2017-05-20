@@ -485,6 +485,7 @@ EditorPages = {
             @CheckBox('Use separated settings for eyes', 'SeparateEyes')
             for publicName in *{'', 'Left', 'Right'}
                 @Label("'#{publicName}' Eye settings")
+                @ComboBox("#{publicName} Eye type", "EyeType#{publicName}")
                 @CheckBox("#{publicName} Eye lines", "EyeLines#{publicName}")
                 @CheckBox("#{publicName} Derp eye", "DerpEyes#{publicName}")
                 @NumSlider("#{publicName} Derp eye strength", "DerpEyesStrength#{publicName}", 2)

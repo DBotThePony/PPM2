@@ -51,6 +51,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('SeparateEyes',     net.ReadBool, net.WriteBool,              false)
     for publicName in *{'', 'Left', 'Right'}
+        @NetworkVar("EyeType#{publicName}",          (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
         @NetworkVar("EyeBackground#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
         @NetworkVar("EyeHole#{publicName}",          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
         @NetworkVar("EyeIrisTop#{publicName}",       net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))

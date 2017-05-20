@@ -184,9 +184,18 @@ class PonyDataInstance
         'eye_derp_strength': {
             default: -> 1
             getFunc: 'DerpEyesStrength'
-            fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
             min: PPM2.MIN_DERP_STRENGTH
             max: PPM2.MAX_DERP_STRENGTH
+        }
+
+        'eye_type': {
+            default: -> 0
+            getFunc: 'EyeType'
+            enum: [arg for arg in *PPM2.AvaliableEyeTypes]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE)
+            min: PPM2.MIN_EYE_TYPE
+            max: PPM2.MAX_EYE_TYPE
         }
 
         'eye_bg': {
@@ -508,12 +517,21 @@ class PonyDataInstance
             fix: (arg = true) -> tobool(arg)
         }
 
-        @PONY_DATA["eye_derp_strength_#{internal}"]= {
+        @PONY_DATA["eye_derp_strength_#{internal}"] = {
             default: -> 1
             getFunc: "DerpEyesStrength#{publicName}"
-            fix: (arg = 1) -> math.Clamp(tonumber(arg), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
             min: PPM2.MIN_DERP_STRENGTH
             max: PPM2.MAX_DERP_STRENGTH
+        }
+
+        @PONY_DATA["eye_type_#{internal}"] = {
+            default: -> 0
+            getFunc: "EyeType#{publicName}"
+            enum: [arg for arg in *PPM2.AvaliableEyeTypes]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE)
+            min: PPM2.MIN_EYE_TYPE
+            max: PPM2.MAX_EYE_TYPE
         }
 
         @PONY_DATA["hole_width_#{internal}"] = {
