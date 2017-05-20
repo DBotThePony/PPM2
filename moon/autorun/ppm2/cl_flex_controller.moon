@@ -47,6 +47,11 @@ net.Receive 'PPM2.DamageAnimation', ->
     return if not IsValid(ent) or not ent\IsPlayer()
     hook.Call('PPM2_HurtAnimation', nil, ent)
 
+net.Receive 'PPM2.KillAnimation', ->
+    ent = net.ReadEntity()
+    return if not IsValid(ent) or not ent\IsPlayer()
+    hook.Call('PPM2_KillAnimation', nil, ent)
+
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
@@ -559,6 +564,18 @@ class PonyFlexController
                 @SetModifierWeight(3, .36)
                 @SetModifierWeight(4, .81)
         }
+
+        {
+            'name': 'kill_grin'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Smirk', 'Frown', 'Grin'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, .51)
+                @SetModifierWeight(2, .38)
+                @SetModifierWeight(3, .66)
+        }
     }
 
     @__inherited: (child) =>
@@ -598,6 +615,7 @@ class PonyFlexController
         @Hook('PlayerStartVoice', @PlayerStartVoice)
         @Hook('PlayerEndVoice', @PlayerEndVoice)
         @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
+        @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
     
     StartSequence: (seqID = '') =>
         return @currentSequences[seqID] if @currentSequences[seqID]
@@ -709,6 +727,9 @@ class PonyFlexController
     PPM2_HurtAnimation: (ply = NULL) =>
         return if ply ~= @ent
         @RestartSequence('hurt')
+    PPM2_KillAnimation: (ply = NULL) =>
+        return if ply ~= @ent
+        @RestartSequence('kill_grin')
 
     RemoveHooks: =>
         for iHook in *@hooks
