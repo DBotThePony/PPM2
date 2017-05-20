@@ -59,6 +59,7 @@ include 'autorun/ppm2/sh_ponydata.lua'
 include 'autorun/ppm2/sh_hooks.lua'
 include 'autorun/ppm2/sh_bodygroup_controller.lua'
 include 'autorun/ppm2/sh_weight_controller.lua'
+include 'autorun/ppm2/sh_flex_controller.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
@@ -67,7 +68,6 @@ if CLIENT
     include 'autorun/ppm2/cl_texture_controller.lua'
     include 'autorun/ppm2/cl_hooks.lua'
     include 'autorun/ppm2/cl_render_controller.lua'
-    include 'autorun/ppm2/cl_flex_controller.lua'
     include 'autorun/ppm2/cl_editor.lua'
 
     for ent in *ents.GetAll()
@@ -87,10 +87,10 @@ else
     AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
     AddCSLuaFile 'autorun/ppm2/sh_weight_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/sh_flex_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
     AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_hooks.lua'
     AddCSLuaFile 'autorun/ppm2/cl_render_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_flex_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_editor.lua'
     include 'autorun/ppm2/sv_hooks.lua'

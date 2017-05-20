@@ -152,6 +152,8 @@ class FlexState
         @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
         @ent\SetFlexWeight(@flexID, @current)
 
+PPM2.FlexState = FlexState
+
 class FlexSequence
     new: (controller, data) =>
         {
@@ -243,6 +245,8 @@ class FlexSequence
     HasFinished: =>
         return false if @dorepeat
         return RealTime() > @finish
+
+PPM2.FlexSequence = FlexSequence
 
 class PonyFlexController
     @AVALIABLE_CONTROLLERS = {}
