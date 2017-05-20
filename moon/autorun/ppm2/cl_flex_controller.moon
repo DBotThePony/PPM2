@@ -379,6 +379,16 @@ class PonyFlexController
         }
 
         {
+            'name': 'sad'
+            'autostart': false
+            'repeat': false
+            'time': 4
+            'ids': {'Frown'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, 1)
+        }
+
+        {
             'name': 'cat'
             'autostart': false
             'repeat': false
@@ -604,9 +614,15 @@ class PonyFlexController
         switch text\lower()
             when 'o'
                 @StartSequence('ooo')
+            when ':o'
+                @StartSequence('ooo')
             when 'о'
                 @StartSequence('ooo')
             when 'О'
+                @StartSequence('ooo')
+            when ':о'
+                @StartSequence('ooo')
+            when ':О'
                 @StartSequence('ooo')
             when ':3'
                 @StartSequence('cat')
@@ -624,6 +640,12 @@ class PonyFlexController
                 @StartSequence('tongue')
             when ':Р'
                 @StartSequence('tongue')
+            when ':c'
+                @StartSequence('sad')
+            when ':с'
+                @StartSequence('sad')
+            when ':С'
+                @StartSequence('sad')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
                     @StartSequence('greeny')
