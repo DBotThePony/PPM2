@@ -58,7 +58,7 @@ class FlexState
         @originalspeed = speed
         @min = min
         @max = max
-        @current = 0
+        @current = -1
         @target = 0
         @speedModify = 1
         @scaleModify = 1
@@ -288,7 +288,7 @@ class PonyFlexController
             'autostart': true
             'repeat': true
             'time': 5
-            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O'}
+            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen'}
             'func': (delta, timeOfAnim) =>
                 frown = @GetModifierID(1)
                 frownState = @GetFlexState(1)
@@ -306,6 +306,14 @@ class PonyFlexController
                 leftState\SetModifierWeight(left, strength * .1)
                 rightState\SetModifierWeight(right, strength * .1)
                 Mouth_OState\SetModifierWeight(Mouth_O, strength * .8)
+
+                JawOpen = @GetModifierID(6)
+                JawOpenState = @GetFlexState(6)
+
+                if strength > .75
+                    JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTime() * strength * 3) * .1)
+                else
+                    JawOpenState\SetModifierWeight(JawOpen, 0)
         }
 
         {
