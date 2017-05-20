@@ -270,6 +270,10 @@ class PonyTextureController
                                 }
 
                                 img.style.setProperty('margin-top', (#{@QUAD_SIZE_CONST} - img.height) / 2);
+                                
+                                setInterval(function() {
+                                    console.log('FRAME');
+                                }, 50);
                             };
                         </script>
                     </head>
@@ -288,7 +292,10 @@ class PonyTextureController
         if IsValid(data.panel)
             panel = data.panel
             return if panel\IsLoading()
-            timer.Remove data.timerid
+            if data.timerid
+                timer.Remove(data.timerid)
+                data.timerid = nil
+            return if data.frame < 20
             @SHOULD_WAIT_WEB = true
             timer.Simple 1, ->
                 @SHOULD_WAIT_WEB = false
@@ -320,6 +327,7 @@ class PonyTextureController
                 table.remove(@HTML_MATERIAL_QUEUE, 1)
                 timer.Simple 0, -> panel\Remove() if IsValid(panel)
             return
+        data.frame = 0
         panel = vgui.Create('DHTML')
         data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
         timer.Create data.timerid, 4, 0, -> panel\Remove() if IsValid(panel)
@@ -327,7 +335,9 @@ class PonyTextureController
         panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
         panel\Refresh()
-        panel.ConsoleMessage = ->
+        panel.ConsoleMessage = (pnl, msg) ->
+            if msg == 'FRAME'
+                data.frame += 1
         data.panel = panel
 
     new: (controller, compile = true) =>
