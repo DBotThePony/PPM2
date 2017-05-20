@@ -42,6 +42,11 @@
 -- 24	Throat_Bulge
 -- 
 
+net.Receive 'PPM2.DamageAnimation', ->
+    ent = net.ReadEntity()
+    return if not IsValid(ent) or not ent\IsPlayer()
+    hook.Call('PPM2_HurtAnimation', nil, ent)
+
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
@@ -178,6 +183,12 @@ class FlexSequence
         @scale = 1
         @valid = true
         @createfunc() if @createfunc
+    
+    Reset: =>
+        @frame = 0
+        @start = RealTime()
+        @finish = @start + @time
+        @deltaAnim = 1
     
     GetController: => @controller
     GetEntity: => @ent
@@ -529,6 +540,19 @@ class PonyFlexController
                 rightState\SetModifierWeight(right, .9)
                 @blinkHit = true
         }
+
+        {
+            'name': 'hurt'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'JawOpen', 'Frown', 'Grin', 'Scrunch'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, .08)
+                @SetModifierWeight(2, .69)
+                @SetModifierWeight(3, .36)
+                @SetModifierWeight(4, .81)
+        }
     }
 
     @__inherited: (child) =>
@@ -567,6 +591,7 @@ class PonyFlexController
         @Hook('OnPlayerChat', @OnPlayerChat)
         @Hook('PlayerStartVoice', @PlayerStartVoice)
         @Hook('PlayerEndVoice', @PlayerEndVoice)
+        @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
     
     StartSequence: (seqID = '') =>
         return @currentSequences[seqID] if @currentSequences[seqID]
@@ -574,6 +599,12 @@ class PonyFlexController
         @currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
         @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
         return @currentSequences[seqID]
+
+    RestartSequence: (seqID = '') =>
+        if @currentSequences[seqID]
+            @currentSequences[seqID]\Reset()
+            return @currentSequences[seqID]
+        return @StartSequence(seqID)
     
     EndSequence: (seqID = '', callStop = true) =>
         return false if not @currentSequences[seqID]
@@ -669,6 +700,9 @@ class PonyFlexController
     PlayerEndVoice: (ply = NULL) =>
         return if ply ~= @ent
         @EndSequence('talk_endless')
+    PPM2_HurtAnimation: (ply = NULL) =>
+        return if ply ~= @ent
+        @RestartSequence('hurt')
 
     RemoveHooks: =>
         for iHook in *@hooks

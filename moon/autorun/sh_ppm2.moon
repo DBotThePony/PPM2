@@ -78,6 +78,7 @@ else
     util.AddNetworkString('PPM2.PlayerRespawn')
     util.AddNetworkString('PPM2.Require')
     util.AddNetworkString('PPM2.EditorStatus')
+    util.AddNetworkString('PPM2.DamageAnimation')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_registry.lua'

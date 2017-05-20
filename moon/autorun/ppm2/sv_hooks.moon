@@ -26,6 +26,15 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     return if not IsValid(rag)
     bgController\MergeModels(rag) if bgController.MergeModels
 
+hook.Add 'EntityTakeDamage', 'PPM2.Hooks', (dmg) =>
+    return if not @IsPlayer()
+    @__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
+    return if @__ppm2_last_hurt_anim > CurTime()
+    @__ppm2_last_hurt_anim = CurTime() + 1
+    net.Start('PPM2.DamageAnimation', true)
+    net.WriteEntity(@)
+    net.Broadcast()
+
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     for ent in *ents.GetAll()
         if ent.isPonyPropModel and ent.manePlayer == @
