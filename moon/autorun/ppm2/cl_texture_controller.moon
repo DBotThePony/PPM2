@@ -332,6 +332,7 @@ class PonyTextureController
 
     new: (controller, compile = true) =>
         @ent = controller\GetEntity()
+        @cachedENT = controller\GetEntity()
         @networkedData = controller\GetData()
         @id = @ent\EntIndex()
         if @id == -1
@@ -339,6 +340,14 @@ class PonyTextureController
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
+    GetID: =>
+        if @ent ~= @cachedENT
+            @cachedENT = @ent
+            @id = @ent\EntIndex()
+            if @id == -1
+                @id = @@NEXT_GENERATED_ID
+                @@NEXT_GENERATED_ID += 1
+        return @id
     GetData: =>
         @ent = @networkedData\GetEntity()
         return @networkedData
@@ -430,7 +439,7 @@ class PonyTextureController
         left = 0
 
         textureData = {
-            'name': "PPM2.#{@id}.Body.#{prefix}"
+            'name': "PPM2.#{@GetID()}.Body.#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
@@ -460,7 +469,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@id}_Body_#{prefix}_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -526,7 +535,7 @@ class PonyTextureController
         @__compileBodyInternal(false)
     CompileHorn: =>
         textureData = {
-            'name': "PPM2.#{@id}.Horn"
+            'name': "PPM2.#{@GetID()}.Horn"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
@@ -555,7 +564,7 @@ class PonyTextureController
         return @HornMaterial
     CompileSocks: =>
         textureData = {
-            'name': "PPM2.#{@id}.Socks"
+            'name': "PPM2.#{@GetID()}.Socks"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -587,7 +596,7 @@ class PonyTextureController
         return @SocksMaterial
     CompileWings: =>
         textureData = {
-            'name': "PPM2.#{@id}.Wings"
+            'name': "PPM2.#{@GetID()}.Wings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -620,7 +629,7 @@ class PonyTextureController
     GetTailType: => @GetData()\GetTailType()
     CompileHair: =>
         textureFirst = {
-            'name': "PPM2.#{@id}.Mane.1"
+            'name': "PPM2.#{@GetID()}.Mane.1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -642,7 +651,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@id}.Mane.2"
+            'name': "PPM2.#{@GetID()}.Mane.2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -656,7 +665,7 @@ class PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -688,7 +697,7 @@ class PonyTextureController
             @HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -736,7 +745,7 @@ class PonyTextureController
         return @HairColor1Material, @HairColor2Material
     CompileTail: =>
         textureFirst = {
-            'name': "PPM2.#{@id}.Tail.1"
+            'name': "PPM2.#{@GetID()}.Tail.1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -758,7 +767,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@id}.Tail.2"
+            'name': "PPM2.#{@GetID()}.Tail.2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -773,7 +782,7 @@ class PonyTextureController
             oldW, oldH = ScrW(), ScrH()
 
             -- First tail pass
-            rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Tail_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -808,7 +817,7 @@ class PonyTextureController
             @TailColor1Material\SetTexture('$basetexture', rt)
 
             -- Second tail pass
-            rt = GetRenderTarget("PPM2_#{@id}_Tail_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Tail_rt_2", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -886,7 +895,7 @@ class PonyTextureController
         shiftY -= DerpEyesStrength * .15 * @@QUAD_SIZE_CONST if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2.#{@id}.Eye.#{prefix}"
+            'name': "PPM2.#{@GetID()}.Eye.#{prefix}"
             'shader': 'eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
@@ -918,7 +927,7 @@ class PonyTextureController
 
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        rt = GetRenderTarget("PPM2_#{@id}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+        rt = GetRenderTarget("PPM2_#{@GetID()}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
         rt\Download()
         render.PushRenderTarget(rt)
         render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -969,7 +978,7 @@ class PonyTextureController
     
     CompileCMark: =>
         textureData = {
-            'name': "PPM2.#{@id}.CMark"
+            'name': "PPM2.#{@GetID()}.CMark"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -978,7 +987,7 @@ class PonyTextureController
         }
 
         textureDataGUI = {
-            'name': "PPM2.#{@id}.CMark.GUI"
+            'name': "PPM2.#{@GetID()}.CMark.GUI"
             'shader': 'UnlitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1074,7 +1083,7 @@ class NewPonyTextureController extends PonyTextureController
 
     CompileHairInternal: (prefix = 'Upper') =>
         textureFirst = {
-            'name': "PPM2.#{@id}.Mane.1_#{prefix}"
+            'name': "PPM2.#{@GetID()}.Mane.1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1096,7 +1105,7 @@ class NewPonyTextureController extends PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@id}.Mane.2_#{prefix}"
+            'name': "PPM2.#{@GetID()}.Mane.2_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -1110,7 +1119,7 @@ class NewPonyTextureController extends PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
@@ -1142,7 +1151,7 @@ class NewPonyTextureController extends PonyTextureController
             HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{@id}_Mane_rt_2_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_2_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
