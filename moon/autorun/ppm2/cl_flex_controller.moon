@@ -642,6 +642,10 @@ class PonyFlexController
                 @StartSequence('tongue')
             when ':c'
                 @StartSequence('sad')
+            when ':('
+                @StartSequence('sad')
+            when '('
+                @StartSequence('sad')
             when ':с'
                 @StartSequence('sad')
             when ':С'
