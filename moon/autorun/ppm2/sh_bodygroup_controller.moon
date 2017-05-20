@@ -96,7 +96,7 @@ class DefaultBodygroupController
     
     MergeModels: (targetEnt = NULL) =>
         return unless IsValid(targetEnt)
-        socks = @CreateSocksModelIfNotExists()
+        socks = @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
         if IsValid(socks)
             socks\SetParent(targetEnt)
             socks\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
