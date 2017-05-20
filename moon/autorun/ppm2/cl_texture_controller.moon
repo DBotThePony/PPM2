@@ -346,11 +346,13 @@ class PonyTextureController
         @networkedData = controller\GetData()
         @id = @ent\EntIndex()
         if @id == -1
+            @clientsideID = true
             @id = @@NEXT_GENERATED_ID
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
     GetID: =>
+        return @id if @clientsideID
         if @ent ~= @cachedENT
             @cachedENT = @ent
             @id = @ent\EntIndex()
