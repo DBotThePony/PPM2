@@ -358,6 +358,21 @@ PANEL_SETTINGS_BASE = {
             \SetExpanded(false)
         @scroll\AddItem(collapse) if IsValid(@scroll)
         return box, collapse
+    Spoiler: (name = 'Mysterious spoiler') =>
+        collapse = vgui.Create('DCollapsibleCategory', @scroll or @)
+        canvas = vgui.Create('EditablePanel', collapse)
+        with canvas
+            \SetSize(0, 400)
+            \Dock(FILL)
+        with collapse
+            \SetContents(canvas)
+            \Dock(TOP)
+            \DockMargin(2, 2, 2, 2)
+            \SetSize(250, 270)
+            \SetLabel(name)
+            \SetExpanded(false)
+        @scroll\AddItem(collapse) if IsValid(@scroll)
+        return canvas, collapse
     ComboBox: (name = 'Combo Box', option = '', choices) =>
         label = vgui.Create('DLabel', @scroll or @)
         with label
@@ -444,6 +459,7 @@ EditorPages = {
         'name': 'Main'
         'internal': 'main'
         'func': (sheet) =>
+            @ScrollPanel()
             @CheckBox('Gender', 'Gender')
             @ComboBox('Race', 'Race')
             @NumSlider('Weight', 'Weight', 2)
@@ -451,9 +467,14 @@ EditorPages = {
             @ComboBox('Eyelashes', 'EyelashType')
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
-            @CheckBox('No flexes on new model', 'NoFlex')
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
+            @CheckBox('No flexes on new model', 'NoFlex')
+            @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+            flexes = @Spoiler('Flexes controls')
+            for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+            flexes\SizeToContents()
     }
 
     {

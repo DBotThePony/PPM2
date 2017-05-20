@@ -793,6 +793,14 @@ class PonyDataInstance
                     else
                         return Color(255, 255, 255)
         }
+
+    for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+        continue if not active
+        @PONY_DATA["flex_disable_#{flex\lower()}"] = {
+            default: -> false
+            getFunc: "DisableFlex#{flex}"
+            fix: (arg = false) -> tobool(arg)
+        }
     
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA

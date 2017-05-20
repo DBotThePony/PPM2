@@ -55,11 +55,11 @@ entMeta.HasPonyModel = entMeta.IsPony
 
 include 'autorun/ppm2/sh_networked_object.lua'
 include 'autorun/ppm2/sh_registry.lua'
-include 'autorun/ppm2/sh_ponydata.lua'
 include 'autorun/ppm2/sh_hooks.lua'
 include 'autorun/ppm2/sh_bodygroup_controller.lua'
 include 'autorun/ppm2/sh_weight_controller.lua'
 include 'autorun/ppm2/sh_flex_controller.lua'
+include 'autorun/ppm2/sh_ponydata.lua'
 
 if CLIENT
     file.CreateDir('ppm2')

@@ -79,6 +79,7 @@ class FlexState
         @useModifiers = useModifiers
         @nextModifierID = 0
         @active = active
+        @activeID = "DisableFlex#{@flexName}"
     
     GetFlexID: => @flexID
     GetFlexName: => @flexName
@@ -151,6 +152,24 @@ class FlexState
         @ent = @controller.ent
         @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
         @ent\SetFlexWeight(@flexID, @current)
+    DataChanges: (state) =>
+        return if state\GetKey() ~= @activeID
+        @SetIsActive(not state\GetValue())
+        @GetController()\RebuildIterableList()
+        @Reset()
+    Reset: (resetVars = true) =>
+        for name, id in pairs @modifiersNames
+            @speedModifiers[id] = 0
+            @scaleModifiers[id] = 0
+            @modifiers[id] = 0
+        if resetVars
+            @scaleModify = 1
+            @speedModify = 1
+        @scale = @originalscale * @scaleModify
+        @speed = @originalspeed * @speedModify
+        @target = 0
+        @current = 0
+        @ent\SetFlexWeight(@flexID, 0)
 
 PPM2.FlexState = FlexState
 
@@ -604,9 +623,7 @@ class PonyFlexController
         @statesTable = {state\GetFlexName(), state for state in *@states}
         @statesTable[state\GetFlexName()\lower()] = state for state in *@states
         @statesTable[state\GetFlexID()] = state for state in *@states
-        @statesIterable = for state in *@states
-            continue if not state\GetIsActive()
-            state
+        @RebuildIterableList()
         @hooks = {}
         @@NEXT_HOOK_ID += 1
         @fid = @@NEXT_HOOK_ID
@@ -647,7 +664,7 @@ class PonyFlexController
         
         @currentSequences = {}
         @currentSequencesIterable = {}
-        state\Think(1000) for state in *@statesIterable
+        state\Reset(false) for state in *@statesIterable
 
         for seq in *@@FLEX_SEQUENCES
             continue if not seq.autostart
@@ -659,7 +676,12 @@ class PonyFlexController
     HasSequence: (seqID = '') => @currentSequences[seqID] and true or false
     
     GetFlexState: (name = '') => @statesTable[name]
+    RebuildIterableList: =>
+        @statesIterable = for state in *@states
+            continue if not state\GetIsActive()
+            state
     DataChanges: (state) =>
+        flexState\DataChanges(state) for flexState in *@states
     GetEntity: => @ent
     GetData: => @controller
     GetController: => @controller
