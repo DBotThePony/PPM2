@@ -133,10 +133,9 @@ class FlexState
             @scale += modif for modif in *@scaleModifiers
             @speed += modif for modif in *@speedModifiers
             @target = math.Clamp(@target, @min, @max) * @scale
-        if @current ~= @target
-            @ent = @controller.ent
-            @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target)
-            @ent\SetFlexWeight(@flexID, @current)
+        @ent = @controller.ent
+        @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
+        @ent\SetFlexWeight(@flexID, @current)
 
 class FlexSequence
     new: (controller, data) =>
