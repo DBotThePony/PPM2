@@ -45,7 +45,7 @@
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
-    new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, min = 0, max = 1, useModifiers = true) =>
+    new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
         @controller = controller
         @ent = controller.ent
         @name = flexName
@@ -68,6 +68,7 @@ class FlexState
         @modifiersNames = {}
         @useModifiers = useModifiers
         @nextModifierID = 0
+        @active = active
     
     GetFlexID: => @flexID
     GetFlexName: => @flexName
@@ -122,9 +123,13 @@ class FlexState
     SetScaleModify: (val = @scaleModify) => @scaleModify = val
     GetSpeedModify: (val = @speedModify) => @speedModify = val
 
+    GetIsActive: => @active
+    SetIsActive: (val = true) => @active = val
+
     AddValue: (val = 0) => @SetValue(@current + val)
     AddRealValue: (val = 0) => @SetRealValue(@target + val)
     Think: (delta = 0) =>
+        return if not @active
         if @useModifiers
             @target = 0
             @scale = @originalscale * @scaleModify
@@ -228,31 +233,31 @@ class PonyFlexController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
 
     @FLEX_LIST = {
-        {flex: 'eyes_updown',       scale: 1, speed: 1}
-        {flex: 'eyes_rightleft',    scale: 1, speed: 1}
-        {flex: 'JawOpen',           scale: 1, speed: 1}
-        {flex: 'JawClose',          scale: 1, speed: 1}
-        {flex: 'Smirk',             scale: 1, speed: 1}
-        {flex: 'Frown',             scale: 1, speed: 1}
-        {flex: 'Stretch',           scale: 1, speed: 1}
-        {flex: 'Pucker',            scale: 1, speed: 1}
-        {flex: 'Grin',              scale: 1, speed: 1}
-        {flex: 'CatFace',           scale: 1, speed: 1}
-        {flex: 'Mouth_O',           scale: 1, speed: 1}
-        {flex: 'Mouth_O2',          scale: 1, speed: 1}
-        {flex: 'Mouth_Full',        scale: 1, speed: 1}
-        {flex: 'Tongue_Out',        scale: 1, speed: 1}
-        {flex: 'Tongue_Up',         scale: 1, speed: 1}
-        {flex: 'Tongue_Down',       scale: 1, speed: 1}
-        {flex: 'NoEyelashes',       scale: 1, speed: 1}
-        {flex: 'Eyes_Blink',        scale: 1, speed: 1}
-        {flex: 'Left_Blink',        scale: 1, speed: 1}
-        {flex: 'Right_Blink',       scale: 1, speed: 1}
-        {flex: 'Scrunch',           scale: 1, speed: 1}
-        {flex: 'FatButt',           scale: 1, speed: 1}
-        {flex: 'Stomach_Out',       scale: 1, speed: 1}
-        {flex: 'Stomach_In',        scale: 1, speed: 1}
-        {flex: 'Throat_Bulge',      scale: 1, speed: 1}
+        {flex: 'eyes_updown',       scale: 1, speed: 1, active: true}
+        {flex: 'eyes_rightleft',    scale: 1, speed: 1, active: true}
+        {flex: 'JawOpen',           scale: 1, speed: 1, active: true}
+        {flex: 'JawClose',          scale: 1, speed: 1, active: true}
+        {flex: 'Smirk',             scale: 1, speed: 1, active: true}
+        {flex: 'Frown',             scale: 1, speed: 1, active: true}
+        {flex: 'Stretch',           scale: 1, speed: 1, active: true}
+        {flex: 'Pucker',            scale: 1, speed: 1, active: true}
+        {flex: 'Grin',              scale: 1, speed: 1, active: true}
+        {flex: 'CatFace',           scale: 1, speed: 1, active: true}
+        {flex: 'Mouth_O',           scale: 1, speed: 1, active: true}
+        {flex: 'Mouth_O2',          scale: 1, speed: 1, active: true}
+        {flex: 'Mouth_Full',        scale: 1, speed: 1, active: true}
+        {flex: 'Tongue_Out',        scale: 1, speed: 1, active: true}
+        {flex: 'Tongue_Up',         scale: 1, speed: 1, active: true}
+        {flex: 'Tongue_Down',       scale: 1, speed: 1, active: true}
+        {flex: 'NoEyelashes',       scale: 1, speed: 1, active: true}
+        {flex: 'Eyes_Blink',        scale: 1, speed: 1, active: true}
+        {flex: 'Left_Blink',        scale: 1, speed: 1, active: true}
+        {flex: 'Right_Blink',       scale: 1, speed: 1, active: true}
+        {flex: 'Scrunch',           scale: 1, speed: 1, active: true}
+        {flex: 'FatButt',           scale: 1, speed: 1, active: true}
+        {flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
+        {flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
+        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: true}
     }
 
     @FLEX_SEQUENCES = {
@@ -544,10 +549,13 @@ class PonyFlexController
     new: (data) =>
         @controller = data
         @ent = data.ent
-        @states = [FlexState(@, flex, id, scale, speed) for {:flex, :id, :scale, :speed} in *@@FLEX_LIST]
+        @states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
         @statesTable = {state\GetFlexName(), state for state in *@states}
         @statesTable[state\GetFlexName()\lower()] = state for state in *@states
         @statesTable[state\GetFlexID()] = state for state in *@states
+        @statesIterable = for state in *@states
+            continue if not state\GetIsActive()
+            state
         @hooks = {}
         @@NEXT_HOOK_ID += 1
         @fid = @@NEXT_HOOK_ID
@@ -580,7 +588,7 @@ class PonyFlexController
         
         @currentSequences = {}
         @currentSequencesIterable = {}
-        state\Think(1000) for state in *@states
+        state\Think(1000) for state in *@statesIterable
 
         for seq in *@@FLEX_SEQUENCES
             continue if not seq.autostart
@@ -673,7 +681,7 @@ class PonyFlexController
         return if not IsValid(@ent) or @ent\IsDormant() or not @ent\Alive()
         delta = RealTime() - @lastThink
         @lastThink = RealTime()
-        state\Think(delta) for state in *@states
+        state\Think(delta) for state in *@statesIterable
         for seq in *@currentSequencesIterable
             if not seq\IsValid()
                 @EndSequence(seq\GetName(), false)
