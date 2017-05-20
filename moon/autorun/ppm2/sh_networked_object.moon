@@ -75,6 +75,7 @@ class NetworkedObject
 		@NW_Create = "PPM2.NW.Created.#{@__name}"
 		@NW_Modify = "PPM2.NW.Modified.#{@__name}"
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
+		@NW_Rejected = "PPM2.NW.Rejected.#{@__name}"
 		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
 		@NW_NextObjectID = 0
 		@NW_NextObjectID_CL = 2 ^ 28
@@ -99,6 +100,13 @@ class NetworkedObject
 			@NW_Objects[obj.netID] = nil
 			obj.netID = netID
 			@NW_Objects[netID] = obj
+		net.Receive @NW_Rejected, (len = 0, ply = NULL) ->
+			return if SERVER
+			netID = net.ReadUInt(16)
+			obj = @NW_Objects[netID]
+			return unless obj
+			obj.NETWORKED = false
+			obj\Create()
 	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
@@ -157,7 +165,11 @@ class NetworkedObject
 		return if not @NW_ClientsideCreation and IsValid(ply)
 		id = net.ReadUInt(16)
 		obj = @NW_Objects[id]
-		return unless obj
+		unless obj
+			net.Start(@NW_Rejected)
+			net.WriteUInt(id, 16)
+			net.Send(ply)
+			return
 		return if IsValid(ply) and obj.NW_Player ~= ply
 		varID = net.ReadUInt(8)
 		varData = @NW_VarsTable[varID]
