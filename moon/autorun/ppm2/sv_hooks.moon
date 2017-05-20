@@ -36,6 +36,8 @@ hook.Add 'EntityTakeDamage', 'PPM2.Hooks', (dmg) =>
     net.Broadcast()
 
 killGrin = =>
+    return if not IsValid(@)
+    return if not @IsPlayer()
     @__ppm2_grin_hurt_anim = @__ppm2_grin_hurt_anim or 0
     return if @__ppm2_grin_hurt_anim > CurTime()
     @__ppm2_grin_hurt_anim = CurTime() + 1
@@ -43,17 +45,8 @@ killGrin = =>
     net.WriteEntity(@)
     net.Broadcast()
 
-hook.Add 'OnNPCKilled', 'PPM2.Hooks', (npc = NULL, attacker = NULL, weapon = NULL) =>
-    return if not IsValid(attacker)
-    self = attacker
-    return if not @IsPlayer()
-    killGrin(@)
-
-hook.Add 'DoPlayerDeath', 'PPM2.Hooks', (ply = NULL, attacker = NULL) =>
-    return if not IsValid(attacker)
-    self = attacker
-    return if not @IsPlayer()
-    killGrin(@)
+hook.Add 'OnNPCKilled', 'PPM2.Hooks', (npc = NULL, attacker = NULL, weapon = NULL) => killGrin(attacker)
+hook.Add 'DoPlayerDeath', 'PPM2.Hooks', (ply = NULL, attacker = NULL) => killGrin(attacker)
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     for ent in *ents.GetAll()
