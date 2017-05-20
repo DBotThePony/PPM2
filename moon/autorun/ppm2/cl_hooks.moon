@@ -128,8 +128,8 @@ concommand.Add 'ppm2_reload', ->
 
 hook.Add 'KeyPress', 'PPM2.RequireData', ->
     hook.Remove 'KeyPress', 'PPM2.RequireData'
-    timer.Simple 1, -> RunConsoleCommand('ppm2_reload')
-    RunConsoleCommand('ppm2_require')
+    RunConsoleCommand('ppm2_reload')
+    timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 
 hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
     lply = LocalPlayer()
