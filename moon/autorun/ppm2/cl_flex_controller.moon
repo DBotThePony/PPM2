@@ -189,6 +189,8 @@ class FlexSequence
     GetModifierID: (id = '') => @flexIDS[id]
     GetFlexState: (id = '') => @flexStates[id]
 
+    SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
+
     IsValid: => @valid
     Think: (delta = 0) =>
         @ent = @controller.ent
@@ -363,6 +365,17 @@ class PonyFlexController
                 JawOpenState = @GetFlexState(4)
                 JawOpenState\SetModifierScale(JawOpen, 2)
                 JawOpenState\SetModifierWeight(JawOpen, (timeOfAnim % .1) * 2)
+        }
+
+        {
+            'name': 'tongue'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'JawOpen', 'Tongue_Out'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, .1)
+                @SetModifierWeight(2, 1)
         }
 
         {
@@ -603,6 +616,14 @@ class PonyFlexController
                 @StartSequence('big_grin')
             when 'xd'
                 @StartSequence('xd')
+            when 'exdi'
+                @StartSequence('xd')
+            when ':p'
+                @StartSequence('tongue')
+            when ':р'
+                @StartSequence('tongue')
+            when ':Р'
+                @StartSequence('tongue')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
                     @StartSequence('greeny')
