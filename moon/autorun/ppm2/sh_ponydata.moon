@@ -193,6 +193,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\Remove()
         @GetBodygroupController()\Remove()
         super(byClient)
+    __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 for obj in *OLD_NW_OBJECTS
     obj.__class = NetworkedPonyData

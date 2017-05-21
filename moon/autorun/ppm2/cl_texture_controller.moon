@@ -386,6 +386,7 @@ class PonyTextureController
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
+    __tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
     Remove: =>
         @isValid = false
     IsValid: => IsValid(@ent) and @isValid and @compiled
@@ -1133,6 +1134,8 @@ class NewPonyTextureController extends PonyTextureController
         @MANE_UPDATE_TRIGGER["LowerManeURLColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeURL#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeURLColor#{i}"] = true
+    
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
     DataChanges: (state) =>
         return unless @isValid

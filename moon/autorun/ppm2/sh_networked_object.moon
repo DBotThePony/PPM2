@@ -280,6 +280,8 @@ class NetworkedObject
 	SendVar: (Var = '') =>
 		return if @[Var] == nil
 	
+	__tostring: => "[NetworkedObject:#{@netID}|#{@ent}]"
+
 	Create: =>
 		return if @NETWORKED
 		return if CLIENT and not @@NW_ClientsideCreation

@@ -43,12 +43,17 @@ class DefaultBodygroupController
     @BODYGROUP_CMARK = 7
     @BODYGROUP_EYELASH = 8
 
+    @NEXT_OBJ_ID = 0
+
     new: (controller) =>
         @isValid = true
         @ent = controller.ent
         @entID = controller.entID
         @controller = controller
+        @objID = @@NEXT_OBJ_ID
+        @@NEXT_OBJ_ID += 1
     
+    __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
     IsValid: => @isValid
     GetData: => @controller
     GetEntity: => @ent
@@ -201,6 +206,8 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_GENDER = -1
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
+
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
     CreateUpperManeModel: =>
         return NULL unless @isValid

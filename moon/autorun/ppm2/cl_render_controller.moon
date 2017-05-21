@@ -24,9 +24,12 @@ class PonyRenderController
         child.MODELS_HASH = {mod, true for mod in *child.MODELS}
         @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
     @__inherited(@)
+    @NEXT_OBJ_ID = 0
 
     CompileTextures: => @GetTextureController()\CompileTextures()
     new: (data) =>
+        @objID = @@NEXT_OBJ_ID
+        @@NEXT_OBJ_ID += 1
         @isValid = true
         @networkedData = data
         @ent = data.ent
@@ -36,6 +39,7 @@ class PonyRenderController
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
         @CreateFlexController() if @ent
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     GetEntity: => @ent
     GetData: => @networkedData
     GetModel: => @networkedData\GetModel()
@@ -273,6 +277,7 @@ class NewPonyRenderController extends PonyRenderController
         @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
         @tailModel\SetNoDraw(true) if IsValid(@tailModel)
         super(data)
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     
     DataChanges: (state) =>
         return if not @ent

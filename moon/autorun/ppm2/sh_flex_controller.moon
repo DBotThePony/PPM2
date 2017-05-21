@@ -81,6 +81,8 @@ class FlexState
         @active = active
         @activeID = "DisableFlex#{@flexName}"
     
+    __tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
+    
     GetFlexID: => @flexID
     GetFlexName: => @flexName
     
@@ -209,6 +211,8 @@ class FlexSequence
         @scale = 1
         @valid = true
         @createfunc() if @createfunc
+    
+    __tostring: => "[#{@@__name}:#{@name}]"
     
     Reset: =>
         @frame = 0
@@ -787,6 +791,7 @@ class PonyFlexController
                 @EndSequence(seq\GetName(), false)
                 break
             seq\Think(delta)
+    __tostring: => "[#{@@__name}:#{@fid}:#{#@currentSequencesIterable}|#{@GetData()}]"
     Remove: =>
         @isValid = false
         @RemoveHooks()
