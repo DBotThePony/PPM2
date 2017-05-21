@@ -1,3 +1,4 @@
 lua/
 lint.txt
 *.blend
+*.blend*
