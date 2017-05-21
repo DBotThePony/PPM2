@@ -172,9 +172,9 @@ class PonyRenderController
     
     IsValid: => IsValid(@ent) and @isValid
     Remove: =>
-        @isValid = false
         @flexes\Remove() if @flexes
-        @GetRenderController()\Remove()
+        @GetTextureController()\Remove()
+        @isValid = false
     
     PlayerRespawn: =>
         return if not @isValid
