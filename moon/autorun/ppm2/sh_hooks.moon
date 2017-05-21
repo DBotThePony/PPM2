@@ -30,9 +30,14 @@ hook.Add 'Think', 'PPM2.Think', ->
         data = ply\GetPonyData()
         data\Think() if data
 
+DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
+DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
+
 hook.Add 'PlayerStepSoundTime', 'PPM2.Hooks', (stepType = STEPSOUNDTIME_NORMAL, isWalking = false) =>
     return if not IsValid(@)
     return if not @IsPonyCached()
+    return if CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool()
+    return if DISABLE_HOOFSTEP_SOUND\GetBool()
     rate = @GetPlaybackRate() * .5
     if @Crouching()
         switch stepType
