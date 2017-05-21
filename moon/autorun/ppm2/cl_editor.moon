@@ -454,6 +454,8 @@ PANEL_SETTINGS_BASE = {
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
 
+ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options')
+
 EditorPages = {
     {
         'name': 'Main'
@@ -463,18 +465,19 @@ EditorPages = {
             @CheckBox('Gender', 'Gender')
             @ComboBox('Race', 'Race')
             @NumSlider('Weight', 'Weight', 2)
-            @CheckBox('Socks (simple texture)', 'Socks')
+            @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @ComboBox('Eyelashes', 'EyelashType')
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
-            @CheckBox('No flexes on new model', 'NoFlex')
-            @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-            flexes = @Spoiler('Flexes controls')
-            for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-                @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-            flexes\SizeToContents()
+            if ADVANCED_MODE\GetBool()
+                @CheckBox('No flexes on new model', 'NoFlex')
+                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+                flexes = @Spoiler('Flexes controls')
+                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+                flexes\SizeToContents()
     }
 
     {
@@ -482,8 +485,10 @@ EditorPages = {
         'internal': 'eyes'
         'func': (sheet) =>
             @ScrollPanel()
-            @CheckBox('Use separated settings for eyes', 'SeparateEyes')
-            for publicName in *{'', 'Left', 'Right'}
+            @CheckBox('Use separated settings for eyes', 'SeparateEyes') if ADVANCED_MODE\GetBool()
+            eyes = {''}
+            eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
+            for publicName in *eyes
                 @Label("'#{publicName}' Eye settings")
                 @ComboBox("#{publicName} Eye type", "EyeType#{publicName}")
                 @CheckBox("#{publicName} Eye lines", "EyeLines#{publicName}")
@@ -522,11 +527,11 @@ EditorPages = {
                 @ColorBox("Mane color #{i}", "ManeColor#{i}")
                 @ColorBox("Tail color #{i}", "TailColor#{i}")
 
-            for i = 1, 6
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
                 @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}")
                 @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}")
 
-            for i = 1, 6
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
                 @Label("Mane URL Detail #{i} input field")
                 @URLInput("ManeURL#{i}")
                 @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
@@ -541,11 +546,11 @@ EditorPages = {
                 @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}")
                 @ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}")
 
-            for i = 1, 6
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
                 @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}")
                 @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}")
 
-            for i = 1, 6
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
                 @Label("Upper mane URL Detail #{i} input field")
                 @URLInput("UpperManeURL#{i}")
                 @ColorBox("Upper Mane URL detail color #{i}", "UpperManeURLColor#{i}")
@@ -559,12 +564,12 @@ EditorPages = {
         'internal': 'bodydetail'
         'func': (sheet) =>
             @ScrollPanel()
-            for i = 1, PPM2.MAX_BODY_DETAILS
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
 
             @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
-            for i = 1, PPM2.MAX_BODY_DETAILS
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
                 @Label("Body detail #{i}")
                 @URLInput("BodyDetailURL#{i}")
                 @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
@@ -785,7 +790,27 @@ PPM2.OpenEditor = ->
                 @Close()
                 timer.Simple 0.1, PPM2.OpenEditor
             Derma_Query(
-                'You should restart editor for applying change.\nRestart now?\nUnsaved data can be lost!',
+                'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
+                'Editor restart required',
+                'Yas!',
+                confirm,
+                'Noh!'
+            )
+    @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
+    with @enableAdvanced
+        \SetSize(120, 20)
+        \SetPos(W - 590, 7)
+        \SetConVar('ppm2_editor_advanced')
+        \SetText('Advanced mode')
+        .ingore = true
+        .OnChange = (pnl = box, newVal) ->
+            return if newVal == ADVANCED_MODE\GetBool()
+            @SetDeleteOnClose(true)
+            confirm = ->
+                @Close()
+                timer.Simple 0.1, PPM2.OpenEditor
+            Derma_Query(
+                'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
                 'Editor restart required',
                 'Yas!',
                 confirm,
