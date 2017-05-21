@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flasglight_pass', '0', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
+
 class PonyRenderController
     @AVALIABLE_CONTROLLERS = {}
     @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
@@ -149,6 +151,12 @@ class PonyRenderController
         render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
         cam.Start3D() if start3D
 
+        if ENABLE_FLASHLIGHT_PASS\GetBool()
+            render.PushFlashlightMode(true)
+            @PreDraw()
+            @legsModel\DrawModel()
+            @PostDraw()
+            render.PopFlashlightMode()
         @PreDraw()
         @legsModel\DrawModel()
         @PostDraw()
@@ -177,6 +185,13 @@ class PonyRenderController
 
         if IsValid(@socksModel)
             @socksModel\SetNoDraw(true)
+            if ENABLE_FLASHLIGHT_PASS\GetBool()
+                render.PushFlashlightMode(true)
+                textures\PreDrawSocks()
+                @socksModel\DrawModel()
+                textures\PostDrawSocks()
+                render.PopFlashlightMode()
+
             textures\PreDrawSocks()
             @socksModel\DrawModel()
             textures\PostDrawSocks()
@@ -254,20 +269,8 @@ class NewPonyRenderController extends PonyRenderController
                 @tailModel\SetNoDraw(true) if IsValid(@tailModel)
         super(state)
 
-    PostDraw: (ent = @ent) =>
-        return if @IGNORE_DRAW
+    DrawManeAndTailModels: =>
         textures = @GetTextureController()
-        @IGNORE_DRAW = true
-
-        if @GetData()\IsNetworked()
-            @upperManeModel = @ent\GetNWEntity('PPM2.UpperManeModel') if not IsValid(@upperManeModel)
-            @lowerManeModel = @ent\GetNWEntity('PPM2.LowerManeModel') if not IsValid(@lowerManeModel)
-            @tailModel = @ent\GetNWEntity('PPM2.TailModel') if not IsValid(@tailModel)
-
-        @upperManeModel = @GetData()\GetUpperManeModel() if not IsValid(@upperManeModel)
-        @lowerManeModel = @GetData()\GetLowerManeModel() if not IsValid(@lowerManeModel)
-        @tailModel = @GetData()\GetTailModel() if not IsValid(@tailModel)
-
         if IsValid(@upperManeModel)
             @upperManeModel\SetNoDraw(true)
             textures\PreDrawUpperMane()
@@ -285,6 +288,25 @@ class NewPonyRenderController extends PonyRenderController
             textures\PreDrawTail()
             @tailModel\DrawModel()
             textures\PostDrawTail()
+
+    PostDraw: (ent = @ent) =>
+        return if @IGNORE_DRAW
+        @IGNORE_DRAW = true
+
+        if @GetData()\IsNetworked()
+            @upperManeModel = @ent\GetNWEntity('PPM2.UpperManeModel') if not IsValid(@upperManeModel)
+            @lowerManeModel = @ent\GetNWEntity('PPM2.LowerManeModel') if not IsValid(@lowerManeModel)
+            @tailModel = @ent\GetNWEntity('PPM2.TailModel') if not IsValid(@tailModel)
+
+        @upperManeModel = @GetData()\GetUpperManeModel() if not IsValid(@upperManeModel)
+        @lowerManeModel = @GetData()\GetLowerManeModel() if not IsValid(@lowerManeModel)
+        @tailModel = @GetData()\GetTailModel() if not IsValid(@tailModel)
+
+        if ENABLE_FLASHLIGHT_PASS\GetBool()
+            render.PushFlashlightMode(true)
+            @DrawManeAndTailModels()
+            render.PopFlashlightMode()
+        @DrawManeAndTailModels()
 
         @IGNORE_DRAW = false
         super(ent)
