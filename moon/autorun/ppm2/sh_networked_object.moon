@@ -169,9 +169,10 @@ class NetworkedObject
 		id = net.ReadUInt(16)
 		obj = @NW_Objects[id]
 		unless obj
-			net.Start(@NW_Rejected)
-			net.WriteUInt(id, 16)
-			net.Send(ply)
+			if SERVER
+				net.Start(@NW_Rejected)
+				net.WriteUInt(id, 16)
+				net.Send(ply)
 			return
 		return if IsValid(ply) and obj.NW_Player ~= ply
 		varID = net.ReadUInt(8)
