@@ -29,3 +29,17 @@ hook.Add 'Think', 'PPM2.Think', ->
     for ply in *player.GetAll()
         data = ply\GetPonyData()
         data\Think() if data
+
+hook.Add 'PlayerStepSoundTime', 'PPM2.Hooks', (stepType = STEPSOUNDTIME_NORMAL, isWalking = false) =>
+    return if not IsValid(@)
+    return if not @IsPonyCached()
+    rate = @GetPlaybackRate()
+    switch stepType
+        when STEPSOUNDTIME_NORMAL
+            return not walk and (150 / rate) or (300 / rate)
+        when STEPSOUNDTIME_ON_LADDER
+            return 500 / rate
+        when STEPSOUNDTIME_WATER_KNEE
+            return not walk and (250 / rate) or (500 / rate)
+        when STEPSOUNDTIME_WATER_FOOT
+            return not walk and (175 / rate) or (350 / rate)
