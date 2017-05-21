@@ -206,7 +206,6 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_GENDER = -1
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
-    @FLEX_ID_MALE = 25
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
@@ -390,16 +389,27 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetBodygroup(1, bodygroupID)
         @tailModel\SetModelScale(@GetData()\GetTailSize())
         return @tailModel
+    
+    @FLEX_ID_MALE = 25
+    @FLEX_ID_BAT_PONY_EARS = 28
+    @FLEX_ID_FANGS = 31
+    @FLEX_ID_CLAW_TEETH = 30
 
     ResetBodygroups: =>
         return unless IsValid(@ent)
         @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+        @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
+        @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         super()
     ApplyBodygroups: =>
         return unless @isValid
         @ResetBodygroups()
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GetData()\GetFangs() and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GetData()\GetClawTeeth() and 1 or 0)
         @ApplyRace()
         @CreateUpperManeModel()
         @CreateLowerManeModel()
@@ -413,6 +423,12 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
                 @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
+            when 'BatPonyEars'
+                @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
+            when 'Fangs'
+                @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GetData()\GetFangs() and 1 or 0)
+            when 'ClawTeeth'
+                @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GetData()\GetClawTeeth() and 1 or 0)
             when 'ManeTypeNew'
                 @UpdateUpperMane()
             when 'ManeTypeLowerNew'

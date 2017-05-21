@@ -155,6 +155,24 @@ class PonyDataInstance
             fix: (arg = true) -> tobool(arg)
         }
 
+        'fangs': {
+            default: -> false
+            getFunc: 'Fangs'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'bat_pony_ears': {
+            default: -> false
+            getFunc: 'BatPonyEars'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'claw_teeth': {
+            default: -> false
+            getFunc: 'ClawTeeth'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'cmark_type': {
             default: -> 4
             getFunc: 'CMarkType'

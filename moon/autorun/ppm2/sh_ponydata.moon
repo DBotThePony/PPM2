@@ -107,6 +107,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('SocksAsModel',     net.ReadBool, net.WriteBool,              false)
     @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
 
+    @NetworkVar('BatPonyEars',      net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('Fangs',            net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('ClawTeeth',        net.ReadBool, net.WriteBool,              false)
+
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
         @NetworkVar("DisableFlex#{flex}", net.ReadBool, net.WriteBool, false) if active
 

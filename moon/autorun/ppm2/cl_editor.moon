@@ -462,13 +462,17 @@ EditorPages = {
         'internal': 'main'
         'func': (sheet) =>
             @ScrollPanel()
-            @CheckBox('Gender', 'Gender')
             @ComboBox('Race', 'Race')
+            @CheckBox('Gender', 'Gender')
             @NumSlider('Weight', 'Weight', 2)
-            @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @ComboBox('Eyelashes', 'EyelashType')
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
+            @CheckBox('Bat pony ears', 'BatPonyEars')
+            @CheckBox('Fangs', 'Fangs')
+            @CheckBox('Claw teeth', 'ClawTeeth')
+
+            @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
             if ADVANCED_MODE\GetBool()
