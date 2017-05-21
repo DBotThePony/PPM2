@@ -768,6 +768,8 @@ PPM2.OpenEditor = ->
             return if RealTime() < lastWear
             lastWear = RealTime() + 5
             mainData = PPM2.GetMainData()
+            nwdata = LocalPlayer()\GetPonyData()
+            mainData\SetNetworkData(nwdata) if nwdata
             copy\ApplyDataToObject(mainData, false) -- no save on apply
     @selectModelBox = vgui.Create('DComboBox', @)
     with @selectModelBox
