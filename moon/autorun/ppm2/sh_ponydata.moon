@@ -129,7 +129,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         return unless IsValid(ent)
         @modelCached = ent\GetModel()
         @ent = ent
-        ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData and ent.__PPM2_PonyData ~= @
+        ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)

@@ -44,10 +44,12 @@ class DefaultBodygroupController
     @BODYGROUP_EYELASH = 8
 
     new: (controller) =>
+        @isValid = true
         @ent = controller.ent
         @entID = controller.entID
         @controller = controller
     
+    IsValid: => @isValid
     GetData: => @controller
     GetEntity: => @ent
     GetEntityID: => @entID
@@ -57,6 +59,7 @@ class DefaultBodygroupController
     @ATTACHMENT_EYES_NAME = 'eyes'
 
     CreateSocksModel: =>
+        return NULL unless @isValid
         @socksModel\Remove() if IsValid(@socksModel)
 
         for ent in *ents.GetAll()
@@ -90,11 +93,13 @@ class DefaultBodygroupController
         
         return @socksModel
     CreateSocksModelIfNotExists: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
         return @socksModel
     
     MergeModels: (targetEnt = NULL) =>
+        return unless @isValid
         return unless IsValid(targetEnt)
         socks = @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
         if IsValid(socks)
@@ -104,6 +109,7 @@ class DefaultBodygroupController
     GetSocks: => @socksModel or NULL
 
     ApplyRace: =>
+        return unless @isValid
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
@@ -119,9 +125,11 @@ class DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 0)
 
     ResetBodygroups: =>
+        return unless @isValid
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
     ApplyBodygroups: =>
+        return unless @isValid
         @ResetBodygroups()
         @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
         @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
@@ -131,10 +139,16 @@ class DefaultBodygroupController
         @ApplyRace()
         @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
     
+    Remove: =>
+        @socksModel\Remove() if IsValid(@socksModel)
+        @ResetBodygroups()
+        @isValid = false
+    
     @TAIL_BONE1 = 38
     @TAIL_BONE2 = 39
     @TAIL_BONE3 = 40
     DataChanges: (state) =>
+        return unless @isValid
         switch state\GetKey()
             when 'ManeType'
                 @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
@@ -189,6 +203,7 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_WINGS = 2
 
     CreateUpperManeModel: =>
+        return NULL unless @isValid
         @maneModelUP\Remove() if IsValid(@maneModelUP)
 
         for ent in *ents.GetAll()
@@ -225,6 +240,7 @@ class NewBodygroupController extends DefaultBodygroupController
             
         return @maneModelUP
     CreateLowerManeModel: =>
+        return NULL unless @isValid
         @maneModelLower\Remove() if IsValid(@maneModelLower)
 
         for ent in *ents.GetAll()
@@ -261,6 +277,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
         return @maneModelLower
     CreateTailModel: =>
+        return NULL unless @isValid
         @tailModel\Remove() if IsValid(@tailModel)
 
         for ent in *ents.GetAll()
@@ -298,15 +315,18 @@ class NewBodygroupController extends DefaultBodygroupController
         return @tailModel
     
     CreateUpperManeModelIfNotExists: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModel() if not IsValid(@maneModelUP)
         return @maneModelUP
     CreateLowerManeModelIfNotExists: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModel() if not IsValid(@maneModelLower)
         return @maneModelLower
     CreateTailModelIfNotExists: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModel() if not IsValid(@tailModel)
         return @tailModel
 
@@ -315,6 +335,7 @@ class NewBodygroupController extends DefaultBodygroupController
     GetTail: => @tailModel or NULL
 
     MergeModels: (targetEnt = NULL) =>
+        return unless @isValid
         super(targetEnt)
         return unless IsValid(targetEnt)
         maneUpper = @CreateUpperManeModelIfNotExists()
@@ -331,7 +352,8 @@ class NewBodygroupController extends DefaultBodygroupController
             tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
 
     UpdateUpperMane: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -340,7 +362,8 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelUP\SetBodygroup(1, bodygroupID)
         return @maneModelUP
     UpdateLowerMane: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModelIfNotExists()
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
@@ -349,7 +372,8 @@ class NewBodygroupController extends DefaultBodygroupController
         @maneModelLower\SetBodygroup(1, bodygroupID)
         return @maneModelLower
     UpdateTailModel: =>
-        return if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModelIfNotExists()
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -360,6 +384,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @tailModel
 
     ApplyBodygroups: =>
+        return unless @isValid
         @ResetBodygroups()
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
@@ -370,6 +395,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
 
     DataChanges: (state) =>
+        return unless @isValid
         switch state\GetKey()
             when 'EyelashType'
                 @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
@@ -390,6 +416,11 @@ class NewBodygroupController extends DefaultBodygroupController
                     @CreateSocksModelIfNotExists()
                 else
                     @socksModel\Remove() if IsValid(@socksModel)
+    Remove: =>
+        @maneModelUP\Remove() if IsValid(@maneModelUP)
+        @maneModelLower\Remove() if IsValid(@maneModelLower)
+        @tailModel\Remove() if IsValid(@tailModel)
+        super()
 
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
