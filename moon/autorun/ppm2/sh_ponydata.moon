@@ -24,6 +24,7 @@ PPM2.TransformNewModelID = (id = 0) ->
 OLD_NW_OBJECTS = {}
 
 for ply in *player.GetAll()
+    break if not ply.GetPonyData 
     if ply\GetPonyData()
         table.insert(OLD_NW_OBJECTS, ply\GetPonyData())
 
