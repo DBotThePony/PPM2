@@ -346,6 +346,7 @@ class PonyTextureController
         timer.Create data.timerid, 4, 0, ->
             if IsValid(panel)
                 panel\Remove()
+                print "[PPM2] Failed to download #{data.url}!"
                 newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
                     '$basetexture': 'models/ppm/partrender/null'
                     '$ignorez': 1
@@ -369,6 +370,7 @@ class PonyTextureController
             if msg == 'FRAME'
                 data.frame += 1
         data.panel = panel
+        print "[PPM2] Downloading #{data.url}"
 
     new: (controller, compile = true) =>
         @ent = controller\GetEntity()
