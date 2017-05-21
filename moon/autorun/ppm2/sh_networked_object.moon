@@ -77,6 +77,9 @@ class NetworkedObject
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
 		@NW_Rejected = "PPM2.NW.Rejected.#{@__name}"
 		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
+		@NW_CooldownTimerCount = "PPM2_NW_CooldownTimerCount_#{@__name}"
+		@NW_CooldownTimer = "PPM2_NW_CooldownTimer_#{@__name}"
+		@NW_CooldownMessage = "PPM2_NW_CooldownMessage_#{@__name}"
 		@NW_NextObjectID = 0
 		@NW_NextObjectID_CL = 2 ^ 28
 
@@ -107,7 +110,7 @@ class NetworkedObject
 			obj = @NW_Objects[netID]
 			return unless obj
 			return if obj.__LastReject and obj.__LastReject > RealTime()
-			obj.__LastReject = RealTime() + 1
+			obj.__LastReject = RealTime() + 3
 			obj.NETWORKED = false
 			obj\Create()
 	-- @__inherited = (child) => child.Setup(child)
@@ -151,6 +154,22 @@ class NetworkedObject
 			obj\ReadNetworkData()
 			@OnNetworkedCreatedCallback(obj, ply, len)
 		else
+			ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
+			ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
+
+			if ply[@NW_CooldownTimer] < RealTime()
+				ply[@NW_CooldownTimerCount] = 1
+				ply[@NW_CooldownTimer] = RealTime() + 10
+			else
+				ply[@NW_CooldownTimerCount] += 1
+			
+			if ply[@NW_CooldownTimerCount] >= 3
+				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
+				if ply[@NW_CooldownMessage] < RealTime()
+					print "[PPM2] Player #{ply\Nick()}<#{ply\SteamID}> is creating #{@__name} too quickly!"
+					ply[@NW_CooldownMessage] = RealTime() + 1
+				return
+
 			waitID = net.ReadUInt(16)
 			obj = @()
 			obj.NW_Player = ply
