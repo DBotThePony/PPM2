@@ -85,6 +85,7 @@ class NetworkedObject
 			util.AddNetworkString(@NW_Modify)
 			util.AddNetworkString(@NW_Remove)
 			util.AddNetworkString(@NW_ReceiveID)
+			util.AddNetworkString(@NW_Rejected)
 		
 		net.Receive @NW_Create, (len = 0, ply = NULL) -> @OnNetworkedCreated(ply, len)
 		net.Receive @NW_Modify, (len = 0, ply = NULL) -> @OnNetworkedModify(ply, len)
@@ -105,6 +106,8 @@ class NetworkedObject
 			netID = net.ReadUInt(16)
 			obj = @NW_Objects[netID]
 			return unless obj
+			return if obj.__LastReject and obj.__LastReject > RealTime()
+			obj.__LastReject = RealTime() + 1
 			obj.NETWORKED = false
 			obj\Create()
 	-- @__inherited = (child) => child.Setup(child)
