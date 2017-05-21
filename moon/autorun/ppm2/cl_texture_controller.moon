@@ -190,6 +190,7 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
     
     DataChanges: (state) =>
+        return unless @isValid
         return if not @ent
         key = state\GetKey()
         switch key
@@ -374,6 +375,7 @@ class PonyTextureController
         print "[PPM2] Downloading #{data.url}"
 
     new: (controller, compile = true) =>
+        @isValid = true
         @ent = controller\GetEntity()
         @cachedENT = controller\GetEntity()
         @networkedData = controller\GetData()
@@ -384,6 +386,9 @@ class PonyTextureController
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
+    Remove: =>
+        @isValid = false
+    IsValid: => IsValid(@ent) and @isValid and @compiled
     GetID: =>
         return @id if @clientsideID
         if @ent ~= @cachedENT
@@ -442,6 +447,7 @@ class PonyTextureController
     
     PreDraw: (ent = @ent) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
@@ -455,6 +461,7 @@ class PonyTextureController
     
     PostDraw: (ent = @ent) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
@@ -470,14 +477,17 @@ class PonyTextureController
 
     PreDrawSocks: (ent = @ent, socksEnt) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS, @GetSocks())
 
     PostDrawSocks: (ent = @ent, socksEnt) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS)
     
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (bType = false) =>
+        return unless @isValid
         prefix = bType and 'Female' or 'Male'
         prefixUP = bType and 'FEMALE' or 'MALE'
         urlTextures = {}
@@ -511,6 +521,7 @@ class PonyTextureController
         @["#{prefix}Material"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         continueCompilation = ->
+            return unless @isValid
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
@@ -576,9 +587,11 @@ class PonyTextureController
             continueCompilation()
         return @["#{prefix}Material"]
     CompileBody: =>
+        return unless @isValid
         @__compileBodyInternal(true)
         @__compileBodyInternal(false)
     CompileHorn: =>
+        return unless @isValid
         textureData = {
             'name': "PPM2.#{@GetID()}.Horn"
             'shader': 'VertexLitGeneric'
@@ -608,6 +621,7 @@ class PonyTextureController
 
         return @HornMaterial
     CompileSocks: =>
+        return unless @isValid
         textureData = {
             'name': "PPM2.#{@GetID()}.Socks"
             'shader': 'VertexLitGeneric'
@@ -640,6 +654,7 @@ class PonyTextureController
 
         return @SocksMaterial
     CompileWings: =>
+        return unless @isValid
         textureData = {
             'name': "PPM2.#{@GetID()}.Wings"
             'shader': 'VertexLitGeneric'
@@ -673,6 +688,7 @@ class PonyTextureController
     GetManeTypeLower: => @GetData()\GetManeTypeLower()
     GetTailType: => @GetData()\GetTailType()
     CompileHair: =>
+        return unless @isValid
         textureFirst = {
             'name': "PPM2.#{@GetID()}.Mane.1"
             'shader': 'VertexLitGeneric'
@@ -708,6 +724,7 @@ class PonyTextureController
         left = 0
 
         continueCompilation = ->
+            return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
             rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_1", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
@@ -789,6 +806,7 @@ class PonyTextureController
             continueCompilation()
         return @HairColor1Material, @HairColor2Material
     CompileTail: =>
+        return unless @isValid
         textureFirst = {
             'name': "PPM2.#{@GetID()}.Tail.1"
             'shader': 'VertexLitGeneric'
@@ -824,6 +842,7 @@ class PonyTextureController
         left = 0
 
         continueCompilation = ->
+            return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
             -- First tail pass
@@ -912,6 +931,7 @@ class PonyTextureController
             continueCompilation()
         return @TailColor1Material, @TailColor2Material
     CompileEye: (left = false) =>
+        return unless @isValid
         prefix = left and 'l' or 'r'
         prefixUpper = left and 'L' or 'R'
 
@@ -1023,6 +1043,7 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
     
     CompileCMark: =>
+        return unless @isValid
         textureData = {
             'name': "PPM2.#{@GetID()}.CMark"
             'shader': 'VertexLitGeneric'
@@ -1114,6 +1135,7 @@ class NewPonyTextureController extends PonyTextureController
         @MANE_UPDATE_TRIGGER["UpperManeURLColor#{i}"] = true
 
     DataChanges: (state) =>
+        return unless @isValid
         super(state)
         switch state\GetKey()
             when 'ManeTypeNew'
@@ -1128,6 +1150,7 @@ class NewPonyTextureController extends PonyTextureController
     GetTailType: => @GetData()\GetTailTypeNew()
 
     CompileHairInternal: (prefix = 'Upper') =>
+        return unless @isValid
         textureFirst = {
             'name': "PPM2.#{@GetID()}.Mane.1_#{prefix}"
             'shader': 'VertexLitGeneric'
@@ -1163,6 +1186,7 @@ class NewPonyTextureController extends PonyTextureController
         left = 0
 
         continueCompilation = ->
+            return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
             rt = GetRenderTarget("PPM2_#{@GetID()}_Mane_rt_1_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
@@ -1244,6 +1268,7 @@ class NewPonyTextureController extends PonyTextureController
             continueCompilation()
         return HairColor1Material, HairColor2Material
     CompileHair: =>
+        return unless @isValid
         return super() if not @GetData()\GetSeparateMane()
         mat1, mat2 = @CompileHairInternal('Upper')
         mat3, mat4 = @CompileHairInternal('Lower')
@@ -1263,6 +1288,7 @@ class NewPonyTextureController extends PonyTextureController
             return @LowerManeColor1
 
     PreDrawUpperMane: (ent = @ent, entMane) =>
+        return unless @isValid
         return unless @compiled
 
         if not @GetData()\GetSeparateMane()
@@ -1273,12 +1299,14 @@ class NewPonyTextureController extends PonyTextureController
             render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHair(2))
 
     PostDrawUpperMane: (ent = @ent, entMane) =>
+        return unless @isValid
         return unless @compiled
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
     
     PreDrawLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
+        return unless @isValid
 
         if not @GetData()\GetSeparateMane()
             render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
@@ -1289,21 +1317,25 @@ class NewPonyTextureController extends PonyTextureController
 
     PostDrawLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
 
     PreDrawTail: (ent = @ent, entTail) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetTail(1))
         render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetTail(2))
 
     PostDrawTail: (ent = @ent, entTail) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
 
     PreDraw: (ent = @ent) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
@@ -1313,6 +1345,7 @@ class NewPonyTextureController extends PonyTextureController
     
     PostDraw: (ent = @ent) =>
         return unless @compiled
+        return unless @isValid
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)

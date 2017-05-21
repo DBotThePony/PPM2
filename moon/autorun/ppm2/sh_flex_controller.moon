@@ -617,6 +617,7 @@ class PonyFlexController
     @NEXT_HOOK_ID = 0
 
     new: (data) =>
+        @isValid = true
         @controller = data
         @ent = data.ent
         @states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
@@ -638,7 +639,9 @@ class PonyFlexController
         @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
         @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
     
+    IsValid: => @isValid
     StartSequence: (seqID = '') =>
+        return false if not @isValid
         return @currentSequences[seqID] if @currentSequences[seqID]
         return if not @@FLEX_SEQUENCES_TABLE[seqID]
         @currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
@@ -646,12 +649,14 @@ class PonyFlexController
         return @currentSequences[seqID]
 
     RestartSequence: (seqID = '') =>
+        return false if not @isValid
         if @currentSequences[seqID]
             @currentSequences[seqID]\Reset()
             return @currentSequences[seqID]
         return @StartSequence(seqID)
     
     EndSequence: (seqID = '', callStop = true) =>
+        return false if not @isValid
         return false if not @currentSequences[seqID]
         @currentSequences[seqID]\Stop() if callStop
         @currentSequences[seqID] = nil
@@ -659,6 +664,7 @@ class PonyFlexController
         return true
     
     ResetSequences: =>
+        return false if not @isValid
         for seq in *@currentSequencesIterable
             seq\Stop()
         
@@ -671,22 +677,28 @@ class PonyFlexController
             @StartSequence(seq.name)
     
     PlayerRespawn: =>
+        return if not @isValid
         @ResetSequences()
 
-    HasSequence: (seqID = '') => @currentSequences[seqID] and true or false
+    HasSequence: (seqID = '') =>
+        return false if not @isValid
+        @currentSequences[seqID] and true or false
     
     GetFlexState: (name = '') => @statesTable[name]
     RebuildIterableList: =>
+        return false if not @isValid
         @statesIterable = for state in *@states
             continue if not state\GetIsActive()
             state
     DataChanges: (state) =>
+        return if not @isValid
         flexState\DataChanges(state) for flexState in *@states
     GetEntity: => @ent
     GetData: => @controller
     GetController: => @controller
 
     Hook: (id, func) =>
+        return if not @isValid
         newFunc = (...) ->
             if not IsValid(@ent)
                 @ent = @GetData().ent
@@ -763,6 +775,7 @@ class PonyFlexController
 
     Think: =>
         return if DISABLE_FLEXES\GetBool()
+        return if not @isValid
         if not IsValid(@ent)
             @ent = @GetData().ent
         return if not IsValid(@ent) or @ent\IsDormant() or not @ent\Alive()
@@ -774,6 +787,9 @@ class PonyFlexController
                 @EndSequence(seq\GetName(), false)
                 break
             seq\Think(delta)
+    Remove: =>
+        @isValid = false
+        @RemoveHooks()
 
 do
     ppm2_disable_flexes = (cvar, oldval, newval) ->

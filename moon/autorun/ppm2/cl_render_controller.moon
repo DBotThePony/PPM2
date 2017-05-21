@@ -27,6 +27,7 @@ class PonyRenderController
 
     CompileTextures: => @GetTextureController()\CompileTextures()
     new: (data) =>
+        @isValid = true
         @networkedData = data
         @ent = data.ent
         @modelCached = data\GetModel()
@@ -40,10 +41,12 @@ class PonyRenderController
     GetModel: => @networkedData\GetModel()
 
     GetLegs: =>
+        return NULL if not @isValid
         return NULL if @ent ~= LocalPlayer()
         @CreateLegs() if not IsValid()
         return @legsModel
     CreateLegs: =>
+        return NULL if not @isValid
         return NULL if @ent ~= LocalPlayer()
         for ent in *ents.GetAll()
             if ent.isPonyLegsModel
@@ -75,6 +78,7 @@ class PonyRenderController
     @LEG_CLIP_OFFSET_VEHICLE = 11
 
     UpdateLegs: =>
+        return if not @isValid
         return unless IsValid(@legsModel)
         return if @legUpdateFrame == FrameNumber()
         @legUpdateFrame = FrameNumber()
@@ -142,6 +146,7 @@ class PonyRenderController
     
     @LEG_CLIP_VECTOR = Vector(0, 0, -1)
     DrawLegs: (start3D = true) =>
+        return if not @isValid
         @CreateLegs() unless IsValid(@legsModel)
         return unless IsValid(@legsModel)
         return if @ent\ShouldDrawLocalPlayer()
@@ -165,14 +170,23 @@ class PonyRenderController
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
     
+    IsValid: => IsValid(@ent) and @isValid
+    Remove: =>
+        @isValid = false
+        @flexes\Remove() if @flexes
+        @GetRenderController()\Remove()
+    
     PlayerRespawn: =>
+        return if not @isValid
         @flexes\PlayerRespawn() if @flexes
 
     PreDraw: (ent = @ent) =>
+        return if not @isValid
         return false if @IGNORE_DRAW
         @GetTextureController()\PreDraw(ent)
         @flexes\Think() if @flexes
     PostDraw: (ent = @ent) =>
+        return if not @isValid
         return if @IGNORE_DRAW
         textures = @GetTextureController()
         textures\PostDraw(ent)
@@ -199,6 +213,7 @@ class PonyRenderController
 
     @ARMS_MATERIAL_INDEX = 0
     PreDrawArms: (ent) =>
+        return if not @isValid
         if ent and not @armsWeightSetup
             @armsWeightSetup = true
             weight = @GetData()\GetWeight()
@@ -207,9 +222,11 @@ class PonyRenderController
                 ent\ManipulateBoneScale(i, vec)
         render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
     PostDrawArms: (ent) =>
+        return if not @isValid
         render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX)
 
     DataChanges: (state) =>
+        return if not @isValid
         return if not @ent
         @GetTextureController()\DataChanges(state)
         @flexes\DataChanges(state) if @flexes
@@ -227,12 +244,14 @@ class PonyRenderController
                 else
                     @CreateFlexController()
     GetTextureController: =>
+        return if not @isValid
         if not @renderController
             cls = PPM2.GetTextureController(@modelCached)
             @renderController = cls(@)
         @renderController.ent = @ent
         return @renderController
     CreateFlexController: =>
+        return if not @isValid
         return if not @ent\IsPlayer()
         return if @GetData()\GetNoFlex()
         if not @flexes

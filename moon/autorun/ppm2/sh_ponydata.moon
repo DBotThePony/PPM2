@@ -129,6 +129,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         return unless IsValid(ent)
         @modelCached = ent\GetModel()
         @ent = ent
+        ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
@@ -185,6 +186,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @modelBodygroups = @modelCached
         @bodygroups.ent = @ent
         return @bodygroups
+    Remove: (byClient = false) =>
+        @ent.__PPM2_PonyData = nil if IsValid(@ent)
+        if CLIENT
+            @GetWeightController()\Remove()
+            @GetRenderController()\Remove()
+        @GetBodygroupController()\Remove()
+        super(byClient)
 
 for obj in *OLD_NW_OBJECTS
     obj.__class = NetworkedPonyData

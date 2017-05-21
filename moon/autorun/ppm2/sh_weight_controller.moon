@@ -71,10 +71,13 @@ class PonyWeightController
     @HARD_LIMIT_MAXIMAL = 3
 
     new: (data, applyWeight = true) =>
+        @isValid = true
         @networkedData = data
         @ent = data.ent
         @SetWeight(data\GetWeight())
         @UpdateWeight() if IsValid(@ent) and applyWeight
+    
+    IsValid: => IsValid(@ent) and @isValid
     GetEntity: => @ent
     GetData: => @networkedData
     GetController: => @networkedData
@@ -90,6 +93,7 @@ class PonyWeightController
     DataChanges: (state) =>
         return if not IsValid(@ent)
         return if state\GetKey() ~= 'Weight'
+        return if not @isValid
         @SetWeight(state\GetValue())
         @UpdateWeight()
 
@@ -98,13 +102,17 @@ class PonyWeightController
     @DEFAULT_BONE_SIZE = Vector(1, 1, 1)
     ResetBones: (ent = @ent) =>
         return if not IsValid(ent)
+        return if not @isValid
         for i = 0, ent\GetBoneCount() - 1
             ent\ManipulateBoneScale(i, @@DEFAULT_BONE_SIZE)
     UpdateWeight: (ent = @ent) =>
         return if not IsValid(ent)
+        return if not @isValid
         @ResetBones(ent)
         for {:id, :scale} in *@@WEIGHT_BONES
             ent\ManipulateBoneScale(id, Vector(scale * @weight, scale * @weight, scale * @weight))
+    Remove: =>
+        @isValid = false
 
 -- 0	LrigPelvis
 -- 1	Lrig_LEG_BL_Femur
