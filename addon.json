@@ -13,6 +13,7 @@
 		"build.sh",
 		"README.md",
 		"lint.sh",
+		"cmark_resizer.html",
 		"LICENSE"
 	]
 }
