@@ -442,7 +442,7 @@ class PonyFlexController
             'name': 'cat'
             'autostart': false
             'repeat': false
-            'time': 2
+            'time': 5
             'ids': {'CatFace'}
             'func': (delta, timeOfAnim) =>
                 Grin = @GetModifierID(1)
