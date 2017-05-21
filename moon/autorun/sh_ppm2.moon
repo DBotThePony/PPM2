@@ -108,3 +108,5 @@ else
     AddCSLuaFile 'autorun/ppm2/cl_render_controller.lua'
     AddCSLuaFile 'autorun/ppm2/cl_editor.lua'
     include 'autorun/ppm2/sv_hooks.lua'
+
+include 'autorun/ppm2/sh_vll_loader.lua' if VLL
