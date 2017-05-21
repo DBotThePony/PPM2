@@ -199,6 +199,7 @@ class NetworkedObject
 		return unless varData
 		{:strName, :getName, :readFunc, :writeFunc} = varData
 		newVal = readFunc()
+		return if newVal == obj["Get#{getName}"](obj)
 		state = NetworkChangeState(strName, getName, newVal, obj, len, ply)
 		state\Apply()
 		obj\NetworkDataChanges(state)
