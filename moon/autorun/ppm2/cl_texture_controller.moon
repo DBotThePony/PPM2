@@ -361,7 +361,8 @@ class PonyTextureController
                     material: newMat
                 }
 
-                data.callback(newMat\GetTexture('$basetexture'), nil, newMat)
+                for callback in *data.callbacks
+                    callback(newMat\GetTexture('$basetexture'), nil, newMat)
         panel\SetVisible(false)
         panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
