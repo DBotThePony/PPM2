@@ -21,6 +21,12 @@ PPM2.TransformNewModelID = (id = 0) ->
     maneModelID = 1 if maneModelID == 0
     return maneModelID, bgID
 
+OLD_NW_OBJECTS = {}
+
+for ply in *player.GetAll()
+    if ply\GetPonyData()
+        table.insert(OLD_NW_OBJECTS, ply\GetPonyData())
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
 
@@ -178,6 +184,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @modelBodygroups = @modelCached
         @bodygroups.ent = @ent
         return @bodygroups
+
+for obj in *OLD_NW_OBJECTS
+    obj.__class = NetworkedPonyData
+    NetworkedPonyData.NW_Objects[obj.netID] = obj if obj.netID >= 0
+OLD_NW_OBJECTS = nil
 
 PPM2.NetworkedPonyData = NetworkedPonyData
 
