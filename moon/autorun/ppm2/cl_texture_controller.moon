@@ -343,26 +343,26 @@ class PonyTextureController
         data.frame = 0
         panel = vgui.Create('DHTML')
         data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
-        timer.Create data.timerid, 4, 0, ->
-            if IsValid(panel)
-                panel\Remove()
-                print "[PPM2] Failed to download #{data.url}!"
-                newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
-                    '$basetexture': 'models/ppm/partrender/null'
-                    '$ignorez': 1
-                    '$vertexcolor': 1
-                    '$vertexalpha': 1
-                    '$nolod': 1
-                    '$translucent': 1
-                })
+        timer.Create data.timerid, 8, 1, ->
+            return unless IsValid(panel)
+            panel\Remove()
+            print "[PPM2] Failed to download #{data.url}!"
+            newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
+                '$basetexture': 'models/ppm/partrender/null'
+                '$ignorez': 1
+                '$vertexcolor': 1
+                '$vertexalpha': 1
+                '$nolod': 1
+                '$translucent': 1
+            })
 
-                @FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
-                    texture: newMat\GetTexture('$basetexture')
-                    material: newMat
-                }
+            @FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
+                texture: newMat\GetTexture('$basetexture')
+                material: newMat
+            }
 
-                for callback in *data.callbacks
-                    callback(newMat\GetTexture('$basetexture'), nil, newMat)
+            for callback in *data.callbacks
+                callback(newMat\GetTexture('$basetexture'), nil, newMat)
         panel\SetVisible(false)
         panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
