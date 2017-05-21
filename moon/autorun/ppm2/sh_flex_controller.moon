@@ -40,7 +40,17 @@
 -- 22	Stomach_Out
 -- 23	Stomach_In
 -- 24	Throat_Bulge
--- 
+-- 25	Male
+-- 26	Hoof_Fluffers
+-- 27	o3o
+-- 28	Ear_Fluffers
+-- 29	Fangs
+-- 30	Claw_Teeth
+-- 31	Fang_Test
+-- 32	angry_eyes
+-- 33	sad_eyes
+-- 34	Eyes_Blink_Lower
+--
 
 net.Receive 'PPM2.DamageAnimation', ->
     ent = net.ReadEntity()
@@ -301,6 +311,16 @@ class PonyFlexController
         {flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
         {flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
         {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: false}
+        {flex: 'Male',              scale: 1, speed: 1, active: false}
+        {flex: 'Hoof_Fluffers',     scale: 1, speed: 1, active: false}
+        {flex: 'o3o',               scale: 1, speed: 1, active: false}
+        {flex: 'Ear_Fluffers',      scale: 1, speed: 1, active: false}
+        {flex: 'Fangs',             scale: 1, speed: 1, active: false}
+        {flex: 'Claw_Teeth',        scale: 1, speed: 1, active: false}
+        {flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
+        {flex: 'angry_eyes',        scale: 1, speed: 1, active: false}
+        {flex: 'sad_eyes',          scale: 1, speed: 1, active: false}
+        {flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
     }
 
     @FLEX_SEQUENCES = {

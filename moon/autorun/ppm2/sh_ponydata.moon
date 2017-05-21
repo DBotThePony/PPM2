@@ -187,12 +187,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @bodygroups.ent = @ent
         return @bodygroups
     Remove: (byClient = false) =>
-        @ent.__PPM2_PonyData = nil if IsValid(@ent)
+        @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
         if CLIENT
             @GetWeightController()\Remove()
             @GetRenderController()\Remove()
         @GetBodygroupController()\Remove()
-        super(byClient)
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 for obj in *OLD_NW_OBJECTS

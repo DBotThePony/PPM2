@@ -16,7 +16,6 @@
 --
 
 return if not VLL
-VLL.LoadGMA('ppm2')
 
 oldhooks = {
     {'PlayerDeath', 'ponyPlayerDeath'}

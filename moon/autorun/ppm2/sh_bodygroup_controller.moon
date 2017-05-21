@@ -206,6 +206,7 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_GENDER = -1
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
+    @FLEX_ID_MALE = 25
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
@@ -390,11 +391,15 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetModelScale(@GetData()\GetTailSize())
         return @tailModel
 
+    ResetBodygroups: =>
+        return unless IsValid(@ent)
+        @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+        super()
     ApplyBodygroups: =>
         return unless @isValid
         @ResetBodygroups()
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
-        @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+        @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
         @ApplyRace()
         @CreateUpperManeModel()
         @CreateLowerManeModel()
@@ -407,7 +412,7 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'EyelashType'
                 @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
-                @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+                @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
             when 'ManeTypeNew'
                 @UpdateUpperMane()
             when 'ManeTypeLowerNew'
