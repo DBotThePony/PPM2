@@ -223,12 +223,18 @@ class PonyTextureController
     @HTML_MATERIAL_QUEUE = {}
     @URL_MATERIAL_CACHE = {}
     @ALREADY_DOWNLOADING = {}
+    @FAILED_TO_DOWNLOAD = {}
     @LoadURL: (url, width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST, callback = (->)) =>
         error('Must specify URL') if not url or url == ''
         @URL_MATERIAL_CACHE[width] = @URL_MATERIAL_CACHE[width] or {}
         @URL_MATERIAL_CACHE[width][height] = @URL_MATERIAL_CACHE[width][height] or {}
         @ALREADY_DOWNLOADING[width] = @ALREADY_DOWNLOADING[width] or {}
         @ALREADY_DOWNLOADING[width][height] = @ALREADY_DOWNLOADING[width][height] or {}
+        @FAILED_TO_DOWNLOAD[width] = @FAILED_TO_DOWNLOAD[width] or {}
+        @FAILED_TO_DOWNLOAD[width][height] = @FAILED_TO_DOWNLOAD[width][height] or {}
+        if @FAILED_TO_DOWNLOAD[width][height][url]
+            callback(@FAILED_TO_DOWNLOAD[width][height][url].texture, nil, @FAILED_TO_DOWNLOAD[width][height][url].material)
+            return
         if @ALREADY_DOWNLOADING[width][height][url]
             for data in *@HTML_MATERIAL_QUEUE
                 if data.url == url
@@ -337,7 +343,24 @@ class PonyTextureController
         data.frame = 0
         panel = vgui.Create('DHTML')
         data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
-        timer.Create data.timerid, 4, 0, -> panel\Remove() if IsValid(panel)
+        timer.Create data.timerid, 4, 0, ->
+            if IsValid(panel)
+                panel\Remove()
+                newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
+                    '$basetexture': 'models/ppm/partrender/null'
+                    '$ignorez': 1
+                    '$vertexcolor': 1
+                    '$vertexalpha': 1
+                    '$nolod': 1
+                    '$translucent': 1
+                })
+
+                @FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
+                    texture: newMat\GetTexture('$basetexture')
+                    material: newMat
+                }
+
+                callback(newMat\GetTexture('$basetexture'), nil, newMat)
         panel\SetVisible(false)
         panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
