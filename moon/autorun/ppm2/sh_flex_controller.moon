@@ -702,48 +702,48 @@ class PonyFlexController
         return if ply ~= @ent or teamOnly or isDead
         switch text\lower()
             when 'o'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when ':o'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when 'о'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when 'О'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when ':о'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when ':О'
-                @StartSequence('ooo')
+                @RestartSequence('ooo')
             when ':3'
-                @StartSequence('cat')
+                @RestartSequence('cat')
             when ':з'
-                @StartSequence('cat')
+                @RestartSequence('cat')
             when ':d'
-                @StartSequence('big_grin')
+                @RestartSequence('big_grin')
             when 'xd'
-                @StartSequence('xd')
+                @RestartSequence('xd')
             when 'exdi'
-                @StartSequence('xd')
+                @RestartSequence('xd')
             when ':p'
-                @StartSequence('tongue')
+                @RestartSequence('tongue')
             when ':р'
-                @StartSequence('tongue')
+                @RestartSequence('tongue')
             when ':Р'
-                @StartSequence('tongue')
+                @RestartSequence('tongue')
             when ':c'
-                @StartSequence('sad')
+                @RestartSequence('sad')
             when ':('
-                @StartSequence('sad')
+                @RestartSequence('sad')
             when '('
-                @StartSequence('sad')
+                @RestartSequence('sad')
             when ':с'
-                @StartSequence('sad')
+                @RestartSequence('sad')
             when ':С'
-                @StartSequence('sad')
+                @RestartSequence('sad')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
-                    @StartSequence('greeny')
+                    @RestartSequence('greeny')
                 else
-                    @StartSequence('talk')
+                    @RestartSequence('talk')
     PlayerStartVoice: (ply = NULL) =>
         return if ply ~= @ent
         @StartSequence('talk_endless')
