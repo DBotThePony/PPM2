@@ -671,6 +671,9 @@ EditorPages = {
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, w, h)
             
+            @NumSlider('Cutiemark size', 'CMarkSize', 2)
+            @ColorBox('Cutiemark color', 'CMarkColor')
+            @Hr()
             @Label('Cutiemark URL image input field\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')\DockMargin(5, 10, 5, 10)
             @URLInput('CMarkURL')
     }

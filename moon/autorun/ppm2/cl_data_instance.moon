@@ -155,6 +155,28 @@ class PonyDataInstance
             fix: (arg = true) -> tobool(arg)
         }
 
+        'cmark_size': {
+            default: -> 1
+            getFunc: 'CMarkSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, 0, 1)
+            min: 0
+            max: 1
+        }
+
+        'cmark_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'CMarkColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
         'fangs': {
             default: -> false
             getFunc: 'Fangs'

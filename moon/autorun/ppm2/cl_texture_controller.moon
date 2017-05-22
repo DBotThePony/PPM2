@@ -208,6 +208,10 @@ class PonyTextureController
                 @CompileCMark()
             when 'CMarkURL'
                 @CompileCMark()
+            when 'CMarkColor'
+                @CompileCMark()
+            when 'CMarkSize'
+                @CompileCMark()
             when 'SocksColor'
                 @CompileSocks()
             else
@@ -1072,15 +1076,55 @@ class PonyTextureController
             return @CMarkTexture, @CMarkTextureGUI
         
         URL = @GetData()\GetCMarkURL()
+        size = @GetData()\GetCMarkSize()
+        sizeQuad = @@QUAD_SIZE_CONST * size
+        shift = (@@QUAD_SIZE_CONST - sizeQuad) / 2
 
         if URL == '' or not URL\find('^https?://')
+            oldW, oldH = ScrW(), ScrH()
+            {:r, :g, :b, :a} = @GetData()\GetCMarkColor()
+
+            rt = GetRenderTarget("PPM2_#{@GetID()}_CMark", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            render.Clear(0, 0, 0, 0, true, true)
+            cam.Start2D()
+
             mark = PPM2.DefaultCutiemarksMaterials[@GetData()\GetCMarkType() + 1]
-            @CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
-            @CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture')) if mark
+            if mark
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mark)
+                surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
+            
+            cam.End2D()
+            render.PopRenderTarget()
+            render.SetViewPort(0, 0, oldW, oldH)
+
+            @CMarkTexture\SetTexture('$basetexture', rt)
+            @CMarkTextureGUI\SetTexture('$basetexture', rt)
         else
-            @@LoadURL URL, @@QUAD_SIZE_CONST / 2, @@QUAD_SIZE_CONST / 2, (texture, panel) ->
-                @CMarkTexture\SetTexture('$basetexture', texture)
-                @CMarkTextureGUI\SetTexture('$basetexture', texture)
+            @@LoadURL URL, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, material) ->
+                oldW, oldH = ScrW(), ScrH()
+                {:r, :g, :b, :a} = @GetData()\GetCMarkColor()
+
+                rt = GetRenderTarget("PPM2_#{@GetID()}_CMark", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+                rt\Download()
+                render.PushRenderTarget(rt)
+                render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                render.Clear(0, 0, 0, 0, true, true)
+                cam.Start2D()
+
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(material)
+                surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
+                
+                cam.End2D()
+                render.PopRenderTarget()
+                render.SetViewPort(0, 0, oldW, oldH)
+
+                @CMarkTexture\SetTexture('$basetexture', rt)
+                @CMarkTextureGUI\SetTexture('$basetexture', rt)
         
         return @CMarkTexture, @CMarkTextureGUI
 
