@@ -248,7 +248,7 @@ class PonyRenderController
                 else
                     @CreateFlexController()
     GetTextureController: =>
-        return if not @isValid
+        return @renderController if not @isValid
         if not @renderController
             cls = PPM2.GetTextureController(@modelCached)
             @renderController = cls(@)
