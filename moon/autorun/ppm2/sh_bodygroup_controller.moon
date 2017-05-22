@@ -45,6 +45,9 @@ class DefaultBodygroupController
 
     @NEXT_OBJ_ID = 0
 
+    @COOLDOWN_TIME = 5
+    @COOLDOWN_MAX_COUNT = 4
+
     new: (controller) =>
         @isValid = true
         @ent = controller.ent
@@ -52,6 +55,17 @@ class DefaultBodygroupController
         @controller = controller
         @objID = @@NEXT_OBJ_ID
         @@NEXT_OBJ_ID += 1
+        @SocksModelUpdateCooldown = 0
+        @SocksModelUpdateCount = 0
+    
+    UpdateCooldowns: =>
+        if CLIENT
+            @SocksModelUpdateCooldown = 0
+            @SocksModelUpdateCount = 0
+        rTime = RealTime()
+        if @SocksModelUpdateCooldown < rTime
+            @SocksModelUpdateCooldown = rTime + @@COOLDOWN_TIME
+            @SocksModelUpdateCount = 0
     
     __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
     IsValid: => @isValid
@@ -65,11 +79,16 @@ class DefaultBodygroupController
 
     CreateSocksModel: =>
         return NULL unless @isValid
-        @socksModel\Remove() if IsValid(@socksModel)
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return @socksModel if IsValid(@socksModel)
+        @UpdateCooldowns()
+        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @SocksModelUpdateCount += 1
 
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
-                ent\Remove()
+                @socksModel = ent
+                return ent
 
         model = 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
 
@@ -228,25 +247,27 @@ class NewBodygroupController extends DefaultBodygroupController
             @TailModelUpdateCount = 0 
         rTime = RealTime()
         if @UpperManeModelUpdateCooldown > rTime
-            @UpperManeModelUpdateCooldown = rTime + 5
+            @UpperManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @UpperManeModelUpdateCount = 0
         if @LowerManeModelUpdateCooldown > rTime
-            @LowerManeModelUpdateCooldown = rTime + 5
+            @LowerManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @LowerManeModelUpdateCount = 0
         if @TailModelUpdateCooldown > rTime
-            @TailModelUpdateCooldown = rTime + 5
+            @TailModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @TailModelUpdateCount = 0
 
     CreateUpperManeModel: =>
         return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return @maneModelUP if IsValid(@maneModelUP)
         @UpdateCooldowns()
-        return NULL if @UpperManeModelUpdateCount > 4
+        return NULL if @UpperManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
         @UpperManeModelUpdateCount += 1
-        @maneModelUP\Remove() if IsValid(@maneModelUP)
 
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
-                ent\Remove()
+                @maneModelUP = ent
+                return ent
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -279,14 +300,16 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return @maneModelLower if IsValid(@maneModelLower)
         @UpdateCooldowns()
-        return NULL if @LowerManeModelUpdateCount > 4
+        return NULL if @LowerManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
         @LowerManeModelUpdateCount += 1
-        @maneModelLower\Remove() if IsValid(@maneModelLower)
 
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
-                ent\Remove()
+                @maneModelLower = ent
+                return ent
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
@@ -319,14 +342,16 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
+        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return @tailModel if IsValid(@tailModel)
         @UpdateCooldowns()
-        return NULL if @TailModelUpdateCount > 4
+        return NULL if @TailModelUpdateCount > @@COOLDOWN_MAX_COUNT
         @TailModelUpdateCount += 1
-        @tailModel\Remove() if IsValid(@tailModel)
 
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
-                ent\Remove()
+                @tailModel = ent
+                return ent
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
