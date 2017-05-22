@@ -145,4 +145,5 @@ hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
         @SetModel('models/ppm/player_default_base_new.mdl')
         if not @GetPonyData()
             data = PPM2.NetworkedPonyData(nil, @)
+            PPM2.Randomize(data)
             data\Create()
