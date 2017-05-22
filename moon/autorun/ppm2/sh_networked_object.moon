@@ -285,7 +285,7 @@ class NetworkedObject
 	Create: =>
 		return if @NETWORKED
 		return if CLIENT and not @@NW_ClientsideCreation
-		@NETWORKED = true
+		@NETWORKED = true if SERVER
 		@NETWORKED_PREDICT = true
 		if SERVER
 			net.Start(@@NW_Create)
