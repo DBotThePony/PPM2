@@ -93,6 +93,7 @@ hook.Add 'PlayerInitialSpawn', 'PPM2.Hooks', =>
 net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     for ent in *ents.GetAll()
+        continue if ent == ply
         data = ent\GetPonyData()
         continue if not data
         data\NetworkTo(ply)
