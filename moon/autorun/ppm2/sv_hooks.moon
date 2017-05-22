@@ -90,13 +90,36 @@ hook.Add 'PlayerInitialSpawn', 'PPM2.Hooks', =>
             net.Start('PPM2.RequestPonyData')
             net.Send(@)
 
-net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
-    return if not IsValid(ply)
-    for ent in *ents.GetAll()
-        continue if ent == ply
-        data = ent\GetPonyData()
-        continue if not data
-        data\NetworkTo(ply)
+do
+    REQUIRE_CLIENTS = {}
+
+    safeSendFunction = ->
+        for ply, data in pairs REQUIRE_CLIENTS
+            if not IsValid(ply)
+                REQUIRE_CLIENTS[ply] = nil
+                continue
+            
+            ent = table.remove(data, 1)
+            if not ent
+                REQUIRE_CLIENTS[ply] = nil
+                continue
+            
+            data = ent\GetPonyData()
+            continue if not data
+            data\NetworkTo(ply)
+    
+    errorTrack = (err) ->
+        print '[PPM2] Networking Error: ', err
+        print debug.traceback()
+
+    timer.Create 'PPM2.Require', 1, 0, -> xpcall(safeSendFunction, errorTrack)
+    net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
+        return if not IsValid(ply)
+        REQUIRE_CLIENTS[ply] = for ent in *ents.GetAll()
+            continue if ent == ply
+            data = ent\GetPonyData()
+            continue if not data
+            ent
 
 net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
