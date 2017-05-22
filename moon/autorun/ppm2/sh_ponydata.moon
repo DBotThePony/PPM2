@@ -21,12 +21,7 @@ PPM2.TransformNewModelID = (id = 0) ->
     maneModelID = 1 if maneModelID == 0
     return maneModelID, bgID
 
-OLD_NW_OBJECTS = {}
-
-for ply in *player.GetAll()
-    break if not ply.GetPonyData 
-    if ply\GetPonyData()
-        table.insert(OLD_NW_OBJECTS, ply\GetPonyData())
+ply.__PPM2_PonyData = nil for ply in *player.GetAll()
 
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
@@ -140,14 +135,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
         if CLIENT
-            timer.Simple(0, ->
-                @GetRenderController()\CompileTextures()
-            )
+            timer.Simple 0, ->
+                @GetRenderController()\CompileTextures() if @GetRenderController()
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
         timer.Simple 0.5, ->
             return unless IsValid(@ent)
-            @GetBodygroupController()\ApplyBodygroups()
+            @GetBodygroupController()\ApplyBodygroups() if @GetBodygroupController()
             if CLIENT
                 @GetRenderController()
                 @GetWeightController()
@@ -158,38 +152,54 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @GetBodygroupController()\DataChanges(state) if @ent
 
         if CLIENT and @ent
-            @GetWeightController()\DataChanges(state)
-            @GetRenderController()\DataChanges(state)
+            @GetWeightController()\DataChanges(state) if @GetWeightController()
+            @GetRenderController()\DataChanges(state) if @GetRenderController()
     Think: =>
     PlayerRespawn: =>
         if CLIENT
-            @GetWeightController()\UpdateWeight()
-            @GetRenderController()\PlayerRespawn()
+            @GetWeightController()\UpdateWeight() if @GetWeightController()
+            @GetRenderController()\PlayerRespawn() if @GetRenderController()
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
     GetRenderController: =>
         return if SERVER
+        return @renderController if not @isValid
         if not @renderController or @modelCached ~= @modelRender
-            cls = PPM2.GetRenderController(@modelCached)
             @modelRender = @modelCached
+            cls = PPM2.GetRenderController(@modelCached)
+            if @renderController and cls == @renderController.__class
+                @renderController.ent = @ent
+                return @renderController
+            @renderController\Remove() if @renderController
             @renderController = cls(@)
         @renderController.ent = @ent
         return @renderController
     GetWeightController: =>
         return if SERVER
+        return @weightController if not @isValid
         if not @weightController or @modelCached ~= @modelWeight
-            cls = PPM2.GetPonyWeightController(@modelCached)
+            @modelCached = @modelCached or @ent\GetModel()
             @modelWeight = @modelCached
+            cls = PPM2.GetPonyWeightController(@modelCached)
+            if @weightController and cls == @weightController.__class
+                @weightController.ent = @ent
+                return @weightController
+            @weightController\Remove() if @weightController
             @weightController = cls(@)
         @weightController.ent = @ent
         return @weightController
     GetBodygroupController: =>
+        return @bodygroups if not @isValid
         if not @bodygroups or @modelBodygroups ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()
-            cls = PPM2.GetBodugroupController(@modelCached)
-            @bodygroups = cls(@)
             @modelBodygroups = @modelCached
+            cls = PPM2.GetBodugroupController(@modelCached)
+            if @bodygroups and cls == @bodygroups.__class
+                @bodygroups.ent = @ent
+                return @bodygroups
+            @bodygroups\Remove() if @bodygroups
+            @bodygroups = cls(@)
         @bodygroups.ent = @ent
         return @bodygroups
     Remove: (byClient = false) =>
@@ -200,11 +210,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\Remove()
         @GetBodygroupController()\Remove()
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
-
-for obj in *OLD_NW_OBJECTS
-    obj.__class = NetworkedPonyData
-    NetworkedPonyData.NW_Objects[obj.netID] = obj if obj.netID >= 0
-OLD_NW_OBJECTS = nil
 
 PPM2.NetworkedPonyData = NetworkedPonyData
 
