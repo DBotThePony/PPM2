@@ -122,11 +122,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     new: (netID, ent) =>
         @recomputeTextures = true
+        @isValid = true
         if ent
             @modelCached = ent\GetModel()
             @SetEntity(ent)
             @SetupEntity(ent)
         super(netID)
+    IsValid: => @isValid
     GetModel: => @modelCached
     EntIndex: => @entID
     SetupEntity: (ent) =>
@@ -191,6 +193,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @bodygroups.ent = @ent
         return @bodygroups
     Remove: (byClient = false) =>
+        @isValid = false
         @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
         if CLIENT
             @GetWeightController()\Remove()
