@@ -325,13 +325,13 @@ class PonyFlexController
         {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: false}
         {flex: 'Male',              scale: 1, speed: 1, active: false}
         {flex: 'Hoof_Fluffers',     scale: 1, speed: 1, active: false}
-        {flex: 'o3o',               scale: 1, speed: 1, active: false}
+        {flex: 'o3o',               scale: 1, speed: 1, active: true}
         {flex: 'Ear_Fluffers',      scale: 1, speed: 1, active: false}
         {flex: 'Fangs',             scale: 1, speed: 1, active: false}
         {flex: 'Claw_Teeth',        scale: 1, speed: 1, active: false}
         {flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
         {flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
-        {flex: 'sad_eyes',          scale: 1, speed: 1, active: false}
+        {flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
         {flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
     }
 
@@ -356,6 +356,26 @@ class PonyFlexController
                 @SetModifierWeight(2, @grinStrength)
                 @SetModifierWeight(3, @angryStrength)
                 @SetModifierWeight(4, @scrunchStrength)
+        }
+
+        {
+            'name': 'sad'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Frown', 'Grin', 'sad_eyes'}
+            'reset': =>
+                @SetTime(math.random(15, 45) / 10)
+                @lastStrengthUpdate = @lastStrengthUpdate or 0
+                if @lastStrengthUpdate < RealTime()
+                    @lastStrengthUpdate = RealTime() + 2
+                    @frownStrength = math.random(40, 100) / 100
+                    @grinStrength = math.random(15, 40) / 100
+                    @angryStrength = math.random(30, 80) / 100
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, @frownStrength)
+                @SetModifierWeight(2, @grinStrength)
+                @SetModifierWeight(3, @angryStrength)
         }
 
         {
@@ -448,6 +468,16 @@ class PonyFlexController
                 Grin = @GetModifierID(1)
                 GrinState = @GetFlexState(1)
                 GrinState\SetModifierWeight(Grin, 1)
+        }
+
+        {
+            'name': 'o3o'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'o3o'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, 1)
         }
 
         {
@@ -809,6 +839,12 @@ class PonyFlexController
             when ':с'
                 @RestartSequence('sad')
             when ':С'
+                @RestartSequence('sad')
+            when 'o3o'
+                @RestartSequence('o3o')
+            when 'sorry'
+                @RestartSequence('sad')
+            when 'oops'
                 @RestartSequence('sad')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
