@@ -390,6 +390,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetModelScale(@GetData()\GetTailSize())
         return @tailModel
     
+    @FLEX_ID_EYELASHES = 16
     @FLEX_ID_MALE = 25
     @FLEX_ID_BAT_PONY_EARS = 28
     @FLEX_ID_FANGS = 31
@@ -397,6 +398,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     ResetBodygroups: =>
         return unless IsValid(@ent)
+        @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
@@ -405,11 +407,11 @@ class NewBodygroupController extends DefaultBodygroupController
     ApplyBodygroups: =>
         return unless @isValid
         @ResetBodygroups()
-        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
-        @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
-        @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GetData()\GetFangs() and 1 or 0)
-        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GetData()\GetClawTeeth() and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
         @ApplyRace()
         @CreateUpperManeModel()
         @CreateLowerManeModel()
@@ -420,7 +422,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return unless @isValid
         switch state\GetKey()
             when 'EyelashType'
-                @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
+                @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
             when 'Gender'
                 @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
             when 'BatPonyEars'
