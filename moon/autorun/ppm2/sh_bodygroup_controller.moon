@@ -120,6 +120,8 @@ class DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
+        @socksModel\SetParent(@ent) if IsValid(@ent)
+        @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         return @socksModel
     
     MergeModels: (targetEnt = NULL) =>
@@ -238,6 +240,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @TailModelUpdateCount = 0
     
     UpdateCooldowns: =>
+        super()
         if CLIENT
             @UpperManeModelUpdateCooldown = 0
             @UpperManeModelUpdateCount = 0
@@ -430,6 +433,8 @@ class NewBodygroupController extends DefaultBodygroupController
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
         @maneModelUP\SetModel(model)
         @maneModelUP\SetBodygroup(1, bodygroupID)
+        @maneModelUP\SetParent(@ent) if IsValid(@ent)
+        @maneModelUP\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         return @maneModelUP
     UpdateLowerMane: =>
         return NULL unless @isValid
@@ -441,6 +446,8 @@ class NewBodygroupController extends DefaultBodygroupController
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
         @maneModelLower\SetModel(model)
         @maneModelLower\SetBodygroup(1, bodygroupID)
+        @maneModelLower\SetParent(@ent) if IsValid(@ent)
+        @maneModelLower\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         return @maneModelLower
     UpdateTailModel: =>
         return NULL unless @isValid
@@ -453,6 +460,8 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetModel(model)
         @tailModel\SetBodygroup(1, bodygroupID)
         @tailModel\SetModelScale(@GetData()\GetTailSize())
+        @tailModel\SetParent(@ent) if IsValid(@ent)
+        @tailModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         return @tailModel
     
     @FLEX_ID_EYELASHES = 16
