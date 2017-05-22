@@ -26,14 +26,25 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     return if not IsValid(rag)
     bgController\MergeModels(rag) if bgController.MergeModels
 
-hook.Add 'EntityTakeDamage', 'PPM2.Hooks', (dmg) =>
-    return if not @IsPlayer()
-    @__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
-    return if @__ppm2_last_hurt_anim > CurTime()
-    @__ppm2_last_hurt_anim = CurTime() + 1
-    net.Start('PPM2.DamageAnimation', true)
-    net.WriteEntity(@)
-    net.Broadcast()
+hook.Add 'EntityTakeDamage', 'PPM2.Hooks', (ent, dmg) ->
+    do
+        self = ent
+        if @IsPlayer()
+            @__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
+            if @__ppm2_last_hurt_anim < CurTime()
+                @__ppm2_last_hurt_anim = CurTime() + 1
+                net.Start('PPM2.DamageAnimation', true)
+                net.WriteEntity(@)
+                net.Broadcast()
+    do
+        self = dmg\GetAttacker()
+        if @IsPlayer() and IsValid(ent) and (ent\IsNPC() or ent\IsPlayer())
+            @__ppm2_last_anger_anim = @__ppm2_last_anger_anim or 0
+            if @__ppm2_last_anger_anim < CurTime()
+                @__ppm2_last_anger_anim = CurTime() + 1
+                net.Start('PPM2.AngerAnimation', true)
+                net.WriteEntity(@)
+                net.Broadcast()
 
 killGrin = =>
     return if not IsValid(@)

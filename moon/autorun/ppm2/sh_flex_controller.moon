@@ -62,6 +62,11 @@ net.Receive 'PPM2.KillAnimation', ->
     return if not IsValid(ent) or not ent\IsPlayer()
     hook.Call('PPM2_KillAnimation', nil, ent)
 
+net.Receive 'PPM2.AngerAnimation', ->
+    ent = net.ReadEntity()
+    return if not IsValid(ent) or not ent\IsPlayer()
+    hook.Call('PPM2_AngerAnimation', nil, ent)
+
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
@@ -193,6 +198,7 @@ class FlexSequence
             'frames': @frames
             'time': @time
             'func': @func
+            'reset': @resetfunc
             'create': @createfunc
             'ids': @flexIDsIterable
             'numid': @numid
@@ -221,14 +227,20 @@ class FlexSequence
         @scale = 1
         @valid = true
         @createfunc() if @createfunc
+        @resetfunc() if @resetfunc
     
     __tostring: => "[#{@@__name}:#{@name}]"
     
+    SetTime: (newTime = @time, refresh = true) =>
+        @frame = 0
+        @start = RealTime() if refresh
+        @finish = @start + @time
     Reset: =>
         @frame = 0
         @start = RealTime()
         @finish = @start + @time
         @deltaAnim = 1
+        @resetfunc() if @resetfunc
     
     GetController: => @controller
     GetEntity: => @ent
@@ -318,12 +330,34 @@ class PonyFlexController
         {flex: 'Fangs',             scale: 1, speed: 1, active: false}
         {flex: 'Claw_Teeth',        scale: 1, speed: 1, active: false}
         {flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
-        {flex: 'angry_eyes',        scale: 1, speed: 1, active: false}
+        {flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
         {flex: 'sad_eyes',          scale: 1, speed: 1, active: false}
         {flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
     }
 
     @FLEX_SEQUENCES = {
+        {
+            'name': 'anger'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch'}
+            'reset': =>
+                @SetTime(math.random(15, 45) / 10)
+                @lastStrengthUpdate = @lastStrengthUpdate or 0
+                if @lastStrengthUpdate < RealTime()
+                    @lastStrengthUpdate = RealTime() + 2
+                    @frownStrength = math.random(40, 100) / 100
+                    @grinStrength = math.random(15, 40) / 100
+                    @angryStrength = math.random(30, 80) / 100
+                    @scrunchStrength = math.random(50, 100) / 100
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, @frownStrength)
+                @SetModifierWeight(2, @grinStrength)
+                @SetModifierWeight(3, @angryStrength)
+                @SetModifierWeight(4, @scrunchStrength)
+        }
+
         {
             'name': 'eyes_idle'
             'autostart': true
@@ -662,6 +696,7 @@ class PonyFlexController
         @Hook('PlayerEndVoice', @PlayerEndVoice)
         @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
         @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
+        @Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
     
     IsValid: => @isValid
     StartSequence: (seqID = '') =>
@@ -789,9 +824,15 @@ class PonyFlexController
     PPM2_HurtAnimation: (ply = NULL) =>
         return if ply ~= @ent
         @RestartSequence('hurt')
+        @EndSequence('kill_grin')
     PPM2_KillAnimation: (ply = NULL) =>
         return if ply ~= @ent
         @RestartSequence('kill_grin')
+        @EndSequence('anger')
+    PPM2_AngerAnimation: (ply = NULL) =>
+        return if ply ~= @ent
+        @EndSequence('kill_grin')
+        @RestartSequence('anger')
 
     RemoveHooks: =>
         for iHook in *@hooks
