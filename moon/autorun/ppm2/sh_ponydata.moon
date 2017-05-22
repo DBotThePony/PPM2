@@ -92,7 +92,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("UpperManeURLColor#{i}",    net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     
     @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
-    @NetworkVar('CMarkSize',        (-> math.Clamp(net.ReadFloat(), 0, 1)), net.ReadFloat, 1)
+    @NetworkVar('CMarkSize',        (-> math.Clamp(net.ReadFloat(), 0, 1)), net.WriteFloat, 1)
     @NetworkVar('CMarkColor',       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
     @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')
     @NetworkVar('CMarkType',        (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_CMARK, PPM2.MAX_CMARK)),           ((arg = 4) -> net.WriteUInt(arg, 8)), 4)
