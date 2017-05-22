@@ -37,20 +37,20 @@ hook.Add 'PlayerStepSoundTime', 'PPM2.Hooks', (stepType = STEPSOUNDTIME_NORMAL, 
     if @Crouching()
         switch stepType
             when STEPSOUNDTIME_NORMAL
-                return not walk and (300 / rate) or (600 / rate)
+                return not isWalking and (300 / rate) or (600 / rate)
             when STEPSOUNDTIME_ON_LADDER
                 return 500 / rate
             when STEPSOUNDTIME_WATER_KNEE
-                return not walk and (400 / rate) or (800 / rate)
+                return not isWalking and (400 / rate) or (800 / rate)
             when STEPSOUNDTIME_WATER_FOOT
-                return not walk and (350 / rate) or (700 / rate)
+                return not isWalking and (350 / rate) or (700 / rate)
     else
         switch stepType
             when STEPSOUNDTIME_NORMAL
-                return not walk and (150 / rate) or (300 / rate)
+                return not isWalking and (150 / rate) or (300 / rate)
             when STEPSOUNDTIME_ON_LADDER
                 return 500 / rate
             when STEPSOUNDTIME_WATER_KNEE
-                return not walk and (250 / rate) or (500 / rate)
+                return not isWalking and (250 / rate) or (500 / rate)
             when STEPSOUNDTIME_WATER_FOOT
-                return not walk and (175 / rate) or (350 / rate)
+                return not isWalking and (175 / rate) or (350 / rate)
