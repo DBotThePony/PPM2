@@ -845,7 +845,7 @@ PPM2.OpenEditor = ->
             if nwdata
                 mainData\SetNetworkData(nwdata)
                 if nwdata.netID == -1
-                    nwData.NETWORKED = false
+                    nwdata.NETWORKED = false
                     nwdata\Create()
             copy\ApplyDataToObject(mainData, false) -- no save on apply
     @selectModelBox = vgui.Create('DComboBox', @)
