@@ -176,10 +176,11 @@ class NetworkedObject
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			obj\Create()
-			net.Start(@NW_ReceiveID)
-			net.WriteUInt(waitID, 16)
-			net.WriteUInt(obj.netID, 16)
-			net.Send(ply)
+			timer.Simple 0.5, ->
+				net.Start(@NW_ReceiveID)
+				net.WriteUInt(waitID, 16)
+				net.WriteUInt(obj.netID, 16)
+				net.Send(ply)
 			@OnNetworkedCreatedCallback(obj, ply, len)
 	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
 
