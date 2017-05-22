@@ -209,8 +209,39 @@ class NewBodygroupController extends DefaultBodygroupController
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
+    new: (...) =>
+        super(...)
+        @UpperManeModelUpdateCooldown = 0
+        @UpperManeModelUpdateCount = 0
+        @LowerManeModelUpdateCooldown = 0
+        @LowerManeModelUpdateCount = 0
+        @TailModelUpdateCooldown = 0
+        @TailModelUpdateCount = 0
+    
+    UpdateCooldowns: =>
+        if CLIENT
+            @UpperManeModelUpdateCooldown = 0
+            @UpperManeModelUpdateCount = 0
+            @LowerManeModelUpdateCooldown = 0
+            @LowerManeModelUpdateCount = 0
+            @TailModelUpdateCooldown = 0
+            @TailModelUpdateCount = 0 
+        rTime = RealTime()
+        if @UpperManeModelUpdateCooldown > rTime
+            @UpperManeModelUpdateCooldown = rTime + 5
+            @UpperManeModelUpdateCount = 0
+        if @LowerManeModelUpdateCooldown > rTime
+            @LowerManeModelUpdateCooldown = rTime + 5
+            @LowerManeModelUpdateCount = 0
+        if @TailModelUpdateCooldown > rTime
+            @TailModelUpdateCooldown = rTime + 5
+            @TailModelUpdateCount = 0
+
     CreateUpperManeModel: =>
         return NULL unless @isValid
+        @UpdateCooldowns()
+        return NULL if @UpperManeModelUpdateCount > 4
+        @UpperManeModelUpdateCount += 1
         @maneModelUP\Remove() if IsValid(@maneModelUP)
 
         for ent in *ents.GetAll()
@@ -248,6 +279,9 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
+        @UpdateCooldowns()
+        return NULL if @LowerManeModelUpdateCount > 4
+        @LowerManeModelUpdateCount += 1
         @maneModelLower\Remove() if IsValid(@maneModelLower)
 
         for ent in *ents.GetAll()
@@ -285,6 +319,9 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
+        @UpdateCooldowns()
+        return NULL if @TailModelUpdateCount > 4
+        @TailModelUpdateCount += 1
         @tailModel\Remove() if IsValid(@tailModel)
 
         for ent in *ents.GetAll()
@@ -362,6 +399,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
+        return NULL if not IsValid(@maneModelUP)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
@@ -372,6 +410,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModelIfNotExists()
+        return NULL if not IsValid(@maneModelLower)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
@@ -382,6 +421,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModelIfNotExists()
+        return NULL if not IsValid(@tailModel)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
