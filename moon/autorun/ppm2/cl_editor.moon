@@ -842,7 +842,11 @@ PPM2.OpenEditor = ->
             lastWear = RealTime() + 5
             mainData = PPM2.GetMainData()
             nwdata = LocalPlayer()\GetPonyData()
-            mainData\SetNetworkData(nwdata) if nwdata
+            if nwdata
+                mainData\SetNetworkData(nwdata)
+                if nwdata.netID == -1
+                    nwData.NETWORKED = false
+                    nwdata\Create()
             copy\ApplyDataToObject(mainData, false) -- no save on apply
     @selectModelBox = vgui.Create('DComboBox', @)
     with @selectModelBox
