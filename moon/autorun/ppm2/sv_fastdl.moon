@@ -394,4 +394,4 @@ Files = {
     'materials/models/props_pony/ppm/ppm_socks/socks_striped.vtf'
 }
 
-resource.AddSingleFile(fil) for fil in Files
+resource.AddSingleFile(fil) for fil in *Files
