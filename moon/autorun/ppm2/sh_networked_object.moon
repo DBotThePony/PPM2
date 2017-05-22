@@ -97,12 +97,13 @@ class NetworkedObject
 			return if SERVER
 			waitID = net.ReadUInt(16)
 			netID = net.ReadUInt(16)
-			obj = @NW_Waiting[netID]
-			@NW_Waiting[netID] = nil
+			obj = @NW_Waiting[waitID]
+			@NW_Waiting[waitID] = nil
 			return unless obj
 			obj.NETWORKED = true
 			@NW_Objects[obj.netID] = nil
 			obj.netID = netID
+			obj.waitID = nil
 			@NW_Objects[netID] = obj
 		net.Receive @NW_Rejected, (len = 0, ply = NULL) ->
 			return if SERVER
@@ -177,10 +178,12 @@ class NetworkedObject
 			obj\ReadNetworkData()
 			obj\Create()
 			timer.Simple 0.5, ->
+				return if not IsValid(ply)
 				net.Start(@NW_ReceiveID)
 				net.WriteUInt(waitID, 16)
 				net.WriteUInt(obj.netID, 16)
 				net.Send(ply)
+				print waitID, obj.netID, ply
 			@OnNetworkedCreatedCallback(obj, ply, len)
 	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
 
@@ -298,11 +301,12 @@ class NetworkedObject
 			net.Send(filter)
 		else
 			@@NW_WaitID += 1
+			@waitID = @@NW_WaitID
 			net.Start(@@NW_Create)
-			net.WriteUInt(@@NW_WaitID, 16)
+			net.WriteUInt(@waitID, 16)
 			@WriteNetworkData()
 			net.SendToServer()
-			@@NW_Waiting[@@NW_WaitID] = @
+			@@NW_Waiting[@waitID] = @
 	NetworkTo: (targets = {}) =>
 		net.Start(@@NW_Create)
 		net.WriteUInt(@netID, 16)
