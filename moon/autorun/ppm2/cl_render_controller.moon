@@ -281,6 +281,7 @@ class NewPonyRenderController extends PonyRenderController
 
     DataChanges: (state) =>
         return if not @ent
+        return if not @isValid
         switch state\GetKey()
             when 'UpperManeModel'
                 @upperManeModel = @GetData()\GetUpperManeModel()
@@ -294,7 +295,9 @@ class NewPonyRenderController extends PonyRenderController
         super(state)
 
     DrawManeAndTailModels: =>
+        return if not @isValid
         textures = @GetTextureController()
+        return if not textures
         if IsValid(@upperManeModel)
             @upperManeModel\SetNoDraw(true)
             textures\PreDrawUpperMane()
@@ -315,6 +318,7 @@ class NewPonyRenderController extends PonyRenderController
 
     PostDraw: (ent = @ent) =>
         return if @IGNORE_DRAW
+        return if not @isValid
         @IGNORE_DRAW = true
 
         if @GetData()\IsNetworked()
