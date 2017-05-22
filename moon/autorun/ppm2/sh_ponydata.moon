@@ -163,6 +163,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
+
+    SlowUpdate: =>
+        @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
     
     GetRenderController: =>
         return if SERVER
@@ -196,7 +199,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if not @bodygroups or @modelBodygroups ~= @modelCached
             @modelCached = @modelCached or @ent\GetModel()
             @modelBodygroups = @modelCached
-            cls = PPM2.GetBodugroupController(@modelCached)
+            cls = PPM2.GetBodygroupController(@modelCached)
             if @bodygroups and cls == @bodygroups.__class
                 @bodygroups.ent = @ent
                 return @bodygroups

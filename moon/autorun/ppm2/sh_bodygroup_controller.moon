@@ -159,9 +159,7 @@ class DefaultBodygroupController
         return unless @isValid
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
-    ApplyBodygroups: =>
-        return unless @isValid
-        @ResetBodygroups()
+    SlowUpdate: =>
         @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
         @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
         @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
@@ -169,6 +167,10 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @ApplyRace()
         @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
+    ApplyBodygroups: =>
+        return unless @isValid
+        @ResetBodygroups()
+        @SlowUpdate()
     
     Remove: =>
         @socksModel\Remove() if IsValid(@socksModel)
@@ -507,9 +509,8 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         super()
-    ApplyBodygroups: =>
-        return unless @isValid
-        @ResetBodygroups()
+    
+    SlowUpdate: =>
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
@@ -520,6 +521,10 @@ class NewBodygroupController extends DefaultBodygroupController
         @UpdateLowerMane()
         @UpdateTailModel()
         @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
+    ApplyBodygroups: =>
+        return unless @isValid
+        @ResetBodygroups()
+        @SlowUpdate()
 
     DataChanges: (state) =>
         return unless @isValid
@@ -559,4 +564,4 @@ class NewBodygroupController extends DefaultBodygroupController
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController
 
-PPM2.GetBodugroupController = (model = 'models/ppm/player_default_base.mdl') -> DefaultBodygroupController.AVALIABLE_CONTROLLERS[model\lower()] or DefaultBodygroupController
+PPM2.GetBodygroupController = (model = 'models/ppm/player_default_base.mdl') -> DefaultBodygroupController.AVALIABLE_CONTROLLERS[model\lower()] or DefaultBodygroupController
