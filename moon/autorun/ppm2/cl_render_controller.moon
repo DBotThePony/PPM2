@@ -186,7 +186,7 @@ class PonyRenderController
 
     PreDraw: (ent = @ent) =>
         return if not @isValid
-        return false if @IGNORE_DRAW
+        return if @IGNORE_DRAW
         @GetTextureController()\PreDraw(ent)
         @flexes\Think() if @flexes
     PostDraw: (ent = @ent) =>
