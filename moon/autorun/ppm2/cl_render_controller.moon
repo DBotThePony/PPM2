@@ -26,7 +26,7 @@ class PonyRenderController
     @__inherited(@)
     @NEXT_OBJ_ID = 0
 
-    CompileTextures: => @GetTextureController()\CompileTextures()
+    CompileTextures: => @GetTextureController()\CompileTextures() if @GetTextureController and @GetTextureController()
     new: (data) =>
         @objID = @@NEXT_OBJ_ID
         @@NEXT_OBJ_ID += 1
@@ -177,7 +177,7 @@ class PonyRenderController
     IsValid: => IsValid(@ent) and @isValid
     Remove: =>
         @flexes\Remove() if @flexes
-        @GetTextureController()\Remove()
+        @GetTextureController()\Remove() if @GetTextureController and @GetTextureController()
         @isValid = false
     
     PlayerRespawn: =>
@@ -278,7 +278,7 @@ class NewPonyRenderController extends PonyRenderController
         @tailModel\SetNoDraw(true) if IsValid(@tailModel)
         super(data)
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
-    
+
     DataChanges: (state) =>
         return if not @ent
         switch state\GetKey()
