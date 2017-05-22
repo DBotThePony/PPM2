@@ -95,6 +95,7 @@ else
     util.AddNetworkString('PPM2.DamageAnimation')
     util.AddNetworkString('PPM2.KillAnimation')
     util.AddNetworkString('PPM2.AngerAnimation')
+    util.AddNetworkString('PPM2.NotifyDisconnect')
 
     AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
     AddCSLuaFile 'autorun/ppm2/sh_registry.lua'

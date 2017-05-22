@@ -208,6 +208,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @bodygroups.ent = @ent
         return @bodygroups
     Remove: (byClient = false) =>
+        @@NW_Objects[@netID] = nil if @NETWORKED
         @isValid = false
         @ent = @GetEntity() if not IsValid(@ent)
         @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
@@ -218,6 +219,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData
+
+if CLIENT
+    net.Receive 'PPM2.NotifyDisconnect', ->
+        netID = net.ReadUInt(16)
+        data = NetworkedPonyData.NW_Objects[netID]
+        return if not data
+        data\Remove()
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>

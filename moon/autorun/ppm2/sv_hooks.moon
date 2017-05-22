@@ -124,3 +124,25 @@ do
 net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     ply\SetNWBool('PPM2.InEditor', net.ReadBool())
+
+
+hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
+    data = @GetPonyData()
+    return if not data
+    net.Start('PPM2.NotifyDisconnect')
+    net.WriteUInt(data.netID, 16)
+    net.Broadcast()
+
+BOTS_ARE_PONIES = CreateConVar('ppm2_bots', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Whatever spawn bots as ponies')
+
+hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
+    return if not BOTS_ARE_PONIES\GetBool()
+    return if not @IsBot()
+    timer.Simple 0.1, ->
+        return if not IsValid(@)
+        @SetViewOffset(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET))
+        @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
+        @SetModel('models/ppm/player_default_base_new.mdl')
+        if not @GetPonyData()
+            data = PPM2.NetworkedPonyData(nil, @)
+            data\Create()
