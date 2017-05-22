@@ -106,8 +106,10 @@ PlayerRespawn = ->
     ent\GetPonyData()\PlayerRespawn()
 
 lastDataSend = 0
+lastDataReceived = 0
 net.Receive 'PPM2.RequestPonyData', ->
-    lastDataSend = 0
+    return if lastDataReceived > RealTime()
+    lastDataReceived = RealTime() + 10
     RunConsoleCommand('ppm2_reload')
 
 net.Receive 'PPM2.PlayerRespawn', UpdateWeight
