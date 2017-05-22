@@ -183,7 +183,6 @@ class NetworkedObject
 				net.WriteUInt(waitID, 16)
 				net.WriteUInt(obj.netID, 16)
 				net.Send(ply)
-				print waitID, obj.netID, ply
 			@OnNetworkedCreatedCallback(obj, ply, len)
 	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
 
