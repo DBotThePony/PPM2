@@ -25,11 +25,6 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
                 data\ModelChanges(ply.__ppm2_lastmodel, model)
                 ply.__ppm2_lastmodel = model
 
-hook.Add 'Think', 'PPM2.Think', ->
-    for ply in *player.GetAll()
-        data = ply\GetPonyData()
-        data\Think() if data
-
 DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
 

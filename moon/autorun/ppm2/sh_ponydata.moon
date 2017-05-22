@@ -149,12 +149,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
         
-        @GetBodygroupController()\DataChanges(state) if @ent
+        @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state) if @GetWeightController()
             @GetRenderController()\DataChanges(state) if @GetRenderController()
-    Think: =>
     PlayerRespawn: =>
         if CLIENT
             @GetWeightController()\UpdateWeight() if @GetWeightController()
@@ -162,6 +161,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     ApplyBodygroups: => @GetBodygroupController()\ApplyBodygroups() if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
+    
     GetRenderController: =>
         return if SERVER
         return @renderController if not @isValid
@@ -204,6 +204,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         return @bodygroups
     Remove: (byClient = false) =>
         @isValid = false
+        @ent = @GetEntity() if not IsValid(@ent)
         @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
         if CLIENT
             @GetWeightController()\Remove()
