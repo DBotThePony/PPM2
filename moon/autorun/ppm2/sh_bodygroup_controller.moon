@@ -109,6 +109,7 @@ class DefaultBodygroupController
         
         if SERVER
             timer.Simple .5, ->
+                return unless @isValid
                 return unless IsValid(@socksModel)
                 @GetData()\SetSocksModel(@socksModel)
                 @ent\SetNWEntity('PPM2.SocksModel', @socksModel) if IsValid(@ent)
@@ -294,6 +295,7 @@ class NewBodygroupController extends DefaultBodygroupController
         
         if SERVER
             timer.Simple .5, ->
+                return unless @isValid
                 return unless IsValid(@maneModelUP)
                 @GetData()\SetUpperManeModel(@maneModelUP)
                 @ent\SetNWEntity('PPM2.UpperManeModel', @maneModelUP) if IsValid(@ent)
@@ -336,6 +338,7 @@ class NewBodygroupController extends DefaultBodygroupController
         
         if SERVER
             timer.Simple .5, ->
+                return unless @isValid
                 return unless IsValid(@maneModelLower)
                 @GetData()\SetLowerManeModel(@maneModelLower) 
                 @ent\SetNWEntity('PPM2.LowerManeModel', @maneModelLower) if IsValid(@ent)
@@ -378,6 +381,7 @@ class NewBodygroupController extends DefaultBodygroupController
         
         if SERVER
             timer.Simple .5, ->
+                return unless @isValid
                 return unless IsValid(@tailModel)
                 @GetData()\SetTailModel(@tailModel)
                 @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent)
