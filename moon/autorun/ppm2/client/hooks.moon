@@ -133,6 +133,9 @@ hook.Add 'KeyPress', 'PPM2.RequireData', ->
     RunConsoleCommand('ppm2_reload')
     timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 
+PPM_HINT_COLOR_FIRST = Color(255, 255, 255)
+PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
+
 hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
     lply = LocalPlayer()
     lpos = lply\EyePos()
@@ -145,4 +148,5 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
                     pos.z += 10
                     alpha = math.Clamp(1 - dist / 250, 0.1, 1)
                     {:x, :y} = pos\ToScreen()
-                    draw.DrawText('In PPM Editor', 'Default', x, y, color_white, TEXT_ALIGN_CENTER)
+                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x + 1, y + 1, PPM_HINT_COLOR_SECOND, TEXT_ALIGN_CENTER)
+                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x, y, PPM_HINT_COLOR_FIRST, TEXT_ALIGN_CENTER)
