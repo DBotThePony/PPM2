@@ -58,8 +58,8 @@ hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
         PPM2.EmotesPanel = vgui.Create('EditablePanel')
         self = PPM2.EmotesPanel
-        @SetSize(100, 200)
-        @SetPos(ScrW() - 100, ScrH() / 2 - 100)
+        @SetSize(200, 300)
+        @SetPos(ScrW() - 200, ScrH() / 2 - 150)
         @Paint = (w = 0, h = 0) =>
             surface.SetDrawColor(0, 0, 0, 150)
             surface.DrawRect(0, 0, w, h)
@@ -67,6 +67,7 @@ hook.Add 'StartChat', 'PPM2.Emotes', ->
         with @scroll
             \Dock(FILL)
             .Paint = ->
+            \SetMouseInputEnabled(true)
         @buttons = for {:name, :id, :sequence, :time} in *PPM2.AVALIABLE_EMOTES
             with vgui.Create('DButton', @scroll)
                 \SetTextColor(BUTTON_TEXT_COLOR)
@@ -74,11 +75,13 @@ hook.Add 'StartChat', 'PPM2.Emotes', ->
                 .id = id
                 .time = time
                 .sequence = sequence
+                .hoverDelta = 0
+                .DoClick = BUTTON_CLICK_FUNC
                 \SetSize(200, 30)
                 \SetText(name)
-                .hoverDelta = 0
+                \SetFont('HudHintTextLarge')
                 \Dock(TOP)
-                .DoClick = BUTTON_CLICK_FUNC
+        @scroll\AddItem(btn) for btn in *@buttons
         @SetVisible(false)
         @SetMouseInputEnabled(false)
 

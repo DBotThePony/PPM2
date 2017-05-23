@@ -219,6 +219,7 @@ class FlexSequence
     SetTime: (newTime = @time, refresh = true) =>
         @frame = 0
         @start = RealTime() if refresh
+        @time = newTime
         @finish = @start + @time
     Reset: =>
         @frame = 0
@@ -248,7 +249,6 @@ class FlexSequence
     Think: (delta = 0) =>
         @ent = @controller.ent
         return false if not IsValid(@ent)
-        return false if not @func
         if @HasFinished()
             @Stop()
             return false
@@ -261,10 +261,11 @@ class FlexSequence
             @finish = @start + @time
         @frame += 1
 
-        status = @func(delta, 1 - @deltaAnim)
-        if status == false
-            @Stop()
-            return false
+        if @func
+            status = @func(delta, 1 - @deltaAnim)
+            if status == false
+                @Stop()
+                return false
         
         return true
     Stop: =>
@@ -307,7 +308,7 @@ class PonyFlexController
         {flex: 'FatButt',           scale: 1, speed: 1, active: false}
         {flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
         {flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
-        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: false}
+        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: true}
         {flex: 'Male',              scale: 1, speed: 1, active: false}
         {flex: 'Hoof_Fluffers',     scale: 1, speed: 1, active: false}
         {flex: 'o3o',               scale: 1, speed: 1, active: true}
@@ -662,6 +663,64 @@ class PonyFlexController
                 @SetModifierWeight(2, .38)
                 @SetModifierWeight(3, .66)
         }
+
+        {
+            'name': 'sorry'
+            'autostart': false
+            'repeat': false
+            'time': 8
+            'ids': {'Frown', 'Stretch', 'Grin', 'Scrunch', 'sad_eyes'}
+            'create': =>
+                @SetModifierWeight(1, math.random(45, 75) / 100)
+                @SetModifierWeight(2, math.random(45, 75) / 100)
+                @SetModifierWeight(3, math.random(70, 100) / 100)
+                @SetModifierWeight(4, math.random(7090, 100) / 100)
+        }
+
+        {
+            'name': 'gulp'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'Throat_Bulge', 'Frown', 'Grin'}
+            'create': =>
+                @SetModifierWeight(2, 1)
+                @SetModifierWeight(3, math.random(35, 55) / 100)
+            'func': (delta, timeOfAnim) =>
+                if timeOfAnim > 0.5
+                    @SetModifierWeight(1, (1 - timeOfAnim) * 2)
+                else
+                    @SetModifierWeight(1, timeOfAnim * 2)
+        }
+
+        {
+            'name': 'blahblah'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'o3o', 'Mouth_O'}
+            'create': =>
+                @SetModifierWeight(1, 1)
+                @talkAnim = [math.random(50, 70) / 100 for i = 0, 1, 0.05]
+            'func': (delta, timeOfAnim) =>
+                cPos = math.floor(timeOfAnim * 20) + 1
+                data = @talkAnim[cPos]
+                return if not data
+                @SetModifierWeight(2, data)
+        }
+
+        {
+            'name': 'wink_left'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'Frown', 'Stretch', 'Grin', 'Left_Blink'}
+            'create': =>
+                @SetModifierWeight(1, math.random(40, 60) / 100)
+                @SetModifierWeight(2, math.random(30, 50) / 100)
+                @SetModifierWeight(3, math.random(60, 100) / 100)
+                @SetModifierWeight(4, 1)
+        }
     }
 
     @__inherited: (child) =>
@@ -715,12 +774,13 @@ class PonyFlexController
         @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
         return @currentSequences[seqID]
 
-    RestartSequence: (seqID = '') =>
+    RestartSequence: (seqID = '', time) =>
         return false if not @isValid
         if @currentSequences[seqID]
             @currentSequences[seqID]\Reset()
+            @currentSequences[seqID]\SetTime(time)
             return @currentSequences[seqID]
-        return @StartSequence(seqID)
+        return @StartSequence(seqID, time)
     
     EndSequence: (seqID = '', callStop = true) =>
         return false if not @isValid
@@ -821,7 +881,7 @@ class PonyFlexController
             when 'o3o'
                 @RestartSequence('o3o')
             when 'sorry'
-                @RestartSequence('sad')
+                @RestartSequence('sorry')
             when 'oops'
                 @RestartSequence('sad')
             else

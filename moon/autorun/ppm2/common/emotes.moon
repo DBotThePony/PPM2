@@ -45,6 +45,30 @@ PPM2.AVALIABLE_EMOTES = {
         'sequence': 'cat'
         'time': 10
     }
+
+    {
+        'name': 'Sorry'
+        'sequence': 'sorry'
+        'time': 5
+    }
+
+    {
+        'name': 'Wink'
+        'sequence': 'wink_left'
+        'time': 2
+    }
+
+    {
+        'name': 'Gulp'
+        'sequence': 'gulp'
+        'time': 2
+    }
+
+    {
+        'name': 'Blah blah blah'
+        'sequence': 'blahblah'
+        'time': 4
+    }
 }
 
 for i, data in pairs PPM2.AVALIABLE_EMOTES
