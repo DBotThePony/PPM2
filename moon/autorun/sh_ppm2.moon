@@ -57,8 +57,8 @@ if CLIENT
     include 'client/texture_controller.lua'
     include 'client/hooks.lua'
     include 'client/render_controller.lua'
-    include 'client/editor.lua'
     include 'client/emotes.lua'
+    include 'client/editor.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel

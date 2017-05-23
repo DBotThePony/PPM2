@@ -37,6 +37,7 @@ net.Receive 'PPM2.PlayEmote', ->
     return if not PPM2.AVALIABLE_EMOTES[emoteID]
     hook.Call('PPM2_EmoteAnimation', nil, ply, PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time)
 
+PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
 PPM2.EmotesPanel\Remove() if IsValid(PPM2.EmotesPanel)
 
 BUTTON_DRAW_FUNC = (w = 0, h = 0) =>
@@ -54,37 +55,47 @@ BUTTON_CLICK_FUNC = =>
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
+CreatePanel = (parent) ->
+    self = vgui.Create('DPanel', parent)
+    @SetSize(200, 300)
+    @Paint = (w = 0, h = 0) =>
+        surface.SetDrawColor(0, 0, 0, 150)
+        surface.DrawRect(0, 0, w, h)
+    @scroll = vgui.Create('DScrollPanel', @)
+    with @scroll
+        \Dock(FILL)
+        \SetSize(200, 300)
+        .Paint = ->
+        \SetMouseInputEnabled(true)
+    @buttons = for {:name, :id, :sequence, :time} in *PPM2.AVALIABLE_EMOTES
+        with vgui.Create('DButton', @scroll)
+            \SetTextColor(BUTTON_TEXT_COLOR)
+            .Paint = BUTTON_DRAW_FUNC
+            .id = id
+            .time = time
+            .sequence = sequence
+            .hoverDelta = 0
+            .DoClick = BUTTON_CLICK_FUNC
+            \SetSize(200, 30)
+            \SetText(name)
+            \SetFont('HudHintTextLarge')
+            \Dock(TOP)
+    @scroll\AddItem(btn) for btn in *@buttons
+    @SetVisible(false)
+    @SetMouseInputEnabled(false)
+    return @
+
+hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
+    PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
+    PPM2.EmotesPanelContext = CreatePanel(@)
+    PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
+    PPM2.EmotesPanelContext\SetVisible(true)
+    PPM2.EmotesPanelContext\SetMouseInputEnabled(true)
+
 hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
-        PPM2.EmotesPanel = vgui.Create('DPanel')
-        self = PPM2.EmotesPanel
-        @SetSize(200, 300)
-        @SetPos(ScrW() - 500, ScrH() - 300)
-        @Paint = (w = 0, h = 0) =>
-            surface.SetDrawColor(0, 0, 0, 150)
-            surface.DrawRect(0, 0, w, h)
-        @scroll = vgui.Create('DScrollPanel', @)
-        with @scroll
-            \Dock(FILL)
-            \SetSize(200, 300)
-            .Paint = ->
-            \SetMouseInputEnabled(true)
-        @buttons = for {:name, :id, :sequence, :time} in *PPM2.AVALIABLE_EMOTES
-            with vgui.Create('DButton', @scroll)
-                \SetTextColor(BUTTON_TEXT_COLOR)
-                .Paint = BUTTON_DRAW_FUNC
-                .id = id
-                .time = time
-                .sequence = sequence
-                .hoverDelta = 0
-                .DoClick = BUTTON_CLICK_FUNC
-                \SetSize(200, 30)
-                \SetText(name)
-                \SetFont('HudHintTextLarge')
-                \Dock(TOP)
-        @scroll\AddItem(btn) for btn in *@buttons
-        @SetVisible(false)
-        @SetMouseInputEnabled(false)
+        PPM2.EmotesPanel = CreatePanel()
+        PPM2.EmotesPanel\SetPos(ScrW() - 500, ScrH() - 300)
 
     if IsValid(PPM2.EmotesPanel) and LocalPlayer()\IsPony()
         PPM2.EmotesPanel\SetVisible(true)
