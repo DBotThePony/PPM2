@@ -758,6 +758,19 @@ class PonyFlexController
                 @SetModifierWeight(3, math.random(60, 100) / 100)
                 @SetModifierWeight(4, 1)
         }
+
+        {
+            'name': 'wink_right'
+            'autostart': false
+            'repeat': false
+            'time': 2
+            'ids': {'Frown', 'Stretch', 'Grin', 'Right_Blink'}
+            'create': =>
+                @SetModifierWeight(1, math.random(40, 60) / 100)
+                @SetModifierWeight(2, math.random(30, 50) / 100)
+                @SetModifierWeight(3, math.random(60, 100) / 100)
+                @SetModifierWeight(4, 1)
+        }
     }
 
     @__inherited: (child) =>

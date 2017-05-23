@@ -71,6 +71,12 @@ PPM2.AVALIABLE_EMOTES = {
     }
 
     {
+        'name': 'Right Wink'
+        'sequence': 'wink_right'
+        'time': 2
+    }
+
+    {
         'name': 'Gulp'
         'sequence': 'gulp'
         'time': 1
