@@ -329,6 +329,14 @@ PANEL_SETTINGS_BASE = {
             .Paint = (w = 0, h = 0) =>
                 surface.SetDrawColor(150, 162, 162)
                 surface.DrawLine(0, h / 2, w, h / 2)
+    Button: (text = 'Perfectly generic button', doClick = (->), parent = @scroll or @) =>
+        with vgui.Create('DButton', parent)
+            \Dock(TOP)
+            \SetSize(200, 20)
+            \DockMargin(2, 2, 2, 2)
+            \SetText(text)
+            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            .DoClick = -> doClick()
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
 		with vgui.Create('DCheckBoxLabel', parent)
 			\Dock(TOP)
@@ -490,6 +498,13 @@ EditorPages = {
         'internal': 'main'
         'func': (sheet) =>
             @ScrollPanel()
+            @Button 'Randomize!', ->
+                data = @GetTargetData()
+                return if not data
+                confirmed = ->
+                    PPM2.Randomize(data, false)
+                    @ValueChanges()
+                Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
             @ComboBox('Race', 'Race')
             @CheckBox('Gender', 'Gender')
             @NumSlider('Weight', 'Weight', 2)
