@@ -101,7 +101,7 @@ class DefaultBodygroupController
             .isSocks = true
             .manePlayer = @ent
             \SetModel(model)
-            \SetPos(@ent\GetPos())
+            \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
             \SetParent(@ent)
@@ -290,7 +290,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .upperMane = true
             .manePlayer = @ent
             \SetModel(model)
-            \SetPos(@ent\GetPos())
+            \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
             \SetBodygroup(1, bodygroupID)
@@ -333,7 +333,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .lowerMane = true
             .manePlayer = @ent
             \SetModel(model)
-            \SetPos(@ent\GetPos())
+            \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
             \SetBodygroup(1, bodygroupID)
@@ -376,7 +376,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .isTail = true
             .manePlayer = @ent
             \SetModel(model)
-            \SetPos(@ent\GetPos())
+            \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
             \SetBodygroup(1, bodygroupID)
