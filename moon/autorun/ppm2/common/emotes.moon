@@ -59,6 +59,12 @@ PPM2.AVALIABLE_EMOTES = {
     }
 
     {
+        'name': 'Scrunch'
+        'sequence': 'scrunch'
+        'time': 6
+    }
+
+    {
         'name': 'Sorry'
         'sequence': 'sorry'
         'time': 4

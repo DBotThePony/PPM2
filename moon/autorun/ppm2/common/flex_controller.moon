@@ -715,6 +715,16 @@ class PonyFlexController
         }
 
         {
+            'name': 'scrunch'
+            'autostart': false
+            'repeat': false
+            'time': 6
+            'ids': {'Scrunch'}
+            'create': =>
+                @SetModifierWeight(1, math.random(80, 100) / 100)
+        }
+
+        {
             'name': 'gulp'
             'autostart': false
             'repeat': false
