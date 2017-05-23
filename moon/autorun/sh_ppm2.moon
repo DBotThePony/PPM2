@@ -48,6 +48,7 @@ include 'common/bodygroup_controller.lua'
 include 'common/weight_controller.lua'
 include 'common/flex_controller.lua'
 include 'common/ponydata.lua'
+include 'common/emotes.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
@@ -57,6 +58,7 @@ if CLIENT
     include 'client/hooks.lua'
     include 'client/render_controller.lua'
     include 'client/editor.lua'
+    include 'client/emotes.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel
@@ -66,9 +68,6 @@ else
     util.AddNetworkString('PPM2.PlayerRespawn')
     util.AddNetworkString('PPM2.Require')
     util.AddNetworkString('PPM2.EditorStatus')
-    util.AddNetworkString('PPM2.DamageAnimation')
-    util.AddNetworkString('PPM2.KillAnimation')
-    util.AddNetworkString('PPM2.AngerAnimation')
     util.AddNetworkString('PPM2.NotifyDisconnect')
 
     AddCSLuaFile 'common/networked_object.lua'
@@ -79,12 +78,15 @@ else
     AddCSLuaFile 'common/weight_controller.lua'
     AddCSLuaFile 'common/flex_controller.lua'
     AddCSLuaFile 'common/functions.lua'
+    AddCSLuaFile 'common/emotes.lua'
     AddCSLuaFile 'client/data_instance.lua'
     AddCSLuaFile 'client/texture_controller.lua'
     AddCSLuaFile 'client/hooks.lua'
     AddCSLuaFile 'client/render_controller.lua'
     AddCSLuaFile 'client/editor.lua'
+    AddCSLuaFile 'client/emotes.lua'
     include 'server/hooks.lua'
     include 'server/fastdl.lua'
+    include 'server/emotes.lua'
 
 include 'common/vll_loader.lua' if VLL

@@ -52,21 +52,6 @@
 -- 34	Eyes_Blink_Lower
 --
 
-net.Receive 'PPM2.DamageAnimation', ->
-    ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
-    hook.Call('PPM2_HurtAnimation', nil, ent)
-
-net.Receive 'PPM2.KillAnimation', ->
-    ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
-    hook.Call('PPM2_KillAnimation', nil, ent)
-
-net.Receive 'PPM2.AngerAnimation', ->
-    ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
-    hook.Call('PPM2_AngerAnimation', nil, ent)
-
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
@@ -717,14 +702,16 @@ class PonyFlexController
         @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
         @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
         @Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
+        @Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
         PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
     
     IsValid: => @isValid
-    StartSequence: (seqID = '') =>
+    StartSequence: (seqID = '', time) =>
         return false if not @isValid
         return @currentSequences[seqID] if @currentSequences[seqID]
         return if not @@FLEX_SEQUENCES_TABLE[seqID]
         @currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
+        @currentSequences[seqID]\SetTime(time) if time
         @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
         return @currentSequences[seqID]
 
@@ -860,6 +847,9 @@ class PonyFlexController
         return if ply ~= @ent
         @EndSequence('kill_grin')
         @RestartSequence('anger')
+    PPM2_EmoteAnimation: (ply = NULL, emote = '', time) =>
+        return if ply ~= @ent
+        @RestartSequence(emote, time)
 
     RemoveHooks: =>
         for iHook in *@hooks

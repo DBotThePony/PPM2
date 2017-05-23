@@ -26,39 +26,6 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     return if not IsValid(rag)
     bgController\MergeModels(rag) if bgController.MergeModels
 
-hook.Add 'EntityTakeDamage', 'PPM2.Hooks', (ent, dmg) ->
-    do
-        self = ent
-        if @IsPlayer()
-            @__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
-            if @__ppm2_last_hurt_anim < CurTime()
-                @__ppm2_last_hurt_anim = CurTime() + 1
-                net.Start('PPM2.DamageAnimation', true)
-                net.WriteEntity(@)
-                net.Broadcast()
-    do
-        self = dmg\GetAttacker()
-        if @IsPlayer() and IsValid(ent) and (ent\IsNPC() or ent\IsPlayer())
-            @__ppm2_last_anger_anim = @__ppm2_last_anger_anim or 0
-            if @__ppm2_last_anger_anim < CurTime()
-                @__ppm2_last_anger_anim = CurTime() + 1
-                net.Start('PPM2.AngerAnimation', true)
-                net.WriteEntity(@)
-                net.Broadcast()
-
-killGrin = =>
-    return if not IsValid(@)
-    return if not @IsPlayer()
-    @__ppm2_grin_hurt_anim = @__ppm2_grin_hurt_anim or 0
-    return if @__ppm2_grin_hurt_anim > CurTime()
-    @__ppm2_grin_hurt_anim = CurTime() + 1
-    net.Start('PPM2.KillAnimation', true)
-    net.WriteEntity(@)
-    net.Broadcast()
-
-hook.Add 'OnNPCKilled', 'PPM2.Hooks', (npc = NULL, attacker = NULL, weapon = NULL) => killGrin(attacker)
-hook.Add 'DoPlayerDeath', 'PPM2.Hooks', (ply = NULL, attacker = NULL) => killGrin(attacker)
-
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     for ent in *ents.GetAll()
         if ent.isPonyPropModel and ent.manePlayer == @
