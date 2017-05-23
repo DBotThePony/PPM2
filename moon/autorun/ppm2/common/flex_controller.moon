@@ -340,7 +340,7 @@ class PonyFlexController
             'name': 'anger'
             'autostart': false
             'repeat': false
-            'time': 3
+            'time': 5
             'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch'}
             'reset': =>
                 @SetTime(math.random(15, 45) / 10)
@@ -362,7 +362,7 @@ class PonyFlexController
             'name': 'sad'
             'autostart': false
             'repeat': false
-            'time': 3
+            'time': 5
             'ids': {'Frown', 'Grin', 'sad_eyes'}
             'reset': =>
                 @SetTime(math.random(15, 45) / 10)
@@ -517,16 +517,6 @@ class PonyFlexController
         }
 
         {
-            'name': 'sad'
-            'autostart': false
-            'repeat': false
-            'time': 4
-            'ids': {'Frown'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, 1)
-        }
-
-        {
             'name': 'cat'
             'autostart': false
             'repeat': false
@@ -667,7 +657,7 @@ class PonyFlexController
             'name': 'hurt'
             'autostart': false
             'repeat': false
-            'time': 2
+            'time': 4
             'ids': {'JawOpen', 'Frown', 'Grin', 'Scrunch'}
             'func': (delta, timeOfAnim) =>
                 @SetModifierWeight(1, .08)
@@ -680,7 +670,7 @@ class PonyFlexController
             'name': 'kill_grin'
             'autostart': false
             'repeat': false
-            'time': 3
+            'time': 8
             'ids': {'Smirk', 'Frown', 'Grin'}
             'func': (delta, timeOfAnim) =>
                 @SetModifierWeight(1, .51)
