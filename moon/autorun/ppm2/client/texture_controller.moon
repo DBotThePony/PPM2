@@ -1154,7 +1154,7 @@ class NewPonyTextureController extends PonyTextureController
     @MAT_INDEX_TEETH = 4
     @MAT_INDEX_EYE_LEFT = 5
     @MAT_INDEX_EYE_RIGHT = 6
-    @MAT_INDEX_MOUNTH = 7
+    @MAT_INDEX_MOUTH = 7
     @MAT_INDEX_HORN = 8
     @MAT_INDEX_WINGS = 9
 
@@ -1193,11 +1193,11 @@ class NewPonyTextureController extends PonyTextureController
             when 'TailTypeNew'
                 @CompileTail()
             when 'TeethColor'
-                @CompileMounth()
-            when 'MounthColor'
-                @CompileMounth()
-            when 'MounthColor'
-                @CompileMounth()
+                @CompileMouth()
+            when 'MouthColor'
+                @CompileMouth()
+            when 'MouthColor'
+                @CompileMouth()
 
     GetManeType: => @GetData()\GetManeTypeNew()
     GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
@@ -1330,7 +1330,7 @@ class NewPonyTextureController extends PonyTextureController
         @LowerManeColor1, @LowerManeColor2 = mat3, mat4
         return mat1, mat2, mat3, mat4
     
-    CompileMounth: =>
+    CompileMouth: =>
         textureData = {
             '$basetexture': 'models/debug/debugwhite' 
             '$phong': '1'
@@ -1354,24 +1354,24 @@ class NewPonyTextureController extends PonyTextureController
         @TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
-        {:r, :g, :b} = @GetData()\GetMounthColor()
-        @MounthMaterial = CreateMaterial("PPM2.#{@GetID()}.Mounth", 'VertexLitGeneric', textureData)
-        @MounthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-        @MounthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+        {:r, :g, :b} = @GetData()\GetMouthColor()
+        @MouthMaterial = CreateMaterial("PPM2.#{@GetID()}.Mouth", 'VertexLitGeneric', textureData)
+        @MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+        @MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetTongueColor()
         @TongueMaterial = CreateMaterial("PPM2.#{@GetID()}.Tongue", 'VertexLitGeneric', textureData)
         @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
-        return @TeethMaterial, @MounthMaterial, @TongueMaterial
+        return @TeethMaterial, @MouthMaterial, @TongueMaterial
     
     CompileTextures: =>
         super()
-        @CompileMounth()
+        @CompileMouth()
     
     GetTeeth: => @TeethMaterial
-    GetMounth: => @MounthMaterial
+    GetMouth: => @MouthMaterial
     GetTongue: => @TongueMaterial
     
     GetUpperHair: (index = 1) =>
@@ -1438,7 +1438,7 @@ class NewPonyTextureController extends PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
         render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
         render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH, @GetTeeth())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUNTH, @GetMounth())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH, @GetMouth())
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
         render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
@@ -1451,7 +1451,7 @@ class NewPonyTextureController extends PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUNTH)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH)
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
         render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
