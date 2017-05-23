@@ -57,6 +57,7 @@ class DefaultBodygroupController
         @@NEXT_OBJ_ID += 1
         @SocksModelUpdateCooldown = 0
         @SocksModelUpdateCount = 0
+        PPM2.DebugPrint('Created new bodygroups controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
     UpdateCooldowns: =>
         if CLIENT
@@ -85,6 +86,7 @@ class DefaultBodygroupController
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
                 @socksModel = ent
                 @GetData()\SetSocksModel(@socksModel)
+                PPM2.DebugPrint('Resuing ', @socksModel, ' as socks model for ', @ent)
                 return ent
 
         @UpdateCooldowns()
@@ -106,6 +108,8 @@ class DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
+        
+        PPM2.DebugPrint('Creating new socks model for ', @ent, ' as ', @socksModel)
 
         if SERVER
             timer.Simple .5, ->
@@ -210,6 +214,7 @@ class CPPMBodygroupController extends DefaultBodygroupController
     new: (...) => super(...)
 
     ApplyRace: =>
+        return unless @isValid
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
@@ -271,6 +276,7 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
                 @maneModelUP = ent
                 @GetData()\SetUpperManeModel(@maneModelUP)
+                PPM2.DebugPrint('Resuing ', @maneModelUP, ' as upper mane model for ', @ent)
                 return ent
 
         @UpdateCooldowns()
@@ -295,6 +301,8 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
+        
+        PPM2.DebugPrint('Creating new upper mane model for ', @ent, ' as ', @maneModelUP)
 
         if SERVER
             timer.Simple .5, ->
@@ -313,6 +321,7 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
                 @maneModelLower = ent
                 @GetData()\SetLowerManeModel(@maneModelLower)
+                PPM2.DebugPrint('Resuing ', @maneModelLower, ' as lower mane model for ', @ent)
                 return ent
 
         @UpdateCooldowns()
@@ -337,6 +346,8 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
+        
+        PPM2.DebugPrint('Creating new lower mane model for ', @ent, ' as ', @maneModelLower)
 
         if SERVER
             timer.Simple .5, ->
@@ -355,6 +366,7 @@ class NewBodygroupController extends DefaultBodygroupController
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
                 @tailModel = ent
                 @GetData()\SetTailModel(@tailModel)
+                PPM2.DebugPrint('Resuing ', @tailModel, ' as tail model for ', @ent)
                 return ent
 
         @UpdateCooldowns()
@@ -379,6 +391,8 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
+        
+        PPM2.DebugPrint('Creating new tail model for ', @ent, ' as ', @tailModel)
 
         if SERVER
             timer.Simple .5, ->

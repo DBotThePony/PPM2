@@ -70,13 +70,19 @@ class PonyWeightController
     @HARD_LIMIT_MINIMAL = 0.1
     @HARD_LIMIT_MAXIMAL = 3
 
+    @NEXT_OBJ_ID = 0
+
     new: (data, applyWeight = true) =>
         @isValid = true
         @networkedData = data
         @ent = data.ent
+        @objID = @@NEXT_OBJ_ID
+        @@NEXT_OBJ_ID += 1
         @SetWeight(data\GetWeight())
         @UpdateWeight() if IsValid(@ent) and applyWeight
+        PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
     
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     IsValid: => IsValid(@ent) and @isValid
     GetEntity: => @ent
     GetData: => @networkedData
@@ -150,6 +156,8 @@ class PonyWeightController
 
 class NewPonyWeightController extends PonyWeightController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
+
+    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
     @WEIGHT_BONES = {
         {id: 11, scale: 0.7}

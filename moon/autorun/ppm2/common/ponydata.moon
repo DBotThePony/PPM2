@@ -133,6 +133,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT
             timer.Simple 0, ->
                 @GetRenderController()\CompileTextures() if @GetRenderController()
+        PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
         timer.Simple 0.5, ->

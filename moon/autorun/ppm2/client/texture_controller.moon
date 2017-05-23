@@ -390,6 +390,7 @@ class PonyTextureController
             @@NEXT_GENERATED_ID += 1
         @compiled = false
         @CompileTextures() if compile
+        PPM2.DebugPrint('Created new texture controller for ', @ent, ' as part of ', controller, '; internal ID is ', @id)
     __tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
     Remove: =>
         @isValid = false

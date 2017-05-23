@@ -727,6 +727,7 @@ class PonyFlexController
         @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
         @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
         @Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
+        PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
     
     IsValid: => @isValid
     StartSequence: (seqID = '') =>

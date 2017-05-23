@@ -16,7 +16,9 @@
 --
 
 PREFIX = '[PPM2] '
+PREFIX_DEBUG = '[PPM2 DEBUG] '
 PREFIX_COLOR = Color(95, 188, 179)
+DEBUG_COLOR = Color(209, 207, 183)
 DEFAULT_TEXT_COLOR = Color(200, 200, 200)
 NUMBER_COLOR = Color(245, 199, 64)
 STEAMID_COLOR = Color(255, 255, 255)
@@ -84,6 +86,18 @@ PPM2.Message = (...) ->
     frmt = PPM2.Format(...)
     MsgC(PREFIX_COLOR, PREFIX, unpack(frmt))
     MsgC('\n')
+    return frmt
+
+DEBUG_LEVEL = CreateConVar('ppm2_debug', '0', {}, 'Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.')
+
+PPM2.DebugPrint = (...) ->
+    return if DEBUG_LEVEL\GetInt() <= 0
+    frmt = PPM2.Format(DEBUG_COLOR, ...)
+    MsgC(DEBUG_COLOR, PREFIX_DEBUG, unpack(frmt))
+    MsgC('\n')
+    if DEBUG_LEVEL\GetInt() >= 2
+        MsgC(DEBUG_COLOR, debug.traceback())
+        MsgC('\n')
     return frmt
 
 PPM2.TransformNewModelID = (id = 0) ->
