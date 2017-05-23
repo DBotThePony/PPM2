@@ -901,10 +901,16 @@ class PonyFlexController
                 @RestartSequence('xd')
             when ':p'
                 @RestartSequence('tongue')
+            when '>:p'
+                @RestartSequence('angry_tongue')
             when ':р'
                 @RestartSequence('tongue')
             when ':Р'
                 @RestartSequence('tongue')
+            when '>:р'
+                @RestartSequence('angry_tongue')
+            when '>:Р'
+                @RestartSequence('angry_tongue')
             when ':c'
                 @RestartSequence('sad')
             when ':('
@@ -921,9 +927,17 @@ class PonyFlexController
                 @RestartSequence('sorry')
             when 'oops'
                 @RestartSequence('sad')
+            when 'okay mate'
+                @RestartSequence('wink_left')
+            when 'okay, mate'
+                @RestartSequence('wink_left')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
                     @RestartSequence('greeny')
+                elseif string.find(text, '^pff+')
+                    @RestartSequence('pffff')
+                elseif string.find(text, '^blah blah')
+                    @RestartSequence('blahblah')
                 else
                     @RestartSequence('talk')
     PlayerStartVoice: (ply = NULL) =>
