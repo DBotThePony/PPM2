@@ -57,7 +57,7 @@ class DefaultBodygroupController
         @@NEXT_OBJ_ID += 1
         @SocksModelUpdateCooldown = 0
         @SocksModelUpdateCount = 0
-    
+
     UpdateCooldowns: =>
         if CLIENT
             @SocksModelUpdateCooldown = 0
@@ -66,7 +66,7 @@ class DefaultBodygroupController
         if @SocksModelUpdateCooldown < rTime
             @SocksModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @SocksModelUpdateCount = 0
-    
+
     __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
     IsValid: => @isValid
     GetData: => @controller
@@ -81,15 +81,15 @@ class DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @socksModel if IsValid(@socksModel)
-        @UpdateCooldowns()
-        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @SocksModelUpdateCount += 1
-
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
                 @socksModel = ent
                 @GetData()\SetSocksModel(@socksModel)
                 return ent
+
+        @UpdateCooldowns()
+        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @SocksModelUpdateCount += 1
 
         model = 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
 
@@ -107,7 +107,7 @@ class DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         if SERVER
             timer.Simple .5, ->
                 return unless @isValid
@@ -116,7 +116,7 @@ class DefaultBodygroupController
                 @ent\SetNWEntity('PPM2.SocksModel', @socksModel) if IsValid(@ent)
         else
             @GetData()\SetSocksModel(@socksModel)
-        
+
         return @socksModel
     CreateSocksModelIfNotExists: =>
         return NULL unless @isValid
@@ -126,7 +126,7 @@ class DefaultBodygroupController
         @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         @GetData()\SetSocksModel(@socksModel)
         return @socksModel
-    
+
     MergeModels: (targetEnt = NULL) =>
         return unless @isValid
         return unless IsValid(targetEnt)
@@ -134,7 +134,7 @@ class DefaultBodygroupController
         if IsValid(socks)
             socks\SetParent(targetEnt)
             socks\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
-    
+
     GetSocks: => @socksModel or NULL
 
     ApplyRace: =>
@@ -169,12 +169,12 @@ class DefaultBodygroupController
         return unless @isValid
         @ResetBodygroups()
         @SlowUpdate()
-    
+
     Remove: =>
         @socksModel\Remove() if IsValid(@socksModel)
         @ResetBodygroups()
         @isValid = false
-    
+
     @TAIL_BONE1 = 38
     @TAIL_BONE2 = 39
     @TAIL_BONE3 = 40
@@ -243,7 +243,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @LowerManeModelUpdateCount = 0
         @TailModelUpdateCooldown = 0
         @TailModelUpdateCount = 0
-    
+
     UpdateCooldowns: =>
         super()
         if CLIENT
@@ -252,7 +252,7 @@ class NewBodygroupController extends DefaultBodygroupController
             @LowerManeModelUpdateCooldown = 0
             @LowerManeModelUpdateCount = 0
             @TailModelUpdateCooldown = 0
-            @TailModelUpdateCount = 0 
+            @TailModelUpdateCount = 0
         rTime = RealTime()
         if @UpperManeModelUpdateCooldown < rTime
             @UpperManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
@@ -268,15 +268,15 @@ class NewBodygroupController extends DefaultBodygroupController
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelUP if IsValid(@maneModelUP)
-        @UpdateCooldowns()
-        return NULL if @UpperManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @UpperManeModelUpdateCount += 1
-
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
                 @maneModelUP = ent
                 @GetData()\SetUpperManeModel(@maneModelUP)
                 return ent
+
+        @UpdateCooldowns()
+        return NULL if @UpperManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @UpperManeModelUpdateCount += 1
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -297,7 +297,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         if SERVER
             timer.Simple .5, ->
                 return unless @isValid
@@ -305,22 +305,21 @@ class NewBodygroupController extends DefaultBodygroupController
                 @GetData()\SetUpperManeModel(@maneModelUP)
         else
             @GetData()\SetUpperManeModel(@maneModelUP)
-            
+
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelLower if IsValid(@maneModelLower)
-        @UpdateCooldowns()
-        return NULL if @LowerManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @LowerManeModelUpdateCount += 1
-
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
                 @maneModelLower = ent
-                @GetData()\SetLowerManeModel(@maneModelLower) 
-                @ent\SetNWEntity('PPM2.LowerManeModel', @maneModelLower) if IsValid(@ent) and SERVER
+                @GetData()\SetLowerManeModel(@maneModelLower)
                 return ent
+
+        @UpdateCooldowns()
+        return NULL if @LowerManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @LowerManeModelUpdateCount += 1
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
@@ -341,30 +340,29 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         if SERVER
             timer.Simple .5, ->
                 return unless @isValid
                 return unless IsValid(@maneModelLower)
-                @GetData()\SetLowerManeModel(@maneModelLower) 
+                @GetData()\SetLowerManeModel(@maneModelLower)
         else
-            @GetData()\SetLowerManeModel(@maneModelLower) 
+            @GetData()\SetLowerManeModel(@maneModelLower)
 
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @tailModel if IsValid(@tailModel)
-        @UpdateCooldowns()
-        return NULL if @TailModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @TailModelUpdateCount += 1
-
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
                 @tailModel = ent
                 @GetData()\SetTailModel(@tailModel)
-                @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent) and SERVER
                 return ent
+
+        @UpdateCooldowns()
+        return NULL if @TailModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @TailModelUpdateCount += 1
 
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -385,7 +383,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         if SERVER
             timer.Simple .5, ->
                 return unless @isValid
@@ -394,9 +392,9 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent)
         else
             @GetData()\SetTailModel(@tailModel)
-        
+
         return @tailModel
-    
+
     CreateUpperManeModelIfNotExists: =>
         return NULL unless @isValid
         return NULL if CLIENT and @GetData()\IsGoingToNetwork()
@@ -477,7 +475,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetParent(@ent) if IsValid(@ent)
         @GetData()\SetTailModel(@tailModel)
         return @tailModel
-    
+
     @FLEX_ID_EYELASHES = 16
     @FLEX_ID_MALE = 25
     @FLEX_ID_BAT_PONY_EARS = 28
@@ -492,7 +490,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         super()
-    
+
     SlowUpdate: =>
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
