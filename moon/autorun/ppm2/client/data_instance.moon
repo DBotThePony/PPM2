@@ -437,9 +437,9 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
-        'mounth_color': {
+        'mouth_color': {
             default: -> Color(219, 65, 155)
-            getFunc: 'MounthColor'
+            getFunc: 'MouthColor'
             fix: (arg = Color(219, 65, 155)) ->
                 if type(arg) ~= 'table'
                     return Color(219, 65, 155)

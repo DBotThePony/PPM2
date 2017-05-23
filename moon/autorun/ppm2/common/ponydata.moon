@@ -103,7 +103,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('ClawTeeth',        net.ReadBool, net.WriteBool,              false)
 
     @NetworkVar('TeethColor',       net.ReadColor, net.WriteColor,    Color(255, 255, 255))
-    @NetworkVar('MounthColor',      net.ReadColor, net.WriteColor,    Color(219, 65, 155))
+    @NetworkVar('MouthColor',       net.ReadColor, net.WriteColor,    Color(219, 65, 155))
     @NetworkVar('TongueColor',      net.ReadColor, net.WriteColor,    Color(235, 131, 59))
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
@@ -174,6 +174,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             cls = PPM2.GetRenderController(@modelCached)
             if @renderController and cls == @renderController.__class
                 @renderController.ent = @ent
+                PPM2.DebugPrint('Skipping render controller recreation for ', @ent, ' as part of ', @)
                 return @renderController
             @renderController\Remove() if @renderController
             @renderController = cls(@)
@@ -188,6 +189,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             cls = PPM2.GetPonyWeightController(@modelCached)
             if @weightController and cls == @weightController.__class
                 @weightController.ent = @ent
+                PPM2.DebugPrint('Skipping weight controller recreation for ', @ent, ' as part of ', @)
                 return @weightController
             @weightController\Remove() if @weightController
             @weightController = cls(@)
@@ -201,6 +203,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             cls = PPM2.GetBodygroupController(@modelCached)
             if @bodygroups and cls == @bodygroups.__class
                 @bodygroups.ent = @ent
+                PPM2.DebugPrint('Skipping bodygroup controller recreation for ', @ent, ' as part of ', @)
                 return @bodygroups
             @bodygroups\Remove() if @bodygroups
             @bodygroups = cls(@)

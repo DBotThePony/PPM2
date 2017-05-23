@@ -548,9 +548,9 @@ EditorPages = {
 
             if ADVANCED_MODE\GetBool()
                 @Hr()
-                @Label('Teeth, Tongue and Mounth colors affect only new model')
+                @Label('Teeth, Tongue and Mouth colors affect only new model')
                 @ColorBox('Teeth color', 'TeethColor')
-                @ColorBox('Mounth color', 'MounthColor')
+                @ColorBox('Mouth color', 'MouthColor')
                 @ColorBox('Tongue color', 'TongueColor')
                 @Hr()
                 @CheckBox('Use separated settings for eyes', 'SeparateEyes')
