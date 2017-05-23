@@ -552,9 +552,24 @@ EditorPages = {
                 @ColorBox('Teeth color', 'TeethColor')
                 @ColorBox('Mouth color', 'MouthColor')
                 @ColorBox('Tongue color', 'TongueColor')
+                
+                @Hr()
+                @CheckBox('No flexes on new model', 'NoFlex')
+                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+                flexes = @Spoiler('Flexes controls')
+                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+                flexes\SizeToContents()
+    }
+
+    {
+        'name': 'Eyes'
+        'internal': 'eyes'
+        'func': (sheet) =>
+            @ScrollPanel()
+            if ADVANCED_MODE\GetBool()
                 @Hr()
                 @CheckBox('Use separated settings for eyes', 'SeparateEyes')
-            
             eyes = {''}
             eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
             for publicName in *eyes
@@ -580,15 +595,6 @@ EditorPages = {
                 @ColorBox("#{prefix}Eye line 2", "EyeIrisLine2#{publicName}")
                 @ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
                 @ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
-
-            if ADVANCED_MODE\GetBool()
-                @Hr()
-                @CheckBox('No flexes on new model', 'NoFlex')
-                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-                flexes = @Spoiler('Flexes controls')
-                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-                flexes\SizeToContents()
     }
 
     {
