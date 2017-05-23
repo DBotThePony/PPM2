@@ -254,13 +254,13 @@ class NewBodygroupController extends DefaultBodygroupController
             @TailModelUpdateCooldown = 0
             @TailModelUpdateCount = 0 
         rTime = RealTime()
-        if @UpperManeModelUpdateCooldown > rTime
+        if @UpperManeModelUpdateCooldown < rTime
             @UpperManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @UpperManeModelUpdateCount = 0
-        if @LowerManeModelUpdateCooldown > rTime
+        if @LowerManeModelUpdateCooldown < rTime
             @LowerManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @LowerManeModelUpdateCount = 0
-        if @TailModelUpdateCooldown > rTime
+        if @TailModelUpdateCooldown < rTime
             @TailModelUpdateCooldown = rTime + @@COOLDOWN_TIME
             @TailModelUpdateCount = 0
 
