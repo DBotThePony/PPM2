@@ -337,11 +337,10 @@ class PonyFlexController
                     @grinStrength = math.random(15, 40) / 100
                     @angryStrength = math.random(30, 80) / 100
                     @scrunchStrength = math.random(50, 100) / 100
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, @frownStrength)
-                @SetModifierWeight(2, @grinStrength)
-                @SetModifierWeight(3, @angryStrength)
-                @SetModifierWeight(4, @scrunchStrength)
+                    @SetModifierWeight(1, @frownStrength)
+                    @SetModifierWeight(2, @grinStrength)
+                    @SetModifierWeight(3, @angryStrength)
+                    @SetModifierWeight(4, @scrunchStrength)
         }
 
         {
@@ -500,6 +499,44 @@ class PonyFlexController
             'func': (delta, timeOfAnim) =>
                 @SetModifierWeight(1, .1)
                 @SetModifierWeight(2, 1)
+        }
+
+        {
+            'name': 'angry_tongue'
+            'autostart': false
+            'repeat': false
+            'time': 6
+            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out'}
+            'reset': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, math.random(40, 100) / 100)
+                @SetModifierWeight(2, math.random(15, 40) / 100)
+                @SetModifierWeight(3, math.random(30, 80) / 100)
+                @SetModifierWeight(4, math.random(50, 100) / 100)
+                @SetModifierWeight(5, math.random(10, 15) / 100)
+                @SetModifierWeight(6, math.random(80, 100) / 100)
+        }
+
+        {
+            'name': 'pffff'
+            'autostart': false
+            'repeat': false
+            'time': 6
+            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out', 'Tongue_Down', 'Tongue_Up'}
+            'reset': =>
+                @SetModifierWeight(1, math.random(40, 100) / 100)
+                @SetModifierWeight(2, math.random(15, 40) / 100)
+                @SetModifierWeight(3, math.random(30, 80) / 100)
+                @SetModifierWeight(4, math.random(50, 100) / 100)
+                @SetModifierWeight(5, math.random(10, 15) / 100)
+                @SetModifierWeight(6, math.random(80, 100) / 100)
+            'func': (delta, timeOfAnim) =>
+                val = math.sin(RealTime() * 8) * .6
+                if val > 0
+                    @SetModifierWeight(7, val)
+                    @SetModifierWeight(8, 0)
+                else
+                    @SetModifierWeight(7, 0)
+                    @SetModifierWeight(8, -val)
         }
 
         {
@@ -909,6 +946,9 @@ class PonyFlexController
         @RestartSequence('anger')
     PPM2_EmoteAnimation: (ply = NULL, emote = '', time) =>
         return if ply ~= @ent
+        for {:sequence} in *PPM2.AVALIABLE_EMOTES
+            continue if sequence == emote
+            @EndSequence(sequence)
         @RestartSequence(emote, time)
 
     RemoveHooks: =>

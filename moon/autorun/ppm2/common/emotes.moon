@@ -41,6 +41,18 @@ PPM2.AVALIABLE_EMOTES = {
     }
 
     {
+        'name': '>:P'
+        'sequence': 'angry_tongue'
+        'time': 7
+    }
+
+    {
+        'name': 'Pffff!'
+        'sequence': 'pffff'
+        'time': 4
+    }
+
+    {
         'name': ':3'
         'sequence': 'cat'
         'time': 10
