@@ -422,6 +422,48 @@ class PonyDataInstance
             min: PPM2.MIN_SUIT
             max: PPM2.MAX_SUIT
         }
+
+        'teeth_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'TeethColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'mounth_color': {
+            default: -> Color(219, 65, 155)
+            getFunc: 'MounthColor'
+            fix: (arg = Color(219, 65, 155)) ->
+                if type(arg) ~= 'table'
+                    return Color(219, 65, 155)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(219, 65, 155)
+        }
+
+        'tongue_color': {
+            default: -> Color(235, 131, 59)
+            getFunc: 'TongueColor'
+            fix: (arg = Color(235, 131, 59)) ->
+                if type(arg) ~= 'table'
+                    return Color(235, 131, 59)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(235, 131, 59)
+        }
     }
 
     for {internal, publicName} in *{{'left', 'Left'}, {'right', 'Right'}}
