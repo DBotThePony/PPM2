@@ -40,6 +40,40 @@ net.Receive 'PPM2.PlayEmote', ->
 PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
 PPM2.EmotesPanel\Remove() if IsValid(PPM2.EmotesPanel)
 
+CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
+    args[1] = args[1] or ''
+    emoteID = tonumber(args[1])
+
+    if emoteID
+        if not PPM2.AVALIABLE_EMOTES[emoteID]
+            PPM2.Message('No such emotion with ID: ', emoteID)
+            return
+        net.Start('PPM2.PlayEmote')
+        net.WriteUInt(emoteID, 8)
+        net.SendToServer()
+        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time)
+    else
+        emoteID = args[1]\lower()
+        if not PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID]
+            PPM2.Message('No such emotion with ID: ', emoteID)
+            return
+        net.Start('PPM2.PlayEmote')
+        net.WriteUInt(PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].id, 8)
+        net.SendToServer()
+        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), emoteID, PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].time)
+
+CONSOLE_DEF_LIST = ['ppm2_emote "' .. sequence .. '"' for {:sequence} in *PPM2.AVALIABLE_EMOTES]
+CONSOLE_EMOTES_AUTOCOMPLETE = (cmd = '', args = '') ->
+    args = args\Trim()
+    return CONSOLE_DEF_LIST if args == ''
+    output = {}
+    for {:sequence} in *PPM2.AVALIABLE_EMOTES
+        if string.find(sequence, '^' .. args)
+            table.insert(output, 'ppm2_emote "' .. sequence .. '"')
+    return output
+
+concommand.Add 'ppm2_emote', CONSOLE_EMOTES_COMMAND, CONSOLE_EMOTES_AUTOCOMPLETE
+
 BUTTON_DRAW_FUNC = (w = 0, h = 0) =>
     @hoverDelta = math.Clamp(@hoverDelta + (@IsHovered() and FrameTime() or -FrameTime()) * 5, 0, 1)
     col = @hoverDelta * 150

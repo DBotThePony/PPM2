@@ -85,3 +85,6 @@ PPM2.AVALIABLE_EMOTES = {
 
 for i, data in pairs PPM2.AVALIABLE_EMOTES
     data.id = i
+
+PPM2.AVALIABLE_EMOTES_BY_NAME = {data.name, data for data in *PPM2.AVALIABLE_EMOTES}
+PPM2.AVALIABLE_EMOTES_BY_SEQUENCE = {data.sequence, data for data in *PPM2.AVALIABLE_EMOTES}
