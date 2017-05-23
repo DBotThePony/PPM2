@@ -15,6 +15,77 @@
 -- limitations under the License.
 --
 
+PREFIX = '[PPM2] '
+PREFIX_COLOR = Color(95, 188, 179)
+DEFAULT_TEXT_COLOR = Color(200, 200, 200)
+NUMBER_COLOR = Color(245, 199, 64)
+STEAMID_COLOR = Color(255, 255, 255)
+ENTITY_COLOR = Color(180, 232, 180)
+NPC_COLOR = Color(180, 213, 232)
+VEHICLE_COLOR = Color(192, 180, 232)
+FUNCTION_COLOR = Color(62, 106, 255)
+TABLE_COLOR = Color(107, 200, 224)
+URL_COLOR = Color(174, 124, 192)
+
+PPM2.Format = (...) ->
+	previousColor = DEFAULT_TEXT_COLOR
+	output = {previousColor}
+	
+	for value in *{...}
+		switch type(value)
+			when 'table'
+				if value.r and value.g and value.b and value.a
+					table.insert(output, value)
+					previousColor = value
+                else
+                    table.insert(output, TABLE_COLOR)
+                    table.insert(output, tostring(value))
+                    table.insert(output, previousColor)
+			when 'Entity'
+				table.insert(output, ENTITY_COLOR)
+				table.insert(output, tostring(value))
+				table.insert(output, previousColor)
+			when 'string'
+                if value\find('^https?://')
+                    table.insert(output, URL_COLOR)
+                    table.insert(output, value)
+                    table.insert(output, previousColor)
+                else
+				    table.insert(output, value)
+			when 'number'
+				table.insert(output, NUMBER_COLOR)
+				table.insert(output, tostring(value))
+				table.insert(output, previousColor)
+			when 'Player'
+				tm = value\Team()
+				table.insert(output, team.GetColor(tm))
+				table.insert(output, value\Nick())
+				table.insert(output, " (#{value\SteamName()})") if value.SteamName
+				table.insert(output, STEAMID_COLOR)
+				table.insert(output, "<#{value\SteamID()}>")
+				table.insert(output, previousColor)
+			when 'NPC'
+				table.insert(output, NPC_COLOR)
+				table.insert(output, "[NPC:#{value\GetClass()}]")
+				table.insert(output, previousColor)
+			when 'Vehicle'
+				table.insert(output, VEHICLE_COLOR)
+				table.insert(output, "[Vehicle:#{value\GetClass()}|#{value\GetModel()}]")
+				table.insert(output, previousColor)
+			when 'function'
+				table.insert(output, FUNCTION_COLOR)
+				table.insert(output, tostring(value))
+				table.insert(output, previousColor)
+			else
+				table.insert(output, tostring(value))
+	return output
+
+PPM2.Message = (...) ->
+    frmt = PPM2.Format(...)
+    MsgC(PREFIX_COLOR, PREFIX, unpack(frmt))
+    MsgC('\n')
+    return frmt
+
 PPM2.TransformNewModelID = (id = 0) ->
     bgID = id % 17
     maneModelID = math.floor(id / 16 - .01) + 1

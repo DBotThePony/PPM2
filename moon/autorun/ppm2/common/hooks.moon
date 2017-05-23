@@ -27,8 +27,8 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
 
 do
     catchError = (err) ->
-        print '[PPM2] Slow Update Error: ', err
-        print debug.traceback()
+        PPM2.Message 'Slow Update Error: ', err
+        PPM2.Message debug.traceback()
     timer.Create 'PPM2.SlowUpdate', 5, 0, ->
         for ply in *player.GetAll()
             data = ply\GetPonyData()

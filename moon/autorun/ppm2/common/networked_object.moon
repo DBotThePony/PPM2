@@ -167,7 +167,7 @@ class NetworkedObject
 			if ply[@NW_CooldownTimerCount] >= 3
 				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
 				if ply[@NW_CooldownMessage] < RealTime()
-					print "[PPM2] Player #{ply\Nick()}<#{ply\SteamID()}> is creating #{@__name} too quickly!"
+					PPM2.Message 'Player ', ply, " is creating #{@__name} too quickly!"
 					ply[@NW_CooldownMessage] = RealTime() + 1
 				return
 

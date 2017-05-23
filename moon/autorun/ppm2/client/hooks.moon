@@ -117,7 +117,7 @@ net.Receive 'PPM2.PlayerRespawn', UpdateWeight
 concommand.Add 'ppm2_require', ->
     net.Start('PPM2.Require')
     net.SendToServer()
-    print '[PPM2] Requesting pony data...'
+    PPM2.Message 'Requesting pony data...'
 
 concommand.Add 'ppm2_reload', ->
     return if lastDataSend > RealTime()
@@ -126,7 +126,7 @@ concommand.Add 'ppm2_reload', ->
     newData = instance\CreateNetworkObject()
     newData\Create()
     instance\SetNetworkData(newData)
-    print '[PPM2] Sending pony data to server...'
+    PPM2.Message 'Sending pony data to server...'
 
 hook.Add 'KeyPress', 'PPM2.RequireData', ->
     hook.Remove 'KeyPress', 'PPM2.RequireData'

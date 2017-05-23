@@ -109,8 +109,8 @@ do
             data\NetworkTo(ply)
     
     errorTrack = (err) ->
-        print '[PPM2] Networking Error: ', err
-        print debug.traceback()
+        PPM2.Message 'Networking Error: ', err
+        PPM2.Message debug.traceback()
 
     timer.Create 'PPM2.Require', 1, 0, -> xpcall(safeSendFunction, errorTrack)
     net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
