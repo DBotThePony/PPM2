@@ -810,6 +810,10 @@ EditorPages = {
             @URLLabel('New models was created by Durpy', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
             @URLLabel('CPPM Models (including pony hands) belong to UnkN', 'http://steamcommunity.com/profiles/76561198084938735')\SetFont('PPM2.AboutLabels')
             @URLLabel('Old models belong to Scentus and others', 'https://github.com/ChristinaTech/PonyPlayerModels')\SetFont('PPM2.AboutLabels')
+            @URLLabel('Found a bug? Report here!', 'https://git.dbot.serealia.ca/Ponyscape-open/PPM2/issues')\SetFont('PPM2.AboutLabels')
+            @URLLabel("Bugs don't like to be forgotten", 'https://dbot.serealia.ca/sharex/2017/05/07465b74f6ee60dbba3e0253114db552.jpg')\SetFont('PPM2.AboutLabels')
+            @URLLabel('You can find sources here', 'https://git.dbot.serealia.ca/Ponyscape-open/PPM2')\SetFont('PPM2.AboutLabels')
+            @URLLabel('Or on GitHub mirror', 'https://github.com/roboderpy/PPM2')\SetFont('PPM2.AboutLabels')
             @Label('Special thanks to everypony who criticized,\nhelped and tested PPM/2!')\SetFont('PPM2.AboutLabels')
     }
 }
