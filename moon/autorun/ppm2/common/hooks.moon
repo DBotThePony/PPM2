@@ -31,6 +31,7 @@ do
         PPM2.Message debug.traceback()
     timer.Create 'PPM2.SlowUpdate', 5, 0, ->
         for ply in *player.GetAll()
+            continue if not ply\Alive()
             data = ply\GetPonyData()
             continue if not data
             xpcall(data.SlowUpdate, catchError, data) if data.SlowUpdate
