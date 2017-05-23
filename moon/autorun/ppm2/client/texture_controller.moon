@@ -566,6 +566,7 @@ class PonyTextureController
             
             suitType = @GetData()\GetBodysuit()
             if PPM2.AvaliablePonySuitsMaterials[suitType]
+                surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
                 surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
