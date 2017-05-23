@@ -91,6 +91,9 @@ PPM2.AVALIABLE_EMOTES = {
 
 for i, data in pairs PPM2.AVALIABLE_EMOTES
     data.id = i
+    data.file = "materials/gui/ppm2/emotes/#{data.sequence}.png"
+    data.filecrop = "gui/ppm2/emotes/#{data.sequence}.png"
+    data.fexists = file.Exists(data.file, 'GAME') if CLIENT
 
 PPM2.AVALIABLE_EMOTES_BY_NAME = {data.name, data for data in *PPM2.AVALIABLE_EMOTES}
 PPM2.AVALIABLE_EMOTES_BY_SEQUENCE = {data.sequence, data for data in *PPM2.AVALIABLE_EMOTES}

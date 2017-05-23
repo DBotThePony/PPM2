@@ -89,6 +89,17 @@ BUTTON_CLICK_FUNC = =>
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
+IMAGE_PANEL_THINK = =>
+    if @IsHovered()
+        if not @oldHover
+            @oldHover = true
+            @hoverPnl\SetVisible(true)
+            x, y = @LocalToScreen(0, 0)
+            @hoverPnl\SetPos(x - 256, y - 224)
+    else
+        if @oldHover
+            @oldHover = false
+            @hoverPnl\SetVisible(false)
 CreatePanel = (parent) ->
     self = vgui.Create('DPanel', parent)
     @SetSize(200, 300)
@@ -101,8 +112,9 @@ CreatePanel = (parent) ->
         \SetSize(200, 300)
         .Paint = ->
         \SetMouseInputEnabled(true)
-    @buttons = for {:name, :id, :sequence, :time} in *PPM2.AVALIABLE_EMOTES
-        with vgui.Create('DButton', @scroll)
+    @buttons = for {:name, :id, :sequence, :time, :fexists, :filecrop} in *PPM2.AVALIABLE_EMOTES
+        btn = vgui.Create('DButton', @scroll)
+        with btn
             \SetTextColor(BUTTON_TEXT_COLOR)
             .Paint = BUTTON_DRAW_FUNC
             .id = id
@@ -110,10 +122,26 @@ CreatePanel = (parent) ->
             .sequence = sequence
             .hoverDelta = 0
             .DoClick = BUTTON_CLICK_FUNC
-            \SetSize(200, 30)
+            \SetSize(200, 32)
             \SetText(name)
             \SetFont('HudHintTextLarge')
             \Dock(TOP)
+            if fexists
+                with vgui.Create('DImage', btn)
+                    \Dock(LEFT)
+                    \SetSize(32, 32)
+                    \SetImage(filecrop)
+                    \SetMouseInputEnabled(true)
+                    .hoverPnl = vgui.Create('DImage')
+                    .Think = IMAGE_PANEL_THINK
+                    .oldHover = false
+                    with .hoverPnl
+                        \SetMouseInputEnabled(false)
+                        \SetVisible(false)
+                        \SetImage(filecrop)
+                        \SetSize(256, 256)
+                    .OnRemove = -> .hoverPnl\Remove() if IsValid(.hoverPnl)
+        btn
     @scroll\AddItem(btn) for btn in *@buttons
     @SetVisible(false)
     @SetMouseInputEnabled(false)
