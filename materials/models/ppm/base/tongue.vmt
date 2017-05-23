@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/VN_mlp/common/tongue"
+	"$basetexture" "models/ppm/base/tongue"
 
 	"$phong" "1"
 	"$phongexponent" "20"
