@@ -67,22 +67,22 @@ entMeta.IsPonyCached = =>
             return false
 entMeta.HasPonyModel = entMeta.IsPony
 
-include 'autorun/ppm2/sh_networked_object.lua'
-include 'autorun/ppm2/sh_registry.lua'
-include 'autorun/ppm2/sh_hooks.lua'
-include 'autorun/ppm2/sh_bodygroup_controller.lua'
-include 'autorun/ppm2/sh_weight_controller.lua'
-include 'autorun/ppm2/sh_flex_controller.lua'
-include 'autorun/ppm2/sh_ponydata.lua'
+include 'autorun/ppm2/common/networked_object.lua'
+include 'autorun/ppm2/common/registry.lua'
+include 'autorun/ppm2/common/hooks.lua'
+include 'autorun/ppm2/common/bodygroup_controller.lua'
+include 'autorun/ppm2/common/weight_controller.lua'
+include 'autorun/ppm2/common/flex_controller.lua'
+include 'autorun/ppm2/common/ponydata.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
     file.CreateDir('ppm2/backups')
-    include 'autorun/ppm2/cl_data_instance.lua'
-    include 'autorun/ppm2/cl_texture_controller.lua'
-    include 'autorun/ppm2/cl_hooks.lua'
-    include 'autorun/ppm2/cl_render_controller.lua'
-    include 'autorun/ppm2/cl_editor.lua'
+    include 'autorun/ppm2/client/data_instance.lua'
+    include 'autorun/ppm2/client/texture_controller.lua'
+    include 'autorun/ppm2/client/hooks.lua'
+    include 'autorun/ppm2/client/render_controller.lua'
+    include 'autorun/ppm2/client/editor.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel
@@ -97,19 +97,19 @@ else
     util.AddNetworkString('PPM2.AngerAnimation')
     util.AddNetworkString('PPM2.NotifyDisconnect')
 
-    AddCSLuaFile 'autorun/ppm2/sh_networked_object.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_registry.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_ponydata.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_hooks.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_bodygroup_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_weight_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/sh_flex_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_data_instance.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_texture_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_hooks.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_render_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/cl_editor.lua'
-    include 'autorun/ppm2/sv_hooks.lua'
-    include 'autorun/ppm2/sv_fastdl.lua'
+    AddCSLuaFile 'autorun/ppm2/common/networked_object.lua'
+    AddCSLuaFile 'autorun/ppm2/common/registry.lua'
+    AddCSLuaFile 'autorun/ppm2/common/ponydata.lua'
+    AddCSLuaFile 'autorun/ppm2/common/hooks.lua'
+    AddCSLuaFile 'autorun/ppm2/common/bodygroup_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/common/weight_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/common/flex_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/client/data_instance.lua'
+    AddCSLuaFile 'autorun/ppm2/client/texture_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/client/hooks.lua'
+    AddCSLuaFile 'autorun/ppm2/client/render_controller.lua'
+    AddCSLuaFile 'autorun/ppm2/client/editor.lua'
+    include 'autorun/ppm2/server/hooks.lua'
+    include 'autorun/ppm2/server/fastdl.lua'
 
-include 'autorun/ppm2/sh_vll_loader.lua' if VLL
+include 'autorun/ppm2/common/vll_loader.lua' if VLL
