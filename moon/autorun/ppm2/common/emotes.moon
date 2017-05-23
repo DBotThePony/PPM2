@@ -19,19 +19,19 @@ PPM2.AVALIABLE_EMOTES = {
     {
         'name': 'Sad'
         'sequence': 'sad'
-        'time': 10
+        'time': 6
     }
 
     {
         'name': 'Grin'
         'sequence': 'big_grin'
-        'time': 10
+        'time': 6
     }
 
     {
         'name': 'Angry'
         'sequence': 'anger'
-        'time': 10
+        'time': 7
     }
 
     {
@@ -49,7 +49,7 @@ PPM2.AVALIABLE_EMOTES = {
     {
         'name': 'Sorry'
         'sequence': 'sorry'
-        'time': 5
+        'time': 4
     }
 
     {
@@ -61,13 +61,13 @@ PPM2.AVALIABLE_EMOTES = {
     {
         'name': 'Gulp'
         'sequence': 'gulp'
-        'time': 2
+        'time': 1
     }
 
     {
         'name': 'Blah blah blah'
         'sequence': 'blahblah'
-        'time': 4
+        'time': 3
     }
 }
 

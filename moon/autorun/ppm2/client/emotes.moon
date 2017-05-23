@@ -56,16 +56,17 @@ BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
 hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
-        PPM2.EmotesPanel = vgui.Create('EditablePanel')
+        PPM2.EmotesPanel = vgui.Create('DPanel')
         self = PPM2.EmotesPanel
         @SetSize(200, 300)
-        @SetPos(ScrW() - 200, ScrH() / 2 - 150)
+        @SetPos(ScrW() - 500, ScrH() - 300)
         @Paint = (w = 0, h = 0) =>
             surface.SetDrawColor(0, 0, 0, 150)
             surface.DrawRect(0, 0, w, h)
         @scroll = vgui.Create('DScrollPanel', @)
         with @scroll
             \Dock(FILL)
+            \SetSize(200, 300)
             .Paint = ->
             \SetMouseInputEnabled(true)
         @buttons = for {:name, :id, :sequence, :time} in *PPM2.AVALIABLE_EMOTES
@@ -88,6 +89,7 @@ hook.Add 'StartChat', 'PPM2.Emotes', ->
     if IsValid(PPM2.EmotesPanel) and LocalPlayer()\IsPony()
         PPM2.EmotesPanel\SetVisible(true)
         PPM2.EmotesPanel\SetMouseInputEnabled(true)
+        PPM2.EmotesPanel\RequestFocus()
 hook.Add 'FinishChat', 'PPM2.Emotes', ->
     if IsValid(PPM2.EmotesPanel)
         PPM2.EmotesPanel\KillFocus()
