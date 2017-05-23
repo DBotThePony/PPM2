@@ -93,7 +93,6 @@ class DefaultBodygroupController
 
         model = 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
 
-        return if CLIENT and @GetData()\IsGoingToNetwork()
         @socksModel = ents.Create('prop_dynamic') if SERVER
         @socksModel = ClientsideModel(model) if CLIENT
         with @socksModel
@@ -282,7 +281,6 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
 
-        return if CLIENT and @GetData()\IsGoingToNetwork()
         @maneModelUP = ents.Create('prop_dynamic') if SERVER
         @maneModelUP = ClientsideModel(model) if CLIENT
         with @maneModelUP
@@ -325,7 +323,6 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
 
-        return if CLIENT and @GetData()\IsGoingToNetwork()
         @maneModelLower = ents.Create('prop_dynamic') if SERVER
         @maneModelLower = ClientsideModel(model) if CLIENT
         with @maneModelLower
@@ -368,7 +365,6 @@ class NewBodygroupController extends DefaultBodygroupController
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
 
-        return if CLIENT and @GetData()\IsGoingToNetwork()
         @tailModel = ents.Create('prop_dynamic') if SERVER
         @tailModel = ClientsideModel(model) if CLIENT
         with @tailModel
