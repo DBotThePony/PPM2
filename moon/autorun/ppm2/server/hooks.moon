@@ -135,14 +135,19 @@ hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
 
 BOTS_ARE_PONIES = CreateConVar('ppm2_bots', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Whatever spawn bots as ponies')
 
+hook.Add 'PlayerSetModel', 'PPM2.Bots', =>
+    return if not BOTS_ARE_PONIES\GetBool()
+    return if not @IsBot()
+    @SetModel('models/ppm/player_default_base_new.mdl')
+    return true
+
 hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
     return if not BOTS_ARE_PONIES\GetBool()
     return if not @IsBot()
-    timer.Simple 0.1, ->
+    timer.Simple 1, ->
         return if not IsValid(@)
         @SetViewOffset(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET))
         @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
-        @SetModel('models/ppm/player_default_base_new.mdl')
         if not @GetPonyData()
             data = PPM2.NetworkedPonyData(nil, @)
             PPM2.Randomize(data)
