@@ -316,10 +316,24 @@ PANEL_SETTINGS_BASE = {
         with vgui.Create('DLabel', parent)
             \SetText(text)
             \Dock(TOP)
+            \DockMargin(2, 2, 2, 2)
             \SetTextColor(color_white)
             \SizeToContents()
             w, h = \GetSize()
             \SetSize(w, h + 5)
+            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+    URLLabel: (text = '', url = '', parent = @scroll or @) =>
+        with vgui.Create('DLabel', parent)
+            \SetText(text)
+            \Dock(TOP)
+            \DockMargin(2, 2, 2, 2)
+            \SetTextColor(Color(158, 208, 208))
+            \SizeToContents()
+            \SetCursor('hand')
+            w, h = \GetSize()
+            \SetSize(w, h + 5)
+            \SetMouseInputEnabled(true)
+            .DoClick = -> gui.OpenURL(url) if url ~= ''
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
     Hr: (parent = @scroll or @) =>
         with vgui.Create('EditablePanel', parent)
@@ -491,6 +505,18 @@ BackgroundColors = {
     Color(228, 155, 92)
     Color(228, 92, 110)
 }
+
+surface.CreateFont('PPM2.Title', {
+    font: 'Roboto'
+    size: 72
+    weight: 600
+})
+
+surface.CreateFont('PPM2.AboutLabels', {
+    font: 'Roboto'
+    size: 16
+    weight: 500
+})
 
 EditorPages = {
     {
@@ -770,6 +796,21 @@ EditorPages = {
                 files, dirs = file.Find('ppm/*', 'DATA')
                 list\AddLine(fil\sub(1, #fil - 4)) for fil in *files
             @rebuildFileList()
+    }
+
+    {
+        'name': 'About'
+        'internal': 'about'
+        'func': (sheet) =>
+            title = @Label('PPM/2')
+            title\SetFont('PPM2.Title')
+            title\SizeToContents()
+            @URLLabel('PPM/2 is a Ponyscape project', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
+            @URLLabel('PPM/2 was created and being developed by DBot', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
+            @URLLabel('New models was created by Durpy', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
+            @URLLabel('CPPM Models (including pony hands) belong to UnkN', 'http://steamcommunity.com/profiles/76561198084938735')\SetFont('PPM2.AboutLabels')
+            @URLLabel('Old models belong to Scentus and others', 'https://github.com/ChristinaTech/PonyPlayerModels')\SetFont('PPM2.AboutLabels')
+            @Label('Special thanks to everypony who criticized,\nhelped and tested PPM/2!')\SetFont('PPM2.AboutLabels')
     }
 }
 
