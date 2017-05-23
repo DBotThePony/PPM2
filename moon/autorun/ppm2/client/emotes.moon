@@ -153,6 +153,14 @@ hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
     PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
     PPM2.EmotesPanelContext\SetVisible(true)
     PPM2.EmotesPanelContext\SetMouseInputEnabled(true)
+    timer.Create 'PPM2.ContextMenuEmotesUpdate', 1, 0, ->
+        if not IsValid(PPM2.EmotesPanelContext)
+            timer.Remove 'PPM2.ContextMenuEmotesUpdate'
+            return
+        return if not IsValid(LocalPlayer())
+        status = LocalPlayer()\IsPony()
+        PPM2.EmotesPanelContext\SetVisible(status)
+        PPM2.EmotesPanelContext\SetMouseInputEnabled(status)
 
 hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
