@@ -16,6 +16,7 @@
 --
 
 export PPM2
+PPM2 = PPM2 or {}
 
 player_manager.AddValidModel('pony', 'models/ppm/player_default_base_new.mdl')
 list.Set('PlayerOptionsModel', 'pony', 'models/ppm/player_default_base_new.mdl')
@@ -34,55 +35,28 @@ list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_n
 
 player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
 
-PPM2 = PPM2 or {}
+include_ = include
+AddCSLuaFile_ = AddCSLuaFile
+include = (f) -> include_("autorun/ppm2/#{f}")
+AddCSLuaFile = (f) -> AddCSLuaFile_("autorun/ppm2/#{f}")
 
-entMeta = FindMetaTable('Entity')
-entMeta.IsPony = =>
-    switch @GetModel()
-        when 'models/ppm/player_default_base.mdl'
-            return true
-        when 'models/ppm/player_default_base_new.mdl'
-            return true
-        when 'models/ppm/player_default_base_nj.mdl'
-            return true
-        when 'models/cppm/player_default_base.mdl'
-            return true
-        when 'models/cppm/player_default_base_nj.mdl'
-            return true
-        else
-            return false
-entMeta.IsPonyCached = =>
-    switch @__ppm2_lastmodel
-        when 'models/ppm/player_default_base.mdl'
-            return true
-        when 'models/ppm/player_default_base_new.mdl'
-            return true
-        when 'models/ppm/player_default_base_nj.mdl'
-            return true
-        when 'models/cppm/player_default_base.mdl'
-            return true
-        when 'models/cppm/player_default_base_nj.mdl'
-            return true
-        else
-            return false
-entMeta.HasPonyModel = entMeta.IsPony
-
-include 'autorun/ppm2/common/networked_object.lua'
-include 'autorun/ppm2/common/registry.lua'
-include 'autorun/ppm2/common/hooks.lua'
-include 'autorun/ppm2/common/bodygroup_controller.lua'
-include 'autorun/ppm2/common/weight_controller.lua'
-include 'autorun/ppm2/common/flex_controller.lua'
-include 'autorun/ppm2/common/ponydata.lua'
+include 'common/networked_object.lua'
+include 'common/registry.lua'
+include 'common/functions.lua'
+include 'common/hooks.lua'
+include 'common/bodygroup_controller.lua'
+include 'common/weight_controller.lua'
+include 'common/flex_controller.lua'
+include 'common/ponydata.lua'
 
 if CLIENT
     file.CreateDir('ppm2')
     file.CreateDir('ppm2/backups')
-    include 'autorun/ppm2/client/data_instance.lua'
-    include 'autorun/ppm2/client/texture_controller.lua'
-    include 'autorun/ppm2/client/hooks.lua'
-    include 'autorun/ppm2/client/render_controller.lua'
-    include 'autorun/ppm2/client/editor.lua'
+    include 'client/data_instance.lua'
+    include 'client/texture_controller.lua'
+    include 'client/hooks.lua'
+    include 'client/render_controller.lua'
+    include 'client/editor.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel
@@ -97,19 +71,20 @@ else
     util.AddNetworkString('PPM2.AngerAnimation')
     util.AddNetworkString('PPM2.NotifyDisconnect')
 
-    AddCSLuaFile 'autorun/ppm2/common/networked_object.lua'
-    AddCSLuaFile 'autorun/ppm2/common/registry.lua'
-    AddCSLuaFile 'autorun/ppm2/common/ponydata.lua'
-    AddCSLuaFile 'autorun/ppm2/common/hooks.lua'
-    AddCSLuaFile 'autorun/ppm2/common/bodygroup_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/common/weight_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/common/flex_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/client/data_instance.lua'
-    AddCSLuaFile 'autorun/ppm2/client/texture_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/client/hooks.lua'
-    AddCSLuaFile 'autorun/ppm2/client/render_controller.lua'
-    AddCSLuaFile 'autorun/ppm2/client/editor.lua'
-    include 'autorun/ppm2/server/hooks.lua'
-    include 'autorun/ppm2/server/fastdl.lua'
+    AddCSLuaFile 'common/networked_object.lua'
+    AddCSLuaFile 'common/registry.lua'
+    AddCSLuaFile 'common/ponydata.lua'
+    AddCSLuaFile 'common/hooks.lua'
+    AddCSLuaFile 'common/bodygroup_controller.lua'
+    AddCSLuaFile 'common/weight_controller.lua'
+    AddCSLuaFile 'common/flex_controller.lua'
+    AddCSLuaFile 'common/functions.lua'
+    AddCSLuaFile 'client/data_instance.lua'
+    AddCSLuaFile 'client/texture_controller.lua'
+    AddCSLuaFile 'client/hooks.lua'
+    AddCSLuaFile 'client/render_controller.lua'
+    AddCSLuaFile 'client/editor.lua'
+    include 'server/hooks.lua'
+    include 'server/fastdl.lua'
 
-include 'autorun/ppm2/common/vll_loader.lua' if VLL
+include 'common/vll_loader.lua' if VLL
