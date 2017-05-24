@@ -766,8 +766,7 @@ EditorPages = {
             list = vgui.Create('DListView', @)
             list\Dock(FILL)
             list\SetMultiSelect(false)
-            list.DoDoubleClick = (pnl, rowID, line) ->
-                fil = line\GetColumnText(1)
+            openFile = (fil) ->
                 confirm = ->
                     @frame.data\SetFilename(fil)
                     @frame.data\ReadFromDisk(true)
@@ -786,6 +785,26 @@ EditorPages = {
                     )
                 else
                     confirm()
+            list.DoDoubleClick = (pnl, rowID, line) ->
+                fil = line\GetColumnText(1)
+                openFile(fil)
+            list.OnRowRightClick = (pnl, rowID, line) ->
+                fil = line\GetColumnText(1)
+                menu = DermaMenu()
+                menu\AddOption('Open', -> openFile(fil))\SetIcon('icon16/accept.png')
+                menu\AddOption('Delete', ->
+                    confirm = ->
+                        file.Delete("ppm2/#{fil}.txt")
+                        @rebuildFileList()
+                    Derma_Query(
+                        "Do you really want to delete #{fil}?\nIt will be gone forever!\n(a long time!)",
+                        "Delete #{fil}?",
+                        'Yas!',
+                        confirm,
+                        'Noh!'
+                    )
+                )\SetIcon('icon16/cross.png')
+                menu\Open()
             list\AddColumn('Filename')
             @rebuildFileList = ->
                 list\Clear()
