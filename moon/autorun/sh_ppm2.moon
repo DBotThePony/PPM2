@@ -21,14 +21,17 @@ PPM2 = PPM2 or {}
 player_manager.AddValidModel('pony', 'models/ppm/player_default_base_new.mdl')
 list.Set('PlayerOptionsModel', 'pony', 'models/ppm/player_default_base_new.mdl')
 
+player_manager.AddValidModel('ponynj', 'models/ppm/player_default_base_new.mdl')
+list.Set('PlayerOptionsModel', 'ponynj', 'models/ppm/player_default_base_new.mdl')
+
+player_manager.AddValidModel('ponynj_old', 'models/ppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ponynj_old', 'models/ppm/player_default_base_nj.mdl')
+
 player_manager.AddValidModel('pony_old', 'models/ppm/player_default_base.mdl')
 list.Set('PlayerOptionsModel', 'pony_old', 'models/ppm/player_default_base.mdl')
 
 player_manager.AddValidModel('pony_cppm', 'models/cppm/player_default_base.mdl')
 list.Set('PlayerOptionsModel', 'pony_cppm', 'models/cppm/player_default_base.mdl')
-
-player_manager.AddValidModel('ponynj', 'models/ppm/player_default_base_nj.mdl')
-list.Set('PlayerOptionsModel', 'ponynj', 'models/ppm/player_default_base_nj.mdl')
 
 player_manager.AddValidModel('ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
