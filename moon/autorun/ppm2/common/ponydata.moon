@@ -174,6 +174,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @deathRagdollMerged = false
             @GetWeightController()\UpdateWeight() if @GetWeightController()
             @GetRenderController()\PlayerRespawn() if @GetRenderController()
+            @GetBodygroupController()\MergeModels(@ent) if IsValid(@ent) and @GetBodygroupController().MergeModels
     PlayerDeath: =>
         if CLIENT
             @DoRagdollMerge()
