@@ -623,6 +623,8 @@ class PonyTextureController
             render.PopRenderTarget()
 
             @["#{prefix}Material"]\SetTexture('$basetexture', rt)
+
+            PPM2.DebugPrint('Compiled body texture for ', @ent, ' as part of ', @)
         
         data = @GetData()
         validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
@@ -699,6 +701,8 @@ class PonyTextureController
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
 
+            PPM2.DebugPrint('Compiled Horn texture for ', @ent, ' as part of ', @)
+
         data = @GetData()
         validURLS = for i = 1, 3
             detailURL = data["GetHornURL#{i}"](data)
@@ -746,6 +750,8 @@ class PonyTextureController
         @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
         @SocksMaterial\SetFloat('$alpha', 1)
+
+        PPM2.DebugPrint('Compiled socks texture for ', @ent, ' as part of ', @)
 
         return @SocksMaterial
     CompileWings: =>
@@ -801,6 +807,8 @@ class PonyTextureController
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
+
+            PPM2.DebugPrint('Compiled wings texture for ', @ent, ' as part of ', @)
 
         data = @GetData()
         validURLS = for i = 1, 3
@@ -924,6 +932,8 @@ class PonyTextureController
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
             @HairColor2Material\SetTexture('$basetexture', rt)
+
+            PPM2.DebugPrint('Compiled mane textures for ', @ent, ' as part of ', @)
 
         data = @GetData()
         validURLS = for i = 1, 6
@@ -1049,6 +1059,8 @@ class PonyTextureController
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
             @TailColor2Material\SetTexture('$basetexture', rt)
+
+            PPM2.DebugPrint('Compiled tail textures for ', @ent, ' as part of ', @)
 
         data = @GetData()
         validURLS = for i = 1, 6
@@ -1177,7 +1189,9 @@ class PonyTextureController
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
-    
+
+        PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
+        return @["EyeMaterial#{prefixUpper}"]
     CompileCMark: =>
         return unless @isValid
         textureData = {
@@ -1234,6 +1248,8 @@ class PonyTextureController
 
             @CMarkTexture\SetTexture('$basetexture', rt)
             @CMarkTextureGUI\SetTexture('$basetexture', rt)
+
+            PPM2.DebugPrint('Compiled cutiemark texture for ', @ent, ' as part of ', @)
         else
             @@LoadURL URL, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, material) ->
                 oldW, oldH = ScrW(), ScrH()
@@ -1256,6 +1272,8 @@ class PonyTextureController
 
                 @CMarkTexture\SetTexture('$basetexture', rt)
                 @CMarkTextureGUI\SetTexture('$basetexture', rt)
+
+                PPM2.DebugPrint('Compiled cutiemark texture for ', @ent, ' as part of ', @)
         
         return @CMarkTexture, @CMarkTextureGUI
 
@@ -1435,6 +1453,8 @@ class NewPonyTextureController extends PonyTextureController
             render.PopRenderTarget()
             HairColor2Material\SetTexture('$basetexture', rt)
 
+            PPM2.DebugPrint('Compiled mane textures for ', @ent, ' as part of ', @)
+
         data = @GetData()
         validURLS = for i = 1, 6
             detailURL = data["Get#{prefix}ManeURL#{i}"](data)
@@ -1493,6 +1513,8 @@ class NewPonyTextureController extends PonyTextureController
         @TongueMaterial = CreateMaterial("PPM2.#{@GetID()}.Tongue", 'VertexLitGeneric', textureData)
         @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+        PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
 
         return @TeethMaterial, @MouthMaterial, @TongueMaterial
     
