@@ -187,13 +187,7 @@ class PonyRenderController
     PreDraw: (ent = @ent) =>
         return if not @isValid
         return if @IGNORE_DRAW
-        @GetTextureController()\PreDraw(ent)
-        @flexes\Think() if @flexes
-    PostDraw: (ent = @ent) =>
-        return if not @isValid
-        return if @IGNORE_DRAW
         textures = @GetTextureController()
-        textures\PostDraw(ent)
 
         @IGNORE_DRAW = true
         if @GetData()\IsNetworked()
@@ -214,6 +208,12 @@ class PonyRenderController
             @socksModel\DrawModel()
             textures\PostDrawSocks()
         @IGNORE_DRAW = false
+        textures\PreDraw(ent)
+        @flexes\Think() if @flexes
+    PostDraw: (ent = @ent) =>
+        return if not @isValid
+        return if @IGNORE_DRAW
+        @GetTextureController()\PostDraw(ent)
 
     @ARMS_MATERIAL_INDEX = 0
     PreDrawArms: (ent) =>
@@ -316,7 +316,7 @@ class NewPonyRenderController extends PonyRenderController
             @tailModel\DrawModel()
             textures\PostDrawTail()
 
-    PostDraw: (ent = @ent) =>
+    PreDraw: (ent = @ent) =>
         return if @IGNORE_DRAW
         return if not @isValid
         @IGNORE_DRAW = true
