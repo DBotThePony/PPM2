@@ -51,9 +51,9 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
                     rag\SetNoDraw(true)
                     renderController = data\GetRenderController()
                     if renderController
-                        renderController\PreDraw()
+                        renderController\PreDraw(rag)
                         rag\DrawModel()
-                        renderController\PostDraw()
+                        renderController\PostDraw(rag)
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()

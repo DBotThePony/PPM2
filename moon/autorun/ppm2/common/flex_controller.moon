@@ -141,7 +141,7 @@ class FlexState
 
     AddValue: (val = 0) => @SetValue(@current + val)
     AddRealValue: (val = 0) => @SetRealValue(@target + val)
-    Think: (delta = 0) =>
+    Think: (ent = @ent, delta = 0) =>
         return if not @active
         if @useModifiers
             @target = 0
@@ -151,9 +151,12 @@ class FlexState
             @scale += modif for modif in *@scaleModifiers
             @speed += modif for modif in *@speedModifiers
             @target = math.Clamp(@target, @min, @max) * @scale
-        @ent = @controller.ent
+        if not IsValid(@ent)
+            @ent = @controller.ent
+            ent = @ent
+        
         @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
-        @ent\SetFlexWeight(@flexID, @current)
+        ent\SetFlexWeight(@flexID, @current)
     DataChanges: (state) =>
         return if state\GetKey() ~= @activeID
         @SetIsActive(not state\GetValue())
@@ -992,15 +995,16 @@ class PonyFlexController
         for iHook in *@hooks
             hook.Remove iHook, @hookID
 
-    Think: =>
+    Think: (ent = @ent) =>
         return if DISABLE_FLEXES\GetBool()
         return if not @isValid
         if not IsValid(@ent)
             @ent = @GetData().ent
-        return if not IsValid(@ent) or @ent\IsDormant() or not @ent\Alive()
+            ent = @ent
+        return if not IsValid(ent) or ent\IsDormant()
         delta = RealTime() - @lastThink
         @lastThink = RealTime()
-        state\Think(delta) for state in *@statesIterable
+        state\Think(ent, delta) for state in *@statesIterable
         for seq in *@currentSequencesIterable
             if not seq\IsValid()
                 @EndSequence(seq\GetName(), false)

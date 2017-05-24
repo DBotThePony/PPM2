@@ -209,7 +209,7 @@ class PonyRenderController
             textures\PostDrawSocks()
         @IGNORE_DRAW = false
         textures\PreDraw(ent)
-        @flexes\Think() if @flexes
+        @flexes\Think(ent) if @flexes
     PostDraw: (ent = @ent) =>
         return if not @isValid
         return if @IGNORE_DRAW
