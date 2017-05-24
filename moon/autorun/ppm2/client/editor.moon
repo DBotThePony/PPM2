@@ -837,12 +837,47 @@ EditorModels = {
 }
 
 USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
+PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
 
 if IsValid(PPM2.EditorFrame)
     PPM2.EditorFrame\Remove()
     net.Start('PPM2.EditorStatus')
     net.WriteBool(false)
     net.SendToServer()
+
+STRETCHING_PANEL = {
+    Init: =>
+        @size = PANEL_WIDTH\GetInt()
+        @isize = PANEL_WIDTH\GetInt()
+        @SetSize(8, 0)
+        @SetCursor('sizewe')
+        @SetMouseInputEnabled(true)
+        @hold = false
+        @MINS = 200
+        @MAXS = 600
+        @posx, @posy = 0, 0
+    OnMousePressed: (key = MOUSE_LEFT) =>
+        return if key ~= MOUSE_LEFT
+        @hold = true
+        @posx, @posy = @LocalToScreen(0, 0)
+        @posx += 3
+        @isize = @size
+    OnMouseReleased: (key = MOUSE_LEFT) =>
+        return if key ~= MOUSE_LEFT
+        @hold = false
+        RunConsoleCommand('ppm2_editor_width', @size)
+    Think: =>
+        return if not @hold
+        x, y = gui.MousePos()
+        @size = @isize + x - @posx
+        @target\SetSize(@size, 0) if @size ~= @isize
+    Paint: (w = 0, h = 0) =>
+        surface.SetDrawColor(35, 175, 99)
+        surface.DrawRect(0, 0, w, h)
+}
+
+vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
+
 PPM2.OpenEditor = ->
     if IsValid(PPM2.EditorFrame)
         PPM2.EditorFrame\SetVisible(true)
@@ -870,7 +905,12 @@ PPM2.OpenEditor = ->
 
     @menus = vgui.Create('DPropertySheet', @)
     @menus\Dock(LEFT)
-    @menus\SetSize(370, 0)
+    @menus\SetSize(PANEL_WIDTH\GetInt(), 0)
+
+    @stretch = vgui.Create('PPM2.Editor.Stretch', @)
+    @stretch\Dock(LEFT)
+    @stretch\DockMargin(5, 0, 0, 0)
+    @stretch.target = @menus
 
     @model = vgui.Create('PPM2ModelPanel', @)
     @model\Dock(FILL)
