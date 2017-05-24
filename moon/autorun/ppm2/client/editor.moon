@@ -101,28 +101,27 @@ MODEL_BOX_PANEL = {
         @lastTick = RealTime()
         @SetCursor('none')
 
-        @animButton = vgui.Create('DButton', @)
-        with @animButton
-            \SetSize(120, 20)
-            \SetText('Playing animation')
-            .LastStatus = true
-            .Think = ->
-                if .LastStatus ~= @playing
-                    .LastStatus = @playing
-                    \SetText('Playing Animation') if @playing
-                    \SetText('Play Animation') if not @playing
-            .DoClick = ->
-                @playing = not @playing
-                if @playing
-                    @editorSeq = 1
-                    @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
-                    @ResetPosition()
+        -- @animButton = vgui.Create('DButton', @)
+        -- with @animButton
+        --     \SetSize(120, 20)
+        --     \SetText('Playing animation')
+        --     .LastStatus = true
+        --     .Think = ->
+        --         if .LastStatus ~= @playing
+        --             .LastStatus = @playing
+        --             \SetText('Playing Animation') if @playing
+        --             \SetText('Play Animation') if not @playing
+        --     .DoClick = ->
+        --         @playing = not @playing
+        --         if @playing
+        --             @editorSeq = 1
+        --             @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
+        --             @ResetPosition()
 
         @seqButton = vgui.Create('DComboBox', @)
         with @seqButton
             \SetSize(120, 20)
             \SetValue('Standing')
-            SEQUENCES
             \AddChoice(choice, num) for choice, num in pairs @SEQUENCES
             .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
                 @SetSequence(data)
@@ -132,7 +131,7 @@ MODEL_BOX_PANEL = {
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
     
     PerformLayout: (w = 0, h = 0) =>
-        @animButton\SetPos(w - 130, 10)
+        --@animButton\SetPos(w - 130, 10)
         @seqButton\SetPos(10, 10)
     
     OnMousePressed: (code = MOUSE_LEFT) =>
@@ -194,27 +193,36 @@ MODEL_BOX_PANEL = {
         
         @hold = @IsHovered() if @hold
         
-        if @playing
-            cseq = @EDITOR_SEQUENCES[@editorSeq]
-            if @nextSeq < rtime
-                @editorSeq += 1
-                @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
-                cseq = @EDITOR_SEQUENCES[@editorSeq]
-                @nextSeq = rtime + cseq.time
+        -- if @playing
+        --     cseq = @EDITOR_SEQUENCES[@editorSeq]
+        --     if @nextSeq < rtime
+        --         @editorSeq += 1
+        --         @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
+        --         cseq = @EDITOR_SEQUENCES[@editorSeq]
+        --         @nextSeq = rtime + cseq.time
             
-            {:p, :y, :r} = @targetAngle
-            @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
-            @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
-            @targetAngle.p = math.Clamp(@targetAngle.p, -40, 10)
-        else
-            if @hold
-                x, y = gui.MousePos()
-                deltaX, deltaY = x - @mouseX, y - @mouseY
-                @mouseX, @mouseY = x, y
-                {:pitch, :yaw, :roll} = @targetAngle
-                yaw -= deltaX * .5
-                pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
-                @targetAngle = Angle(pitch, yaw, roll)
+        --     {:p, :y, :r} = @targetAngle
+        --     @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
+        --     @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
+        --     @targetAngle.p = math.Clamp(@targetAngle.p, -40, 10)
+        -- else
+        --     if @hold
+        --         x, y = gui.MousePos()
+        --         deltaX, deltaY = x - @mouseX, y - @mouseY
+        --         @mouseX, @mouseY = x, y
+        --         {:pitch, :yaw, :roll} = @targetAngle
+        --         yaw -= deltaX * .5
+        --         pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
+        --         @targetAngle = Angle(pitch, yaw, roll)
+        
+        if @hold
+            x, y = gui.MousePos()
+            deltaX, deltaY = x - @mouseX, y - @mouseY
+            @mouseX, @mouseY = x, y
+            {:pitch, :yaw, :roll} = @targetAngle
+            yaw -= deltaX * .5
+            pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
+            @targetAngle = Angle(pitch, yaw, roll)
         
         @angle = LerpAngle(delta * 4, @angle, @targetAngle)
         @distToPony = Lerp(delta * 4, @distToPony, @targetDistToPony)
