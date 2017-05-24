@@ -80,7 +80,7 @@ class DefaultBodygroupController
 
     CreateSocksModel: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @socksModel if IsValid(@socksModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
@@ -123,7 +123,7 @@ class DefaultBodygroupController
         return @socksModel
     CreateSocksModelIfNotExists: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
         @socksModel\SetParent(@ent) if IsValid(@ent)
         @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
@@ -160,18 +160,18 @@ class DefaultBodygroupController
         return unless @isValid
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
-    SlowUpdate: =>
+    SlowUpdate: (createModels = CLIENT) =>
         @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
         @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
         @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @ApplyRace()
-        @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
-    ApplyBodygroups: =>
+        @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
+    ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
         @ResetBodygroups()
-        @SlowUpdate()
+        @SlowUpdate(createModels)
 
     Remove: =>
         @socksModel\Remove() if IsValid(@socksModel)
@@ -270,7 +270,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     CreateUpperManeModel: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelUP if IsValid(@maneModelUP)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
@@ -315,7 +315,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelLower if IsValid(@maneModelLower)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
@@ -360,7 +360,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @tailModel if IsValid(@tailModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
@@ -407,19 +407,19 @@ class NewBodygroupController extends DefaultBodygroupController
 
     CreateUpperManeModelIfNotExists: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModel() if not IsValid(@maneModelUP)
         @GetData()\SetUpperManeModel(@maneModelUP) if IsValid(@maneModelUP)
         return @maneModelUP
     CreateLowerManeModelIfNotExists: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModel() if not IsValid(@maneModelLower)
         @GetData()\SetLowerManeModel(@maneModelLower) if IsValid(@maneModelLower)
         return @maneModelLower
     CreateTailModelIfNotExists: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModel() if not IsValid(@tailModel)
         @GetData()\SetTailModel(@tailModel) if IsValid(@tailModel)
         return @tailModel
@@ -447,7 +447,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     UpdateUpperMane: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
         return NULL if not IsValid(@maneModelUP)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
@@ -460,7 +460,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     UpdateLowerMane: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModelIfNotExists()
         return NULL if not IsValid(@maneModelLower)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
@@ -473,7 +473,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     UpdateTailModel: =>
         return NULL unless @isValid
-        return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModelIfNotExists()
         return NULL if not IsValid(@tailModel)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
@@ -501,21 +501,22 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         super()
 
-    SlowUpdate: =>
+    SlowUpdate: (createModels = CLIENT) =>
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
         @ApplyRace()
-        @UpdateUpperMane()
-        @UpdateLowerMane()
-        @UpdateTailModel()
-        @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
-    ApplyBodygroups: =>
+        if createModels
+            @UpdateUpperMane()
+            @UpdateLowerMane()
+            @UpdateTailModel()
+            @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
+    ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
         @ResetBodygroups()
-        @SlowUpdate()
+        @SlowUpdate(createModels)
 
     DataChanges: (state) =>
         return unless @isValid
@@ -531,16 +532,17 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'ClawTeeth'
                 @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GetData()\GetClawTeeth() and 1 or 0)
             when 'ManeTypeNew'
-                @UpdateUpperMane()
+                @UpdateUpperMane() if CLIENT
             when 'ManeTypeLowerNew'
-                @UpdateLowerMane()
+                @UpdateLowerMane() if CLIENT
             when 'TailTypeNew'
-                @UpdateTailModel()
+                @UpdateTailModel() if CLIENT
             when 'TailSize'
-                @UpdateTailModel()
+                @UpdateTailModel() if CLIENT
             when 'Race'
                 @ApplyRace()
             when 'SocksAsModel'
+                return if SERVER
                 if state\GetValue()
                     @CreateSocksModelIfNotExists()
                 else

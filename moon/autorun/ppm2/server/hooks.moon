@@ -38,7 +38,7 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
         @SetViewOffset(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET))
         @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
         if @GetPonyData()
-            @GetPonyData()\ApplyBodygroups()
+            @GetPonyData()\PlayerRespawn()
             net.Start('PPM2.PlayerRespawn')
             net.WriteEntity(@)
             net.Broadcast()

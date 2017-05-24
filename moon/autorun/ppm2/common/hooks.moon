@@ -34,7 +34,7 @@ do
             continue if not ply\Alive()
             data = ply\GetPonyData()
             continue if not data
-            xpcall(data.SlowUpdate, catchError, data) if data.SlowUpdate
+            xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
 
 DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
