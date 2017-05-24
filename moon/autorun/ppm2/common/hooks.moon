@@ -31,9 +31,8 @@ do
         PPM2.Message debug.traceback()
     timer.Create 'PPM2.SlowUpdate', 5, 0, ->
         for ply in *player.GetAll()
-            continue if not ply\Alive()
+            continue if not ply\Alive() or not ply\IsPonyCached() or not ply\GetPonyData()
             data = ply\GetPonyData()
-            continue if not data
             xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
 
 DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT

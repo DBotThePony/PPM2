@@ -149,7 +149,14 @@ do
 
 entMeta = FindMetaTable('Entity')
 entMeta.IsPony = =>
-    switch @GetModel()
+    model = @GetModel()
+    @__ppm2_lastmodel = @__ppm2_lastmodel or model
+    if @__ppm2_lastmodel ~= model
+        data = @GetPonyData()
+        if data and data.ModelChanges
+            data\ModelChanges(@__ppm2_lastmodel, model)
+            @__ppm2_lastmodel = model
+    switch model
         when 'models/ppm/player_default_base.mdl'
             return true
         when 'models/ppm/player_default_base_new.mdl'

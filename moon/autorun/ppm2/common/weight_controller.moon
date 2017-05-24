@@ -115,6 +115,7 @@ class PonyWeightController
         return if not IsValid(ent)
         return if not @isValid
         @ResetBones(ent)
+        return if not @ent\IsPony()
         for {:id, :scale} in *@@WEIGHT_BONES
             ent\ManipulateBoneScale(id, Vector(scale * @weight, scale * @weight, scale * @weight))
     Remove: =>

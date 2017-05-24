@@ -161,7 +161,10 @@ class DefaultBodygroupController
         return unless IsValid(@ent)
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
+    RemoveModels: =>
+        @socksModel\Remove() if IsValid(@socksModel)
     SlowUpdate: (createModels = CLIENT) =>
+        return if not @ent\IsPony()
         @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
         @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
         @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
@@ -172,10 +175,11 @@ class DefaultBodygroupController
     ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
         @ResetBodygroups()
+        return if not @ent\IsPony()
         @SlowUpdate(createModels)
 
     Remove: =>
-        @socksModel\Remove() if IsValid(@socksModel)
+        @RemoveModels()
         @ResetBodygroups()
         @isValid = false
 
@@ -504,6 +508,7 @@ class NewBodygroupController extends DefaultBodygroupController
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
+        return if not @ent\IsPony()
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
@@ -515,9 +520,15 @@ class NewBodygroupController extends DefaultBodygroupController
             @UpdateLowerMane()
             @UpdateTailModel()
             @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
+    RemoveModels: =>
+        @maneModelUP\Remove() if IsValid(@maneModelUP)
+        @maneModelLower\Remove() if IsValid(@maneModelLower)
+        @tailModel\Remove() if IsValid(@tailModel)
+        super()
     ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
         @ResetBodygroups()
+        return @RemoveModels() if not @ent\IsPony()
         @SlowUpdate(createModels)
 
     DataChanges: (state) =>
@@ -549,11 +560,6 @@ class NewBodygroupController extends DefaultBodygroupController
                     @CreateSocksModelIfNotExists()
                 else
                     @socksModel\Remove() if IsValid(@socksModel)
-    Remove: =>
-        @maneModelUP\Remove() if IsValid(@maneModelUP)
-        @maneModelLower\Remove() if IsValid(@maneModelLower)
-        @tailModel\Remove() if IsValid(@tailModel)
-        super()
 
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
