@@ -1016,7 +1016,9 @@ do
         for ply in *player.GetAll()
             data = ply\GetPonyData()
             continue if not data
-            flex = data\GetFlexController()
+            renderer = data\GetRenderController()
+            continue if not renderer
+            flex = renderer\GetFlexController()
             continue if not flex
             flex\ResetSequences()
     cvars.AddChangeCallback 'ppm2_disable_flexes', ppm2_disable_flexes, 'ppm2_disable_flexes'
