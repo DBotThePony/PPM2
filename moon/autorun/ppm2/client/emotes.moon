@@ -90,6 +90,7 @@ BUTTON_CLICK_FUNC = =>
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
 IMAGE_PANEL_THINK = =>
+    @lastThink = RealTime() + .4
     if @IsHovered()
         if not @oldHover
             @oldHover = true
@@ -100,6 +101,12 @@ IMAGE_PANEL_THINK = =>
         if @oldHover
             @oldHover = false
             @hoverPnl\SetVisible(false)
+HOVERED_IMAGE_PANEL_THINK = =>
+    if not @parent\IsValid()
+        @Remove()
+        return
+    if @parent.lastThink < RealTime()
+        @SetVisible(false)
 CreatePanel = (parent) ->
     self = vgui.Create('DPanel', parent)
     @SetSize(200, 300)
@@ -127,7 +134,8 @@ CreatePanel = (parent) ->
             \SetFont('HudHintTextLarge')
             \Dock(TOP)
             if fexists
-                with vgui.Create('DImage', btn)
+                image = vgui.Create('DImage', btn)
+                with image
                     \Dock(LEFT)
                     \SetSize(32, 32)
                     \SetImage(filecrop)
@@ -140,6 +148,8 @@ CreatePanel = (parent) ->
                         \SetVisible(false)
                         \SetImage(filecrop)
                         \SetSize(256, 256)
+                        .Think = HOVERED_IMAGE_PANEL_THINK
+                        .parent = image
                     .OnRemove = -> .hoverPnl\Remove() if IsValid(.hoverPnl)
         btn
     @scroll\AddItem(btn) for btn in *@buttons
