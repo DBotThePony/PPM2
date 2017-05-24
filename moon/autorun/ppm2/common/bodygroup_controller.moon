@@ -158,6 +158,7 @@ class DefaultBodygroupController
 
     ResetBodygroups: =>
         return unless @isValid
+        return unless IsValid(@ent)
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
     SlowUpdate: (createModels = CLIENT) =>
@@ -493,6 +494,7 @@ class NewBodygroupController extends DefaultBodygroupController
     @FLEX_ID_CLAW_TEETH = 30
 
     ResetBodygroups: =>
+        return unless @isValid
         return unless IsValid(@ent)
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
