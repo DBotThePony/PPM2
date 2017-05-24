@@ -190,9 +190,6 @@ class PonyRenderController
         textures = @GetTextureController()
 
         @IGNORE_DRAW = true
-        if @GetData()\IsNetworked()
-            @socksModel = @ent\GetNWEntity('PPM2.SocksModel') if not IsValid(@socksModel)
-
         @socksModel = @GetData()\GetSocksModel() if not IsValid(@socksModel)
 
         if IsValid(@socksModel)
@@ -320,11 +317,6 @@ class NewPonyRenderController extends PonyRenderController
         return if @IGNORE_DRAW
         return if not @isValid
         @IGNORE_DRAW = true
-
-        if @GetData()\IsNetworked()
-            @upperManeModel = @ent\GetNWEntity('PPM2.UpperManeModel') if not IsValid(@upperManeModel)
-            @lowerManeModel = @ent\GetNWEntity('PPM2.LowerManeModel') if not IsValid(@lowerManeModel)
-            @tailModel = @ent\GetNWEntity('PPM2.TailModel') if not IsValid(@tailModel)
 
         @upperManeModel = @GetData()\GetUpperManeModel() if not IsValid(@upperManeModel)
         @lowerManeModel = @GetData()\GetLowerManeModel() if not IsValid(@lowerManeModel)

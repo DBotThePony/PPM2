@@ -18,19 +18,7 @@
 PPM2.PLAYER_VIEW_OFFSET = 64 * .7
 PPM2.PLAYER_VIEW_OFFSET_DUCK = 28 * 1.2
 
-hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
-    return if not @GetPonyData()
-    data = @GetPonyData()
-    bgController = data\GetBodygroupController()
-    rag = @GetRagdollEntity()
-    return if not IsValid(rag)
-    bgController\MergeModels(rag) if bgController.MergeModels
-
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
-    for ent in *ents.GetAll()
-        if ent.isPonyPropModel and ent.manePlayer == @
-            ent\Remove()
-
     timer.Simple 0.5, ->
         return unless @IsValid()
         return unless @IsPony()
@@ -92,6 +80,12 @@ net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     ply\SetNWBool('PPM2.InEditor', net.ReadBool())
 
+hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
+    return if not @GetPonyData()
+    @GetPonyData()\PlayerDeath()
+    net.Start('PPM2.PlayerDeath')
+    net.WriteEntity(@)
+    net.Broadcast()
 
 hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
     data = @GetPonyData()

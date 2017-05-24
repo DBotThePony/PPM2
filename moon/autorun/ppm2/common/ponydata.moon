@@ -155,18 +155,31 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state) if @GetWeightController()
             @GetRenderController()\DataChanges(state) if @GetRenderController()
+    
     PlayerRespawn: =>
         @ApplyBodygroups(CLIENT)
 
         if CLIENT
+            @deathRagdollMerged = false
             @GetWeightController()\UpdateWeight() if @GetWeightController()
             @GetRenderController()\PlayerRespawn() if @GetRenderController()
+    PlayerDeath: =>
+        if CLIENT
+            @DoRagdollMerge()
+    DoRagdollMerge: =>
+        return if @deathRagdollMerged
+        bgController = @GetBodygroupController()
+        rag = @ent\GetRagdollEntity()
+        if not bgController.MergeModels
+            @deathRagdollMerged = true
+        elseif IsValid(rag)
+            @deathRagdollMerged = true
+            bgController\MergeModels(rag)
+    
     ApplyBodygroups: (updateModels = CLIENT) => @GetBodygroupController()\ApplyBodygroups(updateModels) if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
-
-    SlowUpdate: =>
-        @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
+    SlowUpdate: => @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
     
     GetRenderController: =>
         return if SERVER

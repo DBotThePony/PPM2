@@ -66,6 +66,8 @@ if CLIENT
 else
     util.AddNetworkString('PPM2.RequestPonyData')
     util.AddNetworkString('PPM2.PlayerRespawn')
+    util.AddNetworkString('PPM2.PlayerDeath')
+    util.AddNetworkString('PPM2.PostPlayerDeath')
     util.AddNetworkString('PPM2.Require')
     util.AddNetworkString('PPM2.EditorStatus')
     util.AddNetworkString('PPM2.NotifyDisconnect')

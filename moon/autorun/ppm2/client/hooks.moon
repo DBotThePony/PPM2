@@ -50,6 +50,7 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
                 if IsValid(rag)
                     rag\SetNoDraw(true)
                     renderController = data\GetRenderController()
+                    data\DoRagdollMerge()
                     if renderController
                         renderController\PreDraw(rag)
                         rag\DrawModel()
@@ -105,6 +106,12 @@ PlayerRespawn = ->
     return if not ent\GetPonyData()
     ent\GetPonyData()\PlayerRespawn()
 
+PlayerDeath = ->
+    ent = net.ReadEntity()
+    return if not IsValid(ent)
+    return if not ent\GetPonyData()
+    ent\GetPonyData()\PlayerDeath()
+
 lastDataSend = 0
 lastDataReceived = 0
 net.Receive 'PPM2.RequestPonyData', ->
@@ -112,7 +119,8 @@ net.Receive 'PPM2.RequestPonyData', ->
     lastDataReceived = RealTime() + 10
     RunConsoleCommand('ppm2_reload')
 
-net.Receive 'PPM2.PlayerRespawn', UpdateWeight
+net.Receive 'PPM2.PlayerRespawn', PlayerRespawn
+net.Receive 'PPM2.PlayerDeath', PlayerDeath
 
 concommand.Add 'ppm2_require', ->
     net.Start('PPM2.Require')
