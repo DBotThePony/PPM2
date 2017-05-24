@@ -364,6 +364,46 @@ class PonyDataInstance
                         return Color(255, 255, 255)
         }
 
+        'horn_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'HornColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'wings_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'WingsColor'
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        'separate_wings': {
+            default: -> false
+            getFunc: 'SeparateWings'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'separate_horn': {
+            default: -> false
+            getFunc: 'SeparateHorn'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'eye_lines': {
             default: -> true
             getFunc: 'EyeLines'
@@ -630,6 +670,57 @@ class PonyDataInstance
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
             min: PPM2.MIN_HOLE
             max: PPM2.MAX_HOLE
+        }
+
+    for i = 1, 3
+        @PONY_DATA["horn_url_#{i}"] = {
+            default: -> ''
+            getFunc: "HornURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
+
+        @PONY_DATA["wings_url_#{i}"] = {
+            default: -> ''
+            getFunc: "WingsURL#{i}"
+            fix: (arg = '') ->
+                arg = tostring(arg)
+                if arg\find('^https?://')
+                    return arg
+                else
+                    return ''
+        }
+
+        @PONY_DATA["horn_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "HornURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
+        }
+
+        @PONY_DATA["wings_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "WingsURLColor#{i}"
+            fix: (arg = Color(255, 255, 255)) ->
+                if type(arg) ~= 'table'
+                    return Color(255, 255, 255)
+                else
+                    {:r, :g, :b, :a} = arg
+                    if r and g and b and a
+                        return Color(r, g, b, a)
+                    else
+                        return Color(255, 255, 255)
         }
 
     for i = 1, 6

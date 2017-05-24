@@ -129,6 +129,22 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    @WINGS_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGeneric', {
+        '$basetexture': 'models/debug/debugwhite'
+        '$ignorez': 1
+        '$vertexcolor': 1
+        '$vertexalpha': 1
+        '$nolod': 1
+    })
+
+    @HORN_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGeneric', {
+        '$basetexture': 'models/ppm/base/horn'
+        '$ignorez': 1
+        '$vertexcolor': 1
+        '$vertexalpha': 1
+        '$nolod': 1
+    })
+
     @EYE_OVAL = Material('models/ppm/partrender/eye_oval.png')
 
     @EYE_OVALS = {
@@ -214,6 +230,38 @@ class PonyTextureController
                 @CompileCMark()
             when 'SocksColor'
                 @CompileSocks()
+            when 'HornURL1'
+                @CompileHorn()
+            when 'SeparateHorn'
+                @CompileHorn()
+            when 'HornColor'
+                @CompileHorn()
+            when 'HornURL2'
+                @CompileHorn()
+            when 'HornURL3'
+                @CompileHorn()
+            when 'HornURLColor1'
+                @CompileHorn()
+            when 'HornURLColor2'
+                @CompileHorn()
+            when 'HornURLColor3'
+                @CompileHorn()
+            when 'WingsURL1'
+                @CompileWings()
+            when 'WingsURL2'
+                @CompileWings()
+            when 'WingsURL3'
+                @CompileWings()
+            when 'WingsURLColor1'
+                @CompileWings()
+            when 'WingsURLColor2'
+                @CompileWings()
+            when 'WingsURLColor3'
+                @CompileWings()
+            when 'SeparateWings'
+                @CompileWings()
+            when 'WingsColor'
+                @CompileWings()
             else
                 if @@MANE_UPDATE_TRIGGER[key]
                     @CompileHair()
@@ -618,14 +666,54 @@ class PonyTextureController
             }
         }
 
+        urlTextures = {}
+        left = 0
+
         @HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        {:r, :g, :b} = @GetData()\GetBodyColor()
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
 
-        @HornMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-        @HornMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-        @HornMaterial\SetFloat('$alpha', 1)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Horn_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
+            surface.SetMaterial(@@HORN_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetHornURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            @HornMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetHornURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
         return @HornMaterial
     CompileSocks: =>
         return unless @isValid
@@ -681,13 +769,54 @@ class PonyTextureController
             }
         }
 
+        urlTextures = {}
+        left = 0
         @WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        {:r, :g, :b} = @GetData()\GetBodyColor()
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
 
-        @WingsMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-        @WingsMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-        @WingsMaterial\SetFloat('$alpha', 1)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Wings_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetWingsColor() if @GetData()\GetSeparateWings()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetWingsURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            @WingsMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetWingsURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
 
         return @WingsMaterial
     

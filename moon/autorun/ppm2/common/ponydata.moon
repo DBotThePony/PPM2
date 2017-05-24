@@ -114,6 +114,17 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BodyDetailColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("BodyDetailURL#{i}",    net.ReadString, net.WriteString, '')
         @NetworkVar("BodyDetailURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+    
+    for i = 1, 3
+        @NetworkVar("HornURL#{i}",       net.ReadString, net.WriteString, '')
+        @NetworkVar("WingsURL#{i}",      net.ReadString, net.WriteString, '')
+        @NetworkVar("HornURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+        @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+    
+    @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                  false)
+    @NetworkVar('SeparateHorn',         net.ReadBool,   net.WriteBool,                  false)
+    @NetworkVar('WingsColor',           net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
+    @NetworkVar('HornColor',            net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
 
     new: (netID, ent) =>
         @recomputeTextures = true

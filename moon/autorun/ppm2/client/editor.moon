@@ -677,6 +677,13 @@ EditorPages = {
             @ColorBox('Socks model color', 'SocksColor')
             @Hr()
 
+            if ADVANCED_MODE\GetBool()
+                @CheckBox('Separate wings color from body', 'SeparateWings')
+                @CheckBox('Separate horn color from body', 'SeparateHorn')
+                @ColorBox('Wings color', 'WingsColor')
+                @ColorBox('Horn color', 'HornColor')
+                @Hr()
+
             for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
@@ -687,6 +694,18 @@ EditorPages = {
                 @Label("Body detail #{i}")
                 @URLInput("BodyDetailURL#{i}")
                 @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                for i = 1, 3
+                    @Label("Horn URL detail #{i}")
+                    @URLInput("HornURL#{i}")
+                    @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+                
+                for i = 1, 3
+                    @Label("Wings URL detail #{i}")
+                    @URLInput("WingsURL#{i}")
+                    @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
     }
 
     {
