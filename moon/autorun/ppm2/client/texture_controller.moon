@@ -437,6 +437,8 @@ class PonyTextureController
             @id = @@NEXT_GENERATED_ID
             @@NEXT_GENERATED_ID += 1
         @compiled = false
+        @lastMaterialUpdate = 0
+        @lastMaterialUpdateEnt = NULL
         @CompileTextures() if compile
         PPM2.DebugPrint('Created new texture controller for ', @ent, ' as part of ', controller, '; internal ID is ', @id)
     __tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
@@ -461,32 +463,63 @@ class PonyTextureController
             return @FemaleMaterial
         else
             return @MaleMaterial
+    GetBodyName: =>
+        if @GetData()\GetGender() == PPM2.GENDER_FEMALE
+            return @FemaleMaterialName
+        else
+            return @MaleMaterialName
     GetSocks: => @SocksMaterial
+    GetSocksName: => @SocksMaterialName
     GetCMark: => @CMarkTexture
+    GetCMarkName: => @CMarkTextureName
     GetGUICMark: => @CMarkTextureGUI
+    GetGUICMarkName: => @CMarkTextureGUIName
     GetCMarkGUI: => @CMarkTextureGUI
+    GetCMarkGUIName: => @CMarkTextureGUIName
     GetHair: (index = 1) =>
         if index == 2
             return @HairColor2Material
         else
             return @HairColor1Material
+    GetHairName: (index = 1) =>
+        if index == 2
+            return @HairColor2MaterialName
+        else
+            return @HairColor1MaterialName
     GetMane: (index = 1) =>
         if index == 2
             return @HairColor2Material
         else
             return @HairColor1Material
+    GetManeName: (index = 1) =>
+        if index == 2
+            return @HairColor2MaterialName
+        else
+            return @HairColor1MaterialName
     GetTail: (index = 1) =>
         if index == 2
             return @TailColor2Material
         else
             return @TailColor1Material
+    GetTailName: (index = 1) =>
+        if index == 2
+            return @TailColor2MaterialName
+        else
+            return @TailColor1MaterialName
     GetEye: (left = false) =>
         if left
             return @EyeMaterialL
         else
             return @EyeMaterialR
+    GetEyeName: (left = false) =>
+        if left
+            return @EyeMaterialLName
+        else
+            return @EyeMaterialRName
     GetHorn: => @HornMaterial
+    GetHornName: => @HornMaterialName
     GetWings: => @WingsMaterial
+    GetWingsName: => @WingsMaterialName
     CompileTextures: =>
         @CompileBody()
         @CompileHair()
@@ -502,42 +535,29 @@ class PonyTextureController
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetHair(1))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetHair(2))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1, @GetTail(1))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent
+            @lastMaterialUpdateEnt = ent
+            @lastMaterialUpdate = RealTime() + 1
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT, @GetEyeName(false))
+            ent\SetSubMaterial(@@MAT_INDEX_BODY, @GetBodyName())
+            ent\SetSubMaterial(@@MAT_INDEX_HORN, @GetHornName())
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
+            ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetHairName(1))
+            ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetHairName(2))
+            ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR1, @GetTailName(1))
+            ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2, @GetTailName(2))
+            ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
+            ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
     
     PostDraw: (ent = @ent) =>
-        return unless @compiled
-        return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
     
     @MAT_INDEX_SOCKS = 0
 
-    PreDrawSocks: (ent = @ent, socksEnt) =>
+    UpdateSocks: (ent = @ent, socksEnt) =>
         return unless @compiled
         return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS, @GetSocks())
-
-    PostDrawSocks: (ent = @ent, socksEnt) =>
-        return unless @compiled
-        return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_SOCKS)
+        socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
     
     @QUAD_SIZE_CONST = 512
     __compileBodyInternal: (bType = false) =>
@@ -548,7 +568,7 @@ class PonyTextureController
         left = 0
 
         textureData = {
-            'name': "PPM2.#{@GetID()}.Body.#{prefix}"
+            'name': "PPM2_#{@GetID()}_Body_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
@@ -572,6 +592,7 @@ class PonyTextureController
 
         textureData.data['$basetexture'] = 'models/ppm/base/body' if not bType
 
+        @["#{prefix}MaterialName"] = "!#{textureData.name\lower()}"
         @["#{prefix}Material"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         continueCompilation = ->
@@ -650,7 +671,7 @@ class PonyTextureController
     CompileHorn: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2.#{@GetID()}.Horn"
+            'name': "PPM2_#{@GetID()}_Horn"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
@@ -671,6 +692,7 @@ class PonyTextureController
         urlTextures = {}
         left = 0
 
+        @HornMaterialName = "!#{textureData.name\lower()}"
         @HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         continueCompilation = ->
@@ -722,7 +744,7 @@ class PonyTextureController
     CompileSocks: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2.#{@GetID()}.Socks"
+            'name': "PPM2_#{@GetID()}_Socks"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -743,6 +765,7 @@ class PonyTextureController
             }
         }
 
+        @SocksMaterialName = "!#{textureData.name\lower()}"
         @SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         {:r, :g, :b} = @GetData()\GetSocksColor()
@@ -757,7 +780,7 @@ class PonyTextureController
     CompileWings: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2.#{@GetID()}.Wings"
+            'name': "PPM2_#{@GetID()}_Wings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -777,6 +800,7 @@ class PonyTextureController
 
         urlTextures = {}
         left = 0
+        @WingsMaterialName = "!#{textureData.name\lower()}"
         @WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         continueCompilation = ->
@@ -834,7 +858,7 @@ class PonyTextureController
     CompileHair: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2.#{@GetID()}.Mane.1"
+            'name': "PPM2_#{@GetID()}_Mane_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -856,11 +880,13 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@GetID()}.Mane.2"
+            'name': "PPM2_#{@GetID()}_Mane_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
 
+        @HairColor1MaterialName = "!#{textureFirst.name\lower()}"
+        @HairColor2MaterialName = "!#{textureSecond.name\lower()}"
         @HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
@@ -954,7 +980,7 @@ class PonyTextureController
     CompileTail: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2.#{@GetID()}.Tail.1"
+            'name': "PPM2_#{@GetID()}_Tail_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -976,11 +1002,13 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@GetID()}.Tail.2"
+            'name': "PPM2_#{@GetID()}_Tail_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
 
+        @TailColor1MaterialName = "!#{textureFirst.name\lower()}"
+        @TailColor2MaterialName = "!#{textureSecond.name\lower()}"
         @TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
@@ -1109,7 +1137,7 @@ class PonyTextureController
         shiftY -= DerpEyesStrength * .15 * @@QUAD_SIZE_CONST if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2.#{@GetID()}.Eye.#{prefix}"
+            'name': "PPM2_#{@GetID()}_Eye_#{prefix}"
             'shader': 'eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
@@ -1139,6 +1167,7 @@ class PonyTextureController
             }
         }
 
+        @["EyeMaterial#{prefixUpper}Name"] = "!#{textureData.name\lower()}"
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         rt = GetRenderTarget("PPM2_#{@GetID()}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
@@ -1195,7 +1224,7 @@ class PonyTextureController
     CompileCMark: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2.#{@GetID()}.CMark"
+            'name': "PPM2_#{@GetID()}_CMark"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1204,7 +1233,7 @@ class PonyTextureController
         }
 
         textureDataGUI = {
-            'name': "PPM2.#{@GetID()}.CMark.GUI"
+            'name': "PPM2_#{@GetID()}_CMark_GUI"
             'shader': 'UnlitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1212,7 +1241,9 @@ class PonyTextureController
             }
         }
 
+        @CMarkTextureName = "!#{textureData.name\lower()}"
         @CMarkTexture = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @CMarkTextureGUIName = "!#{textureDataGUI.name\lower()}"
         @CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
         unless @GetData()\GetCMark()
@@ -1354,7 +1385,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileHairInternal: (prefix = 'Upper') =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2.#{@GetID()}.Mane.1_#{prefix}"
+            'name': "PPM2_#{@GetID()}_Mane_1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1376,11 +1407,13 @@ class NewPonyTextureController extends PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2.#{@GetID()}.Mane.2_#{prefix}"
+            'name': "PPM2_#{@GetID()}_Mane_2_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
 
+        HairColor1MaterialName = "!#{textureFirst.name\lower()}"
+        HairColor2MaterialName = "!#{textureSecond.name\lower()}"
         HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
@@ -1470,14 +1503,16 @@ class NewPonyTextureController extends PonyTextureController
                     continueCompilation()
         if left == 0
             continueCompilation()
-        return HairColor1Material, HairColor2Material
+        return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
     CompileHair: =>
         return unless @isValid
         return super() if not @GetData()\GetSeparateMane()
-        mat1, mat2 = @CompileHairInternal('Upper')
-        mat3, mat4 = @CompileHairInternal('Lower')
+        mat1, mat2, name1, name2 = @CompileHairInternal('Upper')
+        mat3, mat4, name3, name4 = @CompileHairInternal('Lower')
         @UpperManeColor1, @UpperManeColor2 = mat1, mat2
         @LowerManeColor1, @LowerManeColor2 = mat3, mat4
+        @UpperManeColor1Name, @UpperManeColor2Name = name1, name2
+        @LowerManeColor1Name, @LowerManeColor2Name = name3, name4
         return mat1, mat2, mat3, mat4
     
     CompileMouth: =>
@@ -1500,17 +1535,20 @@ class NewPonyTextureController extends PonyTextureController
         }
 
         {:r, :g, :b} = @GetData()\GetTeethColor()
-        @TeethMaterial = CreateMaterial("PPM2.#{@GetID()}.Teeth", 'VertexLitGeneric', textureData)
+        @TeethMaterialName = "!ppm2_#{@GetID()}_teeth"
+        @TeethMaterial = CreateMaterial("PPM2_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
         @TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetMouthColor()
-        @MouthMaterial = CreateMaterial("PPM2.#{@GetID()}.Mouth", 'VertexLitGeneric', textureData)
+        @MouthMaterialName = "!ppm2_#{@GetID()}_mouth"
+        @MouthMaterial = CreateMaterial("PPM2_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
         @MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetTongueColor()
-        @TongueMaterial = CreateMaterial("PPM2.#{@GetID()}.Tongue", 'VertexLitGeneric', textureData)
+        @TongueMaterialName = "!ppm2_#{@GetID()}_tongue"
+        @TongueMaterial = CreateMaterial("PPM2_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
         @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
@@ -1525,6 +1563,9 @@ class NewPonyTextureController extends PonyTextureController
     GetTeeth: => @TeethMaterial
     GetMouth: => @MouthMaterial
     GetTongue: => @TongueMaterial
+    GetTeethName: => @TeethMaterialName
+    GetMouthName: => @MouthMaterialName
+    GetTongueName: => @TongueMaterialName
     
     GetUpperHair: (index = 1) =>
         if index == 2
@@ -1536,78 +1577,62 @@ class NewPonyTextureController extends PonyTextureController
             return @LowerManeColor2
         else
             return @LowerManeColor1
-
-    PreDrawUpperMane: (ent = @ent, entMane) =>
-        return unless @isValid
-        return unless @compiled
-
-        if not @GetData()\GetSeparateMane()
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
-        else
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHair(1))
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHair(2))
-
-    PostDrawUpperMane: (ent = @ent, entMane) =>
-        return unless @isValid
-        return unless @compiled
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
     
-    PreDrawLowerMane: (ent = @ent, entMane) =>
+    GetUpperHairName: (index = 1) =>
+        if index == 2
+            return @UpperManeColor2Name
+        else
+            return @UpperManeColor1Name
+    GetLowerHairName: (index = 1) =>
+        if index == 2
+            return @LowerManeColor2Name
+        else
+            return @LowerManeColor1Name
+
+    UpdateUpperMane: (ent = @ent, entMane) =>
+        return unless @isValid
+        return unless @compiled
+
+        if not @GetData()\GetSeparateMane()
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
+        else
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
+    
+    UpdateLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
         return unless @isValid
 
         if not @GetData()\GetSeparateMane()
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetMane(1))
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetMane(2))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
         else
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHair(1))
-            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHair(2))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHairName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
 
-    PostDrawLowerMane: (ent = @ent, entMane) =>
+    UpdateTail: (ent = @ent, entTail) =>
         return unless @compiled
         return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
-
-    PreDrawTail: (ent = @ent, entTail) =>
-        return unless @compiled
-        return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetTail(1))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetTail(2))
-
-    PostDrawTail: (ent = @ent, entTail) =>
-        return unless @compiled
-        return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
+        entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
+        entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
 
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH, @GetTeeth())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH, @GetMouth())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
-        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
-    
-    PostDraw: (ent = @ent) =>
-        return unless @compiled
-        return unless @isValid
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
-        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent
+            @lastMaterialUpdateEnt = ent
+            @lastMaterialUpdate = RealTime() + 1
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT, @GetEyeName(false))
+            ent\SetSubMaterial(@@MAT_INDEX_TONGUE, @GetTongueName())
+            ent\SetSubMaterial(@@MAT_INDEX_TEETH, @GetTeethName())
+            ent\SetSubMaterial(@@MAT_INDEX_MOUTH, @GetMouthName())
+            ent\SetSubMaterial(@@MAT_INDEX_BODY, @GetBodyName())
+            ent\SetSubMaterial(@@MAT_INDEX_HORN, @GetHornName())
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
+            ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
+            ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 
 
 PPM2.NewPonyTextureController = NewPonyTextureController

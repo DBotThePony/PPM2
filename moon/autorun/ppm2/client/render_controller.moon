@@ -38,6 +38,7 @@ class PonyRenderController
         @CompileTextures() if @ent
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
+        @socksModel\SetNowDraw(false) if IsValid(@socksModel)
         @CreateFlexController() if @ent
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     GetEntity: => @ent
@@ -184,32 +185,15 @@ class PonyRenderController
         return if not @isValid
         @flexes\PlayerRespawn() if @flexes
 
+    DrawModels: =>
+        @socksModel\DrawModel() if IsValid(@socksModel)
+
     PreDraw: (ent = @ent) =>
         return if not @isValid
-        return if @IGNORE_DRAW
-        textures = @GetTextureController()
-
-        @IGNORE_DRAW = true
-        @socksModel = @GetData()\GetSocksModel() if not IsValid(@socksModel)
-
-        if IsValid(@socksModel)
-            @socksModel\SetNoDraw(true)
-            if ENABLE_FLASHLIGHT_PASS\GetBool()
-                render.PushFlashlightMode(true)
-                textures\PreDrawSocks()
-                @socksModel\DrawModel()
-                textures\PostDrawSocks()
-                render.PopFlashlightMode()
-
-            textures\PreDrawSocks()
-            @socksModel\DrawModel()
-            textures\PostDrawSocks()
-        @IGNORE_DRAW = false
-        textures\PreDraw(ent)
+        @GetTextureController()\PreDraw(ent)
         @flexes\Think(ent) if @flexes
     PostDraw: (ent = @ent) =>
         return if not @isValid
-        return if @IGNORE_DRAW
         @GetTextureController()\PostDraw(ent)
 
     @ARMS_MATERIAL_INDEX = 0
@@ -237,7 +221,8 @@ class PonyRenderController
                 @GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
             when 'SocksModel'
                 @socksModel = @GetData()\GetSocksModel()
-                @socksModel\SetNoDraw(true) if IsValid(@socksModel)
+                @socksModel\SetNoDraw(false) if IsValid(@socksModel)
+                @GetTextureController()\UpdateSocks(@ent, @socksModel) if @GetTextureController() and IsValid(@socksModel)
             when 'NoFlex'
                 if state\GetValue()
                     @flexes\ResetSequences() if @flexes
@@ -270,9 +255,9 @@ class NewPonyRenderController extends PonyRenderController
         @upperManeModel = data\GetUpperManeModel()
         @lowerManeModel = data\GetLowerManeModel()
         @tailModel = data\GetTailModel()
-        @upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
-        @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
-        @tailModel\SetNoDraw(true) if IsValid(@tailModel)
+        @upperManeModel\SetNoDraw(false) if IsValid(@upperManeModel)
+        @lowerManeModel\SetNoDraw(false) if IsValid(@lowerManeModel)
+        @tailModel\SetNoDraw(false) if IsValid(@tailModel)
         super(data)
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
@@ -282,54 +267,23 @@ class NewPonyRenderController extends PonyRenderController
         switch state\GetKey()
             when 'UpperManeModel'
                 @upperManeModel = @GetData()\GetUpperManeModel()
-                @upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
-            when 'LowerManeMode'
+                @upperManeModel\SetNoDraw(false) if IsValid(@upperManeModel)
+                @GetTextureController()\UpdateUpperMane(@ent, @upperManeModel) if @GetTextureController() and IsValid(@upperManeModel)
+            when 'LowerManeModel'
                 @lowerManeModel = @GetData()\GetLowerManeModel()
-                @lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
+                @lowerManeModel\SetNoDraw(false) if IsValid(@lowerManeModel)
+                @GetTextureController()\UpdateLowerMane(@ent, @lowerManeModel) if @GetTextureController() and IsValid(@lowerManeModel)
             when 'TailModel'
                 @tailModel = @GetData()\GetTailModel()
-                @tailModel\SetNoDraw(true) if IsValid(@tailModel)
+                @tailModel\SetNoDraw(false) if IsValid(@tailModel)
+                @GetTextureController()\UpdateTail(@ent, @tailModel) if @GetTextureController() and IsValid(@tailModel)
         super(state)
 
-    DrawManeAndTailModels: =>
-        return if not @isValid
-        textures = @GetTextureController()
-        return if not textures
-        if IsValid(@upperManeModel)
-            @upperManeModel\SetNoDraw(true)
-            textures\PreDrawUpperMane()
-            @upperManeModel\DrawModel()
-            textures\PostDrawUpperMane()
-
-        if IsValid(@lowerManeModel)
-            @lowerManeModel\SetNoDraw(true)
-            textures\PreDrawLowerMane()
-            @lowerManeModel\DrawModel()
-            textures\PostDrawLowerMane()
-
-        if IsValid(@tailModel)
-            @tailModel\SetNoDraw(true)
-            textures\PreDrawTail()
-            @tailModel\DrawModel()
-            textures\PostDrawTail()
-
-    PreDraw: (ent = @ent) =>
-        return if @IGNORE_DRAW
-        return if not @isValid
-        @IGNORE_DRAW = true
-
-        @upperManeModel = @GetData()\GetUpperManeModel() if not IsValid(@upperManeModel)
-        @lowerManeModel = @GetData()\GetLowerManeModel() if not IsValid(@lowerManeModel)
-        @tailModel = @GetData()\GetTailModel() if not IsValid(@tailModel)
-
-        if ENABLE_FLASHLIGHT_PASS\GetBool()
-            render.PushFlashlightMode(true)
-            @DrawManeAndTailModels()
-            render.PopFlashlightMode()
-        @DrawManeAndTailModels()
-
-        @IGNORE_DRAW = false
-        super(ent)
+    DrawModels: =>
+        @upperManeModel\DrawModel() if IsValid(@upperManeModel)
+        @lowerManeModel\DrawModel() if IsValid(@lowerManeModel)
+        @tailModel\DrawModel() if IsValid(@tailModel)
+        super()
 
 PPM2.PonyRenderController = PonyRenderController
 PPM2.NewPonyRenderController = NewPonyRenderController
