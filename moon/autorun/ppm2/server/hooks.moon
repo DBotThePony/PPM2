@@ -27,7 +27,7 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
         if @IsPony()
             @__ppm2_pony_view_offset = true
             @SetViewOffset(PPM2.PLAYER_VIEW_OFFSET)
-            @SetViewOffsetDucked(PPM.PLAYER_VIEW_OFFSET_DUCK)
+            @SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK)
             if @GetPonyData()
                 @GetPonyData()\PlayerRespawn()
                 net.Start('PPM2.PlayerRespawn')
