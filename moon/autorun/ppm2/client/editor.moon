@@ -984,7 +984,7 @@ PPM2.OpenEditor = ->
             @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
             @panels.saves.rebuildFileList()
             callback(txt)
-        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt', copy\GetFilename(), confirm)
+        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', copy\GetFilename(), confirm)
     
     @saveButton = vgui.Create('DButton', @)
     with @saveButton
