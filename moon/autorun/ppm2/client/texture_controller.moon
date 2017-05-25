@@ -927,12 +927,14 @@ class PonyTextureController
 
             maneTypeUpper = @GetManeType()
             if @@UPPER_MANE_MATERIALS[maneTypeUpper]
-                {:r, :g, :b} = @GetData()\GetManeDetailColor1()
-                surface.SetDrawColor(r, g, b)
+                i = 1
                 for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
                     continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
@@ -958,12 +960,14 @@ class PonyTextureController
 
             maneTypeLower = @GetManeTypeLower()
             if @@LOWER_MANE_MATERIALS[maneTypeLower]
-                {:r, :g, :b} = @GetData()\GetManeDetailColor2()
-                surface.SetDrawColor(r, g, b)
+                i = 1
                 for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
                     continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
             
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
@@ -1454,12 +1458,14 @@ class NewPonyTextureController extends PonyTextureController
 
             maneTypeUpper = @GetManeType()
             if @@UPPER_MANE_MATERIALS[maneTypeUpper]
-                {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor1"](@GetData())
-                surface.SetDrawColor(r, g, b)
+                i = 1
                 for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
                     continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
@@ -1485,12 +1491,14 @@ class NewPonyTextureController extends PonyTextureController
 
             maneTypeLower = @GetManeTypeLower()
             if @@LOWER_MANE_MATERIALS[maneTypeLower]
-                {:r, :g, :b} = @GetData()["Get#{prefix}ManeDetailColor2"](@GetData())
-                surface.SetDrawColor(r, g, b)
+                i = 1
                 for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
                     continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                    i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
