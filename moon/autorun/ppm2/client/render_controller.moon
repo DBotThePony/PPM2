@@ -163,13 +163,14 @@ class PonyRenderController
 
         if ENABLE_FLASHLIGHT_PASS\GetBool()
             render.PushFlashlightMode(true)
-            @PreDraw()
+            @GetTextureController()\PreDrawLegs()
             @legsModel\DrawModel()
-            @PostDraw()
+            @GetTextureController()\PostDrawLegs()
             render.PopFlashlightMode()
-        @PreDraw()
+
+        @GetTextureController()\PreDrawLegs()
         @legsModel\DrawModel()
-        @PostDraw()
+        @GetTextureController()\PostDrawLegs()
 
         render.PopCustomClipPlane()
         cam.End3D() if start3D

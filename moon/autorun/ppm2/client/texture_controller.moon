@@ -550,6 +550,22 @@ class PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
     
+    PreDrawLegs: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+
+    PostDrawLegs: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+    
     PostDraw: (ent = @ent) =>
     
     @MAT_INDEX_SOCKS = 0
@@ -1633,6 +1649,7 @@ class NewPonyTextureController extends PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+
 
 
 PPM2.NewPonyTextureController = NewPonyTextureController
