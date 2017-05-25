@@ -551,20 +551,21 @@ class PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
     
-    ResetTextures: =>
+    ResetTextures: (ent = @ent) =>
+        return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL
         @lastMaterialUpdate = 0
-        @ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
-        @ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
-        @ent\SetSubMaterial(@@MAT_INDEX_BODY)
-        @ent\SetSubMaterial(@@MAT_INDEX_HORN)
-        @ent\SetSubMaterial(@@MAT_INDEX_WINGS)
-        @ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1)
-        @ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2)
-        @ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR1)
-        @ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2)
-        @ent\SetSubMaterial(@@MAT_INDEX_CMARK)
-        @ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
+        ent\SetSubMaterial(@@MAT_INDEX_BODY)
+        ent\SetSubMaterial(@@MAT_INDEX_HORN)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS)
+        ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1)
+        ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2)
+        ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR1)
+        ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2)
+        ent\SetSubMaterial(@@MAT_INDEX_CMARK)
+        ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
     
     PreDrawLegs: (ent = @ent) =>
         return unless @compiled
@@ -1673,19 +1674,20 @@ class NewPonyTextureController extends PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
-    ResetTextures: =>
+    ResetTextures: (ent = @ent) =>
+        return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL
         @lastMaterialUpdate = 0
-        @ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
-        @ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
-        @ent\SetSubMaterial(@@MAT_INDEX_TONGUE)
-        @ent\SetSubMaterial(@@MAT_INDEX_TEETH)
-        @ent\SetSubMaterial(@@MAT_INDEX_MOUTH)
-        @ent\SetSubMaterial(@@MAT_INDEX_BODY)
-        @ent\SetSubMaterial(@@MAT_INDEX_HORN)
-        @ent\SetSubMaterial(@@MAT_INDEX_WINGS)
-        @ent\SetSubMaterial(@@MAT_INDEX_CMARK)
-        @ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
+        ent\SetSubMaterial(@@MAT_INDEX_TONGUE)
+        ent\SetSubMaterial(@@MAT_INDEX_TEETH)
+        ent\SetSubMaterial(@@MAT_INDEX_MOUTH)
+        ent\SetSubMaterial(@@MAT_INDEX_BODY)
+        ent\SetSubMaterial(@@MAT_INDEX_HORN)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS)
+        ent\SetSubMaterial(@@MAT_INDEX_CMARK)
+        ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 
 
 
