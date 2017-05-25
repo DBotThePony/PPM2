@@ -150,11 +150,13 @@ class PonyRenderController
         @legClipDot = @legsClipPlane\Dot(@legClipPlanePos)
     
     @LEG_CLIP_VECTOR = Vector(0, 0, -1)
+    @LEGS_MAX_DISTANCE = 60 ^ 2
     DrawLegs: (start3D = true) =>
         return if not @isValid
         @CreateLegs() unless IsValid(@legsModel)
         return unless IsValid(@legsModel)
         return if @ent\ShouldDrawLocalPlayer()
+        return if @ent\GetPos()\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
         @UpdateLegs()
 
         oldClip = render.EnableClipping(true)
