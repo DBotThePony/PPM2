@@ -137,7 +137,7 @@ class PonyTextureController
         '$nolod': 1
     })
 
-    @HORN_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGeneric', {
+    @HORN_MATERIAL_COLOR = CreateMaterial('PPM2.HornMaterialBase', 'UnlitGeneric', {
         '$basetexture': 'models/ppm/base/horn'
         '$ignorez': 1
         '$vertexcolor': 1
