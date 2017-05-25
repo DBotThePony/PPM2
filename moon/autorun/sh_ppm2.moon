@@ -61,6 +61,7 @@ if CLIENT
     include 'client/hooks.lua'
     include 'client/render_controller.lua'
     include 'client/emotes.lua'
+    include 'client/player_menu.lua'
     include 'client/editor.lua'
 
     for ent in *ents.GetAll()
@@ -90,6 +91,7 @@ else
     AddCSLuaFile 'client/render_controller.lua'
     AddCSLuaFile 'client/editor.lua'
     AddCSLuaFile 'client/emotes.lua'
+    AddCSLuaFile 'client/player_menu.lua'
     include 'server/hooks.lua'
     include 'server/fastdl.lua'
     include 'server/emotes.lua'
