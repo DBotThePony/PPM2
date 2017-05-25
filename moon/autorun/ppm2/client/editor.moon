@@ -543,6 +543,66 @@ EditorPages = {
             @ComboBox('Race', 'Race')
             @CheckBox('Gender', 'Gender')
             @NumSlider('Weight', 'Weight', 2)
+
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                @CheckBox('No flexes on new model', 'NoFlex')
+                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+                flexes = @Spoiler('Flexes controls')
+                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+                flexes\SizeToContents()
+    }
+
+    {
+        'name': 'Body'
+        'internal': 'body'
+        'func': (sheet) =>
+            @ScrollPanel()
+            @ComboBox('Bodysuit', 'Bodysuit')
+            @ColorBox('Body color', 'BodyColor')
+            @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
+            @CheckBox('Socks (as model)', 'SocksAsModel')
+            @ColorBox('Socks model color', 'SocksColor')
+
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                @CheckBox('Separate wings color from body', 'SeparateWings')
+                @CheckBox('Separate horn color from body', 'SeparateHorn')
+                @ColorBox('Wings color', 'WingsColor')
+                @ColorBox('Horn color', 'HornColor')
+    }
+
+    {
+        'name': 'Body details'
+        'internal': 'bodydetails'
+        'func': (sheet) =>
+            @ScrollPanel()
+
+            if ADVANCED_MODE\GetBool()
+                for i = 1, 3
+                    @Label("Horn URL detail #{i}")
+                    @URLInput("HornURL#{i}")
+                    @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+                    @Hr()
+                
+                for i = 1, 3
+                    @Label("Wings URL detail #{i}")
+                    @URLInput("WingsURL#{i}")
+                    @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+                    @Hr()
+
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
+                @ComboBox("Detail #{i}", "BodyDetail#{i}")
+                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+                @Hr()
+
+            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
+                @Label("Body detail #{i}")
+                @URLInput("BodyDetailURL#{i}")
+                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+                @Hr()
     }
 
     {
@@ -561,14 +621,6 @@ EditorPages = {
                 @ColorBox('Teeth color', 'TeethColor')
                 @ColorBox('Mouth color', 'MouthColor')
                 @ColorBox('Tongue color', 'TongueColor')
-                
-                @Hr()
-                @CheckBox('No flexes on new model', 'NoFlex')
-                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-                flexes = @Spoiler('Flexes controls')
-                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-                flexes\SizeToContents()
     }
 
     {
@@ -607,8 +659,8 @@ EditorPages = {
     }
 
     {
-        'name': 'Mane and tail'
-        'internal': 'manetail'
+        'name': 'Old mane and tail'
+        'internal': 'manetail_old'
         'func': (sheet) =>
             @ScrollPanel()
             @ComboBox('Mane type', 'ManeType')
@@ -616,6 +668,19 @@ EditorPages = {
             @ComboBox('Tail type', 'TailType')
 
             @Hr()
+            @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
+            @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
+
+            @Hr()
+            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 3
+            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 3
+    }
+
+    {
+        'name': 'New mane and tail'
+        'internal': 'manetail'
+        'func': (sheet) =>
+            @ScrollPanel()
             @Label('"New" affect only new model')
             @ComboBox('New Mane type', 'ManeTypeNew')
             @ComboBox('New Lower Mane type', 'ManeTypeLowerNew')
@@ -630,18 +695,6 @@ EditorPages = {
             @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
 
             @Hr()
-            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
-                @Label("Mane URL Detail #{i} input field")
-                @URLInput("ManeURL#{i}")
-                @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
-            
-            @Hr()
-            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
-                @Label("Tail URL Detail #{i} input field")
-                @URLInput("TailURL#{i}")
-                @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
-            
-            @Hr()
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             @Label('These options have effect only on new model')
 
@@ -652,61 +705,32 @@ EditorPages = {
             @Hr()
             @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
             @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
+    }
 
-            @Hr()
+    {
+        'name': 'Mane and tail URL details'
+        'internal': 'manetail'
+        'func': (sheet) =>
+            @ScrollPanel()
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+                @Label("Mane URL Detail #{i} input field")
+                @URLInput("ManeURL#{i}")
+                @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
+                @Hr()
+
+            @Label('Next options have effect only on new model')
+            @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+                @Hr()
                 @Label("Upper mane URL Detail #{i} input field")
                 @URLInput("UpperManeURL#{i}")
                 @ColorBox("Upper Mane URL detail color #{i}", "UpperManeURLColor#{i}")
 
-            @Hr()
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+                @Hr()
                 @Label("Lower mane URL Detail #{i} input field")
                 @URLInput("LowerManeURL#{i}")
                 @ColorBox("Lower Tail URL detail color #{i}", "LowerManeURLColor#{i}")
-    }
-
-    {
-        'name': 'Body'
-        'internal': 'body'
-        'func': (sheet) =>
-            @ScrollPanel()
-            @ComboBox('Bodysuit', 'Bodysuit')
-            @ColorBox('Body color', 'BodyColor')
-            @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
-            @CheckBox('Socks (as model)', 'SocksAsModel')
-            @ColorBox('Socks model color', 'SocksColor')
-            @Hr()
-
-            if ADVANCED_MODE\GetBool()
-                @CheckBox('Separate wings color from body', 'SeparateWings')
-                @CheckBox('Separate horn color from body', 'SeparateHorn')
-                @ColorBox('Wings color', 'WingsColor')
-                @ColorBox('Horn color', 'HornColor')
-                @Hr()
-
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
-                @ComboBox("Detail #{i}", "BodyDetail#{i}")
-                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
-
-            @Hr()
-            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
-                @Label("Body detail #{i}")
-                @URLInput("BodyDetailURL#{i}")
-                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
-
-            if ADVANCED_MODE\GetBool()
-                @Hr()
-                for i = 1, 3
-                    @Label("Horn URL detail #{i}")
-                    @URLInput("HornURL#{i}")
-                    @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
-                
-                for i = 1, 3
-                    @Label("Wings URL detail #{i}")
-                    @URLInput("WingsURL#{i}")
-                    @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
     }
 
     {
@@ -953,6 +977,10 @@ PPM2.OpenEditor = ->
     @menus = vgui.Create('DPropertySheet', @)
     @menus\Dock(LEFT)
     @menus\SetSize(PANEL_WIDTH\GetInt(), 0)
+    @menusBar = @menus.tabScroller
+    @menusBar\SetParent(@)
+    @menusBar\Dock(TOP)
+    @menusBar\SetSize(0, 20)
 
     @stretch = vgui.Create('PPM2.Editor.Stretch', @)
     @stretch\Dock(LEFT)
