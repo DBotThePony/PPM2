@@ -101,6 +101,7 @@ class DefaultBodygroupController
             .isPonyPropModel = true
             .isSocks = true
             .manePlayer = @ent
+            \DrawShadow(true) if CLIENT
             \SetModel(model)
             \SetPos(@ent\EyePos())
             \Spawn()
@@ -298,6 +299,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .isPonyPropModel = true
             .upperMane = true
             .manePlayer = @ent
+            \DrawShadow(true) if CLIENT
             \SetModel(model)
             \SetPos(@ent\EyePos())
             \Spawn()
@@ -343,6 +345,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .isPonyPropModel = true
             .lowerMane = true
             .manePlayer = @ent
+            \DrawShadow(true) if CLIENT
             \SetModel(model)
             \SetPos(@ent\EyePos())
             \Spawn()
@@ -388,6 +391,7 @@ class NewBodygroupController extends DefaultBodygroupController
             .isPonyPropModel = true
             .isTail = true
             .manePlayer = @ent
+            \DrawShadow(true) if CLIENT
             \SetModel(model)
             \SetPos(@ent\EyePos())
             \Spawn()
