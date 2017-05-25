@@ -444,6 +444,7 @@ class PonyTextureController
     __tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
     Remove: =>
         @isValid = false
+        @ResetTextures()
     IsValid: => IsValid(@ent) and @isValid and @compiled
     GetID: =>
         return @id if @clientsideID
@@ -549,6 +550,21 @@ class PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2, @GetTailName(2))
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+    
+    ResetTextures: =>
+        @lastMaterialUpdateEnt = NULL
+        @lastMaterialUpdate = 0
+        @ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
+        @ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
+        @ent\SetSubMaterial(@@MAT_INDEX_BODY)
+        @ent\SetSubMaterial(@@MAT_INDEX_HORN)
+        @ent\SetSubMaterial(@@MAT_INDEX_WINGS)
+        @ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1)
+        @ent\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2)
+        @ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR1)
+        @ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2)
+        @ent\SetSubMaterial(@@MAT_INDEX_CMARK)
+        @ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
     
     PreDrawLegs: (ent = @ent) =>
         return unless @compiled
@@ -1657,6 +1673,19 @@ class NewPonyTextureController extends PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+    ResetTextures: =>
+        @lastMaterialUpdateEnt = NULL
+        @lastMaterialUpdate = 0
+        @ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
+        @ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
+        @ent\SetSubMaterial(@@MAT_INDEX_TONGUE)
+        @ent\SetSubMaterial(@@MAT_INDEX_TEETH)
+        @ent\SetSubMaterial(@@MAT_INDEX_MOUTH)
+        @ent\SetSubMaterial(@@MAT_INDEX_BODY)
+        @ent\SetSubMaterial(@@MAT_INDEX_HORN)
+        @ent\SetSubMaterial(@@MAT_INDEX_WINGS)
+        @ent\SetSubMaterial(@@MAT_INDEX_CMARK)
+        @ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 
 
 

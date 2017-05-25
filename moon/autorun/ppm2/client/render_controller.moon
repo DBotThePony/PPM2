@@ -38,7 +38,7 @@ class PonyRenderController
         @CompileTextures() if @ent
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
-        @socksModel\SetNowDraw(false) if IsValid(@socksModel)
+        @socksModel\SetNoDraw(false) if IsValid(@socksModel)
         @CreateFlexController() if @ent
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     GetEntity: => @ent
@@ -185,6 +185,7 @@ class PonyRenderController
     PlayerRespawn: =>
         return if not @isValid
         @flexes\PlayerRespawn() if @flexes
+        @GetTextureController()\ResetTextures() if @GetTextureController()
 
     DrawModels: =>
         @socksModel\DrawModel() if IsValid(@socksModel)

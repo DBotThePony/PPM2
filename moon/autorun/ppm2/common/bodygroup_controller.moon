@@ -80,6 +80,7 @@ class DefaultBodygroupController
 
     CreateSocksModel: =>
         return NULL unless @isValid
+        return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @socksModel if IsValid(@socksModel)
         for ent in *ents.GetAll()
@@ -126,6 +127,7 @@ class DefaultBodygroupController
         return NULL unless @isValid
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
+        return NULL if not IsValid(@socksModel)
         @socksModel\SetParent(@ent) if IsValid(@ent)
         @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         @GetData()\SetSocksModel(@socksModel)
@@ -276,6 +278,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     CreateUpperManeModel: =>
         return NULL unless @isValid
+        return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelUP if IsValid(@maneModelUP)
         for ent in *ents.GetAll()
@@ -322,6 +325,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
+        return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelLower if IsValid(@maneModelLower)
         for ent in *ents.GetAll()
@@ -368,6 +372,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
+        return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @tailModel if IsValid(@tailModel)
         for ent in *ents.GetAll()

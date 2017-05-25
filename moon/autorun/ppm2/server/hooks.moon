@@ -15,26 +15,34 @@
 -- limitations under the License.
 --
 
-PPM2.PLAYER_VIEW_OFFSET = 64 * .7
-PPM2.PLAYER_VIEW_OFFSET_DUCK = 28 * 1.2
+PPM2.PLAYER_VIEW_OFFSET = Vector(0, 0, 64 * .7)
+PPM2.PLAYER_VIEW_OFFSET_DUCK = Vector(0, 0, 28 * 1.2)
+
+PPM2.PLAYER_VIEW_OFFSET_ORIGINAL = Vector(0, 0, 64)
+PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL = Vector(0, 0, 28)
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     timer.Simple 0.5, ->
         return unless @IsValid()
-        return unless @IsPony()
-
-        @SetViewOffset(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET))
-        @SetViewOffsetDucked(Vector(0, 0, PPM2.PLAYER_VIEW_OFFSET_DUCK))
-        if @GetPonyData()
-            @GetPonyData()\PlayerRespawn()
-            net.Start('PPM2.PlayerRespawn')
-            net.WriteEntity(@)
-            net.Broadcast()
-            return
-        
-        timer.Simple 0.5, ->
-            net.Start('PPM2.RequestPonyData')
-            net.Send(@)
+        if @IsPony()
+            @__ppm2_pony_view_offset = true
+            @SetViewOffset(PPM2.PLAYER_VIEW_OFFSET)
+            @SetViewOffsetDucked(PPM.PLAYER_VIEW_OFFSET_DUCK)
+            if @GetPonyData()
+                @GetPonyData()\PlayerRespawn()
+                net.Start('PPM2.PlayerRespawn')
+                net.WriteEntity(@)
+                net.Broadcast()
+                return
+            
+            timer.Simple 0.5, ->
+                net.Start('PPM2.RequestPonyData')
+                net.Send(@)
+        else
+            if @__ppm2_pony_view_offset
+                @__ppm2_pony_view_offset = false
+                @SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL)
+                @SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL)
 
 hook.Add 'PlayerInitialSpawn', 'PPM2.Hooks', =>
     timer.Simple 0.5, ->
