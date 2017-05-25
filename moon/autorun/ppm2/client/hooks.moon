@@ -161,3 +161,14 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
                     {:x, :y} = pos\ToScreen()
                     draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x + 1, y + 1, PPM_HINT_COLOR_SECOND, TEXT_ALIGN_CENTER)
                     draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x, y, PPM_HINT_COLOR_FIRST, TEXT_ALIGN_CENTER)
+
+concommand.Add 'ppm2_cleanup', ->
+    for ent in *ents.GetAll()
+        if ent.isPonyPropModel and not IsValid(ent.manePlayer)
+            ent\Remove()
+    PPM2.Message('All unused models were removed')
+
+timer.Create 'PPM2.ModelCleanup', 60, 0, ->
+    for ent in *ents.GetAll()
+        if ent.isPonyPropModel and not IsValid(ent.manePlayer)
+            ent\Remove()
