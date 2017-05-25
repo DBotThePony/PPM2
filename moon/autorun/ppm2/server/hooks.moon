@@ -67,7 +67,7 @@ do
         PPM2.Message 'Networking Error: ', err
         PPM2.Message debug.traceback()
 
-    timer.Create 'PPM2.Require', 1, 0, -> xpcall(safeSendFunction, errorTrack)
+    timer.Create 'PPM2.Require', 0.25, 0, -> xpcall(safeSendFunction, errorTrack)
     net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
         return if not IsValid(ply)
         REQUIRE_CLIENTS[ply] = for ent in *ents.GetAll()
