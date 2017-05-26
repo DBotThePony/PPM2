@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+resource.AddWorkshop('933203381')
+
 Files = {
     'materials/gui/pped_icon.png'
     'materials/gui/ppm2/emotes/anger.png'
