@@ -866,6 +866,8 @@ class PonyFlexController
             continue if not seq.autostart
             @StartSequence(seq.name)
     
+    Reset: => @ResetSequences()
+    
     PlayerRespawn: =>
         return if not @isValid
         @ResetSequences()

@@ -164,6 +164,7 @@ class DefaultBodygroupController
         return unless IsValid(@ent)
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
+    Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
     SlowUpdate: (createModels = CLIENT) =>
