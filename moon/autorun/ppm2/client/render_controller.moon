@@ -245,8 +245,7 @@ class PonyRenderController
         @renderController.ent = @ent
         return @renderController
     CreateFlexController: =>
-        return if not @isValid
-        return if not @ent\IsPlayer()
+        return @flexes if not @isValid
         return if @GetData()\GetNoFlex()
         if not @flexes
             cls = PPM2.GetFlexController(@modelCached)
