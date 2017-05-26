@@ -291,6 +291,7 @@ PANEL_SETTINGS_BASE = {
         @DockPadding(5, 5, 5, 5)
         @unsavedChanges = false
         @updateFuncs = {}
+        @createdPanels = 1
     ValueChanges: (valID, newVal, pnl) =>
         @unsavedChanges = true
         @frame.unsavedChanges = true
@@ -303,6 +304,7 @@ PANEL_SETTINGS_BASE = {
     SetTargetData: (val) => @data = val
     DoUpdate: => func() for func in *@updateFuncs
     NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
+        @createdPanels += 3
 		with vgui.Create('DNumSlider', parent)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
@@ -328,6 +330,7 @@ PANEL_SETTINGS_BASE = {
                 \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
     Label: (text = '', parent = @scroll or @) =>
+        @createdPanels += 1
         with vgui.Create('DLabel', parent)
             \SetText(text)
             \Dock(TOP)
@@ -338,6 +341,7 @@ PANEL_SETTINGS_BASE = {
             \SetSize(w, h + 5)
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
     URLLabel: (text = '', url = '', parent = @scroll or @) =>
+        @createdPanels += 1
         with vgui.Create('DLabel', parent)
             \SetText(text)
             \Dock(TOP)
@@ -351,6 +355,7 @@ PANEL_SETTINGS_BASE = {
             .DoClick = -> gui.OpenURL(url) if url ~= ''
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
     Hr: (parent = @scroll or @) =>
+        @createdPanels += 1
         with vgui.Create('EditablePanel', parent)
             \Dock(TOP)
             \SetSize(200, 15)
@@ -359,6 +364,7 @@ PANEL_SETTINGS_BASE = {
                 surface.SetDrawColor(150, 162, 162)
                 surface.DrawLine(0, h / 2, w, h / 2)
     Button: (text = 'Perfectly generic button', doClick = (->), parent = @scroll or @) =>
+        @createdPanels += 1
         with vgui.Create('DButton', parent)
             \Dock(TOP)
             \SetSize(200, 20)
@@ -367,6 +373,7 @@ PANEL_SETTINGS_BASE = {
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
             .DoClick = -> doClick()
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
+        @createdPanels += 3
 		with vgui.Create('DCheckBoxLabel', parent)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
@@ -384,6 +391,7 @@ PANEL_SETTINGS_BASE = {
                 \SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
     ColorBox: (name = 'Colorful Box', option = '', parent = @scroll or @) =>
+        @createdPanels += 7
         collapse = vgui.Create('DCollapsibleCategory', parent)
         box = vgui.Create('DColorMixer', collapse)
         collapse.box = box
@@ -409,6 +417,7 @@ PANEL_SETTINGS_BASE = {
         @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
         return box, collapse
     Spoiler: (name = 'Mysterious spoiler', parent = @scroll or @) =>
+        @createdPanels += 2
         collapse = vgui.Create('DCollapsibleCategory', parent)
         canvas = vgui.Create('EditablePanel', collapse)
         with canvas
@@ -424,6 +433,7 @@ PANEL_SETTINGS_BASE = {
         @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
         return canvas, collapse
     ComboBox: (name = 'Combo Box', option = '', choices, parent = @scroll or @) =>
+        @createdPanels += 4
         label = vgui.Create('DLabel', parent)
         with label
             \SetText(name)
@@ -453,6 +463,7 @@ PANEL_SETTINGS_BASE = {
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
         return box, label
     URLInput: (option = '', parent = @scroll or @) =>
+        @createdPanels += 2
         wrapper = vgui.Create('EditablePanel', parent)
         with wrapper
             \Dock(TOP)
@@ -494,6 +505,7 @@ PANEL_SETTINGS_BASE = {
         return textInput
     ScrollPanel: =>
         return @scroll if IsValid(@scroll)
+        @createdPanels += 1
         @scroll = vgui.Create('DScrollPanel', @)
         @scroll\Dock(FILL)
         return @scroll
@@ -1026,6 +1038,7 @@ PPM2.OpenEditor = ->
         net.SendToServer()
         return
     
+    sysTime = SysTime()
     frame = vgui.Create('DFrame')
     self = frame
     W, H = ScrW() - 25, ScrH() - 25
@@ -1153,6 +1166,8 @@ PPM2.OpenEditor = ->
 
     @panels = {}
 
+    createdPanels = 17
+
     for {:name, :func, :internal, :display} in *EditorPages
         continue if display and not display()
         pnl = vgui.Create('PPM2SettingsBase', @menus)
@@ -1161,7 +1176,11 @@ PPM2.OpenEditor = ->
         pnl\Dock(FILL)
         pnl.frame = @
         func(pnl, @menus)
+        createdPanels += pnl.createdPanels
         @panels[internal] = pnl
+    
+    iTime = math.floor((SysTime() - sysTime) * 1000)
+    PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
 concommand.Add 'ppm2_editor', PPM2.OpenEditor
 
