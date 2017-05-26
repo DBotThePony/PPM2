@@ -527,6 +527,22 @@ surface.CreateFont('PPM2.AboutLabels', {
     weight: 500
 })
 
+EditorModels = {
+    'DEFAULT': 'models/ppm/player_default_base.mdl'
+    'CPPM': 'models/cppm/player_default_base.mdl'
+    'NEW': 'models/ppm/player_default_base_new.mdl'
+}
+
+USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
+PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
+
+IS_USING_NEW = ->
+    switch USE_MODEL\GetString()
+        when 'new'
+            return true
+        else
+            return false
+
 EditorPages = {
     {
         'name': 'Main'
@@ -541,12 +557,12 @@ EditorPages = {
                     @ValueChanges()
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
             @ComboBox('Race', 'Race')
-            @ComboBox('Wings Type', 'WingsType')
+            @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW()
             @CheckBox('Gender', 'Gender')
-            @NumSlider('Male chest buff', 'MaleBuff', 2)
+            @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
 
-            if ADVANCED_MODE\GetBool()
+            if ADVANCED_MODE\GetBool() and IS_USING_NEW()
                 @Hr()
                 @CheckBox('No flexes on new model', 'NoFlex')
                 @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
@@ -613,16 +629,16 @@ EditorPages = {
         'func': (sheet) =>
             @ScrollPanel()
             @ComboBox('Eyelashes', 'EyelashType')
-            @CheckBox('Bat pony ears', 'BatPonyEars')
-            @CheckBox('Fangs', 'Fangs')
-            @CheckBox('Claw teeth', 'ClawTeeth')
+            if IS_USING_NEW()
+                @CheckBox('Bat pony ears', 'BatPonyEars')
+                @CheckBox('Fangs', 'Fangs')
+                @CheckBox('Claw teeth', 'ClawTeeth')
 
-            if ADVANCED_MODE\GetBool()
-                @Hr()
-                @Label('Teeth, Tongue and Mouth colors affect only new model')
-                @ColorBox('Teeth color', 'TeethColor')
-                @ColorBox('Mouth color', 'MouthColor')
-                @ColorBox('Tongue color', 'TongueColor')
+                if ADVANCED_MODE\GetBool()
+                    @Hr()
+                    @ColorBox('Teeth color', 'TeethColor')
+                    @ColorBox('Mouth color', 'MouthColor')
+                    @ColorBox('Tongue color', 'TongueColor')
     }
 
     {
@@ -663,6 +679,7 @@ EditorPages = {
     {
         'name': 'Old mane and tail'
         'internal': 'manetail_old'
+        'display': -> not IS_USING_NEW()
         'func': (sheet) =>
             @ScrollPanel()
             @ComboBox('Mane type', 'ManeType')
@@ -681,6 +698,7 @@ EditorPages = {
     {
         'name': 'New mane and tail'
         'internal': 'manetail'
+        'display': IS_USING_NEW
         'func': (sheet) =>
             @ScrollPanel()
             @Label('"New" affect only new model')
@@ -903,15 +921,6 @@ EditorPages = {
     }
 }
 
-EditorModels = {
-    'DEFAULT': 'models/ppm/player_default_base.mdl'
-    'CPPM': 'models/cppm/player_default_base.mdl'
-    'NEW': 'models/ppm/player_default_base_new.mdl'
-}
-
-USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
-PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
-
 if IsValid(PPM2.EditorFrame)
     PPM2.EditorFrame\Remove()
     net.Start('PPM2.EditorStatus')
@@ -1088,7 +1097,8 @@ PPM2.OpenEditor = ->
 
     @panels = {}
 
-    for {:name, :func, :internal} in *EditorPages
+    for {:name, :func, :internal, :display} in *EditorPages
+        continue if display and not display()
         pnl = vgui.Create('PPM2SettingsBase', @menus)
         @menus\AddSheet(name, pnl)
         pnl\SetTargetData(copy)
