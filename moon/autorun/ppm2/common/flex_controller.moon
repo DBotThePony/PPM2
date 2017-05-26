@@ -219,6 +219,8 @@ class FlexSequence
         @speed = 1
         @scale = 1
         @valid = true
+        @paused = false
+        @pausedSequences = {}
         @createfunc() if @createfunc
         @resetfunc() if @resetfunc
     
@@ -257,28 +259,48 @@ class FlexSequence
     Think: (delta = 0) =>
         @ent = @controller.ent
         return false if not IsValid(@ent)
-        if @HasFinished()
-            @Stop()
-            return false
-        
-        @deltaAnim = (@finish - RealTime()) / @time
-        if @deltaAnim < 0
-            @deltaAnim = 1
-            @frame = 0
-            @start = RealTime()
-            @finish = @start + @time
-        @frame += 1
-
-        if @func
-            status = @func(delta, 1 - @deltaAnim)
-            if status == false
+        if @paused
+            @finish += delta
+            @start += delta
+        else
+            if @HasFinished()
                 @Stop()
                 return false
         
+            @deltaAnim = (@finish - RealTime()) / @time
+            if @deltaAnim < 0
+                @deltaAnim = 1
+                @frame = 0
+                @start = RealTime()
+                @finish = @start + @time
+            @frame += 1
+
+            if @func
+                status = @func(delta, 1 - @deltaAnim)
+                if status == false
+                    @Stop()
+                    return false
+        
         return true
+    Pause: =>
+        return false if @paused
+        @paused = true
+        return true
+    Resume: =>
+        return false if not @paused
+        @paused = false
+        return true
+    PauseSequence: (id = '') =>
+        @pausedSequences[id] = true
+        @GetController()\PauseSequence(id)
+    ResumeSequence: (id = '') =>
+        @pausedSequences[id] = false
+        @GetController()\ResumeSequence(id)
     Stop: =>
         for id in *@flexIDsIterable
             @GetController()\GetFlexState(id)\ResetModifiers(@name)
+        for id, bool in pairs @pausedSequences
+            @GetController()\ResumeSequence(id) if bool
         @valid = false
     Remove: => @Stop()
     HasFinished: =>
@@ -783,6 +805,7 @@ class PonyFlexController
                 @SetModifierWeight(2, math.random(30, 50) / 100)
                 @SetModifierWeight(3, math.random(60, 100) / 100)
                 @SetModifierWeight(4, 1)
+                @PauseSequence('eyes_blink')
         }
 
         {
@@ -796,6 +819,7 @@ class PonyFlexController
                 @SetModifierWeight(2, math.random(30, 50) / 100)
                 @SetModifierWeight(3, math.random(60, 100) / 100)
                 @SetModifierWeight(4, 1)
+                @PauseSequence('eyes_blink')
         }
 
         {
@@ -806,6 +830,7 @@ class PonyFlexController
             'ids': {'Happy_Eyes'}
             'create': =>
                 @SetModifierWeight(1, 1)
+                @PauseSequence('eyes_blink')
         }
 
         {
@@ -817,6 +842,7 @@ class PonyFlexController
             'create': =>
                 @SetModifierWeight(1, 1)
                 @SetModifierWeight(2, 1)
+                @PauseSequence('eyes_blink')
         }
 
         {
@@ -836,7 +862,7 @@ class PonyFlexController
             'time': 3
             'ids': {'Duck'}
             'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, math.abs(math.sin(RealTime() * 4)))
+                @SetModifierWeight(1, math.abs(math.sin(timeOfAnim * @GetTime() * 4)))
         }
 
         {
@@ -916,6 +942,16 @@ class PonyFlexController
             @currentSequences[seqID]\SetTime(time)
             return @currentSequences[seqID]
         return @StartSequence(seqID, time)
+
+    PauseSequence: (seqID = '') =>
+        return false if not @isValid
+        return @currentSequences[seqID]\Pause() if @currentSequences[seqID]
+        return false
+
+    ResumeSequence: (seqID = '') =>
+        return false if not @isValid
+        return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
+        return false
     
     EndSequence: (seqID = '', callStop = true) =>
         return false if not @isValid
