@@ -726,6 +726,9 @@ EditorPages = {
                     prefix = publicName .. ' '
                     @Label("'#{publicName}' Eye settings")
                 
+                @Label('Eye URL texture')
+                @URLInput("EyeURL#{publicName}")
+                @Label('When uring eye URL texture; options below have no effect')
                 @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
                 @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")

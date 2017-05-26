@@ -238,6 +238,12 @@ class PonyDataInstance
             fix: URL_FIXER
         }
 
+        'eye_url': {
+            default: -> ''
+            getFunc: 'EyeURL'
+            fix: URL_FIXER
+        }
+
         'eye_derp': {
             default: -> false
             getFunc: 'DerpEyes'
@@ -422,6 +428,12 @@ class PonyDataInstance
     }
 
     for {internal, publicName} in *{{'left', 'Left'}, {'right', 'Right'}}
+        @PONY_DATA["eye_url_#{internal}"] = {
+            default: -> ''
+            getFunc: "EyeURL#{publicName}"
+            fix: URL_FIXER
+        }
+
         @PONY_DATA["eye_bg_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeBackground#{publicName}"

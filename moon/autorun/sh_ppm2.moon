@@ -54,6 +54,7 @@ include 'common/ponydata.lua'
 include 'common/emotes.lua'
 
 if CLIENT
+    PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
     file.CreateDir('ppm2')
     file.CreateDir('ppm2/backups')
     include 'client/data_instance.lua'

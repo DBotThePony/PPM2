@@ -199,6 +199,7 @@ class PonyRenderController
     PreDraw: (ent = @ent) =>
         return if not @isValid
         @GetTextureController()\PreDraw(ent)
+        @GetTextureController()\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and PPM2.ALTERNATIVE_RENDER\GetBool()
         @flexes\Think(ent) if @flexes
     PostDraw: (ent = @ent) =>
         return if not @isValid
@@ -291,6 +292,15 @@ class NewPonyRenderController extends PonyRenderController
         @lowerManeModel\DrawModel() if IsValid(@lowerManeModel)
         @tailModel\DrawModel() if IsValid(@tailModel)
         super()
+    
+    PreDraw: (ent = @ent) =>
+        super(ent)
+        if PPM2.ALTERNATIVE_RENDER\GetBool()
+            textures = @GetTextureController()
+            return if not textures
+            textures\UpdateUpperMane(@ent, @upperManeModel) if IsValid(@upperManeModel)
+            textures\UpdateLowerMane(@ent, @lowerManeModel) if IsValid(@lowerManeModel)
+            textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
 
 PPM2.PonyRenderController = PonyRenderController
 PPM2.NewPonyRenderController = NewPonyRenderController

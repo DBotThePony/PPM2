@@ -186,6 +186,7 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["DerpEyes#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeReflection#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeEffect#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeURL#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -536,7 +537,7 @@ class PonyTextureController
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
-        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1
             ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
@@ -1167,6 +1168,7 @@ class PonyTextureController
         EyeEffect = @GetData()["GetEyeEffect#{prefixData}"](@GetData())
         DerpEyes = @GetData()["GetDerpEyes#{prefixData}"](@GetData())
         DerpEyesStrength = @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
+        EyeURL = @GetData()["GetEyeURL#{prefixData}"](@GetData())
         oldW, oldH = ScrW(), ScrH()
 
         shiftX, shiftY = 0, 0
@@ -1207,56 +1209,60 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}Name"] = "!#{textureData.name\lower()}"
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
-        rt = GetRenderTarget("PPM2_#{@GetID()}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
-        rt\Download()
-        render.PushRenderTarget(rt)
-        render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+        if EyeURL == '' or not EyeURL\find('^https?://')
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Eye_#{prefix}", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        {:r, :g, :b, :a} = EyeBackground
-        render.Clear(r, g, b, 255, true, true)
-        cam.Start2D()
-        surface.SetDrawColor(r, g, b)
-        surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b, :a} = EyeBackground
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
-        surface.SetDrawColor(EyeIris1)
-        surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-        IrisPos = @@QUAD_SIZE_CONST / 2 - @@QUAD_SIZE_CONST * IrisSize / 2
-        IrisQuadSize = @@QUAD_SIZE_CONST * IrisSize
-        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
-
-        surface.SetDrawColor(EyeIris2)
-        surface.SetMaterial(@@EYE_GRAD)
-        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
-
-        if EyeLines
-            surface.SetDrawColor(EyeIrisLine1)
-            surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
+            surface.SetDrawColor(EyeIris1)
+            surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
+            IrisPos = @@QUAD_SIZE_CONST / 2 - @@QUAD_SIZE_CONST * IrisSize / 2
+            IrisQuadSize = @@QUAD_SIZE_CONST * IrisSize
             surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
-            surface.SetDrawColor(EyeIrisLine2)
-            surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
+            surface.SetDrawColor(EyeIris2)
+            surface.SetMaterial(@@EYE_GRAD)
             surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
-        
-        surface.SetDrawColor(EyeHole)
-        surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-        HoleQuadSize = @@QUAD_SIZE_CONST * IrisSize * HoleSize
-        HolePos = @@QUAD_SIZE_CONST / 2
-        surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
 
-        surface.SetDrawColor(EyeEffect)
-        surface.SetMaterial(@@EYE_EFFECT)
-        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            if EyeLines
+                surface.SetDrawColor(EyeIrisLine1)
+                surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
+                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
-        surface.SetDrawColor(EyeReflection)
-        surface.SetMaterial(@@EYE_REFLECTION)
-        surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+                surface.SetDrawColor(EyeIrisLine2)
+                surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
+                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            
+            surface.SetDrawColor(EyeHole)
+            surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
+            HoleQuadSize = @@QUAD_SIZE_CONST * IrisSize * HoleSize
+            HolePos = @@QUAD_SIZE_CONST / 2
+            surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@QUAD_SIZE_CONST * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
-        @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+            surface.SetDrawColor(EyeEffect)
+            surface.SetMaterial(@@EYE_EFFECT)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
 
-        PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
+            surface.SetDrawColor(EyeReflection)
+            surface.SetMaterial(@@EYE_REFLECTION)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+
+            PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
+        else
+            @@LoadURL EyeURL, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, material) ->
+                @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
         return @["EyeMaterial#{prefixUpper}"]
     CompileCMark: =>
         return unless @isValid
@@ -1852,7 +1858,7 @@ class NewPonyTextureController extends PonyTextureController
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
-        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1
             ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))

@@ -59,9 +59,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("EyeLines#{publicName}",         net.ReadBool, net.WriteBool,                           true)
         @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
         @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
-        @NetworkVar("HoleWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat, 1)
+        @NetworkVar("HoleWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat,  1)
         @NetworkVar("HoleSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
         @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
+        @NetworkVar("EyeURL#{publicName}",           net.ReadString,                                                            net.WriteString, '')
 
     @NetworkVar('SeparateMane',     net.ReadBool, net.WriteBool,              false)
     for i = 1, 6
