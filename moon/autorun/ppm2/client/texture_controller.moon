@@ -1689,8 +1689,6 @@ class NewPonyTextureController extends PonyTextureController
         ent\SetSubMaterial(@@MAT_INDEX_CMARK)
         ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 
-
-
 PPM2.NewPonyTextureController = NewPonyTextureController
 PPM2.PonyTextureController = PonyTextureController
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController
