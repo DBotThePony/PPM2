@@ -120,6 +120,8 @@ PPM2.AvaliableEyeTypes = {
     'DEFAULT', 'APERTURE'
 }
 
+PPM2.AvaliablePonyWings = {'DEFAULT', 'BATPONY'}
+
 PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOLTS_LIGHT', 'WONDERBOLTS_FULL', 'WONDERBOLTS_LIGHT'}
 
 do
@@ -161,6 +163,9 @@ PPM2.MAX_CMARK = #PPM2.DefaultCutiemarks - 1
 
 PPM2.MIN_SUIT = 0
 PPM2.MAX_SUIT = #PPM2.AvaliablePonySuits - 1
+
+PPM2.MIN_WINGS = 0
+PPM2.MAX_WINGS = #PPM2.AvaliablePonyWings - 1
 
 PPM2.GENDER_FEMALE = 0
 PPM2.GENDER_MALE = 1

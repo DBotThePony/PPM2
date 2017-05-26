@@ -36,6 +36,15 @@ class PonyDataInstance
             min: 0
             max: 3
         }
+        
+        'wings_type': {
+            default: -> 1
+            getFunc: 'WingsType'
+            enum: [arg for arg in *PPM2.AvaliablePonyWings]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGS, PPM2.MAX_WINGS)
+            min: PPM2.MIN_WINGS
+            max: PPM2.MAX_WINGS
+        }
 
         'gender': {
             default: -> PPM2.GENDER_FEMALE

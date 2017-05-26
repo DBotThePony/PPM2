@@ -540,6 +540,22 @@ class NewBodygroupController extends DefaultBodygroupController
         @ResetBodygroups()
         return @RemoveModels() if not @ent\IsPony()
         @SlowUpdate(createModels)
+    
+    ApplyRace: =>
+        return unless @isValid
+        switch @GetData()\GetRace()
+            when PPM2.RACE_EARTH
+                @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS + 1)
+            when PPM2.RACE_PEGASUS
+                @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, @GetData()\GetWingsType())
+            when PPM2.RACE_UNICORN
+                @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS + 1)
+            when PPM2.RACE_ALICORN
+                @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, @GetData()\GetWingsType())
 
     DataChanges: (state) =>
         return unless @isValid
@@ -563,6 +579,8 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'TailSize'
                 @UpdateTailModel() if CLIENT
             when 'Race'
+                @ApplyRace()
+            when 'WingsType'
                 @ApplyRace()
             when 'SocksAsModel'
                 return if SERVER

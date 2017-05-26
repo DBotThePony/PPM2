@@ -541,6 +541,7 @@ EditorPages = {
                     @ValueChanges()
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
             @ComboBox('Race', 'Race')
+            @ComboBox('Wings Type', 'WingsType')
             @CheckBox('Gender', 'Gender')
             @NumSlider('Weight', 'Weight', 2)
 
