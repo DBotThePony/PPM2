@@ -90,6 +90,7 @@ class PonyWeightController
     GetModel: => @networkedData\GetModel()
 
     @WEIGHT_BONES = {
+        {id: 0, scale: 0.7}
         {id: 1, scale: 0.7}
         {id: 2, scale: 0.7}
     }
@@ -111,13 +112,15 @@ class PonyWeightController
         return if not @isValid
         for i = 0, ent\GetBoneCount() - 1
             ent\ManipulateBoneScale(i, @@DEFAULT_BONE_SIZE)
+    Reset: => @ResetBones()
     UpdateWeight: (ent = @ent) =>
         return if not IsValid(ent)
         return if not @isValid
         @ResetBones(ent)
         return if not @ent\IsPony()
         for {:id, :scale} in *@@WEIGHT_BONES
-            ent\ManipulateBoneScale(id, Vector(scale * @weight, scale * @weight, scale * @weight))
+            delta = (@weight - 1) * scale
+            ent\ManipulateBoneScale(id, Vector(1 + delta, 1 + delta, 1 + delta))
     Remove: =>
         @isValid = false
 
@@ -161,8 +164,13 @@ class NewPonyWeightController extends PonyWeightController
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
     @WEIGHT_BONES = {
+        {id: 0, scale: 0.7}
+        {id: 1, scale: 0.7}
+        {id: 6, scale: 0.7}
         {id: 11, scale: 0.7}
         {id: 12, scale: 0.7}
+        {id: 14, scale: 0.7}
+        {id: 20, scale: 0.7}
     }
 
     table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 1, 10
