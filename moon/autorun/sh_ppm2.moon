@@ -95,5 +95,6 @@ else
     include 'server/hooks.lua'
     include 'server/fastdl.lua'
     include 'server/emotes.lua'
+    include 'server/hitgroups.lua'
 
 include 'common/vll_loader.lua' if VLL
