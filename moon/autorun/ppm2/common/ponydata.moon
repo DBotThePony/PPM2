@@ -261,9 +261,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent = @GetEntity() if not IsValid(@ent)
         @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
         if CLIENT
-            @GetWeightController()\Remove()
-            @GetRenderController()\Remove()
-        @GetBodygroupController()\Remove()
+            @GetWeightController()\Remove() if @GetWeightController()
+            @GetRenderController()\Remove() if @GetRenderController()
+        @GetBodygroupController()\Remove() if @GetBodygroupController()
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData
