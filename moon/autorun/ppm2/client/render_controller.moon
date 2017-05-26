@@ -179,6 +179,10 @@ class PonyRenderController
         render.EnableClipping(oldClip)
     
     IsValid: => IsValid(@ent) and @isValid
+    Reset: =>
+        @flexes\Reset() if @flexes and @flexes.Reset
+        @GetTextureController()\Reset() if @GetTextureController and @GetTextureController() and @GetTextureController().Reset
+        @GetTextureController()\ResetTextures() if @GetTextureController and @GetTextureController()
     Remove: =>
         @flexes\Remove() if @flexes
         @GetTextureController()\Remove() if @GetTextureController and @GetTextureController()

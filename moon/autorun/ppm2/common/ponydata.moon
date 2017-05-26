@@ -145,6 +145,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
+        @Reset()
         if CLIENT
             timer.Simple 0, ->
                 @GetRenderController()\CompileTextures() if @GetRenderController()
@@ -157,6 +158,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             if CLIENT
                 @GetRenderController()
                 @GetWeightController()
+            @Reset()
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
@@ -167,6 +169,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetWeightController()\DataChanges(state) if @GetWeightController()
             @GetRenderController()\DataChanges(state) if @GetRenderController()
     
+    Reset: =>
+        if CLIENT
+            @GetWeightController()\Reset() if @GetWeightController().Reset
+            @GetRenderController()\Reset() if @GetRenderController().Reset
+            @GetBodygroupController()\Reset() if @GetBodygroupController().Reset
     PlayerRespawn: =>
         @ApplyBodygroups(CLIENT)
 

@@ -60,12 +60,16 @@ doPatch = =>
         return if not targetModel
         targetModel.oldSetModel = targetModel.SetModel
         targetModel.SetModel = (model) =>
+            oldModel = @Entity\GetModel()
             oldPonyData = @Entity\GetPonyData()
             @oldSetModel(model)
-            oldPonyData\SetupEntity(@Entity) if IsValid(@Entity) and oldPonyData
+            if IsValid(@Entity) and oldPonyData
+                oldPonyData\SetupEntity(@Entity)
+                oldPonyData\ModelChanges(oldModel, model)
         targetModel.PreDrawModel = (ent) =>
             controller = @ponyController
             return if not controller
+            return if not ent\IsPony()
             controller\SetupEntity(ent) if controller.ent ~= ent
             controller\GetRenderController()\DrawModels()
             controller\GetRenderController()\PreDraw(ent)
