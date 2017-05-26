@@ -1,19 +1,19 @@
+
 {
-	"title"		:	"PPM/2",
-	"type"		:	"tool",
-	"tags"		:	[],
-	"ignore"	:
-	[
-		"*.psd",
-		"*.vcproj",
-		"*.svn*",
-		"*.git*",
-		".gitlab-ci.yml",
-		"moon*",
-		"build.sh",
-		"README.md",
-		"lint.sh",
-		"cmark_resizer.html",
-		"LICENSE"
-	]
+    "title"     :   "PPM/2 - Pony Player Models V2",
+    "type"      :   "model",
+    "tags"      :   ["cartoon", "roleplay"],
+    "ignore"    :   [
+        "*.psd",
+        "*.vcproj",
+        "*.svn*",
+        "*.git*",
+        ".gitlab-ci.yml",
+        "moon*",
+        "build.sh",
+        "README.md",
+        "lint.sh",
+        "cmark_resizer.html",
+        "LICENSE"
+    ]
 }
