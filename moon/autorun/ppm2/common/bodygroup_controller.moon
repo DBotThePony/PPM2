@@ -238,6 +238,54 @@ class CPPMBodygroupController extends DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 2)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 3)
 
+--
+-- 0	LrigPelvis
+-- 1	Lrig_LEG_BL_Femur
+-- 2	Lrig_LEG_BL_Tibia
+-- 3	Lrig_LEG_BL_LargeCannon
+-- 4	Lrig_LEG_BL_PhalanxPrima
+-- 5	Lrig_LEG_BL_RearHoof
+-- 6	Lrig_LEG_BR_Femur
+-- 7	Lrig_LEG_BR_Tibia
+-- 8	Lrig_LEG_BR_LargeCannon
+-- 9	Lrig_LEG_BR_PhalanxPrima
+-- 10	Lrig_LEG_BR_RearHoof
+-- 11	LrigSpine1
+-- 12	LrigSpine2
+-- 13	LrigRibcage
+-- 14	Lrig_LEG_FL_Scapula
+-- 15	Lrig_LEG_FL_Humerus
+-- 16	Lrig_LEG_FL_Radius
+-- 17	Lrig_LEG_FL_Metacarpus
+-- 18	Lrig_LEG_FL_PhalangesManus
+-- 19	Lrig_LEG_FL_FrontHoof
+-- 20	Lrig_LEG_FR_Scapula
+-- 21	Lrig_LEG_FR_Humerus
+-- 22	Lrig_LEG_FR_Radius
+-- 23	Lrig_LEG_FR_Metacarpus
+-- 24	Lrig_LEG_FR_PhalangesManus
+-- 25	Lrig_LEG_FR_FrontHoof
+-- 26	LrigNeck1
+-- 27	LrigNeck2
+-- 28	LrigNeck3
+-- 29	LrigScull
+-- 30	Jaw
+-- 31	Ear_L
+-- 32	Ear_R
+-- 33	Mane02
+-- 34	Mane03
+-- 35	Mane03_tip
+-- 36	Mane04
+-- 37	Mane05
+-- 38	Mane06
+-- 39	Mane07
+-- 40	Mane01
+-- 41	Lrigweaponbone
+-- 42	Tail01
+-- 43	Tail02
+-- 44	Tail03
+--
+
 class NewBodygroupController extends DefaultBodygroupController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
 
@@ -245,6 +293,10 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_GENDER = -1
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
+
+    @BONE_TAIL_1 = 42
+    @BONE_TAIL_2 = 43
+    @BONE_TAIL_3 = 44
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
@@ -519,6 +571,10 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
+        if CLIENT
+            @ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(0, 0, 0))
+            @ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(0, 0, 0))
+            @ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(0, 0, 0))
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
@@ -531,6 +587,14 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
+
+        if CLIENT
+            size = @GetData()\GetTailSize()
+            vecTail = Vector(size, size, size)
+            @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
+            @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
+            @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
+
         @ApplyRace()
         if createModels
             @UpdateUpperMane()
@@ -594,6 +658,13 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'MaleBuff'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
+            when 'TailSize'
+                return if SERVER
+                size = @GetData()\GetTailSize()
+                vecTail = Vector(size, size, size)
+                @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
+                @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
+                @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
             when 'SocksAsModel'
                 return if SERVER
                 if state\GetValue()

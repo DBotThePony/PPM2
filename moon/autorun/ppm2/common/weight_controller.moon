@@ -93,6 +93,7 @@ class PonyWeightController
         {id: 0, scale: 0.7}
         {id: 1, scale: 0.7}
         {id: 2, scale: 0.7}
+        {id: 3, scale: 0.7}
     }
 
     table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
@@ -123,7 +124,7 @@ class PonyWeightController
             ent\ManipulateBoneScale(id, Vector(1 + delta, 1 + delta, 1 + delta))
     Remove: =>
         @isValid = false
-
+--
 -- 0	LrigPelvis
 -- 1	Lrig_LEG_BL_Femur
 -- 2	Lrig_LEG_BL_Tibia
@@ -154,9 +155,21 @@ class PonyWeightController
 -- 27	LrigNeck2
 -- 28	LrigNeck3
 -- 29	LrigScull
--- 30	Ear_L
--- 31	Ear_R
--- 32	__INVALIDBONE__
+-- 30	Jaw
+-- 31	Ear_L
+-- 32	Ear_R
+-- 33	Mane02
+-- 34	Mane03
+-- 35	Mane03_tip
+-- 36	Mane04
+-- 37	Mane05
+-- 38	Mane06
+-- 39	Mane07
+-- 40	Mane01
+-- 41	Lrigweaponbone
+-- 42	Tail01
+-- 43	Tail02
+-- 44	Tail03
 
 class NewPonyWeightController extends PonyWeightController
     @MODELS = {'models/ppm/player_default_base_new.mdl'}
@@ -169,6 +182,7 @@ class NewPonyWeightController extends PonyWeightController
         {id: 6, scale: 0.7}
         {id: 11, scale: 0.7}
         {id: 12, scale: 0.7}
+        {id: 13, scale: 0.7}
         {id: 14, scale: 0.7}
         {id: 20, scale: 0.7}
     }

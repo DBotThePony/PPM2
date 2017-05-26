@@ -745,7 +745,7 @@ EditorPages = {
     }
 
     {
-        'name': 'Old mane and tail'
+        'name': 'Mane and tail'
         'internal': 'manetail_old'
         'display': -> not IS_USING_NEW()
         'func': (sheet) =>
@@ -753,6 +753,8 @@ EditorPages = {
             @ComboBox('Mane type', 'ManeType')
             @ComboBox('Lower Mane type', 'ManeTypeLower')
             @ComboBox('Tail type', 'TailType')
+
+            @NumSlider('Tail size', 'TailSize', 2)
 
             @Hr()
             @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
@@ -764,8 +766,8 @@ EditorPages = {
     }
 
     {
-        'name': 'New mane and tail'
-        'internal': 'manetail'
+        'name': 'Mane and tail'
+        'internal': 'manetail_new'
         'display': IS_USING_NEW
         'func': (sheet) =>
             @ScrollPanel()
@@ -773,6 +775,8 @@ EditorPages = {
             @ComboBox('New Mane type', 'ManeTypeNew')
             @ComboBox('New Lower Mane type', 'ManeTypeLowerNew')
             @ComboBox('New Tail type', 'TailTypeNew')
+
+            @NumSlider('Tail size', 'TailSize', 2)
 
             @Hr()
             @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
