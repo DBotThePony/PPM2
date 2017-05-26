@@ -133,6 +133,7 @@ MODEL_BOX_PANEL = {
     PerformLayout: (w = 0, h = 0) =>
         --@animButton\SetPos(w - 130, 10)
         @seqButton\SetPos(10, 10)
+        @emotesPanel\SetPos(10, 40)
     
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
@@ -181,6 +182,11 @@ MODEL_BOX_PANEL = {
             .__PPM2_PonyData = ponydata
         @model\SetSequence(@seq)
         @model\FrameAdvance(0)
+        @emotesPanel\Remove() if IsValid(@emotesPanel)
+        @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
+        @emotesPanel\SetPos(10, 40)
+        @emotesPanel\SetMouseInputEnabled(true)
+        @emotesPanel\SetVisible(true)
         return @model
     Think: =>
         rtime = RealTime()

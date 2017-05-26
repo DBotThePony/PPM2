@@ -82,10 +82,11 @@ BUTTON_DRAW_FUNC = (w = 0, h = 0) =>
     surface.DrawRect(0, 0, w, h)
 
 BUTTON_CLICK_FUNC = =>
-    net.Start('PPM2.PlayEmote')
-    net.WriteUInt(@id, 8)
-    net.SendToServer()
-    hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), @sequence, @time)
+    if @sendToServer
+        net.Start('PPM2.PlayEmote')
+        net.WriteUInt(@id, 8)
+        net.SendToServer()
+    hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
@@ -107,7 +108,7 @@ HOVERED_IMAGE_PANEL_THINK = =>
         return
     if @parent.lastThink < RealTime()
         @SetVisible(false)
-CreatePanel = (parent) ->
+PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) ->
     self = vgui.Create('DPanel', parent)
     @SetSize(200, 300)
     @Paint = (w = 0, h = 0) =>
@@ -128,6 +129,8 @@ CreatePanel = (parent) ->
             .time = time
             .sequence = sequence
             .hoverDelta = 0
+            .sendToServer = sendToServer
+            .target = target
             .DoClick = BUTTON_CLICK_FUNC
             \SetSize(200, 32)
             \SetText(name)
@@ -159,7 +162,7 @@ CreatePanel = (parent) ->
 
 hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
     PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
-    PPM2.EmotesPanelContext = CreatePanel(@)
+    PPM2.EmotesPanelContext = PPM2.CreateEmotesPanel(@)
     PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
     PPM2.EmotesPanelContext\SetVisible(true)
     PPM2.EmotesPanelContext\SetMouseInputEnabled(true)
@@ -174,7 +177,7 @@ hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
 
 hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
-        PPM2.EmotesPanel = CreatePanel()
+        PPM2.EmotesPanel = PPM2.CreateEmotesPanel()
         PPM2.EmotesPanel\SetPos(ScrW() - 500, ScrH() - 300)
 
     if IsValid(PPM2.EmotesPanel) and LocalPlayer()\IsPony()
