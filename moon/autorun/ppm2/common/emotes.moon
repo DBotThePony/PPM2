@@ -93,6 +93,36 @@ PPM2.AVALIABLE_EMOTES = {
         'sequence': 'blahblah'
         'time': 3
     }
+
+    {
+        'name': 'Happi'
+        'sequence': 'happy_eyes'
+        'time': 4
+    }
+
+    {
+        'name': 'Happi grin'
+        'sequence': 'happy_grin'
+        'time': 5
+    }
+
+    {
+        'name': 'DUCK'
+        'sequence': 'duck'
+        'time': 3
+    }
+
+    {
+        'name': 'DUCK INSANITY'
+        'sequence': 'duck_insanity'
+        'time': 2
+    }
+
+    {
+        'name': 'QUACKS'
+        'sequence': 'duck_quack'
+        'time': 4
+    }
 }
 
 AvaliableFiles = {fil, true for fil in *file.Find('materials/gui/ppm2/emotes/*', 'GAME')} if CLIENT

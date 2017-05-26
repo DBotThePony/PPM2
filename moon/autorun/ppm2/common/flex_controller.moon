@@ -331,8 +331,8 @@ class PonyFlexController
         {flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
         {flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
         {flex: 'Lowerlid_Raise',    scale: 1, speed: 1, active: false}
-        {flex: 'Happy_Eyes',        scale: 1, speed: 1, active: false}
-        {flex: 'Duck',              scale: 1, speed: 1, active: false}
+        {flex: 'Happy_Eyes',        scale: 1, speed: 1, active: true}
+        {flex: 'Duck',              scale: 1, speed: 1, active: true}
 
     }
 
@@ -796,6 +796,65 @@ class PonyFlexController
                 @SetModifierWeight(2, math.random(30, 50) / 100)
                 @SetModifierWeight(3, math.random(60, 100) / 100)
                 @SetModifierWeight(4, 1)
+        }
+
+        {
+            'name': 'happy_eyes'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Happy_Eyes'}
+            'create': =>
+                @SetModifierWeight(1, 1)
+        }
+
+        {
+            'name': 'happy_grin'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Happy_Eyes', 'Grin'}
+            'create': =>
+                @SetModifierWeight(1, 1)
+                @SetModifierWeight(2, 1)
+        }
+
+        {
+            'name': 'duck'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Duck'}
+            'create': =>
+                @SetModifierWeight(1, math.random(70, 90) / 100)
+        }
+
+        {
+            'name': 'duck_insanity'
+            'autostart': false
+            'repeat': false
+            'time': 3
+            'ids': {'Duck'}
+            'func': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, math.abs(math.sin(RealTime() * 4)))
+        }
+
+        {
+            'name': 'duck_quack'
+            'autostart': false
+            'repeat': false
+            'time': 5
+            'ids': {'Duck', 'JawOpen'}
+            'create': =>
+                @talkAnim = for i = 0, 1, 0.1
+                    rand = math.random(1, 100)
+                    rand > 50 and 1 or 0
+                @SetModifierWeight(1, math.random(70, 90) / 100)
+            'func': (delta, timeOfAnim) =>
+                cPos = math.floor(timeOfAnim * 10) + 1
+                data = @talkAnim[cPos]
+                return if not data
+                @SetModifierWeight(2, data)
         }
     }
 
