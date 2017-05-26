@@ -1373,6 +1373,8 @@ class NewPonyTextureController extends PonyTextureController
     @MAT_INDEX_MOUTH = 7
     @MAT_INDEX_HORN = 8
     @MAT_INDEX_WINGS = 9
+    @MAT_INDEX_WINGS_BAT = 10
+    @MAT_INDEX_WINGS_BAT_SKIN = 11
 
     @MAT_INDEX_HAIR_COLOR1 = 0
     @MAT_INDEX_HAIR_COLOR2 = 1
@@ -1414,6 +1416,37 @@ class NewPonyTextureController extends PonyTextureController
                 @CompileMouth()
             when 'MouthColor'
                 @CompileMouth()
+            when 'BatWingColor'
+                @CompileBatWings()
+            when 'SeparateWings'
+                @CompileBatWings()
+                @CompileBatWingsSkin()
+            when 'BatWingSkinColor'
+                @CompileBatWingsSkin()
+            when 'BatWingURL1'
+                @CompileBatWings()
+            when 'BatWingURL2'
+                @CompileBatWings()
+            when 'BatWingURL3'
+                @CompileBatWings()
+            when 'BatWingURLColor1'
+                @CompileBatWings()
+            when 'BatWingURLColor2'
+                @CompileBatWings()
+            when 'BatWingURLColor3'
+                @CompileBatWings()
+            when 'BatWingSkinURL1'
+                @CompileBatWingsSkin()
+            when 'BatWingSkinURL2'
+                @CompileBatWingsSkin()
+            when 'BatWingSkinURL3'
+                @CompileBatWingsSkin()
+            when 'BatWingSkinURLColor1'
+                @CompileBatWingsSkin()
+            when 'BatWingSkinURLColor2'
+                @CompileBatWingsSkin()
+            when 'BatWingSkinURLColor3'
+                @CompileBatWingsSkin()
 
     GetManeType: => @GetData()\GetManeTypeNew()
     GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
@@ -1545,6 +1578,157 @@ class NewPonyTextureController extends PonyTextureController
         if left == 0
             continueCompilation()
         return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
+
+    CompileBatWings: =>
+        return unless @isValid
+        textureData = {
+            'name': "PPM2_#{@GetID()}_BatWings"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite'
+
+                '$model': '1'
+                '$phong': '1'
+                '$phongexponent': '0.1'
+                '$phongboost': '0.1'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                '$alpha': '1'
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
+
+        urlTextures = {}
+        left = 0
+        @BatWingsMaterialName = "!#{textureData.name\lower()}"
+        @BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
+
+            rt = GetRenderTarget("PPM2_#{@GetID()}_BatWings_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetBatWingColor() if @GetData()\GetSeparateWings()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            @BatWingsMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            PPM2.DebugPrint('Compiled Bat Wings texture for ', @ent, ' as part of ', @)
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetBatWingURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+
+        return @BatWingsMaterial
+
+    CompileBatWingsSkin: =>
+        return unless @isValid
+        textureData = {
+            'name': "PPM2_#{@GetID()}_BatWingsSkin"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite'
+
+                '$model': '1'
+                '$phong': '1'
+                '$phongexponent': '0.1'
+                '$phongboost': '0.1'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                '$alpha': '1'
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
+
+        urlTextures = {}
+        left = 0
+        @BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
+        @BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
+
+            rt = GetRenderTarget("PPM2_#{@GetID()}_BatWingsSkin_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetBatWingSkinColor() if @GetData()\GetSeparateWings()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+
+            @BatWingsSkinMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @ent, ' as part of ', @)
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetBatWingSkinURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+
+        return @BatWingsSkinMaterial
+        
     CompileHair: =>
         return unless @isValid
         return super() if not @GetData()\GetSeparateMane()
@@ -1600,10 +1784,17 @@ class NewPonyTextureController extends PonyTextureController
     CompileTextures: =>
         super()
         @CompileMouth()
+        @CompileBatWingsSkin()
+        @CompileBatWings()
     
     GetTeeth: => @TeethMaterial
     GetMouth: => @MouthMaterial
     GetTongue: => @TongueMaterial
+    GetBatWings: => @BatWingsMaterial
+    GetBatWingsSkin: => @BatWingsSkinMaterial
+
+    GetBatWingsName: => @BatWingsMaterialName
+    GetBatWingsSkinName: => @BatWingsSkinMaterialName
     GetTeethName: => @TeethMaterialName
     GetMouthName: => @MouthMaterialName
     GetTongueName: => @TongueMaterialName
@@ -1674,6 +1865,8 @@ class NewPonyTextureController extends PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
     ResetTextures: (ent = @ent) =>
         return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL
@@ -1688,6 +1881,8 @@ class NewPonyTextureController extends PonyTextureController
         ent\SetSubMaterial(@@MAT_INDEX_WINGS)
         ent\SetSubMaterial(@@MAT_INDEX_CMARK)
         ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN)
 
 PPM2.NewPonyTextureController = NewPonyTextureController
 PPM2.PonyTextureController = PonyTextureController

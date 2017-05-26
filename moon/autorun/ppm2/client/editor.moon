@@ -556,6 +556,7 @@ EditorPages = {
                     PPM2.Randomize(data, false)
                     @ValueChanges()
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
+            
             @ComboBox('Race', 'Race')
             @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW()
             @CheckBox('Gender', 'Gender')
@@ -592,23 +593,70 @@ EditorPages = {
     }
 
     {
+        'name': 'Wings and horn'
+        'internal': 'wings_horn'
+        'func': (sheet) =>
+            @ScrollPanel()
+            @CheckBox('Separate wings color from body', 'SeparateWings')
+            @CheckBox('Separate horn color from body', 'SeparateHorn')
+            @Hr()
+            @ColorBox('Wings color', 'WingsColor')
+            @ColorBox('Horn color', 'HornColor')
+            return if not IS_USING_NEW()
+            @Hr()
+            @ColorBox('Bat Wings color', 'BatWingColor')
+            @ColorBox('Bat Wings skin color', 'BatWingSkinColor')
+    }
+
+    {
+        'name': 'Wings and horn details'
+        'internal': 'wings_horn_details'
+        'display': -> ADVANCED_MODE\GetBool()
+        'func': (sheet) =>
+            @ScrollPanel()
+
+            for i = 1, 3
+                @Label("Horn URL detail #{i}")
+                @URLInput("HornURL#{i}")
+                @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+                @Hr()
+            
+            @Hr()
+            @Label('Normal wings')
+            @Hr()
+
+            for i = 1, 3
+                @Label("Wings URL detail #{i}")
+                @URLInput("WingsURL#{i}")
+                @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+                @Hr()
+            
+            @Hr()
+            @Label('Bat wings')
+            @Hr()
+            
+            for i = 1, 3
+                @Label("Bat Wings URL detail #{i}")
+                @URLInput("BatWingURL#{i}")
+                @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
+                @Hr()
+            
+            @Hr()
+            @Label('Bat wings skin')
+            @Hr()
+            
+            for i = 1, 3
+                @Label("Bat Wings skin URL detail #{i}")
+                @URLInput("BatWingSkinURL#{i}")
+                @ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
+                @Hr()
+    }
+
+    {
         'name': 'Body details'
         'internal': 'bodydetails'
         'func': (sheet) =>
             @ScrollPanel()
-
-            if ADVANCED_MODE\GetBool()
-                for i = 1, 3
-                    @Label("Horn URL detail #{i}")
-                    @URLInput("HornURL#{i}")
-                    @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
-                    @Hr()
-                
-                for i = 1, 3
-                    @Label("Wings URL detail #{i}")
-                    @URLInput("WingsURL#{i}")
-                    @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
-                    @Hr()
 
             for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
@@ -616,6 +664,8 @@ EditorPages = {
                 @Hr()
 
             @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+            @Hr()
+
             for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
                 @Label("Body detail #{i}")
                 @URLInput("BodyDetailURL#{i}")

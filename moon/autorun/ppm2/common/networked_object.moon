@@ -118,7 +118,6 @@ class NetworkedObject
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
 		strName = "_NW_#{getName}"
-		error("No more free slots! Can't add #{getName} to the table") if @NW_NextVarID > 254
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
 		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id}
@@ -135,7 +134,7 @@ class NetworkedObject
 			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation or SERVER)
 				net.Start(@@NW_Modify)
 				net.WriteUInt(@GetNetworkID(), 16)
-				net.WriteUInt(id, 8)
+				net.WriteUInt(id, 16)
 				writeFunc(@[strName])
 				if CLIENT
 					net.SendToServer()
@@ -197,7 +196,7 @@ class NetworkedObject
 				net.Send(ply)
 			return
 		return if IsValid(ply) and obj.NW_Player ~= ply
-		varID = net.ReadUInt(8)
+		varID = net.ReadUInt(16)
 		varData = @NW_VarsTable[varID]
 		return unless varData
 		{:strName, :getName, :readFunc, :writeFunc} = varData

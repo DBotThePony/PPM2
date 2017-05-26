@@ -15,6 +15,25 @@
 -- limitations under the License.
 --
 
+COLOR_FIXER = (r = 255, g = 255, b = 255, a = 255) ->
+    func = (arg = Color(r, g, b, a)) ->
+        if type(arg) ~= 'table'
+            return Color(255, 255, 255)
+        else
+            {:r, :g, :b, :a} = arg
+            if r and g and b and a
+                return Color(r, g, b, a)
+            else
+                return Color(255, 255, 255)
+    return func
+
+URL_FIXER = (arg = '') ->
+    arg = tostring(arg)
+    if arg\find('^https?://')
+        return arg
+    else
+        return ''
+
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
     @DATA_DIR_BACKUP = "ppm2/backups/"
@@ -183,15 +202,7 @@ class PonyDataInstance
         'cmark_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'CMarkColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'fangs': {
@@ -224,12 +235,7 @@ class PonyDataInstance
         'cmark_url': {
             default: -> ''
             getFunc: 'CMarkURL'
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         'eye_derp': {
@@ -258,155 +264,67 @@ class PonyDataInstance
         'eye_bg': {
             default: -> Color(255, 255, 255)
             getFunc: 'EyeBackground'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'eye_hole': {
             default: -> Color(0, 0, 0)
             getFunc: 'EyeHole'
-            fix: (arg = Color(0, 0, 0)) ->
-                if type(arg) ~= 'table'
-                    return Color(0, 0, 0)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(0, 0, 0)
+            fix: COLOR_FIXER(0, 0, 0)
         }
 
         'eye_iris1': {
             default: -> Color(200, 200, 200)
             getFunc: 'EyeIrisTop'
-            fix: (arg = Color(200, 200, 200)) ->
-                if type(arg) ~= 'table'
-                    return Color(200, 200, 200)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(200, 200, 200)
+            fix: COLOR_FIXER(200, 200, 200)
         }
 
         'eye_iris2': {
             default: -> Color(200, 200, 200)
             getFunc: 'EyeIrisBottom'
-            fix: (arg = Color(200, 200, 200)) ->
-                if type(arg) ~= 'table'
-                    return Color(200, 200, 200)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(200, 200, 200)
+            fix: COLOR_FIXER(200, 200, 200)
         }
 
         'eye_irisline1': {
             default: -> Color(255, 255, 255)
             getFunc: 'EyeIrisLine1'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'eye_irisline2': {
             default: -> Color(255, 255, 255)
             getFunc: 'EyeIrisLine2'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'eye_reflection': {
             default: -> Color(255, 255, 255, 127)
             getFunc: 'EyeReflection'
-            fix: (arg = Color(255, 255, 255, 127)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255, 127)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255, 127)
+            fix: COLOR_FIXER(255, 255, 255, 127)
         }
 
         'eye_effect': {
             default: -> Color(255, 255, 255)
             getFunc: 'EyeEffect'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'body': {
             default: -> Color(255, 255, 255)
             getFunc: 'BodyColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'horn_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'HornColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'wings_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'WingsColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'separate_wings': {
@@ -460,15 +378,7 @@ class PonyDataInstance
         'socks_model_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'SocksColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'suit': {
@@ -483,43 +393,31 @@ class PonyDataInstance
         'teeth_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'TeethColor'
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         'mouth_color': {
             default: -> Color(219, 65, 155)
             getFunc: 'MouthColor'
-            fix: (arg = Color(219, 65, 155)) ->
-                if type(arg) ~= 'table'
-                    return Color(219, 65, 155)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(219, 65, 155)
+            fix: COLOR_FIXER(219, 65, 155)
         }
 
         'tongue_color': {
             default: -> Color(235, 131, 59)
             getFunc: 'TongueColor'
-            fix: (arg = Color(235, 131, 59)) ->
-                if type(arg) ~= 'table'
-                    return Color(235, 131, 59)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(235, 131, 59)
+            fix: COLOR_FIXER(235, 131, 59)
+        }
+
+        'bat_wing_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'BatWingColor'
+            fix: COLOR_FIXER()
+        }
+
+        'bat_wing_skin_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'BatWingSkinColor'
+            fix: COLOR_FIXER()
         }
     }
 
@@ -527,113 +425,49 @@ class PonyDataInstance
         @PONY_DATA["eye_bg_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeBackground#{publicName}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["eye_hole_#{internal}"] = {
             default: -> Color(0, 0, 0)
             getFunc: "EyeHole#{publicName}"
-            fix: (arg = Color(0, 0, 0)) ->
-                if type(arg) ~= 'table'
-                    return Color(0, 0, 0)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(0, 0, 0)
+            fix: COLOR_FIXER(0, 0, 0)
         }
 
         @PONY_DATA["eye_iris1_#{internal}"] = {
             default: -> Color(200, 200, 200)
             getFunc: "EyeIrisTop#{publicName}"
-            fix: (arg = Color(200, 200, 200)) ->
-                if type(arg) ~= 'table'
-                    return Color(200, 200, 200)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(200, 200, 200)
+            fix: COLOR_FIXER(200, 200, 200)
         }
 
         @PONY_DATA["eye_iris2_#{internal}"] = {
             default: -> Color(200, 200, 200)
             getFunc: "EyeIrisBottom#{publicName}"
-            fix: (arg = Color(200, 200, 200)) ->
-                if type(arg) ~= 'table'
-                    return Color(200, 200, 200)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(200, 200, 200)
+            fix: COLOR_FIXER(200, 200, 200)
         }
 
         @PONY_DATA["eye_irisline1_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeIrisLine1#{publicName}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["eye_irisline2_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeIrisLine2#{publicName}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["eye_reflection_#{internal}"] = {
             default: -> Color(255, 255, 255, 127)
             getFunc: "EyeReflection#{publicName}"
-            fix: (arg = Color(255, 255, 255, 127)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255, 127)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255, 127)
+            fix: COLOR_FIXER(255, 255, 255, 127)
         }
 
         @PONY_DATA["eye_effect_#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeEffect#{publicName}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["eye_lines_#{internal}"] = {
@@ -693,279 +527,153 @@ class PonyDataInstance
         @PONY_DATA["horn_url_#{i}"] = {
             default: -> ''
             getFunc: "HornURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
+        }
+
+        @PONY_DATA["bat_wing_url_#{i}"] = {
+            default: -> ''
+            getFunc: "BatWingURL#{i}"
+            fix: URL_FIXER
+        }
+
+        @PONY_DATA["bat_wing_skin_url_#{i}"] = {
+            default: -> ''
+            getFunc: "BatWingSkinURL#{i}"
+            fix: URL_FIXER
         }
 
         @PONY_DATA["wings_url_#{i}"] = {
             default: -> ''
             getFunc: "WingsURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         @PONY_DATA["horn_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "HornURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
+        }
+
+        @PONY_DATA["bat_wing_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "BatWingURLColor#{i}"
+            fix: COLOR_FIXER()
+        }
+
+        @PONY_DATA["bat_wing_skin_url_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "BatWingSkinURLColor#{i}"
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["wings_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "WingsURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
     for i = 1, 6
         @PONY_DATA["mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "ManeColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["mane_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "ManeDetailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["mane_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "ManeURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["mane_url_#{i}"] = {
             default: -> ''
             getFunc: "ManeURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         @PONY_DATA["tail_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "TailDetailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["tail_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "TailURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["tail_url_#{i}"] = {
             default: -> ''
             getFunc: "TailURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         @PONY_DATA["tail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "TailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["lower_mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "LowerManeColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["lower_mane_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "LowerManeURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["lower_mane_url_#{i}"] = {
             default: -> ''
             getFunc: "LowerManeURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         @PONY_DATA["upper_mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "UpperManeColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["upper_mane_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "UpperManeURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["upper_mane_url_#{i}"] = {
             default: -> ''
             getFunc: "UpperManeURL#{i}"
-            fix: (arg = '') ->
-                arg = tostring(arg)
-                if arg\find('^https?://')
-                    return arg
-                else
-                    return ''
+            fix: URL_FIXER
         }
 
         @PONY_DATA["lower_mane_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "LowerManeDetailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["upper_mane_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "UpperManeDetailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
     
     for i = 1, PPM2.MAX_BODY_DETAILS
         @PONY_DATA["body_detail_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "BodyDetailColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
         @PONY_DATA["body_detail_#{i}"] = {
@@ -991,15 +699,7 @@ class PonyDataInstance
         @PONY_DATA["body_detail_url_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "BodyDetailURLColor#{i}"
-            fix: (arg = Color(255, 255, 255)) ->
-                if type(arg) ~= 'table'
-                    return Color(255, 255, 255)
-                else
-                    {:r, :g, :b, :a} = arg
-                    if r and g and b and a
-                        return Color(r, g, b, a)
-                    else
-                        return Color(255, 255, 255)
+            fix: COLOR_FIXER()
         }
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
