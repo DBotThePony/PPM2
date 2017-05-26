@@ -63,6 +63,14 @@ class PonyDataInstance
             max: PPM2.MAX_WEIGHT
         }
 
+        'male_buff': {
+            default: -> PPM2.DEFAULT_MALE_BUFF
+            getFunc: 'MaleBuff'
+            fix: (arg = PPM2.DEFAULT_MALE_BUFF) -> math.Clamp(tonumber(arg) or PPM2.DEFAULT_MALE_BUFF, PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF)
+            min: PPM2.MIN_MALE_BUFF
+            max: PPM2.MAX_MALE_BUFF
+        }
+
         'eyelash': {
             default: -> 0
             getFunc: 'EyelashType'

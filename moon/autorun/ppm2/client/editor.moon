@@ -543,6 +543,7 @@ EditorPages = {
             @ComboBox('Race', 'Race')
             @ComboBox('Wings Type', 'WingsType')
             @CheckBox('Gender', 'Gender')
+            @NumSlider('Male chest buff', 'MaleBuff', 2)
             @NumSlider('Weight', 'Weight', 2)
 
             if ADVANCED_MODE\GetBool()

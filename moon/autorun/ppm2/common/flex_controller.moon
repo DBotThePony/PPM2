@@ -50,7 +50,12 @@
 -- 32	angry_eyes
 -- 33	sad_eyes
 -- 34	Eyes_Blink_Lower
---
+-- 35	Male_2
+-- 36	Buff_Body
+-- 37	Manliest_Chin
+-- 38	Lowerlid_Raise
+-- 39	Happy_Eyes
+-- 40	Duck
 
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
@@ -322,6 +327,13 @@ class PonyFlexController
         {flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
         {flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
         {flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
+        {flex: 'Male_2',            scale: 1, speed: 1, active: false}
+        {flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
+        {flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
+        {flex: 'Lowerlid_Raise',    scale: 1, speed: 1, active: false}
+        {flex: 'Happy_Eyes',        scale: 1, speed: 1, active: false}
+        {flex: 'Duck',              scale: 1, speed: 1, active: false}
+
     }
 
     @FLEX_SEQUENCES = {

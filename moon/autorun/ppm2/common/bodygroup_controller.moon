@@ -503,6 +503,8 @@ class NewBodygroupController extends DefaultBodygroupController
 
     @FLEX_ID_EYELASHES = 16
     @FLEX_ID_MALE = 25
+    @FLEX_ID_MALE_2 = 35
+    @FLEX_ID_MALE_BODY = 36
     @FLEX_ID_BAT_PONY_EARS = 28
     @FLEX_ID_FANGS = 31
     @FLEX_ID_CLAW_TEETH = 30
@@ -512,6 +514,8 @@ class NewBodygroupController extends DefaultBodygroupController
         return unless IsValid(@ent)
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, 0)
         @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+        @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
+        @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, 0)
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
@@ -520,7 +524,10 @@ class NewBodygroupController extends DefaultBodygroupController
     SlowUpdate: (createModels = CLIENT) =>
         return if not @ent\IsPony()
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
-        @ent\SetFlexWeight(@@FLEX_ID_MALE,          @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
+        maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
+        @ent\SetFlexWeight(@@FLEX_ID_MALE_2,        maleModifier)
+        @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GetData()\GetMaleBuff())
+        
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
@@ -563,7 +570,9 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'EyelashType'
                 @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
             when 'Gender'
-                @ent\SetFlexWeight(@@FLEX_ID_MALE, @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0)
+                maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
+                @ent\SetFlexWeight(@@FLEX_ID_MALE_2, maleModifier)
+                @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
             when 'BatPonyEars'
                 @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
             when 'Fangs'
@@ -582,6 +591,9 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ApplyRace()
             when 'WingsType'
                 @ApplyRace()
+            when 'MaleBuff'
+                maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
+                @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
             when 'SocksAsModel'
                 return if SERVER
                 if state\GetValue()

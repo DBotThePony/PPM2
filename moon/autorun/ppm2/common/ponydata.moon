@@ -127,6 +127,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('HornColor',            net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
 
     @NetworkVar('WingsType',            (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_WINGS, PPM2.MAX_WINGS)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('MaleBuff',             (-> math.Clamp(net.ReadFloat(), PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF)), net.WriteFloat, PPM2.DEFAULT_MALE_BUFF)
 
     new: (netID, ent) =>
         @recomputeTextures = true
