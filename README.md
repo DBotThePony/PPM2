@@ -28,24 +28,19 @@ Addon extends the original PonyPlayerModels idea about customizable ponies for p
 
 # Screenshots
 ## New Models
-### Example
 ![Example](https://dbot.serealia.ca/sharex/2017/05/a977f87da5_2017-05-23_08-09-40.png)
-### They finally can talk!
 ![They finally can talk!](https://dbot.serealia.ca/sharex/2017/05/20170521090424_1.jpg)
-### It hurts
 ![It hurts](https://dbot.serealia.ca/sharex/2017/05/b13d6fcbfa_2017-05-21_08-20-42.png)
-### I got a plan for you
 ![xd](https://dbot.serealia.ca/sharex/2017/05/20170520074818_1.jpg)
-### SFM feel
 ![SFM feel](https://dbot.serealia.ca/sharex/2017/05/20170521083924_1.jpg)
+![funny](https://dbot.serealia.ca/sharex/2017/05/GeYkSCu.jpg)
+![angry](https://dbot.serealia.ca/sharex/2017/05/ebd7a24102_2017-05-25_19-15-55.png)
+![more angry](https://dbot.serealia.ca/sharex/2017/05/20170525191559_1.jpg)
 ## Editor
 ### Overview
-![Editor](https://dbot.serealia.ca/sharex/2017/05/c96022e06d_2017-05-23_08-05-41.png)
-### Flly Customizable eyes
-![Fully Customizable eyes](https://dbot.serealia.ca/sharex/2017/05/1de41afad7_2017-05-23_08-06-08.png)
-### Cutiemark by URL
-![Cutiemark by URL](https://dbot.serealia.ca/sharex/2017/05/63295cca26_2017-05-23_08-06-48.png)
-### Body detail by URL
-![Body detail by URL](https://dbot.serealia.ca/sharex/2017/05/fd5256030f_2017-05-23_08-07-53.png)
-### Supports three models
-![Supports three models](https://dbot.serealia.ca/sharex/2017/05/b42b615cd8_2017-05-23_08-08-36.png)
+![Editor](https://dbot.serealia.ca/sharex/2017/05/8691f15316_2017-05-26_20-31-56.png)
+![Eyes](https://dbot.serealia.ca/sharex/2017/05/c7ab9c6eae_2017-05-26_20-32-17.png)
+![Emote](https://dbot.serealia.ca/sharex/2017/05/217f6b13cc_2017-05-26_20-32-33.png)
+![Customizable body details](https://dbot.serealia.ca/sharex/2017/05/64d1329e56_2017-05-26_20-32-52.png)
+![Cutiemark by URL](https://dbot.serealia.ca/sharex/2017/05/0297035e88_2017-05-26_20-34-56.png)
+![Import old files](https://dbot.serealia.ca/sharex/2017/05/171457f9b3_2017-05-26_20-35-18.png)
