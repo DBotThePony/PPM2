@@ -24,17 +24,18 @@ PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL = Vector(0, 0, 28)
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
     timer.Simple 0, ->
         return unless @IsValid()
+        if @GetPonyData()
+            @GetPonyData()\PlayerRespawn()
+            net.Start('PPM2.PlayerRespawn')
+            net.WriteEntity(@)
+            net.Broadcast()
+        
         if @IsPony()
             @__ppm2_pony_view_offset = true
             @SetViewOffset(PPM2.PLAYER_VIEW_OFFSET)
             @SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK)
-            if @GetPonyData()
-                @GetPonyData()\PlayerRespawn()
-                net.Start('PPM2.PlayerRespawn')
-                net.WriteEntity(@)
-                net.Broadcast()
-                return
             
+            return if @GetPonyData()
             timer.Simple 0.5, ->
                 net.Start('PPM2.RequestPonyData')
                 net.Send(@)

@@ -190,6 +190,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetBodygroupController()\Reset() if @GetBodygroupController().Reset
     PlayerRespawn: =>
         @ent.__cachedIsPony = @ent\IsPony()
+        if not @ent.__cachedIsPony
+            return if @alreadyCalledRespawn
+            @alreadyCalledRespawn = true
+            @alreadyCalledDeath = true
+        else
+            @alreadyCalledRespawn = false
+            @alreadyCalledDeath = false
         @ApplyBodygroups(CLIENT)
 
         if CLIENT
@@ -198,6 +205,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\PlayerRespawn() if @GetRenderController()
             @GetBodygroupController()\MergeModels(@ent) if IsValid(@ent) and @GetBodygroupController().MergeModels
     PlayerDeath: =>
+        @ent.__cachedIsPony = @ent\IsPony()
+        if not @ent.__cachedIsPony
+            return if @alreadyCalledDeath
+            @alreadyCalledDeath = true
+        else
+            @alreadyCalledDeath = false
         if CLIENT
             @DoRagdollMerge()
             @GetRenderController()\PlayerDeath() if @GetRenderController()
