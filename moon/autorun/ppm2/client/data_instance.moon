@@ -370,9 +370,9 @@ class PonyDataInstance
         }
 
         'pac3_bones': {
-            default: -> false
+            default: -> true
             getFunc: 'PAC3Bones'
-            fix: (arg = false) -> tobool(arg)
+            fix: (arg = true) -> tobool(arg)
         }
 
         'noflex': {
