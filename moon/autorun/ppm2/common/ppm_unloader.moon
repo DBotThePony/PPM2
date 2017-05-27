@@ -58,6 +58,17 @@ timer.Simple 0, ->
                     {'PlayerSpawnedRagdoll', 'pony_spawnragdoll'}
                     {'PlayerSpawn', 'pony_spawn'}
                     {'PostPlayerDeath', 'pony_death'}
+
+                    -- CPPM hooks
+                    {'UpdateAnimation', 'CPPMHook#1'}
+                    {'PlayerTick', 'CPPMHook#1'}
+                    {'UpdateAnimation', 'CPPMHook#2'}
+                    {'NotifyShouldTransmit', 'CPPMHook#2'}
+                    {'PlayerTick', 'CPPMHook#2'}
+                    {'KeyPress', 'CPPMHook#3'}
+                    {'EntityNetworkedVarChanged', 'CPPMHook#3'}
+                    {'PlayerTick', 'CPPMHook#4'}
+                    {'PreDrawPlayerHands', 'CPPMHook#4'}
                 }
 
                 hook.Remove event, id for {event, id} in *oldhooks
