@@ -188,6 +188,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\Reset() if @GetRenderController().Reset
             @GetBodygroupController()\Reset() if @GetBodygroupController().Reset
     PlayerRespawn: =>
+        @ent.__cachedIsPony = @ent\IsPony()
         @ApplyBodygroups(CLIENT)
 
         if CLIENT
