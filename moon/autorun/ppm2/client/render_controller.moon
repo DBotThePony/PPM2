@@ -188,6 +188,10 @@ class PonyRenderController
         @GetTextureController()\Remove() if @GetTextureController and @GetTextureController()
         @isValid = false
     
+    PlayerDeath: =>
+        return if not @isValid
+        @GetTextureController()\ResetTextures() if @GetTextureController() and @ent\IsPony()
+    
     PlayerRespawn: =>
         return if not @isValid
         @flexes\PlayerRespawn() if @flexes

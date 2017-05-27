@@ -200,6 +200,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     PlayerDeath: =>
         if CLIENT
             @DoRagdollMerge()
+            @GetRenderController()\PlayerDeath() if @GetRenderController()
     DoRagdollMerge: =>
         return if @deathRagdollMerged
         bgController = @GetBodygroupController()

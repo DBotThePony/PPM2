@@ -53,7 +53,8 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()
-    return unless @__cachedIsPony
+    @__cachedIsPony = @IsPony()
+    return if not @__cachedIsPony
     return if @__ppm2_last_draw == FrameNumber()
     @__ppm2_last_draw = FrameNumber()
     return if @IsDormant()
