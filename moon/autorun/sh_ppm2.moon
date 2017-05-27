@@ -100,4 +100,4 @@ else
     include 'server/emotes.lua'
     include 'server/hitgroups.lua'
 
-include 'common/vll_loader.lua' if VLL
+include 'common/ppm_unloader.lua'
