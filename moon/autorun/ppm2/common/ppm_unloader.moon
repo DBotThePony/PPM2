@@ -87,5 +87,5 @@ PPM/2 has disabled PPM functionality by removing it\'s hooks'
 
                 return if not CLIENT
 
-                Derma_Message(text, title, 'Kill yourself')
+                Derma_Message(text, title, 'Throw your PC into trash can and go to school to understand how stuff works')
                 
