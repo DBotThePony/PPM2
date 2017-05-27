@@ -15,36 +15,31 @@
 -- limitations under the License.
 --
 
-WATCH_WEAPONS = {}
-
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
     for ply in *player.GetAll()
         ply.__cachedIsPony = ply\IsPony()
-        if ply.__ppm2_weapon_hit and not ply.__cachedIsPony
-            wep\SetNoDraw(false) for wep in *ply\GetWeapons()
-            ply.__ppm2_weapon_hit = false
-    
-    for i, wep in pairs WATCH_WEAPONS
-        if not IsValid(wep)
-            WATCH_WEAPONS[wep] = nil
-            continue
-        if not IsValid(wep\GetOwner())
-            WATCH_WEAPONS[wep] = nil
-            wep\SetNoDraw(false)
+
+        if ply.__cachedIsPony
+            draw = ply ~= lply or lply\ShouldDrawLocalPlayer()
+            for wep in *ply\GetWeapons()
+                wep\SetNoDraw(draw)
+                wep.__ppm2_weapon_hit = true
+        else
+            for wep in *ply\GetWeapons()
+                continue if not wep.__ppm2_weapon_hit
+                wep\SetNoDraw(false)
+                print wep
+                ply.__ppm2_weapon_hit = false
 
 PPM2.PostDrawOpaqueRenderables = (a, b) ->
     return if a or b
     lply = LocalPlayer()
 
     for ply in *player.GetAll()
+        alive = ply\Alive()
+        ply.__ppm2_last_dead = RealTime() + 2 if not alive
         if ply.__cachedIsPony
-            wep = ply\GetActiveWeapon()
-            if IsValid(wep)
-                ply.__ppm2_weapon_hit = true
-                wep\SetNoDraw(ply ~= lply or lply\ShouldDrawLocalPlayer())
-                WATCH_WEAPONS[wep\EntIndex()] = wep
-
-            if ply\GetPonyData() and not ply\Alive()
+            if ply\GetPonyData() and not alive
                 data = ply\GetPonyData()
                 rag = ply\GetRagdollEntity()
                 if IsValid(rag)
@@ -62,6 +57,8 @@ PPM2.PrePlayerDraw = =>
     return if @__ppm2_last_draw == FrameNumber()
     @__ppm2_last_draw = FrameNumber()
     return if @IsDormant()
+    @__ppm2_last_dead = @__ppm2_last_dead or 0
+    return if @__ppm2_last_dead > RealTime()
     data = @GetPonyData()
     renderController = data\GetRenderController()
     status = renderController\PreDraw() if renderController

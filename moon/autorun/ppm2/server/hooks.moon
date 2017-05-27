@@ -22,7 +22,7 @@ PPM2.PLAYER_VIEW_OFFSET_ORIGINAL = Vector(0, 0, 64)
 PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL = Vector(0, 0, 28)
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
-    timer.Simple 0.5, ->
+    timer.Simple 0, ->
         return unless @IsValid()
         if @IsPony()
             @__ppm2_pony_view_offset = true
@@ -45,7 +45,7 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
                 @SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL)
 
 hook.Add 'PlayerInitialSpawn', 'PPM2.Hooks', =>
-    timer.Simple 0.5, ->
+    timer.Simple 0, ->
         return unless @IsValid()
         return unless @IsPony()
 
