@@ -20,15 +20,13 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
         ply.__cachedIsPony = ply\IsPony()
 
         if ply.__cachedIsPony
-            draw = ply ~= lply or lply\ShouldDrawLocalPlayer()
             for wep in *ply\GetWeapons()
-                wep\SetNoDraw(draw)
+                wep\SetNoDraw(true)
                 wep.__ppm2_weapon_hit = true
         else
             for wep in *ply\GetWeapons()
                 continue if not wep.__ppm2_weapon_hit
                 wep\SetNoDraw(false)
-                print wep
                 ply.__ppm2_weapon_hit = false
 
 PPM2.PostDrawOpaqueRenderables = (a, b) ->
