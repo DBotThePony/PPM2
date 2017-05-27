@@ -21,10 +21,12 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
 
         if ply.__cachedIsPony
             for wep in *ply\GetWeapons()
+                continue if not wep
                 wep\SetNoDraw(true)
                 wep.__ppm2_weapon_hit = true
         else
             for wep in *ply\GetWeapons()
+                continue if not wep
                 continue if not wep.__ppm2_weapon_hit
                 wep\SetNoDraw(false)
                 ply.__ppm2_weapon_hit = false
