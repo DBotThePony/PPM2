@@ -52,6 +52,7 @@ include 'common/weight_controller.lua'
 include 'common/flex_controller.lua'
 include 'common/ponydata.lua'
 include 'common/emotes.lua'
+include 'common/pac3_patch.lua'
 
 if CLIENT
     PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
@@ -86,6 +87,7 @@ else
     AddCSLuaFile 'common/flex_controller.lua'
     AddCSLuaFile 'common/functions.lua'
     AddCSLuaFile 'common/emotes.lua'
+    AddCSLuaFile 'common/pac3_patch.lua'
     AddCSLuaFile 'client/data_instance.lua'
     AddCSLuaFile 'client/texture_controller.lua'
     AddCSLuaFile 'client/hooks.lua'
