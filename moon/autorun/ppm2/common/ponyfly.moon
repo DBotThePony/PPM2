@@ -16,6 +16,7 @@
 --
 
 ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.')
+FORCE_ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight_force', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Ignore PlayerNoClip hook')
 FLIGHT_DAMAGE = CreateConVar('ppm2_sv_flightdmg', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Damage players in flight')
 
 class PonyflyController
@@ -267,10 +268,12 @@ if SERVER
         data = @GetPonyData()
         return if not data
         if data\GetFly()
+            return data\SetFly(false) if FORCE_ALLOW_FLIGHT\GetBool()
             can = hook.Run('PlayerNoClip', @, false)
             data\SetFly(false) if can ~= false
         else
             return if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
+            return data\SetFly(true) if FORCE_ALLOW_FLIGHT\GetBool()
             can = hook.Run('PlayerNoClip', @, true)
             data\SetFly(true) if can ~= false
 else
