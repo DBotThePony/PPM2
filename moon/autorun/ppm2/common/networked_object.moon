@@ -150,6 +150,7 @@ class NetworkedObject
 			netID = net.ReadUInt(16)
 			obj = @NW_Objects[netID] or @(netID)
 			obj.NETWORKED = true
+			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			@OnNetworkedCreatedCallback(obj, ply, len)
@@ -286,7 +287,7 @@ class NetworkedObject
 
 	Create: =>
 		return if @NETWORKED
-		return if CLIENT and not @@NW_ClientsideCreation
+		return if CLIENT and (not @@NW_ClientsideCreation or @CREATED_BY_SERVER)
 		@NETWORKED = true if SERVER
 		@NETWORKED_PREDICT = true
 		if SERVER
