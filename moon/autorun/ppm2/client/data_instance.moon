@@ -375,6 +375,12 @@ class PonyDataInstance
             fix: (arg = true) -> tobool(arg)
         }
 
+        'override_bones': {
+            default: -> false
+            getFunc: 'OverrideBones'
+            fix: (arg = false) -> tobool(arg)
+        }
+
         'noflex': {
             default: -> false
             getFunc: 'NoFlex'

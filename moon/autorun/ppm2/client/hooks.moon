@@ -63,7 +63,7 @@ PPM2.PrePlayerDraw = =>
     data = @GetPonyData()
     renderController = data\GetRenderController()
     status = renderController\PreDraw() if renderController
-    return status if status ~= nil
+    data\GetWeightController()\UpdateWeight() if data\GetOverrideBones() and data\GetWeightController()
 PPM2.PostPlayerDraw = =>
     return unless @GetPonyData()
     return unless @__cachedIsPony
@@ -71,8 +71,8 @@ PPM2.PostPlayerDraw = =>
     renderController = data\GetRenderController()
     renderController\PostDraw() if renderController
 
-hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, -2
-hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, -2
+hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
+hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
 hook.Add 'RenderScreenspaceEffects', 'PPM2.RenderScreenspaceEffects', ->
     self = LocalPlayer()

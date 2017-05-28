@@ -582,6 +582,8 @@ EditorPages = {
             @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
 
+            @CheckBox('Hard bone reset. Affects FPS when on.', 'OverrideBones') if ADVANCED_MODE\GetBool()
+
             if ADVANCED_MODE\GetBool() and IS_USING_NEW()
                 @Hr()
                 @CheckBox('No flexes on new model', 'NoFlex')
