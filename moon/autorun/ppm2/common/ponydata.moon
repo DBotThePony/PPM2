@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-ply.__PPM2_PonyData = nil for ply in *player.GetAll()
+ply.__PPM2_PonyData\Remove() for ply in *player.GetAll()
 
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
@@ -122,12 +122,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("HornURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
     
+    @NetworkVar('Fly',                  net.ReadBool,   net.WriteBool,                 false)
     @NetworkVar('UseFlexLerp',          net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  net.WriteFloat,                    1)
     @NetworkVar('NewMuzzle',            net.ReadBool,   net.WriteBool,                  true)
-    @NetworkVar('OverrideBones',        net.ReadBool,   net.WriteBool,                  false)
-    @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                  false)
-    @NetworkVar('SeparateHorn',         net.ReadBool,   net.WriteBool,                  false)
+    @NetworkVar('OverrideBones',        net.ReadBool,   net.WriteBool,                 false)
+    @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                 false)
+    @NetworkVar('SeparateHorn',         net.ReadBool,   net.WriteBool,                 false)
     @NetworkVar('WingsColor',           net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
     @NetworkVar('HornColor',            net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
 
@@ -158,6 +159,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         return unless IsValid(ent)
         @modelCached = ent\GetModel()
         @ent = ent
+        @flightController = PPM2.PonyflyController(@)
         ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
@@ -169,6 +171,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
+        @SetFly(false) if SERVER
         timer.Simple 0.5, ->
             return unless IsValid(@ent)
             @GetBodygroupController()\ApplyBodygroups(CLIENT) if @GetBodygroupController()
@@ -179,6 +182,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
+        
+        if state\GetKey() == 'Fly' and @flightController
+            @flightController\Switch(state\GetValue())
         
         @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
@@ -201,6 +207,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @alreadyCalledRespawn = false
             @alreadyCalledDeath = false
         @ApplyBodygroups(CLIENT)
+        @SetFly(false) if SERVER
 
         if CLIENT
             @deathRagdollMerged = false
@@ -214,6 +221,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @alreadyCalledDeath = true
         else
             @alreadyCalledDeath = false
+        @SetFly(false) if SERVER
         if CLIENT
             @DoRagdollMerge()
             @GetRenderController()\PlayerDeath() if @GetRenderController()
@@ -232,6 +240,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     NetworkDataChanges: (state) => @GenericDataChange(state)
     SlowUpdate: => @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
     
+    GetFlightController: => @flightController
     GetRenderController: =>
         return if SERVER
         return @renderController if not @isValid
@@ -284,6 +293,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetWeightController()\Remove() if @GetWeightController()
             @GetRenderController()\Remove() if @GetRenderController()
         @GetBodygroupController()\Remove() if @GetBodygroupController()
+        @flightController\Switch(false) if @flightController
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData
