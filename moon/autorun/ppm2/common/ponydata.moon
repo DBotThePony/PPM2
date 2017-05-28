@@ -123,6 +123,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
     
     @NetworkVar('UseFlexLerp',          net.ReadBool,   net.WriteBool,                  true)
+    @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  net.WriteFloat,                    1)
     @NetworkVar('NewMuzzle',            net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('PAC3Bones',            net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                  false)

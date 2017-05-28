@@ -85,6 +85,7 @@ class FlexState
         @nextModifierID = 0
         @active = active
         @useLerp = true
+        @lerpMultiplier = 1
         @activeID = "DisableFlex#{@flexName}"
     
     __tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
@@ -94,6 +95,9 @@ class FlexState
     SetUseLerp: (val = true) => @useLerp = val
     GetUseLerp: => @useLerp
     UseLerp: => @useLerp
+    SetLerpModify: (val = 1) => @lerpMultiplier = val
+    GetLerpModify: => @lerpMultiplier
+    LerpModify: => @lerpMultiplier
     
     GetModifierID: (name = '') =>
         return @modifiersNames[name] if @modifiersNames[name]
@@ -165,10 +169,11 @@ class FlexState
             ent = @ent
         
         if @useLerp
-            @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
+            @current = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier, @current, @target) if @current ~= @target
         else
             @current = @target
-        ent\SetFlexWeight(@flexID, @target)
+            
+        ent\SetFlexWeight(@flexID, @current)
     DataChanges: (state) =>
         return if state\GetKey() ~= @activeID
         @SetIsActive(not state\GetValue())
@@ -915,7 +920,9 @@ class PonyFlexController
         @statesTable[state\GetFlexName()\lower()] = state for state in *@states
         @statesTable[state\GetFlexID()] = state for state in *@states
         @RebuildIterableList()
-        flex\SetUseLerp(data\GetData()\GetUseFlexLerp()) for flex in *@states
+        ponyData = data\GetData()
+        flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
+        flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
         @hooks = {}
         @@NEXT_HOOK_ID += 1
         @fid = @@NEXT_HOOK_ID
@@ -1003,6 +1010,8 @@ class PonyFlexController
         flexState\DataChanges(state) for flexState in *@states
         if state\GetKey() == 'UseFlexLerp'
             flex\SetUseLerp(state\GetValue()) for flex in *@states
+        if state\GetKey() == 'FlexLerpMultiplier'
+            flex\SetLerpModify(state\GetValue()) for flex in *@states
     GetEntity: => @ent
     GetData: => @controller
     GetController: => @controller
