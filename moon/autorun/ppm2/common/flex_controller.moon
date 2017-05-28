@@ -172,7 +172,7 @@ class FlexState
             @current = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier, @current, @target) if @current ~= @target
         else
             @current = @target
-            
+
         ent\SetFlexWeight(@flexID, @current)
     DataChanges: (state) =>
         return if state\GetKey() ~= @activeID
@@ -191,7 +191,7 @@ class FlexState
         @speed = @originalspeed * @speedModify
         @target = 0
         @current = 0
-        @ent\SetFlexWeight(@flexID, 0)
+        @ent\SetFlexWeight(@flexID, 0) if IsValid(@ent)
 
 PPM2.FlexState = FlexState
 
