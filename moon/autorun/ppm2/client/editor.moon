@@ -266,6 +266,7 @@ MODEL_BOX_PANEL = {
         render.ResetModelLighting(1, 1, 1)
         render.SetColorModulation(1, 1, 1)
         @controller\GetRenderController()\DrawModels()
+        @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
         data = @model\GetPonyData()
         if data

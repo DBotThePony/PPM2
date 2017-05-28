@@ -107,6 +107,7 @@ class DefaultBodygroupController
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
+            \SetNoDraw(true) if CLIENT
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
@@ -360,6 +361,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
+            \SetNoDraw(true) if CLIENT
             \SetBodygroup(1, bodygroupID)
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
@@ -408,6 +410,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Spawn()
             \Activate()
             \SetBodygroup(1, bodygroupID)
+            \SetNoDraw(true) if CLIENT
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
@@ -454,6 +457,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
+            \SetNoDraw(true) if CLIENT
             \SetBodygroup(1, bodygroupID)
             \SetParent(@ent)
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER

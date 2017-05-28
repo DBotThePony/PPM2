@@ -73,6 +73,7 @@ doPatch = =>
             controller\SetupEntity(ent) if controller.ent ~= ent
             controller\GetRenderController()\DrawModels()
             controller\GetRenderController()\PreDraw(ent)
+            controller\GetRenderController()\HideModels(true)
             bg = controller\GetBodygroupController()
             bg\ApplyBodygroups() if bg
 
