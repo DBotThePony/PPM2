@@ -16,6 +16,7 @@
 --
 
 ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.')
+FLIGHT_DAMAGE = CreateConVar('ppm2_sv_flightdmg', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Damage players in flight')
 
 class PonyflyController
     new: (data) =>
@@ -200,7 +201,7 @@ class PonyflyController
                 newPos = tryMove.HitPos + tryMove.HitNormal
                 @ent\SetPos(newPos)
                 movedata\SetOrigin(newPos)
-            if length > 7 and SERVER
+            if length > 7 and SERVER and FLIGHT_DAMAGE\GetBool()
                 dmgInfo = DamageInfo()
                 dmgInfo\SetAttacker(@ent)
                 dmgInfo\SetInflictor(@ent)
