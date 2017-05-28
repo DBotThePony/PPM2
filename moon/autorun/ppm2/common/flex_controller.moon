@@ -915,7 +915,7 @@ class PonyFlexController
         @statesTable[state\GetFlexName()\lower()] = state for state in *@states
         @statesTable[state\GetFlexID()] = state for state in *@states
         @RebuildIterableList()
-        flex\SetUseLerp(data\GetUseFlexLerp()) for flex in *@states
+        flex\SetUseLerp(data\GetData()\GetUseFlexLerp()) for flex in *@states
         @hooks = {}
         @@NEXT_HOOK_ID += 1
         @fid = @@NEXT_HOOK_ID
