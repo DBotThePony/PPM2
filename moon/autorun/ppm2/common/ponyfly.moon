@@ -165,7 +165,7 @@ class PonyflyController
     FinishMove: (movedata) =>
         mvPos = movedata\GetOrigin()
         pos = @ent\GetPos()
-        rpos = pos + @obbCenter
+        rpos = pos
         tryMove = util.TraceHull({
             filter: (ent) ->
                 return false if @ent == ent
