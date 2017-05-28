@@ -116,11 +116,11 @@ class NetworkedObject
 			obj\Create()
 	-- @__inherited = (child) => child.Setup(child)
 
-	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue) =>
+	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val)) =>
 		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
-		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id}
+		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id, :onSet}
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
 		@__base[strName] = defValue
@@ -128,14 +128,15 @@ class NetworkedObject
 		@__base["Set#{getName}"] = (val = defValue, networkNow = true) =>
 			oldVal = @[strName]
 			@[strName] = val
-			state = NetworkChangeState(strName, getName, val, @)
+			nevVal = onSet(@, val)
+			state = NetworkChangeState(strName, getName, nevVal, @)
 			state.networkChange = false
 			@SetLocalChange(state)
-			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation or SERVER)
+			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation and @GetOwner() == LocalPlayer() or SERVER)
 				net.Start(@@NW_Modify)
 				net.WriteUInt(@GetNetworkID(), 16)
 				net.WriteUInt(id, 16)
-				writeFunc(@[strName])
+				writeFunc(nevVal)
 				if CLIENT
 					net.SendToServer()
 				else
@@ -148,7 +149,11 @@ class NetworkedObject
 		return if SERVER and not @NW_ClientsideCreation
 		if CLIENT
 			netID = net.ReadUInt(16)
+			creator = NULL
+			creator = net.ReadEntity() if net.ReadBool()
+			creator = NULL if not IsValid(creator)
 			obj = @NW_Objects[netID] or @(netID)
+			obj.NW_Player = creator
 			obj.NETWORKED = true
 			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
@@ -200,8 +205,8 @@ class NetworkedObject
 		varID = net.ReadUInt(16)
 		varData = @NW_VarsTable[varID]
 		return unless varData
-		{:strName, :getName, :readFunc, :writeFunc} = varData
-		newVal = readFunc()
+		{:strName, :getName, :readFunc, :writeFunc, :onSet} = varData
+		newVal = onSet(obj, readFunc())
 		return if newVal == obj["Get#{getName}"](obj)
 		state = NetworkChangeState(strName, getName, newVal, obj, len, ply)
 		state\Apply()
@@ -241,10 +246,12 @@ class NetworkedObject
 			@netID = netID
 		
 		@@NW_Objects[@netID] = @
-		@NW_Player = NULL
+		@NW_Player = NULL if SERVER
+		@NW_Player = LocalPlayer() if CLIENT
 		@isLocal = localObject
 		@NW_Player = LocalPlayer() if localObject
 	
+	GetOwner: => @NW_Player
 	IsValid: => @valid
 	IsNetworked: => @NETWORKED
 	IsGoingToNetwork: => @NETWORKED_PREDICT
@@ -293,6 +300,8 @@ class NetworkedObject
 		if SERVER
 			net.Start(@@NW_Create)
 			net.WriteUInt(@netID, 16)
+			net.WriteBool(IsValid(@NW_Player))
+			net.WriteEntity(@NW_Player) if IsValid(@NW_Player)
 			@WriteNetworkData()
 			filter = RecipientFilter()
 			filter\AddAllPlayers()
@@ -309,6 +318,8 @@ class NetworkedObject
 	NetworkTo: (targets = {}) =>
 		net.Start(@@NW_Create)
 		net.WriteUInt(@netID, 16)
+		net.WriteBool(IsValid(@NW_Player))
+		net.WriteEntity(@NW_Player) if IsValid(@NW_Player)
 		@WriteNetworkData()
 		net.Send(targets)
 

@@ -21,7 +21,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
 
     @Setup()
-    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL, ((newValue) => @GetOwner()))
     @NetworkVar('UpperManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('LowerManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('TailModel',        net.ReadEntity, net.WriteEntity, NULL)
