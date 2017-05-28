@@ -369,6 +369,12 @@ class PonyDataInstance
             fix: (arg = false) -> tobool(arg)
         }
 
+        'new_male_muzzle': {
+            default: -> true
+            getFunc: 'NewMuzzle'
+            fix: (arg = true) -> tobool(arg)
+        }
+
         'pac3_bones': {
             default: -> true
             getFunc: 'PAC3Bones'

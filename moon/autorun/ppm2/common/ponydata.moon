@@ -122,6 +122,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("HornURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
     
+    @NetworkVar('NewMuzzle',            net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('PAC3Bones',            net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                  false)
     @NetworkVar('SeparateHorn',         net.ReadBool,   net.WriteBool,                  false)

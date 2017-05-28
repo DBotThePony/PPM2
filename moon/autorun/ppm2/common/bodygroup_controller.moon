@@ -581,7 +581,14 @@ class NewBodygroupController extends DefaultBodygroupController
         return if not @ent\IsPony()
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
-        @ent\SetFlexWeight(@@FLEX_ID_MALE_2,        maleModifier)
+
+        if @GetData()\GetNewMuzzle()
+            @ent\SetFlexWeight(@@FLEX_ID_MALE_2, maleModifier)
+            @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+        else
+            @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
+            @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
+
         @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GetData()\GetMaleBuff())
         
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
@@ -635,7 +642,21 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
             when 'Gender'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
-                @ent\SetFlexWeight(@@FLEX_ID_MALE_2, maleModifier)
+                if @GetData()\GetNewMuzzle()
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE_2, maleModifier)
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+                else
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
+                @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
+            when 'NewMuzzle'
+                maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
+                if @GetData()\GetNewMuzzle()
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE_2, maleModifier)
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE, 0)
+                else
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
+                    @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
             when 'BatPonyEars'
                 @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)

@@ -578,6 +578,7 @@ EditorPages = {
             @ComboBox('Race', 'Race')
             @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW()
             @CheckBox('Gender', 'Gender')
+            @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW()
             @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
 
