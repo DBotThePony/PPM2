@@ -43,7 +43,6 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
                 data = ply\GetPonyData()
                 rag = ply\GetRagdollEntity()
                 if IsValid(rag)
-                    rag\SetNoDraw(true)
                     renderController = data\GetRenderController()
                     data\DoRagdollMerge()
                     if renderController
