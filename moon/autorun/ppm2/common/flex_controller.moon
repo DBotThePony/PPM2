@@ -84,12 +84,16 @@ class FlexState
         @useModifiers = useModifiers
         @nextModifierID = 0
         @active = active
+        @useLerp = true
         @activeID = "DisableFlex#{@flexName}"
     
     __tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
     
     GetFlexID: => @flexID
     GetFlexName: => @flexName
+    SetUseLerp: (val = true) => @useLerp = val
+    GetUseLerp: => @useLerp
+    UseLerp: => @useLerp
     
     GetModifierID: (name = '') =>
         return @modifiersNames[name] if @modifiersNames[name]
@@ -160,8 +164,11 @@ class FlexState
             @ent = @controller.ent
             ent = @ent
         
-        @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
-        ent\SetFlexWeight(@flexID, @current)
+        if @useLerp
+            @current = Lerp(delta * 10 * @speed * @speedModify, @current, @target) if @current ~= @target
+        else
+            @current = @target
+        ent\SetFlexWeight(@flexID, @target)
     DataChanges: (state) =>
         return if state\GetKey() ~= @activeID
         @SetIsActive(not state\GetValue())
@@ -908,6 +915,7 @@ class PonyFlexController
         @statesTable[state\GetFlexName()\lower()] = state for state in *@states
         @statesTable[state\GetFlexID()] = state for state in *@states
         @RebuildIterableList()
+        flex\SetUseLerp(data\GetUseFlexLerp()) for flex in *@states
         @hooks = {}
         @@NEXT_HOOK_ID += 1
         @fid = @@NEXT_HOOK_ID
@@ -993,6 +1001,8 @@ class PonyFlexController
     DataChanges: (state) =>
         return if not @isValid
         flexState\DataChanges(state) for flexState in *@states
+        if state\GetKey() == 'UseFlexLerp'
+            flex\SetUseLerp(state\GetValue()) for flex in *@states
     GetEntity: => @ent
     GetData: => @controller
     GetController: => @controller

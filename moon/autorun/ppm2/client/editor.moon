@@ -1086,6 +1086,7 @@ PPM2.OpenEditor = ->
     editorModelSelect = EditorModels[editorModelSelect] and editorModelSelect or 'DEFAULT'
     ent = @model\ResetModel(nil, EditorModels[editorModelSelect])
     controller = copy\CreateCustomController(ent)
+    controller\SetUseFlexLerp(false)
     copy\SetController(controller)
     frame.controller = controller
     frame.data = copy
