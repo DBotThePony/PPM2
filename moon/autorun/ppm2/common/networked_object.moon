@@ -214,7 +214,7 @@ class NetworkedObject
 		if SERVER
 			net.Start(@NW_Modify)
 			net.WriteUInt(id, 16)
-			net.WriteUInt(varID, 8)
+			net.WriteUInt(varID, 16)
 			writeFunc(newVal)
 			net.SendOmit(ply)
 		@OnNetworkedModifyCallback(state)
