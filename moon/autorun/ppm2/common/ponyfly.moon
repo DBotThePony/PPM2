@@ -289,6 +289,10 @@ else
             if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
                 PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
                 return
+            can = hook.Run('PlayerNoClip', @, not data\GetFly())
+            if can == false
+                PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
+                return
             RunConsoleCommand('ppm2_fly')
             lastDouble = 0
             return
