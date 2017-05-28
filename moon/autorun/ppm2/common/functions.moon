@@ -167,6 +167,8 @@ entMeta.IsPony = =>
             return true
         when 'models/ppm/player_default_base_new.mdl'
             return true
+        when 'models/ppm/player_default_base_new_nj.mdl'
+            return true
         when 'models/ppm/player_default_base_nj.mdl'
             return true
         when 'models/cppm/player_default_base.mdl'
@@ -180,6 +182,8 @@ entMeta.IsPonyCached = =>
         when 'models/ppm/player_default_base.mdl'
             return true
         when 'models/ppm/player_default_base_new.mdl'
+            return true
+        when 'models/ppm/player_default_base_new_nj.mdl'
             return true
         when 'models/ppm/player_default_base_nj.mdl'
             return true
