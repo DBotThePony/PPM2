@@ -86,6 +86,7 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
     return unless IsValid(arms)
     return unless ply.__cachedIsPony
     return unless ply\Alive()
+    arms\SetPos(LocalPlayer()\EyePos() + Vector(0, 0, 100))
     wep = ply\GetActiveWeapon()
     if IsValid(wep) and wep.UseHands == false
         return true -- Dafuck?
