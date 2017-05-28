@@ -27,7 +27,7 @@ class PonyflyController
         @obbCenter = Vector(0, 0, 0)
         @obbMins = Vector(0, 0, 0)
         @obbMaxs = Vector(0, 0, 0)
-        @speedMultDiv = 3
+        @speedMultDiv = 2
         @speedMultLift = 2
         @pitch = 0
         @yaw = 0
@@ -165,7 +165,16 @@ class PonyflyController
         pos = @ent\GetPos()
         rpos = pos + @obbCenter
         tryMove = util.TraceHull({
-            filter: @ent
+            filter: (ent) ->
+                return false if @ent == ent
+                return true if not IsValid(ent)
+                collision = ent\GetCollisionGroup()
+                return false if collision == COLLISION_GROUP_WORLD
+                return false if collision == COLLISION_GROUP_DEBRIS
+                return false if collision == COLLISION_GROUP_DEBRIS_TRIGGER
+                return false if collision == COLLISION_GROUP_WEAPON
+                return false if collision == COLLISION_GROUP_PASSABLE_DOOR
+                return true
             mins: @obbMins
             maxs: @obbMaxs
             start: rpos
