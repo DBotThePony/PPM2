@@ -15,7 +15,8 @@
 -- limitations under the License.
 --
 
-ply.__PPM2_PonyData\Remove() for ply in *player.GetAll()
+for ply in *player.GetAll()
+    ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
 
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true

@@ -251,9 +251,32 @@ hook.Add 'CalcMainActivity', 'PPM2.Ponyfly', (movedata) =>
 
 if SERVER
     concommand.Add 'ppm2_fly', =>
+        return if not ALLOW_FLIGHT\GetBool()
         return if not IsValid(@)
         return if not @IsPonyCached()
         data = @GetPonyData()
         return if not data
-        can = hook.Run('PlayerNoClip', @, not data\GetFly())
-        data\SetFly(not data\GetFly()) if can ~= false
+        if data\GetFly()
+            can = hook.Run('PlayerNoClip', @, false)
+            data\SetFly(false) if can ~= false
+        else
+            return if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
+            can = hook.Run('PlayerNoClip', @, true)
+            data\SetFly(true) if can ~= false
+else
+    lastDouble = 0
+    hook.Add 'PlayerBindPress', 'PPM2.Ponyfly', (bind = '', pressed = false) =>
+        return if not ALLOW_FLIGHT\GetBool()
+        return if not pressed
+        return if bind ~= '+jump' and bind ~= 'jump'
+        if lastDouble > RealTime()
+            return if not @IsPonyCached()
+            data = @GetPonyData()
+            return if not data
+            if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
+                PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
+                return
+            RunConsoleCommand('ppm2_fly')
+            lastDouble = 0
+            return
+        lastDouble = RealTime() + 0.2

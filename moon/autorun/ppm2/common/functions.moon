@@ -88,6 +88,12 @@ PPM2.Message = (...) ->
     MsgC('\n')
     return frmt
 
+if CLIENT
+    PPM2.ChatPrint = (...) ->
+        frmt = PPM2.Format(...)
+        chat.AddText(PREFIX_COLOR, PREFIX, unpack(frmt))
+        return frmt
+
 DEBUG_LEVEL = CreateConVar('ppm2_debug', '0', {}, 'Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.')
 
 PPM2.DebugPrint = (...) ->
