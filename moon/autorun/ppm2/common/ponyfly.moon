@@ -278,6 +278,8 @@ if SERVER
             data\SetFly(true) if can ~= false
 else
     lastDouble = 0
+    lastMessage = 0
+    lastMessage2 = 0
     hook.Add 'PlayerBindPress', 'PPM2.Ponyfly', (bind = '', pressed = false) =>
         return if not ALLOW_FLIGHT\GetBool()
         return if not pressed
@@ -287,11 +289,15 @@ else
             data = @GetPonyData()
             return if not data
             if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
-                PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
+                if lastMessage < RealTime()
+                    lastMessage = RealTime() + 1
+                    PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
                 return
             can = hook.Run('PlayerNoClip', @, not data\GetFly())
             if can == false
-                PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
+                if lastMessage2 < RealTime()
+                    lastMessage2 = RealTime() + 1
+                    PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
                 return
             RunConsoleCommand('ppm2_fly')
             lastDouble = 0
