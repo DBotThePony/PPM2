@@ -1363,7 +1363,7 @@ class PonyTextureController
 -- [10] = "models/ppm/base/wings"
 
 class NewPonyTextureController extends PonyTextureController
-    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
     @UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @UPPER_MANE_MATERIALS}
     @LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @LOWER_MANE_MATERIALS}

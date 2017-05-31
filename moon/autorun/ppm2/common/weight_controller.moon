@@ -172,7 +172,7 @@ class PonyWeightController
 -- 44	Tail03
 
 class NewPonyWeightController extends PonyWeightController
-    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 

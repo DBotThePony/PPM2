@@ -323,7 +323,7 @@ PPM2.FlexSequence = FlexSequence
 
 class PonyFlexController
     @AVALIABLE_CONTROLLERS = {}
-    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
     @FLEX_LIST = {
         {flex: 'eyes_updown',       scale: 1, speed: 1, active: false}

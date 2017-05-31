@@ -288,7 +288,7 @@ class CPPMBodygroupController extends DefaultBodygroupController
 --
 
 class NewBodygroupController extends DefaultBodygroupController
-    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
     @BODYGROUP_SKELETON = 0
     @BODYGROUP_GENDER = -1

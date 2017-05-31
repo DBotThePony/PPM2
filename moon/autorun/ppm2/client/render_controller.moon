@@ -266,7 +266,7 @@ class PonyRenderController
     GetFlexController: => @flexes
 
 class NewPonyRenderController extends PonyRenderController
-    @MODELS = {'models/ppm/player_default_base_new.mdl'}
+    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
     new: (data) =>
         super(data)
