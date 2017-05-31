@@ -400,12 +400,14 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 270)
 			\SetTooltip("#{name}\nData value: #{option}")
             \SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            .ValueChanged = (pnl, newVal = Color(0, 0, 0)) ->
-                return if option == ''
-                data = @GetTargetData()
-                return if not data
-                data["Set#{option}"](data, newVal, @GetShouldSaveData())
-                @ValueChanges(option, newVal, pnl)
+            .ValueChanged = (pnl) ->
+                timer.Simple 0, ->
+                    return if option == ''
+                    data = @GetTargetData()
+                    return if not data
+                    newVal = pnl\GetColor()
+                    data["Set#{option}"](data, newVal, @GetShouldSaveData())
+                    @ValueChanges(option, newVal, pnl)
             table.insert @updateFuncs, ->
                 \SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
         with collapse
