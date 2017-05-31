@@ -1002,9 +1002,7 @@ class PonyFlexController
     GetFlexState: (name = '') => @statesTable[name]
     RebuildIterableList: =>
         return false if not @isValid
-        @statesIterable = for state in *@states
-            continue if not state\GetIsActive()
-            state
+        @statesIterable = [state for state in *@states when state\GetIsActive()]
     DataChanges: (state) =>
         return if not @isValid
         flexState\DataChanges(state) for flexState in *@states
