@@ -1211,3 +1211,58 @@ IconData =
 
 list.Set('DesktopWindows', 'PPM2', IconData)
 CreateContextMenu() if IsValid(g_ContextMenu)
+
+ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+
+applyPonyData = {
+	MenuLabel: 'Apply pony data...'
+	Order: 2500
+	MenuIcon: 'icon16/user.png'
+
+	MenuOpen: (menu, ent, tr) =>
+        with menu\AddSubMenu()
+            \AddOption 'Use Local data', ->
+                net.Start('PPM2.RagdollEdit')
+                net.WriteEntity(ent)
+                net.WriteBool(true)
+                net.SendToServer()
+            \AddSpacer()
+            for fil in *PPM2.PonyDataInstance\FindFiles()
+                \AddOption "Use '#{fil}' data", ->
+                    net.Start('PPM2.RagdollEdit')
+                    net.WriteEntity(ent)
+                    net.WriteBool(false)
+                    data = PPM2.PonyDataInstance(fil, nil, true, true, false)
+                    data\WriteNetworkData()
+                    net.SendToServer()
+	Filter: (ent = NULL, ply = NULL) =>
+        return false if not IsValid(ent)
+        return false if not IsValid(ply)
+        return false if not ent\IsPony()
+        return false if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
+        return false if not ply\GetPonyData()
+        return false if not hook.Run('CanProperty', ply, 'ponydata', ent)
+        return false if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
+        return true
+	Action: ->
+}
+
+hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption 'Utilities', 'User', 'PPM2.Posing', 'PPM2', '', '', =>
+    return if not @IsValid()
+    @Clear()
+    @Button 'Spawn new model', 'gm_spawn', 'models/ppm/player_default_base_new.mdl'
+    @Button 'Spawn new nj model', 'gm_spawn', 'models/ppm/player_default_base_new_nj.mdl'
+    @Button 'Spawn old model', 'gm_spawn', 'models/ppm/player_default_base.mdl'
+    @Button 'Spawn old nj model', 'gm_spawn', 'models/ppm/player_default_base_nj.mdl'
+    @Button 'Spawn CPPM model', 'gm_spawn', 'models/cppm/player_default_base.mdl'
+    @Button 'Spawn CPPM nj model', 'gm_spawn', 'models/cppm/player_default_base_nj.mdl'
+    @Button 'Cleanup unused models', 'ppm2_cleanup'
+    @Button 'Reload local data', 'ppm2_reload'
+    @Button 'Require data from server', 'ppm2_require'
+    @CheckBox 'Alternative render', 'ppm2_alternative_render'
+    @CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
+    @CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
+    @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
+    @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
+
+properties.Add('ppm2.applyponydata', applyPonyData)
