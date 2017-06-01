@@ -17,23 +17,23 @@
 
 net.Receive 'PPM2.DamageAnimation', ->
     ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
+    return if not IsValid(ent) or not ent\GetPonyData()
     hook.Call('PPM2_HurtAnimation', nil, ent)
 
 net.Receive 'PPM2.KillAnimation', ->
     ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
+    return if not IsValid(ent) or not ent\GetPonyData()
     hook.Call('PPM2_KillAnimation', nil, ent)
 
 net.Receive 'PPM2.AngerAnimation', ->
     ent = net.ReadEntity()
-    return if not IsValid(ent) or not ent\IsPlayer()
+    return if not IsValid(ent) or not ent\GetPonyData()
     hook.Call('PPM2_AngerAnimation', nil, ent)
 
 net.Receive 'PPM2.PlayEmote', ->
     emoteID = net.ReadUInt(8)
     ply = net.ReadEntity()
-    return if not IsValid(ply) or not ply\IsPlayer()
+    return if not IsValid(ply) or not ply\GetPonyData()
     return if not PPM2.AVALIABLE_EMOTES[emoteID]
     hook.Call('PPM2_EmoteAnimation', nil, ply, PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time)
 

@@ -278,12 +278,14 @@ class NetworkedObject
 	
 	NetworkDataChanges: (state) => -- Override
 	SetLocalChange: (state) => -- Override
-	ReadNetworkData: (len = 24, ply = NULL, silent = false) =>
+	ReadNetworkData: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
+		validPly = IsValid(ply)
 		states = [NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
 		for state in *states
-			state\Apply()
-			@NetworkDataChanges(state) unless silent
+			if not validPly or applyEntities or not isentity(state\GetValue())
+				state\Apply()
+				@NetworkDataChanges(state) unless silent
 	
 	NetworkedIterable: =>
 		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars]

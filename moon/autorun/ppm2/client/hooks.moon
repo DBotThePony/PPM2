@@ -16,6 +16,11 @@
 --
 
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
+    for task in *PPM2.NetworkedPonyData.RenderTasks
+        ent = task.ent
+        if IsValid(ent)
+            ent.__cachedIsPony = ent\IsPony()
+    
     for ply in *player.GetAll()
         ply.__cachedIsPony = ply\IsPony()
 
@@ -35,16 +40,22 @@ ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, 
 
 PPM2.PostDrawOpaqueRenderables = (a, b) ->
     return if a or b
-    lply = LocalPlayer()
 
     for task in *PPM2.NetworkedPonyData.RenderTasks
         ent = task.ent
         if IsValid(ent)
-            ent\SetNoDraw(true)
-            renderController = task\GetRenderController()
-            renderController\PreDraw(ent)
-            ent\DrawModel()
-            renderController\PostDraw(ent)
+            if ent.__cachedIsPony
+                ent\SetNoDraw(true)
+                ent.__ppm2_task_hit = true
+                renderController = task\GetRenderController()
+                renderController\PreDraw(ent)
+                ent\DrawModel()
+                renderController\PostDraw(ent)
+            else
+                if ent.__ppm2_task_hit
+                    ent.__ppm2_task_hit = false
+                    ent\SetNoDraw(false)
+                    task\Reset()
     
     if not ENABLE_NEW_RAGDOLLS\GetBool()
         for ply in *player.GetAll()

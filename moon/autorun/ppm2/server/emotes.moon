@@ -23,7 +23,7 @@ util.AddNetworkString('PPM2.PlayEmote')
 hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
     do
         self = ent
-        if @IsPlayer()
+        if @GetPonyData()
             @__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
             if @__ppm2_last_hurt_anim < CurTime()
                 @__ppm2_last_hurt_anim = CurTime() + 1
@@ -32,7 +32,7 @@ hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
                 net.Broadcast()
     do
         self = dmg\GetAttacker()
-        if @IsPlayer() and IsValid(ent) and (ent\IsNPC() or ent\IsPlayer())
+        if @GetPonyData() and IsValid(ent) and (ent\IsNPC() or ent\IsPlayer() or ent.Type == 'nextbot')
             @__ppm2_last_anger_anim = @__ppm2_last_anger_anim or 0
             if @__ppm2_last_anger_anim < CurTime()
                 @__ppm2_last_anger_anim = CurTime() + 1
@@ -42,7 +42,7 @@ hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
 
 killGrin = =>
     return if not IsValid(@)
-    return if not @IsPlayer()
+    return if not @GetPonyData()
     @__ppm2_grin_hurt_anim = @__ppm2_grin_hurt_anim or 0
     return if @__ppm2_grin_hurt_anim > CurTime()
     @__ppm2_grin_hurt_anim = CurTime() + 1

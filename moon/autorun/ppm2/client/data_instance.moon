@@ -37,6 +37,15 @@ URL_FIXER = (arg = '') ->
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
     @DATA_DIR_BACKUP = "ppm2/backups/"
+
+    @FindFiles = =>
+        output = [str\sub(1, #str - 4) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.txt')]
+        return output
+
+    @FindInstances = =>
+        output = [@(str\sub(1, #str - 4)) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.txt')]
+        return output
+
     @PONY_DATA = {
         'age': {
             default: -> PPM2.AGE_ADULT
@@ -770,6 +779,13 @@ class PonyDataInstance
 			oldVal = @dataTable[key]
 			@dataTable[key] = newVal
             @ValueChanges(key, oldVal, newVal, ...)
+
+    WriteNetworkData: =>
+        for {:strName, :writeFunc, :getName, :defValue} in *PPM2.NetworkedPonyData.NW_Vars
+            if @["Get#{getName}"]
+                writeFunc(@["Get#{getName}"](@))
+            else
+                writeFunc(defValue)
 
     Copy: (fileName = @filename) =>
         copyOfData = {}

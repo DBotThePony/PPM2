@@ -45,8 +45,8 @@ do
             data = ply\GetPonyData()
             xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
         for task in *PPM2.NetworkedPonyData.RenderTasks
-            continue if not IsValid(task.ent)
-            xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
+            if IsValid(task.ent) and task.ent\IsPony()
+                xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
 
 DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
