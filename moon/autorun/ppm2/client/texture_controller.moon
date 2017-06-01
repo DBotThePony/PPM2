@@ -316,6 +316,8 @@ class PonyTextureController
                                 max-width: #{width};
                                 height: auto;
                                 width: 100%;
+                                margin: 0;
+                                padding: 0;
                                 max-height: #{height};
                             }
 
