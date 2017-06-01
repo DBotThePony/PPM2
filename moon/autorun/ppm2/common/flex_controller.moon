@@ -419,11 +419,25 @@ class PonyFlexController
             'time': 5
             'ids': {'Left_Blink', 'Right_Blink'}
             'func': (delta, timeOfAnim) =>
+                return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
                 left, right = @GetModifierID(1), @GetModifierID(2)
                 leftState, rightState = @GetFlexState(1), @GetFlexState(2)
                 value = math.abs(math.sin(RealTime() * .5) * .15)
                 leftState\SetModifierWeight(left, value)
                 rightState\SetModifierWeight(right, value)
+        }
+
+        {
+            'name': 'eyes_close'
+            'autostart': true
+            'repeat': true
+            'time': 5
+            'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
+            'func': (delta, timeOfAnim) =>
+                return if not @ent\GetNWBool('PPM2.IsDeathRagdoll')
+                @SetModifierWeight(1, 1)
+                @SetModifierWeight(2, 1)
+                @SetModifierWeight(3, 0.5)
         }
 
         {
@@ -433,6 +447,7 @@ class PonyFlexController
             'time': 2
             'ids': {'Stomach_Out', 'Stomach_In'}
             'func': (delta, timeOfAnim) =>
+                return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
                 In, Out = @GetModifierID(1), @GetModifierID(2)
                 InState, OutState = @GetFlexState(1), @GetFlexState(2)
                 abs = math.abs(0.5 - timeOfAnim)

@@ -285,6 +285,10 @@ class NetworkedObject
 			state\Apply()
 			@NetworkDataChanges(state) unless silent
 	
+	NetworkedIterable: =>
+		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars]
+		return data
+	
 	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
 
 	SendVar: (Var = '') =>

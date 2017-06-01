@@ -22,6 +22,9 @@ PPM2.PLAYER_VIEW_OFFSET_ORIGINAL = Vector(0, 0, 64)
 PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL = Vector(0, 0, 28)
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
+    if IsValid(@__ppm2_ragdoll)
+        @__ppm2_ragdoll\Remove()
+        @UnSpectate()
     timer.Simple 0, ->
         return unless @IsValid()
         if @GetPonyData()
@@ -89,12 +92,62 @@ net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     ply\SetNWBool('PPM2.InEditor', net.ReadBool())
 
+ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+
+createPlayerRagdoll = =>
+    @__ppm2_ragdoll\Remove() if IsValid(@__ppm2_ragdoll)
+    @__ppm2_ragdoll = ents.Create('prop_ragdoll')
+    rag = @GetRagdollEntity()
+    rag\Remove() if IsValid(rag)
+    with @__ppm2_ragdoll
+        \SetModel(@GetModel())
+        \SetPos(@GetPos())
+        \SetAngles(@EyeAngles())
+        \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+        \Spawn()
+        \Activate()
+        .__ppm2_ragdoll_parent = @
+        \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+        \SetNWBool('PPM2.IsDeathRagdoll', true)
+        vel = @GetVelocity()
+        \SetVelocity(vel)
+        \SetAngles(@EyeAngles())
+        @Spectate(OBS_MODE_CHASE)
+        @SpectateEntity(@__ppm2_ragdoll)
+        for boneID = 0, @__ppm2_ragdoll\GetBoneCount() - 1
+            physobjID = @__ppm2_ragdoll\TranslateBoneToPhysBone(boneID)
+            pos, ang = @GetBonePosition(boneID)
+            physobj = @__ppm2_ragdoll\GetPhysicsObjectNum(physobjID)
+            physobj\SetVelocity(vel)
+            physobj\SetMass(300) -- lol
+            physobj\SetPos(pos, true) if pos
+            physobj\SetAngles(ang) if ang
+        copy = @GetPonyData()\Clone(@__ppm2_ragdoll)
+        timer.Simple 0.5, -> copy\Create() if IsValid(@__ppm2_ragdoll)
+
+hook.Add 'EntityTakeDamage', 'PPM2.DeathRagdoll', (dmg) =>
+    attacker = dmg\GetAttacker()
+    return if not IsValid(attacker)
+    if attacker.__ppm2_ragdoll_parent
+        dmg\SetAttacker(attacker.__ppm2_ragdoll_parent)
+
 hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     return if not @GetPonyData()
     @GetPonyData()\PlayerDeath()
     net.Start('PPM2.PlayerDeath')
     net.WriteEntity(@)
     net.Broadcast()
+    if ENABLE_NEW_RAGDOLLS\GetBool()
+        createPlayerRagdoll(@)
+
+hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
+    return if @IsPlayer()
+    return if not @GetPonyData()
+    with @GetPonyData()
+        net.Start('PPM2.PonyDataRemove')
+        net.WriteUInt(.netID, 16)
+        net.Broadcast()
+        \Remove()
 
 hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
     data = @GetPonyData()

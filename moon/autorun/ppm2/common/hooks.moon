@@ -24,16 +24,29 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
             if data and data.ModelChanges
                 data\ModelChanges(ply.__ppm2_lastmodel, model)
                 ply.__ppm2_lastmodel = model
+    for task in *PPM2.NetworkedPonyData.RenderTasks
+        ply = task.ent
+        if IsValid(ply)
+            model = ply\GetModel()
+            ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
+            if ply.__ppm2_lastmodel ~= model
+                data = ply\GetPonyData()
+                if data and data.ModelChanges
+                    data\ModelChanges(ply.__ppm2_lastmodel, model)
+                    ply.__ppm2_lastmodel = model
 
 do
     catchError = (err) ->
         PPM2.Message 'Slow Update Error: ', err
         PPM2.Message debug.traceback()
-    timer.Create 'PPM2.SlowUpdate', 5, 0, ->
+    timer.Create 'PPM2.SlowUpdate', CLIENT and 0.5 or 5, 0, ->
         for ply in *player.GetAll()
             continue if not ply\Alive() or not ply\IsPonyCached() or not ply\GetPonyData()
             data = ply\GetPonyData()
             xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
+        for task in *PPM2.NetworkedPonyData.RenderTasks
+            continue if not IsValid(task.ent)
+            xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
 
 DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED}, 'Disable hoofstep sound play time')

@@ -31,24 +31,36 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
                 wep\SetNoDraw(false)
                 ply.__ppm2_weapon_hit = false
 
+ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+
 PPM2.PostDrawOpaqueRenderables = (a, b) ->
     return if a or b
     lply = LocalPlayer()
 
-    for ply in *player.GetAll()
-        alive = ply\Alive()
-        ply.__ppm2_last_dead = RealTime() + 2 if not alive
-        if ply.__cachedIsPony
-            if ply\GetPonyData() and not alive
-                data = ply\GetPonyData()
-                rag = ply\GetRagdollEntity()
-                if IsValid(rag)
-                    renderController = data\GetRenderController()
-                    data\DoRagdollMerge()
-                    if renderController
-                        renderController\PreDraw(rag)
-                        rag\DrawModel()
-                        renderController\PostDraw(rag)
+    for task in *PPM2.NetworkedPonyData.RenderTasks
+        ent = task.ent
+        if IsValid(ent)
+            ent\SetNoDraw(true)
+            renderController = task\GetRenderController()
+            renderController\PreDraw(ent)
+            ent\DrawModel()
+            renderController\PostDraw(ent)
+    
+    if not ENABLE_NEW_RAGDOLLS\GetBool()
+        for ply in *player.GetAll()
+            alive = ply\Alive()
+            ply.__ppm2_last_dead = RealTime() + 2 if not alive
+            if ply.__cachedIsPony
+                if ply\GetPonyData() and not alive
+                    data = ply\GetPonyData()
+                    rag = ply\GetRagdollEntity()
+                    if IsValid(rag)
+                        renderController = data\GetRenderController()
+                        data\DoRagdollMerge()
+                        if renderController
+                            renderController\PreDraw(rag)
+                            rag\DrawModel()
+                            renderController\PostDraw(rag)
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()

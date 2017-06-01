@@ -20,9 +20,11 @@ for ply in *player.GetAll()
 
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
+    @RenderTasks = {}
 
     @Setup()
-    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL, ((newValue) => @GetOwner()))
+    --@NetworkVar('EntityIndex',      (-> net.ReadUInt(16)), (-> net.ReadUInt(16)), -1, ((newValue) => IsValid(@GetOwner()) and @GetOwner() or newValue))
+    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL, ((newValue) => IsValid(@GetOwner()) and @GetOwner() or newValue))
     @NetworkVar('UpperManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('LowerManeModel',   net.ReadEntity, net.WriteEntity, NULL)
     @NetworkVar('TailModel',        net.ReadEntity, net.WriteEntity, NULL)
@@ -145,6 +147,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BatWingURLColor#{i}",      net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("BatWingSkinURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
 
+    Clone: (target = @ent) =>
+        copy = @@(nil, target)
+        for {key, value} in *@NetworkedIterable()
+            copy["Set#{key}"](copy, value) if not isentity(value) and copy["Set#{key}"]
+        return copy
+
     new: (netID, ent) =>
         @recomputeTextures = true
         @isValid = true
@@ -170,6 +178,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             timer.Simple 0, ->
                 @GetRenderController()\CompileTextures() if @GetRenderController()
         PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
+        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer()]
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
         @SetFly(false) if SERVER
@@ -295,6 +304,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\Remove() if @GetRenderController()
         @GetBodygroupController()\Remove() if @GetBodygroupController()
         @flightController\Switch(false) if @flightController
+        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer()]
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData
@@ -305,6 +315,18 @@ if CLIENT
         data = NetworkedPonyData.NW_Objects[netID]
         return if not data
         data\Remove()
+    
+    net.Receive 'PPM2.PonyDataRemove', ->
+        netID = net.ReadUInt(16)
+        data = NetworkedPonyData.NW_Objects[netID]
+        return if not data
+        data\Remove()
+
+	hook.Add 'NetworkEntityCreated', 'PPM2.NetworkedObjectCheck', =>
+		return if @GetPonyData()
+		--for i, obj in pairs NetworkedPonyData.NW_Objects
+        --    obj.ent = 
+
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>

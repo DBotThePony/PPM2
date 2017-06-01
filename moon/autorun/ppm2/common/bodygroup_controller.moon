@@ -163,6 +163,7 @@ class DefaultBodygroupController
     ResetBodygroups: =>
         return unless @isValid
         return unless IsValid(@ent)
+        return unless @ent\GetBodyGroups()
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
     Reset: => @ResetBodygroups()
