@@ -1045,59 +1045,25 @@ class PonyFlexController
     OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
         return if ply ~= @ent or teamOnly or isDead
         switch text\lower()
-            when 'o'
+            when 'o', ':o', 'о', 'О', ':о', ':О'
                 @RestartSequence('ooo')
-            when ':o'
-                @RestartSequence('ooo')
-            when 'о'
-                @RestartSequence('ooo')
-            when 'О'
-                @RestartSequence('ooo')
-            when ':о'
-                @RestartSequence('ooo')
-            when ':О'
-                @RestartSequence('ooo')
-            when ':3'
-                @RestartSequence('cat')
-            when ':з'
+            when ':3', ':з'
                 @RestartSequence('cat')
             when ':d'
                 @RestartSequence('big_grin')
-            when 'xd'
-                @RestartSequence('xd')
-            when 'exdi'
+            when 'xd', 'exdi'
                 @RestartSequence('xd')
             when ':p'
                 @RestartSequence('tongue')
-            when '>:p'
+            when '>:p', '>:р', '>:Р'
                 @RestartSequence('angry_tongue')
-            when ':р'
+            when ':р', ':Р'
                 @RestartSequence('tongue')
-            when ':Р'
-                @RestartSequence('tongue')
-            when '>:р'
-                @RestartSequence('angry_tongue')
-            when '>:Р'
-                @RestartSequence('angry_tongue')
-            when ':c'
+            when ':c', 'o3o', 'oops', ':С', ':с', '(', ':('
                 @RestartSequence('sad')
-            when ':('
-                @RestartSequence('sad')
-            when '('
-                @RestartSequence('sad')
-            when ':с'
-                @RestartSequence('sad')
-            when ':С'
-                @RestartSequence('sad')
-            when 'o3o'
-                @RestartSequence('o3o')
             when 'sorry'
                 @RestartSequence('sorry')
-            when 'oops'
-                @RestartSequence('sad')
-            when 'okay mate'
-                @RestartSequence('wink_left')
-            when 'okay, mate'
+            when 'okay mate', 'okay, mate'
                 @RestartSequence('wink_left')
             else
                 if string.find(text, 'hehehe') or string.find(text, 'hahaha')
