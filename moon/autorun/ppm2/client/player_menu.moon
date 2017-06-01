@@ -80,10 +80,10 @@ doPatch = =>
         copy = PPM2.GetMainData()\Copy()
         controller = copy\CreateCustomController(targetModel.Entity)
         copy\SetController(controller)
+        controller\SetDisableTask(true)
         targetModel.ponyController = controller
 
         hook.Run 'BuildPlayerModelMenu', buttonTarget, buttonTarget.Window
-
 
 hook.Add 'ContextMenuCreated', 'PPM2.PatchPlayerModelMenu', => timer.Simple 0, -> doPatch(@)
         

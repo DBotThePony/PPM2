@@ -126,6 +126,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
     
     @NetworkVar('Fly',                  net.ReadBool,   net.WriteBool,                 false)
+    @NetworkVar('DisableTask',          net.ReadBool,   net.WriteBool,                 false)
     @NetworkVar('UseFlexLerp',          net.ReadBool,   net.WriteBool,                  true)
     @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  net.WriteFloat,                    1)
     @NetworkVar('NewMuzzle',            net.ReadBool,   net.WriteBool,                  true)
@@ -178,7 +179,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             timer.Simple 0, ->
                 @GetRenderController()\CompileTextures() if @GetRenderController()
         PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
-        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer()]
+        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
     ModelChanges: (old = @ent\GetModel(), new = old) =>
         @modelCached = new
         @SetFly(false) if SERVER
@@ -195,6 +196,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         
         if state\GetKey() == 'Fly' and @flightController
             @flightController\Switch(state\GetValue())
+        
+        if state\GetKey() == 'DisableTask'
+            @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
         
         @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
@@ -304,7 +308,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetRenderController()\Remove() if @GetRenderController()
         @GetBodygroupController()\Remove() if @GetBodygroupController()
         @flightController\Switch(false) if @flightController
-        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer()]
+        @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData

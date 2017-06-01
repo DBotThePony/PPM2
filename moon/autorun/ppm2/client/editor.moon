@@ -1177,6 +1177,7 @@ PPM2.OpenEditor = ->
 
     @model\SetController(controller)
     controller\SetupEntity(ent)
+    controller\SetDisableTask(true)
 
     @panels = {}
 
