@@ -148,10 +148,14 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BatWingURLColor#{i}",      net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("BatWingSkinURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
 
+    ApplyDataToObject: (target, applyEntities = false) =>
+        for {key, value} in *@NetworkedIterable()
+            target["Set#{key}"](target, value) if not isentity(value) and target["Set#{key}"]
+        return target
+
     Clone: (target = @ent) =>
         copy = @@(nil, target)
-        for {key, value} in *@NetworkedIterable()
-            copy["Set#{key}"](copy, value) if not isentity(value) and copy["Set#{key}"]
+        @ApplyDataToObject(copy)
         return copy
 
     new: (netID, ent) =>
@@ -170,7 +174,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @modelCached = ent\GetModel()
         @ent = ent
         @flightController = PPM2.PonyflyController(@)
-        ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
+        if ent.__PPM2_PonyData
+            return if ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
+            ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
@@ -306,6 +312,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT
             @GetWeightController()\Remove() if @GetWeightController()
             @GetRenderController()\Remove() if @GetRenderController()
+            if IsValid(@ent) and @ent.__ppm2_task_hit
+                @ent.__ppm2_task_hit = false
+                @ent\SetNoDraw(false)
         @GetBodygroupController()\Remove() if @GetBodygroupController()
         @flightController\Switch(false) if @flightController
         @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
