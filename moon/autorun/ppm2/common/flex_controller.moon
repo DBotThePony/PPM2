@@ -462,7 +462,7 @@ class PonyFlexController
             'time': 5
             'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
             'func': (delta, timeOfAnim) =>
-                return false if not @ent\IsPlayer()
+                return false if not @ent\IsPlayer() and not @ent\IsNPC() and @ent.Type ~= 'nextbot'
                 frown = @GetModifierID(1)
                 frownState = @GetFlexState(1)
                 left, right = @GetModifierID(2), @GetModifierID(3)
