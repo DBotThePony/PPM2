@@ -17,11 +17,13 @@
 
 util.AddNetworkString('PPM2.RagdollEdit')
 
+ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+
 net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     ent = net.ReadEntity()
     return if not IsValid(ent)
-    return if ent\GetClass() ~= 'prop_ragdoll'
+    return if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
     return if not ent\IsPony()
     return if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
     return if not hook.Run('CanProperty', ply, 'ponydata', ent)

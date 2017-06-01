@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+
 applyPonyData = {
 	MenuLabel: 'Apply pony data...'
 	Order: 2500
@@ -40,6 +42,7 @@ applyPonyData = {
         return false if not IsValid(ent)
         return false if not IsValid(ply)
         return false if not ent\IsPony()
+        return false if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
         return false if not ply\GetPonyData()
         return false if not hook.Run('CanProperty', ply, 'ponydata', ent)
         return false if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
