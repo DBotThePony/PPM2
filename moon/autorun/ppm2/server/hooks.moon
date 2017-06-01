@@ -175,3 +175,33 @@ hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
             data = PPM2.NetworkedPonyData(nil, @)
             PPM2.Randomize(data)
             data\Create()
+
+ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+
+net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
+    return if not IsValid(ply)
+    ent = net.ReadEntity()
+    return if not IsValid(ent)
+    return if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
+    return if not ent\IsPony()
+    return if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
+    return if not hook.Run('CanProperty', ply, 'ponydata', ent)
+    useLocal = net.ReadBool()
+
+    if useLocal
+        return if not ply\GetPonyData()
+        if not ent\GetPonyData()
+            data = PPM2.NetworkedPonyData(nil, ent)
+        
+        data = ent\GetPonyData()
+        plydata = ply\GetPonyData()
+        plydata\ApplyDataToObject(data)
+
+        data\Create() if not data\IsNetworked()
+    else
+        if not ent\GetPonyData()
+            data = PPM2.NetworkedPonyData(nil, ent)
+        
+        data = ent\GetPonyData()
+        data\ReadNetworkData(len, ply, false, false)
+        data\Create() if not data\IsNetworked()

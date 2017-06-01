@@ -78,6 +78,7 @@ else
     util.AddNetworkString('PPM2.EditorStatus')
     util.AddNetworkString('PPM2.NotifyDisconnect')
     util.AddNetworkString('PPM2.PonyDataRemove')
+    util.AddNetworkString('PPM2.RagdollEdit')
 
     AddCSLuaFile 'common/networked_object.lua'
     AddCSLuaFile 'common/registry.lua'
