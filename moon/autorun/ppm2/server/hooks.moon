@@ -185,6 +185,7 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
     ent = net.ReadEntity()
     return if not IsValid(ent)
     return if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
+    return if DISALLOW_PLAYERS\GetBool() and ent\IsPlayer()
     return if not ent\IsPony()
     return if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
     return if not hook.Run('CanProperty', ply, 'ponydata', ent)
