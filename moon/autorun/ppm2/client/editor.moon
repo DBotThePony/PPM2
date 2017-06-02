@@ -1257,7 +1257,7 @@ applyPonyData = {
 ponyDataFlexEnable = {
 	MenuLabel: 'Enable flexes'
 	Order: 2501
-	MenuIcon: 'icon16/user.png'
+	MenuIcon: 'icon16/emoticon_smile.png'
 
 	MenuOpen: (menu, ent = NULL, tr) =>
 	Filter: (ent = NULL, ply = NULL) =>
@@ -1276,7 +1276,7 @@ ponyDataFlexEnable = {
 ponyDataFlexDisable = {
 	MenuLabel: 'Disable flexes'
 	Order: 2501
-	MenuIcon: 'icon16/user.png'
+	MenuIcon: 'icon16/emoticon_unhappy.png'
 
 	MenuOpen: (menu, ent = NULL, tr) =>
 	Filter: (ent = NULL, ply = NULL) =>
@@ -1295,7 +1295,7 @@ ponyDataFlexDisable = {
 playEmote = {
 	MenuLabel: 'Play pony emote'
 	Order: 2502
-	MenuIcon: 'icon16/user.png'
+	MenuIcon: 'icon16/emoticon_wink.png'
 
 	MenuOpen: (menu, ent = NULL, tr) =>
         return if not IsValid(ent)
