@@ -191,10 +191,12 @@ class PonyRenderController
     
     PlayerDeath: =>
         return if not @isValid
+        @HideModels(true)
         @GetTextureController()\ResetTextures() if @GetTextureController() and @ent\IsPony()
     
     PlayerRespawn: =>
         return if not @isValid
+        @HideModels(false) if @ent\IsPony()
         @flexes\PlayerRespawn() if @flexes
         @GetTextureController()\ResetTextures() if @GetTextureController()
 
