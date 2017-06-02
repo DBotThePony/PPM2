@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+TASK_RENDER_TYPE = CreateConVar('ppm2_task_render_type', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Task rendering type (e.g. pony ragdolls and NPCs). 1 - better render; less conflicts; more FPS. 0 - "old-style" render; possible conflicts;')
+
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
     for task in *PPM2.NetworkedPonyData.RenderTasks
         ent = task.ent
@@ -45,12 +47,20 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
         ent = task.ent
         if IsValid(ent)
             if ent.__cachedIsPony
-                ent\SetNoDraw(true)
-                ent.__ppm2_task_hit = true
-                renderController = task\GetRenderController()
-                renderController\PreDraw(ent)
-                ent\DrawModel()
-                renderController\PostDraw(ent)
+                if not TASK_RENDER_TYPE\GetBool()
+                    ent\SetNoDraw(true)
+                    ent.__ppm2_task_hit = true
+                    renderController = task\GetRenderController()
+                    renderController\PreDraw(ent)
+                    ent\DrawModel()
+                    renderController\PostDraw(ent)
+                else
+                    if ent.__ppm2_task_hit
+                        ent.__ppm2_task_hit = false
+                        ent\SetNoDraw(false)
+                    renderController = task\GetRenderController()
+                    renderController\PreDraw(ent)
+                    renderController\PostDraw(ent)
             else
                 if ent.__ppm2_task_hit
                     ent.__ppm2_task_hit = false
