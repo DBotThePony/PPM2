@@ -1199,6 +1199,7 @@ PPM2.OpenEditor = ->
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
 concommand.Add 'ppm2_editor', PPM2.OpenEditor
+concommand.Add 'ppm2_editor_reload', -> PPM2.EditorFrame\Remove() if IsValid(PPM2.EditorFrame)
 
 IconData =
 	title: 'PPM V2.0',
