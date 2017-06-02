@@ -66,7 +66,7 @@ class PonyDataInstance
         }
         
         'wings_type': {
-            default: -> 1
+            default: -> 0
             getFunc: 'WingsType'
             enum: [arg for arg in *PPM2.AvaliablePonyWings]
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGS, PPM2.MAX_WINGS)
