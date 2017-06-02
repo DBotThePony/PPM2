@@ -269,12 +269,12 @@ if SERVER
         return if not data
         if data\GetFly()
             return data\SetFly(false) if FORCE_ALLOW_FLIGHT\GetBool()
-            can = hook.Run('PlayerNoClip', @, false)
+            can = hook.Run('PlayerNoClip', @, false) or hook.Run('PPM2Fly', @, false)
             data\SetFly(false) if can ~= false
         else
             return if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
             return data\SetFly(true) if FORCE_ALLOW_FLIGHT\GetBool()
-            can = hook.Run('PlayerNoClip', @, true)
+            can = hook.Run('PlayerNoClip', @, true) or hook.Run('PPM2Fly', @, true)
             data\SetFly(true) if can ~= false
 else
     lastDouble = 0
@@ -293,7 +293,7 @@ else
                     lastMessage = RealTime() + 1
                     PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
                 return
-            can = hook.Run('PlayerNoClip', @, not data\GetFly())
+            can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
             if can == false
                 if lastMessage2 < RealTime()
                     lastMessage2 = RealTime() + 1
