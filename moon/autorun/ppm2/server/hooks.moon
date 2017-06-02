@@ -181,16 +181,20 @@ hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
 ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
 DISALLOW_PLAYERS = CreateConVar('ppm2_sv_edit_no_players', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'When unrestricted edit allowed, do not allow to edit players.')
 
+genericUsageCheck = (ply, ent) ->
+    return false if not IsValid(ply)
+    return false if not IsValid(ent)
+    return false if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
+    return false if DISALLOW_PLAYERS\GetBool() and ent\IsPlayer()
+    return false if not ent\IsPony()
+    return false if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
+    return false if not hook.Run('CanProperty', ply, 'ponydata', ent)
+    return true
+
 net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
-    return if not IsValid(ply)
     ent = net.ReadEntity()
-    return if not IsValid(ent)
-    return if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
-    return if DISALLOW_PLAYERS\GetBool() and ent\IsPlayer()
-    return if not ent\IsPony()
-    return if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
-    return if not hook.Run('CanProperty', ply, 'ponydata', ent)
     useLocal = net.ReadBool()
+    return if not genericUsageCheck(ply, ent)
 
     if useLocal
         return if not ply\GetPonyData()
@@ -209,3 +213,15 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
         data = ent\GetPonyData()
         data\ReadNetworkData(len, ply, false, false)
         data\Create() if not data\IsNetworked()
+
+net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
+    ent = net.ReadEntity()
+    status = net.ReadBool()
+    return if not genericUsageCheck(ply, ent)
+
+    if not ent\GetPonyData()
+        data = PPM2.NetworkedPonyData(nil, ent)
+    
+    data = ent\GetPonyData()
+    data\SetNoFlex(status)
+    data\Create() if not data\IsNetworked()
