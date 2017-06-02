@@ -228,7 +228,7 @@ MODEL_BOX_PANEL = {
         @model\SetSequence(@seq)
         @model\FrameAdvance(0)
         @emotesPanel\Remove() if IsValid(@emotesPanel)
-        if IS_USING_NEW\GetBool()
+        if IS_USING_NEW()
             @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
             @emotesPanel\SetPos(10, 40)
             @emotesPanel\SetMouseInputEnabled(true)
