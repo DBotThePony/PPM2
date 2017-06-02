@@ -106,6 +106,7 @@ createPlayerRagdoll = =>
         \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
         \Spawn()
         \Activate()
+        hook.Run 'PlayerSpawnedRagdoll', @, @GetModel(), @__ppm2_ragdoll
         .__ppm2_ragdoll_parent = @
         \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
         \SetNWBool('PPM2.IsDeathRagdoll', true)
