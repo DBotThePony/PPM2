@@ -101,13 +101,13 @@ playEmote = {
     MenuOpen: (menu, ent = NULL, tr) =>
         return if not IsValid(ent)
         with menu\AddSubMenu()
-        for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
-                \AddOption "Play '#{name}' emote", ->
-                net.Start('PPM2.RagdollEditEmote')
-                net.WriteEntity(ent)
-                net.WriteUInt(id, 8)
-                net.SendToServer()
-                hook.Call('PPM2_EmoteAnimation', nil, ent, sequence, time)
+            for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
+                    \AddOption "Play '#{name}' emote", ->
+                    net.Start('PPM2.RagdollEditEmote')
+                    net.WriteEntity(ent)
+                    net.WriteUInt(id, 8)
+                    net.SendToServer()
+                    hook.Call('PPM2_EmoteAnimation', nil, ent, sequence, time)
     Filter: (ent = NULL, ply = NULL) =>
         return false if not genericEditFilter(@, ent, ply)
         return false if not ent\GetPonyData()
