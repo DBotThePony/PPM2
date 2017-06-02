@@ -30,11 +30,11 @@ genericEditFilter = (ent = NULL, ply = NULL) =>
     return true
 
 applyPonyData = {
-	MenuLabel: 'Apply pony data...'
-	Order: 2500
-	MenuIcon: 'icon16/user.png'
+    MenuLabel: 'Apply pony data...'
+    Order: 2500
+    MenuIcon: 'icon16/user.png'
 
-	MenuOpen: (menu, ent = NULL, tr) =>
+    MenuOpen: (menu, ent = NULL, tr) =>
         return if not IsValid(ent)
         with menu\AddSubMenu()
             \AddOption 'Use Local data', ->
@@ -51,22 +51,22 @@ applyPonyData = {
                     data = PPM2.PonyDataInstance(fil, nil, true, true, false)
                     data\WriteNetworkData()
                     net.SendToServer()
-	Filter: genericEditFilter
-	Action: (ent = NULL) =>
+    Filter: genericEditFilter
+    Action: (ent = NULL) =>
 }
 
 ponyDataFlexEnable = {
-	MenuLabel: 'Enable flexes'
-	Order: 2501
-	MenuIcon: 'icon16/emoticon_smile.png'
+    MenuLabel: 'Enable flexes'
+    Order: 2501
+    MenuIcon: 'icon16/emoticon_smile.png'
 
-	MenuOpen: (menu, ent = NULL, tr) =>
-	Filter: (ent = NULL, ply = NULL) =>
+    MenuOpen: (menu, ent = NULL, tr) =>
+    Filter: (ent = NULL, ply = NULL) =>
         return false if not genericEditFilter(@, ent, ply)
         return false if not ent\GetPonyData()
         return false if not ent\GetPonyData()\GetNoFlex()
         return true
-	Action: (ent = NULL) =>
+    Action: (ent = NULL) =>
         return if not IsValid(ent)
         net.Start 'PPM2.RagdollEditFlex'
         net.WriteEntity(ent)
@@ -75,17 +75,17 @@ ponyDataFlexEnable = {
 }
 
 ponyDataFlexDisable = {
-	MenuLabel: 'Disable flexes'
-	Order: 2501
-	MenuIcon: 'icon16/emoticon_unhappy.png'
+    MenuLabel: 'Disable flexes'
+    Order: 2501
+    MenuIcon: 'icon16/emoticon_unhappy.png'
 
-	MenuOpen: (menu, ent = NULL, tr) =>
-	Filter: (ent = NULL, ply = NULL) =>
+    MenuOpen: (menu, ent = NULL, tr) =>
+    Filter: (ent = NULL, ply = NULL) =>
         return false if not genericEditFilter(@, ent, ply)
         return false if not ent\GetPonyData()
         return false if ent\GetPonyData()\GetNoFlex()
         return true
-	Action: (ent = NULL) =>
+    Action: (ent = NULL) =>
         return if not IsValid(ent)
         net.Start 'PPM2.RagdollEditFlex'
         net.WriteEntity(ent)
@@ -94,26 +94,26 @@ ponyDataFlexDisable = {
 }
 
 playEmote = {
-	MenuLabel: 'Play pony emote'
-	Order: 2502
-	MenuIcon: 'icon16/emoticon_wink.png'
+    MenuLabel: 'Play pony emote'
+    Order: 2502
+    MenuIcon: 'icon16/emoticon_wink.png'
 
-	MenuOpen: (menu, ent = NULL, tr) =>
+    MenuOpen: (menu, ent = NULL, tr) =>
         return if not IsValid(ent)
         with menu\AddSubMenu()
-            for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
-                \AddOption "Play '#{emote}' emote", ->
-                    net.Start('PPM2.RagdollEditEmote')
-                    net.WriteEntity(ent)
-                    net.WriteUInt(id, 8)
-                    net.SendToServer()
-                    hook.Call('PPM2_EmoteAnimation', nil, ent, sequence, time)
-	Filter: (ent = NULL, ply = NULL) =>
+        for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
+                \AddOption "Play '#{name}' emote", ->
+                net.Start('PPM2.RagdollEditEmote')
+                net.WriteEntity(ent)
+                net.WriteUInt(id, 8)
+                net.SendToServer()
+                hook.Call('PPM2_EmoteAnimation', nil, ent, sequence, time)
+    Filter: (ent = NULL, ply = NULL) =>
         return false if not genericEditFilter(@, ent, ply)
         return false if not ent\GetPonyData()
         return false if ent\GetPonyData()\GetNoFlex()
         return true
-	Action: (ent = NULL) =>
+    Action: (ent = NULL) =>
 }
 
 properties.Add('ppm2.applyponydata', applyPonyData)
