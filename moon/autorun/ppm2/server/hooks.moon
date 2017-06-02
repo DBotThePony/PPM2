@@ -150,6 +150,7 @@ hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
         \Remove()
 
 hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
+    @__ppm2_ragdoll\Remove() if IsValid(@__ppm2_ragdoll)
     data = @GetPonyData()
     return if not data
     net.Start('PPM2.NotifyDisconnect')
