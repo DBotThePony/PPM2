@@ -553,6 +553,33 @@ class PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2, @GetTailName(2))
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+        if PPM2.ALTERNATIVE_RENDER\GetBool()
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1, @GetHair(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2, @GetHair(2))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1, @GetTail(1))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+    
+    PostDraw: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        return if not PPM2.ALTERNATIVE_RENDER\GetBool()
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR1)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HAIR_COLOR2)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
     
     ResetTextures: (ent = @ent) =>
         return if not IsValid(ent)
@@ -585,8 +612,6 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
-    
-    PostDraw: (ent = @ent) =>
     
     @MAT_INDEX_SOCKS = 0
 
@@ -1875,6 +1900,35 @@ class NewPonyTextureController extends PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
             ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
+        if PPM2.ALTERNATIVE_RENDER\GetBool()
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH, @GetTeeth())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH, @GetMouth())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT, @GetBatWings())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
+    PostDraw: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        return if not PPM2.ALTERNATIVE_RENDER\GetBool()
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN)
     ResetTextures: (ent = @ent) =>
         return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL
