@@ -225,3 +225,17 @@ net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
     data = ent\GetPonyData()
     data\SetNoFlex(status)
     data\Create() if not data\IsNetworked()
+
+net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
+    ent = net.ReadEntity()
+    return if not genericUsageCheck(ply, ent)
+    self = ply
+    emoteID = net.ReadUInt(8)
+    return if not PPM2.AVALIABLE_EMOTES[emoteID]
+    @__ppm2_last_played_emote = @__ppm2_last_played_emote or 0
+    return if @__ppm2_last_played_emote > RealTime()
+    @__ppm2_last_played_emote = RealTime() + 1
+    net.Start('PPM2.PlayEmote')
+    net.WriteUInt(emoteID, 8)
+    net.WriteEntity(ply)
+    net.SendOmit(ply)

@@ -1292,6 +1292,29 @@ ponyDataFlexDisable = {
         net.SendToServer()
 }
 
+playEmote = {
+	MenuLabel: 'Play pony emote'
+	Order: 2502
+	MenuIcon: 'icon16/user.png'
+
+	MenuOpen: (menu, ent = NULL, tr) =>
+        return if not IsValid(ent)
+        with menu\AddSubMenu()
+            for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
+                \AddOption "Play '#{emote}' emote", ->
+                    net.Start('PPM2.RagdollEditEmote')
+                    net.WriteEntity(ent)
+                    net.WriteUInt(id, 8)
+                    net.SendToServer()
+                    hook.Call('PPM2_EmoteAnimation', nil, ent, sequence, time)
+	Filter: (ent = NULL, ply = NULL) =>
+        return false if not genericEditFilter(@, ent, ply)
+        return false if not ent\GetPonyData()
+        return false if ent\GetPonyData()\GetNoFlex()
+        return true
+	Action: (ent = NULL) =>
+}
+
 hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption 'Utilities', 'User', 'PPM2.Posing', 'PPM2', '', '', =>
     return if not @IsValid()
     @Clear()
@@ -1313,3 +1336,4 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
 properties.Add('ppm2.applyponydata', applyPonyData)
 properties.Add('ppm2.enableflex', ponyDataFlexEnable)
 properties.Add('ppm2.disableflex', ponyDataFlexDisable)
+properties.Add('ppm2.playemote', playEmote)
