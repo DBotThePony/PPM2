@@ -15,6 +15,52 @@
 -- limitations under the License.
 --
 
+
+ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options')
+
+BackgroundColors = {
+    Color(200, 200, 200)
+    Color(150, 150, 150)
+    Color(255, 255, 255)
+    Color(131, 255, 240)
+    Color(131, 255, 143)
+    Color(206, 131, 255)
+    Color(131, 135, 255)
+    Color(92, 98, 228)
+    Color(92, 201, 228)
+    Color(92, 228, 201)
+    Color(228, 155, 92)
+    Color(228, 92, 110)
+}
+
+surface.CreateFont('PPM2.Title', {
+    font: 'Roboto'
+    size: 72
+    weight: 600
+})
+
+surface.CreateFont('PPM2.AboutLabels', {
+    font: 'Roboto'
+    size: 16
+    weight: 500
+})
+
+EditorModels = {
+    'DEFAULT': 'models/ppm/player_default_base.mdl'
+    'CPPM': 'models/cppm/player_default_base.mdl'
+    'NEW': 'models/ppm/player_default_base_new.mdl'
+}
+
+USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
+PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
+
+IS_USING_NEW = ->
+    switch USE_MODEL\GetString()
+        when 'new'
+            return true
+        else
+            return false
+
 MODEL_BOX_PANEL = {
     SEQUENCE_STAND: 22
     PONY_VEC_Z: 64 * .7
@@ -133,7 +179,7 @@ MODEL_BOX_PANEL = {
     PerformLayout: (w = 0, h = 0) =>
         --@animButton\SetPos(w - 130, 10)
         @seqButton\SetPos(10, 10)
-        @emotesPanel\SetPos(10, 40)
+        @emotesPanel\SetPos(10, 40) if IsValid(@emotesPanel)
     
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
@@ -183,10 +229,11 @@ MODEL_BOX_PANEL = {
         @model\SetSequence(@seq)
         @model\FrameAdvance(0)
         @emotesPanel\Remove() if IsValid(@emotesPanel)
-        @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
-        @emotesPanel\SetPos(10, 40)
-        @emotesPanel\SetMouseInputEnabled(true)
-        @emotesPanel\SetVisible(true)
+        if IS_USING_NEW\GetBool()
+            @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
+            @emotesPanel\SetPos(10, 40)
+            @emotesPanel\SetMouseInputEnabled(true)
+            @emotesPanel\SetVisible(true)
         return @model
     Think: =>
         rtime = RealTime()
@@ -518,51 +565,6 @@ PANEL_SETTINGS_BASE = {
 }
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
-
-ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options')
-
-BackgroundColors = {
-    Color(200, 200, 200)
-    Color(150, 150, 150)
-    Color(255, 255, 255)
-    Color(131, 255, 240)
-    Color(131, 255, 143)
-    Color(206, 131, 255)
-    Color(131, 135, 255)
-    Color(92, 98, 228)
-    Color(92, 201, 228)
-    Color(92, 228, 201)
-    Color(228, 155, 92)
-    Color(228, 92, 110)
-}
-
-surface.CreateFont('PPM2.Title', {
-    font: 'Roboto'
-    size: 72
-    weight: 600
-})
-
-surface.CreateFont('PPM2.AboutLabels', {
-    font: 'Roboto'
-    size: 16
-    weight: 500
-})
-
-EditorModels = {
-    'DEFAULT': 'models/ppm/player_default_base.mdl'
-    'CPPM': 'models/cppm/player_default_base.mdl'
-    'NEW': 'models/ppm/player_default_base_new.mdl'
-}
-
-USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
-PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
-
-IS_USING_NEW = ->
-    switch USE_MODEL\GetString()
-        when 'new'
-            return true
-        else
-            return false
 
 EditorPages = {
     {
