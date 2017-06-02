@@ -178,6 +178,7 @@ hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
             data\Create()
 
 ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+DISALLOW_PLAYERS = CreateConVar('ppm2_sv_edit_no_players', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'When unrestricted edit allowed, do not allow to edit players.')
 
 net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
     return if not IsValid(ply)

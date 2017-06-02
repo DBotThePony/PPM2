@@ -1213,6 +1213,7 @@ list.Set('DesktopWindows', 'PPM2', IconData)
 CreateContextMenu() if IsValid(g_ContextMenu)
 
 ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
+DISALLOW_PLAYERS = CreateConVar('ppm2_sv_edit_no_players', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'When unrestricted edit allowed, do not allow to edit players.')
 
 applyPonyData = {
 	MenuLabel: 'Apply pony data...'
@@ -1240,6 +1241,7 @@ applyPonyData = {
         return false if not IsValid(ply)
         return false if not ent\IsPony()
         return false if ALLOW_ONLY_RAGDOLLS\GetBool() and ent\GetClass() ~= 'prop_ragdoll'
+        return false if DISALLOW_PLAYERS\GetBool() and ent\IsPlayer()
         return false if not ply\GetPonyData()
         return false if not hook.Run('CanProperty', ply, 'ponydata', ent)
         return false if not hook.Run('CanTool', ply, {Entity: ent, HitPos: ent\GetPos(), HitNormal: Vector()}, 'ponydata')
