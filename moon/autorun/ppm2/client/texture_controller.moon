@@ -322,8 +322,8 @@ class PonyTextureController
                             }
 
                             #imgdiv {
-                                width: #{@QUAD_SIZE_CONST};
-                                height: #{@QUAD_SIZE_CONST};
+                                width: #{width};
+                                height: #{height};
                                 overflow: hidden;
                                 margin: 0;
                                 padding: 0;
@@ -338,7 +338,7 @@ class PonyTextureController
                                     img.style.setProperty('width', 'auto');
                                 }
 
-                                img.style.setProperty('margin-top', (#{@QUAD_SIZE_CONST} - img.height) / 2);
+                                img.style.setProperty('margin-top', (#{height} - img.height) / 2);
                                 
                                 setInterval(function() {
                                     console.log('FRAME');
@@ -420,7 +420,7 @@ class PonyTextureController
             for callback in *data.callbacks
                 callback(newMat\GetTexture('$basetexture'), nil, newMat)
         panel\SetVisible(false)
-        panel\SetSize(@@QUAD_SIZE_CONST, @QUAD_SIZE_CONST)
+        panel\SetSize(data.width, data.height)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
         panel\Refresh()
         panel.ConsoleMessage = (pnl, msg) ->
@@ -662,7 +662,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt3", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt5", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
             rt\Download()
             render.PushRenderTarget(rt)
 

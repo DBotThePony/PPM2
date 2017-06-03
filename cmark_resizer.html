@@ -9,17 +9,17 @@
             }
 
             #mainimage {
-                max-width: 512;
+                max-width: 1024;
                 height: auto;
                 width: 100%;
                 margin: 0;
                 padding: 0;
-                max-height: 512;
+                max-height: 1024;
             }
 
             #imgdiv {
-                width: 512;
-                height: 512;
+                width: 1024;
+                height: 1024;
                 overflow: hidden;
                 margin: 0;
                 padding: 0;
@@ -34,7 +34,7 @@
                     img.style.setProperty('width', 'auto');
                 }
 
-                img.style.setProperty('margin-top', (512 - img.height) / 2);
+                img.style.setProperty('margin-top', (1024 - img.height) / 2);
 
                 setInterval(function() {
                     console.log('FRAME');
@@ -44,7 +44,7 @@
     </head>
     <body>
         <div id='imgdiv'>
-            <img src='https://dbot.serealia.ca/smiles/ponies/mlp-bmsleep.png' id='mainimage' />
+            <img src='https://dbot.serealia.ca/custom/content/materials/sweetiebot/body.png' id='mainimage' />
         </div>
     </body>
 </html>
