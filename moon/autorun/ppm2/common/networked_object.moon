@@ -74,6 +74,7 @@ class NetworkedObject
 		@NW_NextVarID = -1 if @NW_NextVarID == nil
 		@NW_Create = "PPM2.NW.Created.#{@__name}"
 		@NW_Modify = "PPM2.NW.Modified.#{@__name}"
+		@NW_Broadcast = "PPM2.NW.ModifiedBroadcast.#{@__name}"
 		@NW_Remove = "PPM2.NW.Removed.#{@__name}"
 		@NW_Rejected = "PPM2.NW.Rejected.#{@__name}"
 		@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
@@ -89,6 +90,7 @@ class NetworkedObject
 			util.AddNetworkString(@NW_Remove)
 			util.AddNetworkString(@NW_ReceiveID)
 			util.AddNetworkString(@NW_Rejected)
+			util.AddNetworkString(@NW_Broadcast)
 		
 		net.Receive @NW_Create, (len = 0, ply = NULL) -> @OnNetworkedCreated(ply, len)
 		net.Receive @NW_Modify, (len = 0, ply = NULL) -> @OnNetworkedModify(ply, len)
@@ -114,6 +116,12 @@ class NetworkedObject
 			obj.__LastReject = RealTime() + 3
 			obj.NETWORKED = false
 			obj\Create()
+		net.Receive @NW_Broadcast, (len = 0, ply = NULL) ->
+			return if SERVER
+			netID = net.ReadUInt(16)
+			obj = @NW_Objects[netID]
+			return unless obj
+			obj\ReadNetworkData(len, ply)
 	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val)) =>
@@ -292,7 +300,11 @@ class NetworkedObject
 		return data
 	
 	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
-
+	ReBroadcast: =>
+        net.Start(@@NW_Broadcast)
+        net.WriteUInt(@netID, 16)
+        @WriteNetworkData()
+        net.Broadcast()
 	SendVar: (Var = '') =>
 		return if @[Var] == nil
 	

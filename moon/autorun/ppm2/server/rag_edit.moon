@@ -49,6 +49,7 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
         
         data = ent\GetPonyData()
         data\ReadNetworkData(len, ply, false, false)
+        data\ReBroadcast()
         data\Create() if not data\IsNetworked()
 
 net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
