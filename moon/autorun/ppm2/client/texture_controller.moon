@@ -28,6 +28,8 @@
 -- 10   =   models/ppm/base/cmark
 -- 11   =   models/ppm/base/eyelashes
 
+USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
+
 PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/body_leggrad1.png')
     Material('models/ppm/partrender/body_lines1.png')
@@ -622,12 +624,14 @@ class PonyTextureController
     
     @QUAD_SIZE_CONST = 512
     @QUAD_SIZE_CONST_BODY = 2048
+    @QUAD_SIZE_CONST_BODY_HIRES = 4096
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
         prefixUP = bType and 'FEMALE' or 'MALE'
         urlTextures = {}
         left = 0
+        bodysize = USE_HIGHRES_BODY\GetBool() and @@QUAD_SIZE_CONST_BODY_HIRES or @@QUAD_SIZE_CONST_BODY
 
         textureData = {
             'name': "PPM2_#{@GetID()}_Body_#{prefix}"
@@ -662,7 +666,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt7", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
             render.PushRenderTarget(rt)
 
@@ -670,10 +674,10 @@ class PonyTextureController
             cam.Start2D()
             surface.DisableClipping(true)
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+            surface.DrawRect(0, 0, bodysize, bodysize)
 
             surface.SetMaterial(@@["BODY_MATERIAL_#{prefixUP}"])
-            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+            surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             for i = 1, PPM2.MAX_BODY_DETAILS
                 detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
@@ -681,25 +685,25 @@ class PonyTextureController
                 continue if not mat
                 surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
             
             surface.SetDrawColor(255, 255, 255)
 
             if @GetData()\GetSocks()
                 surface.SetMaterial(@@PONY_SOCKS)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
             
             suitType = @GetData()\GetBodysuit()
             if PPM2.AvaliablePonySuitsMaterials[suitType]
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
+                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             surface.DisableClipping(false)
             cam.End2D()
@@ -717,7 +721,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, (texture, panel, mat) ->
+            @@LoadURL url, bodysize, bodysize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
