@@ -74,5 +74,5 @@ net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
     @__ppm2_last_played_emote = RealTime() + 1
     net.Start('PPM2.PlayEmote')
     net.WriteUInt(emoteID, 8)
-    net.WriteEntity(ply)
+    net.WriteEntity(ent)
     net.SendOmit(ply)
