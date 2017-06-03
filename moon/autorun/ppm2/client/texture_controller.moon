@@ -621,6 +621,7 @@ class PonyTextureController
         socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
     
     @QUAD_SIZE_CONST = 512
+    @QUAD_SIZE_CONST_BODY = 4096
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
@@ -661,18 +662,18 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt", @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt3", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
 
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
+            surface.DisableClipping(true)
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            surface.DrawRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
 
             surface.SetMaterial(@@["BODY_MATERIAL_#{prefixUP}"])
-            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+            surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
 
             for i = 1, PPM2.MAX_BODY_DETAILS
                 detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
@@ -680,28 +681,28 @@ class PonyTextureController
                 continue if not mat
                 surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
             
             surface.SetDrawColor(255, 255, 255)
 
             if @GetData()\GetSocks()
                 surface.SetMaterial(@@PONY_SOCKS)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
             
             suitType = @GetData()\GetBodysuit()
             if PPM2.AvaliablePonySuitsMaterials[suitType]
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
-                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST)
+                surface.DrawTexturedRect(0, 0, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY)
 
+            surface.DisableClipping(false)
             cam.End2D()
-            render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
 
             @["#{prefix}Material"]\SetTexture('$basetexture', rt)
@@ -716,7 +717,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@QUAD_SIZE_CONST, @@QUAD_SIZE_CONST, (texture, panel, mat) ->
+            @@LoadURL url, @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
