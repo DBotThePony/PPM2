@@ -295,16 +295,24 @@ class NetworkedObject
 				state\Apply()
 				@NetworkDataChanges(state) unless silent
 	
-	NetworkedIterable: =>
-		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars]
+	NetworkedIterable: (grabEntities = true) =>
+		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars when grabEntities or not isentity(@[strName])]
 		return data
+    
+    ApplyDataToObject: (target, applyEntities = false) =>
+        for {key, value} in *@NetworkedIterable(applyEntities)
+            target["Set#{key}"](target, value) if target["Set#{key}"]
+        return target
 	
 	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
 	ReBroadcast: =>
+        return false if not @NETWORKED
+        return false if CLIENT
         net.Start(@@NW_Broadcast)
         net.WriteUInt(@netID, 16)
         @WriteNetworkData()
         net.Broadcast()
+        return true
 	SendVar: (Var = '') =>
 		return if @[Var] == nil
 	

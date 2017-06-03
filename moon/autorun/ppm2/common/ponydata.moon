@@ -147,12 +147,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BatWingSkinURL#{i}",       net.ReadString, net.WriteString, '')
         @NetworkVar("BatWingURLColor#{i}",      net.ReadColor,  net.WriteColor, Color(255, 255, 255))
         @NetworkVar("BatWingSkinURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
-
-    ApplyDataToObject: (target, applyEntities = false) =>
-        for {key, value} in *@NetworkedIterable()
-            target["Set#{key}"](target, value) if not isentity(value) and target["Set#{key}"]
-        return target
-
+    
     Clone: (target = @ent) =>
         copy = @@(nil, target)
         @ApplyDataToObject(copy)

@@ -51,6 +51,8 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
         data\ReadNetworkData(len, ply, false, false)
         data\ReBroadcast()
         data\Create() if not data\IsNetworked()
+    
+    duplicator.StoreEntityModifier(ent, 'ppm2_ragdolledit', ent\GetPonyData()\NetworkedIterable(false))
 
 net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
     ent = net.ReadEntity()
@@ -77,3 +79,13 @@ net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
     net.WriteUInt(emoteID, 8)
     net.WriteEntity(ent)
     net.SendOmit(ply)
+
+duplicator.RegisterEntityModifier 'ppm2_ragdolledit', (ply = NULL, ent = NULL, storeddata = {}) ->
+    return if not IsValid(ent)
+    if not ent\GetPonyData()
+        data = PPM2.NetworkedPonyData(nil, ent)
+    
+    data = ent\GetPonyData()
+    data["Set#{key}"](data, value, false) for {key, value} in *storeddata when data["Set#{key}"]
+    data\ReBroadcast()
+    timer.Simple 0.5, -> data\Create() if not data\IsNetworked()
