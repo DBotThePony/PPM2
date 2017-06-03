@@ -621,7 +621,7 @@ class PonyTextureController
         socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
     
     @QUAD_SIZE_CONST = 512
-    @QUAD_SIZE_CONST_BODY = 4096
+    @QUAD_SIZE_CONST_BODY = 2048
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
@@ -662,7 +662,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt5", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
+            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt7", @@QUAD_SIZE_CONST_BODY, @@QUAD_SIZE_CONST_BODY, false)
             rt\Download()
             render.PushRenderTarget(rt)
 
