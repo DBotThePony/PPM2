@@ -2,3 +2,4 @@ lua/
 lint.txt
 *.blend
 *.blend*
+tools/temp/
