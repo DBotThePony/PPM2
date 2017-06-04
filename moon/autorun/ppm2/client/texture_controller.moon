@@ -692,10 +692,6 @@ class PonyTextureController
             
             surface.SetDrawColor(255, 255, 255)
 
-            if @GetData()\GetSocks()
-                surface.SetMaterial(@@PONY_SOCKS)
-                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
-
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
@@ -706,6 +702,10 @@ class PonyTextureController
             if PPM2.AvaliablePonySuitsMaterials[suitType]
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(PPM2.AvaliablePonySuitsMaterials[suitType])
+                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+            
+            if @GetData()\GetSocks()
+                surface.SetMaterial(@@PONY_SOCKS)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             surface.DisableClipping(false)
