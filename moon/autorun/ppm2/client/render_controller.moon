@@ -16,6 +16,7 @@
 --
 
 ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flasglight_pass', '0', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
+ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 
 class PonyRenderController
     @AVALIABLE_CONTROLLERS = {}
@@ -85,6 +86,7 @@ class PonyRenderController
 
     UpdateLegs: =>
         return if not @isValid
+        return if not ENABLE_LEGS\GetBool()
         return unless IsValid(@legsModel)
         return if @legUpdateFrame == FrameNumber()
         @legUpdateFrame = FrameNumber()
@@ -154,6 +156,7 @@ class PonyRenderController
     @LEGS_MAX_DISTANCE = 60 ^ 2
     DrawLegs: (start3D = true) =>
         return if not @isValid
+        return if not ENABLE_LEGS\GetBool()
         @CreateLegs() unless IsValid(@legsModel)
         return unless IsValid(@legsModel)
         return if @ent\ShouldDrawLocalPlayer()
