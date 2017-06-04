@@ -138,7 +138,7 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     net.Start('PPM2.PlayerDeath')
     net.WriteEntity(@)
     net.Broadcast()
-    if ENABLE_NEW_RAGDOLLS\GetBool()
+    if ENABLE_NEW_RAGDOLLS\GetBool() and @IsPony()
         createPlayerRagdoll(@)
 
 hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>

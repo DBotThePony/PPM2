@@ -83,3 +83,4 @@ ENABLE_PHYSGUN = CreateConVar('ppm2_sv_ragdoll_physgun', '1', {FCVAR_ARCHIVE, FC
 
 hook.Add 'CanTool', 'PPM2.DeathRagdoll', (ply = NULL, tr = {Entity: NULL}, tool = '') -> false if IsValid(tr.Entity) and tr.Entity\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool()
 hook.Add 'PhysgunPickup', 'PPM2.DeathRagdoll', (ply = NULL, ent = NULL) -> false if IsValid(ent) and ent\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_PHYSGUN\GetBool()
+hook.Add 'CanProperty', 'PPM2.DeathRagdoll', (ply = NULL, mode = '', ent = NULL) -> false if IsValid(ent) and ent\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool()

@@ -80,6 +80,7 @@ class DefaultBodygroupController
 
     CreateSocksModel: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @socksModel if IsValid(@socksModel)
@@ -126,6 +127,7 @@ class DefaultBodygroupController
         return @socksModel
     CreateSocksModelIfNotExists: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
         return NULL if not IsValid(@socksModel)
@@ -146,6 +148,7 @@ class DefaultBodygroupController
 
     ApplyRace: =>
         return unless @isValid
+        return NULL if not IsValid(@ent)
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
@@ -170,6 +173,7 @@ class DefaultBodygroupController
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
     SlowUpdate: (createModels = CLIENT) =>
+        return if not IsValid(@ent)
         return if not @ent\IsPony()
         @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
         @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
@@ -180,6 +184,7 @@ class DefaultBodygroupController
         @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
     ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
+        return if not IsValid(@ent)
         @ResetBodygroups()
         return if not @ent\IsPony()
         @SlowUpdate(createModels)
@@ -194,6 +199,7 @@ class DefaultBodygroupController
     @TAIL_BONE3 = 40
     DataChanges: (state) =>
         return unless @isValid
+        return if not IsValid(@ent)
         switch state\GetKey()
             when 'ManeType'
                 @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
@@ -333,6 +339,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     CreateUpperManeModel: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelUP if IsValid(@maneModelUP)
@@ -381,6 +388,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     CreateLowerManeModel: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @maneModelLower if IsValid(@maneModelLower)
@@ -429,6 +437,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     CreateTailModel: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         return NULL unless @ent\IsPony()
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         return @tailModel if IsValid(@tailModel)
@@ -479,18 +488,21 @@ class NewBodygroupController extends DefaultBodygroupController
 
     CreateUpperManeModelIfNotExists: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModel() if not IsValid(@maneModelUP)
         @GetData()\SetUpperManeModel(@maneModelUP) if IsValid(@maneModelUP)
         return @maneModelUP
     CreateLowerManeModelIfNotExists: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModel() if not IsValid(@maneModelLower)
         @GetData()\SetLowerManeModel(@maneModelLower) if IsValid(@maneModelLower)
         return @maneModelLower
     CreateTailModelIfNotExists: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModel() if not IsValid(@tailModel)
         @GetData()\SetTailModel(@tailModel) if IsValid(@tailModel)
@@ -519,6 +531,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     UpdateUpperMane: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateUpperManeModelIfNotExists()
         return NULL if not IsValid(@maneModelUP)
@@ -532,6 +545,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelUP
     UpdateLowerMane: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateLowerManeModelIfNotExists()
         return NULL if not IsValid(@maneModelLower)
@@ -545,6 +559,7 @@ class NewBodygroupController extends DefaultBodygroupController
         return @maneModelLower
     UpdateTailModel: =>
         return NULL unless @isValid
+        return NULL if not IsValid(@ent)
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateTailModelIfNotExists()
         return NULL if not IsValid(@tailModel)
@@ -583,6 +598,7 @@ class NewBodygroupController extends DefaultBodygroupController
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
+        return if not IsValid(@ent)
         return if not @ent\IsPony()
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
         maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
@@ -620,12 +636,14 @@ class NewBodygroupController extends DefaultBodygroupController
         super()
     ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
+        return if not IsValid(@ent)
         @ResetBodygroups()
         return @RemoveModels() if not @ent\IsPony()
         @SlowUpdate(createModels)
     
     ApplyRace: =>
         return unless @isValid
+        return if not IsValid(@ent)
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
@@ -642,6 +660,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     DataChanges: (state) =>
         return unless @isValid
+        return if not IsValid(@ent)
         switch state\GetKey()
             when 'EyelashType'
                 @ent\SetFlexWeight(@@FLEX_ID_EYELASHES, @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
