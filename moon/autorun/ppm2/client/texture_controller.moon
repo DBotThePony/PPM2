@@ -77,7 +77,7 @@ PPM2.TailDetailsMaterials = {
     [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
 }
 
-PPM2.DefaultCutiemarksMaterials = [Material("models/ppm/cmarks/#{mark}") for mark in *PPM2.DefaultCutiemarks]
+PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
 
 PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
 PPM2.ApplyMaterialData = (mat, matData) ->
@@ -1336,7 +1336,6 @@ class PonyTextureController
 
         if URL == '' or not URL\find('^https?://')
             oldW, oldH = ScrW(), ScrH()
-            {:r, :g, :b, :a} = @GetData()\GetCMarkColor()
 
             rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", @@GetTextureSize(), @@GetTextureSize(), false)
             rt\Download()
@@ -1347,7 +1346,7 @@ class PonyTextureController
 
             mark = PPM2.DefaultCutiemarksMaterials[@GetData()\GetCMarkType() + 1]
             if mark
-                surface.SetDrawColor(r, g, b, a)
+                surface.SetDrawColor(@GetData()\GetCMarkColor())
                 surface.SetMaterial(mark)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
             
@@ -1362,7 +1361,6 @@ class PonyTextureController
         else
             @@LoadURL URL, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, material) ->
                 oldW, oldH = ScrW(), ScrH()
-                {:r, :g, :b, :a} = @GetData()\GetCMarkColor()
 
                 rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", @@GetTextureSize(), @@GetTextureSize(), false)
                 rt\Download()
@@ -1371,7 +1369,7 @@ class PonyTextureController
                 render.Clear(0, 0, 0, 0, true, true)
                 cam.Start2D()
 
-                surface.SetDrawColor(r, g, b, a)
+                surface.SetDrawColor(@GetData()\GetCMarkColor())
                 surface.SetMaterial(material)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
                 
