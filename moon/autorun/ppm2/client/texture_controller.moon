@@ -303,7 +303,7 @@ class PonyTextureController
             return
         @ALREADY_DOWNLOADING[width][height][url] = true
         table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}})
-        PPM2.Message 'Queuing to download ', url
+        --PPM2.Message 'Queuing to download ', url
     @BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
         return "<html>
                     <head>
@@ -392,7 +392,7 @@ class PonyTextureController
                 }
 
                 @ALREADY_DOWNLOADING[data.width][data.height][data.url] = false
-                PPM2.Message 'Finished downloading ', data.url
+                --PPM2.Message 'Finished downloading ', data.url
 
                 for callback in *data.callbacks
                     callback(texture, panel, newMat)
@@ -405,7 +405,7 @@ class PonyTextureController
         timer.Create data.timerid, 8, 1, ->
             return unless IsValid(panel)
             panel\Remove()
-            PPM2.Message 'Failed to download', data.url, '!'
+            --PPM2.Message 'Failed to download', data.url, '!'
             newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
                 '$basetexture': 'models/ppm/partrender/null'
                 '$ignorez': 1
@@ -430,7 +430,7 @@ class PonyTextureController
             if msg == 'FRAME'
                 data.frame += 1
         data.panel = panel
-        PPM2.Message 'Downloading ', data.url
+        --PPM2.Message 'Downloading ', data.url
 
     new: (controller, compile = true) =>
         @isValid = true
