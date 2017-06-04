@@ -111,7 +111,7 @@ class PonyWeightController
     ResetBones: (ent = @ent) =>
         return if not IsValid(ent)
         return if not @isValid
-        for i = 0, ent\GetBoneCount() - 1
+        for i = 0, (ent\GetBoneCount() or 0) - 1
             ent\ManipulateBoneScale(i, @@DEFAULT_BONE_SIZE)
     Reset: => @ResetBones()
     UpdateWeight: (ent = @ent) =>
