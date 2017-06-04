@@ -16,6 +16,7 @@
 --
 
 ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options')
+ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
 
 BackgroundColors = {
     Color(200, 200, 200)
@@ -308,9 +309,10 @@ MODEL_BOX_PANEL = {
         for {pos, ang, w, h} in *@DRAW_WALLS
             render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
 
-        render.SuppressEngineLighting(true)
-        render.ResetModelLighting(1, 1, 1)
-        render.SetColorModulation(1, 1, 1)
+        if ENABLE_FULLBRIGHT\GetBool()
+            render.SuppressEngineLighting(true)
+            render.ResetModelLighting(1, 1, 1)
+            render.SetColorModulation(1, 1, 1)
         @controller\GetRenderController()\DrawModels()
         @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
@@ -321,7 +323,7 @@ MODEL_BOX_PANEL = {
                 bg\ApplyBodygroups()
         @model\DrawModel()
         @controller\GetRenderController()\PostDraw(@model) if @controller
-        render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
 
         cam.End3D()
     OnRemove: =>
@@ -1173,6 +1175,13 @@ PPM2.OpenEditor = ->
                 confirm,
                 'Noh!'
             )
+
+    @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
+    with @fullbrightSwitch
+        \SetSize(120, 20)
+        \SetPos(W - 670, 7)
+        \SetConVar('ppm2_editor_fullbright')
+        \SetText('Fullbright')
 
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
