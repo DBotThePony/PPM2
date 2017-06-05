@@ -158,7 +158,7 @@ class NetworkedObject
 		if CLIENT
 			netID = net.ReadUInt(16)
 			creator = NULL
-			creator = net.ReadEntity() if net.ReadBool()
+			creator = net.ReadStrongEntity() if net.ReadBool()
 			creator = NULL if not IsValid(creator)
 			obj = @NW_Objects[netID] or @(netID)
 			obj.NW_Player = creator
@@ -327,7 +327,7 @@ class NetworkedObject
 			net.Start(@@NW_Create)
 			net.WriteUInt(@netID, 16)
 			net.WriteBool(IsValid(@NW_Player))
-			net.WriteEntity(@NW_Player) if IsValid(@NW_Player)
+			net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
 			@WriteNetworkData()
 			filter = RecipientFilter()
 			filter\AddAllPlayers()
@@ -345,7 +345,7 @@ class NetworkedObject
 		net.Start(@@NW_Create)
 		net.WriteUInt(@netID, 16)
 		net.WriteBool(IsValid(@NW_Player))
-		net.WriteEntity(@NW_Player) if IsValid(@NW_Player)
+		net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
 		@WriteNetworkData()
 		net.Send(targets)
 
