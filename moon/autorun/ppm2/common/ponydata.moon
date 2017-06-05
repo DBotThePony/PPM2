@@ -168,6 +168,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             return if ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
             ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
+        @ent = ent
         return unless IsValid(ent)
         @modelCached = ent\GetModel()
         @ent = ent
@@ -339,7 +340,7 @@ if CLIENT
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
-    if @__PPM2_PonyData and @__PPM2_PonyData\GetEntity() ~= @
+    if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(@)
         @__PPM2_PonyData\SetEntity(@)
         @__PPM2_PonyData\SetupEntity(@) if CLIENT
     return @__PPM2_PonyData
