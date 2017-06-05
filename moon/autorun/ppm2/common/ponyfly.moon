@@ -163,12 +163,13 @@ class PonyflyController
         cmd\SetButtons(cmd\GetButtons() - IN_JUMP) if cmd\KeyDown(IN_JUMP)
     
     FinishMove: (movedata) =>
+        nativeEntity = @ent\GetEntity()
         mvPos = movedata\GetOrigin()
-        pos = @ent\GetPos()
+        pos = nativeEntity\GetPos()
         rpos = pos
         tryMove = util.TraceHull({
             filter: (ent) ->
-                return false if @ent == ent
+                return false if nativeEntity == ent
                 return true if not IsValid(ent)
                 collision = ent\GetCollisionGroup()
                 return false if collision == COLLISION_GROUP_WORLD
@@ -188,40 +189,40 @@ class PonyflyController
         length = velocity\Length()
 
         if not tryMove.Hit
-            @ent\SetPos(mvPos)
+            nativeEntity\SetPos(mvPos)
         else
             if IsValid(tryMove.Entity)
                 newVelocity = Vector(0, 0, 0)
                 movedata\SetVelocity(newVelocity)
                 newPos = tryMove.HitPos + tryMove.HitNormal
-                @ent\SetPos(newPos)
+                nativeEntity\SetPos(newPos)
                 movedata\SetOrigin(newPos)
             else
                 newVelocity = velocity - tryMove.HitNormal * velocity\Dot(tryMove.HitNormal * 1.1)
                 movedata\SetVelocity(newVelocity)
                 newPos = tryMove.HitPos + tryMove.HitNormal
-                @ent\SetPos(newPos)
+                nativeEntity\SetPos(newPos)
                 movedata\SetOrigin(newPos)
             if length > 7 and SERVER and FLIGHT_DAMAGE\GetBool()
                 dmgInfo = DamageInfo()
-                dmgInfo\SetAttacker(@ent)
-                dmgInfo\SetInflictor(@ent)
+                dmgInfo\SetAttacker(nativeEntity)
+                dmgInfo\SetInflictor(nativeEntity)
                 dmgInfo\SetDamageType(DMG_CRUSH)
                 calcDamage = math.Clamp((length / 4) ^ 2, 1, 100)
                 if calcDamage >= 100
-                    @ent\EmitSound('physics/flesh/flesh_bloody_break.wav', 100)
+                    nativeEntity\EmitSound('physics/flesh/flesh_bloody_break.wav', 100)
                 elseif calcDamage > 70
-                    @ent\EmitSound('physics/flesh/flesh_bloody_break.wav', 100)
+                    nativeEntity\EmitSound('physics/flesh/flesh_bloody_break.wav', 100)
                 elseif calcDamage > 50
-                    @ent\EmitSound("physics/body/body_medium_break#{math.random(2, 4)}.wav", 75)
+                    nativeEntity\EmitSound("physics/body/body_medium_break#{math.random(2, 4)}.wav", 75)
                 elseif calcDamage > 25
-                    @ent\EmitSound("physics/body/body_medium_impact_hard#{math.random(1, 6)}.wav", 75)
+                    nativeEntity\EmitSound("physics/body/body_medium_impact_hard#{math.random(1, 6)}.wav", 75)
                 elseif calcDamage > 10
-                    @ent\EmitSound("physics/body/body_medium_impact_soft#{math.random(1, 7)}.wav", 75)
+                    nativeEntity\EmitSound("physics/body/body_medium_impact_soft#{math.random(1, 7)}.wav", 75)
                 else
-                    @ent\EmitSound("physics/flesh/flesh_impact_bullet#{math.random(1, 5)}.wav", 75)
+                    nativeEntity\EmitSound("physics/flesh/flesh_impact_bullet#{math.random(1, 5)}.wav", 75)
                 dmgInfo\SetDamage(calcDamage)
-                @ent\TakeDamageInfo(dmgInfo)
+                nativeEntity\TakeDamageInfo(dmgInfo)
         @lastVelocity = newVelocity
 
 PPM2.PonyflyController = PonyflyController
