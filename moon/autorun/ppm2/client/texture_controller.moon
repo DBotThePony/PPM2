@@ -705,6 +705,7 @@ class PonyTextureController
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
             
             if @GetData()\GetSocks()
+                surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(@@PONY_SOCKS)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
