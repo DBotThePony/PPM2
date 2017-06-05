@@ -106,3 +106,4 @@ else
     include 'server/emotes.lua'
     include 'server/hitgroups.lua'
     include 'server/rag_edit.lua'
+    include 'server/collar_controller.lua'

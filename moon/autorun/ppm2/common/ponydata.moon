@@ -301,6 +301,21 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @bodygroups = cls(@)
         @bodygroups.ent = @ent
         return @bodygroups
+    GetCollarController: =>
+        return if CLIENT
+        return @collars if not @isValid
+        if not @collars or @modelCollars ~= @modelCached
+            @modelCached = @modelCached or @ent\GetModel()
+            @modelCollars = @modelCached
+            cls = PPM2.GetCollarController(@modelCached)
+            if @collars and cls == @collars.__class
+                @collars.ent = @ent
+                PPM2.DebugPrint('Skipping collar controller recreation for ', @ent, ' as part of ', @)
+                return @collars
+            @collars\Remove() if @collars
+            @collars = cls(@)
+        @collars.ent = @ent
+        return @collars
     Remove: (byClient = false) =>
         @@NW_Objects[@netID] = nil if @NETWORKED
         @isValid = false
