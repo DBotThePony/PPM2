@@ -24,10 +24,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @Setup()
     @NetworkVar('Entity',           net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), ((newValue) => IsValid(@GetOwner()) and StrongEntity(@GetOwner()\EntIndex()) or newValue))
-    @NetworkVar('UpperManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1))
-    @NetworkVar('LowerManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1))
-    @NetworkVar('TailModel',        net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1))
-    @NetworkVar('SocksModel',       net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1))
+    @NetworkVar('UpperManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('LowerManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('TailModel',        net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('SocksModel',       net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
 
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)

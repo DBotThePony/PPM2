@@ -124,7 +124,7 @@ class NetworkedObject
 			obj\ReadNetworkData(len, ply)
 	-- @__inherited = (child) => child.Setup(child)
 
-	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val)) =>
+	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
 		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
@@ -133,7 +133,7 @@ class NetworkedObject
 		@NW_VarsTable[id] = tab
 		@__base[strName] = defValue
 		@__base["Get#{getName}"] = => @[strName]
-		@__base["Set#{getName}"] = (val = defValue, networkNow = true) =>
+		@__base["Set#{getName}"] = (val = defValue, networkNow = networkByDefault) =>
 			oldVal = @[strName]
 			@[strName] = val
 			nevVal = onSet(@, val)
@@ -159,7 +159,6 @@ class NetworkedObject
 			netID = net.ReadUInt(16)
 			creator = NULL
 			creator = net.ReadStrongEntity() if net.ReadBool()
-			creator = NULL if not IsValid(creator)
 			obj = @NW_Objects[netID] or @(netID)
 			obj.NW_Player = creator
 			obj.NETWORKED = true
