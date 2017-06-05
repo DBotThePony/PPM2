@@ -3,3 +3,4 @@ lint.txt
 *.blend
 *.blend*
 tools/temp/
+tools/target/
