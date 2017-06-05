@@ -164,14 +164,14 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     GetModel: => @modelCached
     EntIndex: => @entID
     SetupEntity: (ent) =>
-        return unless IsValid(ent)
-        @modelCached = ent\GetModel()
-        @ent = ent
-        @flightController = PPM2.PonyflyController(@)
         if ent.__PPM2_PonyData
             return if ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
             ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
+        return unless IsValid(ent)
+        @modelCached = ent\GetModel()
+        @ent = ent
+        @flightController = PPM2.PonyflyController(@)
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
         @Reset()
