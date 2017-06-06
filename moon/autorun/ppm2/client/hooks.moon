@@ -123,6 +123,7 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
     wep = ply\GetActiveWeapon()
     if IsValid(wep) and wep.UseHands == false
         return true -- Dafuck?
+    return if arms\GetModel() ~= 'models/cppm/pony_arms.mdl'
     data = ply\GetPonyData()
     return unless data
     status = data\GetRenderController()\PreDrawArms(arms)
