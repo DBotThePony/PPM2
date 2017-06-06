@@ -103,12 +103,12 @@ createPlayerRagdoll = =>
         \SetModel(@GetModel())
         \SetPos(@GetPos())
         \SetAngles(@EyeAngles())
-        \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+        \SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
         \Spawn()
         \Activate()
         hook.Run 'PlayerSpawnedRagdoll', @, @GetModel(), @__ppm2_ragdoll
         .__ppm2_ragdoll_parent = @
-        \SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+        \SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
         \SetNWBool('PPM2.IsDeathRagdoll', true)
         vel = @GetVelocity()
         \SetVelocity(vel)
@@ -126,11 +126,16 @@ createPlayerRagdoll = =>
         copy = @GetPonyData()\Clone(@__ppm2_ragdoll)
         timer.Simple 0.5, -> copy\Create() if IsValid(@__ppm2_ragdoll)
 
+ALLOW_RAGDOLL_DAMAGE = CreateConVar('ppm2_sv_ragdoll_damage', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Should death ragdoll cause damage?')
+
 hook.Add 'EntityTakeDamage', 'PPM2.DeathRagdoll', (dmg) =>
     attacker = dmg\GetAttacker()
     return if not IsValid(attacker)
     if attacker.__ppm2_ragdoll_parent
         dmg\SetAttacker(attacker.__ppm2_ragdoll_parent)
+        if not ALLOW_RAGDOLL_DAMAGE\GetBool()
+            dmg\SetDamage(0)
+            dmg\SetMaxDamage(0)
 
 hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
     return if not @GetPonyData()
