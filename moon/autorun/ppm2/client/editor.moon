@@ -822,6 +822,12 @@ EditorPages = {
                 @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
                 @Hr()
 
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+                @Hr()
+                @Label("Tail URL Detail #{i} input field")
+                @URLInput("TailURL#{i}")
+                @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
+            
             @Label('Next options have effect only on new model')
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
@@ -834,7 +840,7 @@ EditorPages = {
                 @Hr()
                 @Label("Lower mane URL Detail #{i} input field")
                 @URLInput("LowerManeURL#{i}")
-                @ColorBox("Lower Tail URL detail color #{i}", "LowerManeURLColor#{i}")
+                @ColorBox("Lower Mane URL detail color #{i}", "LowerManeURLColor#{i}")
     }
 
     {
