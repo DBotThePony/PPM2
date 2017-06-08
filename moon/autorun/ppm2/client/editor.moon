@@ -499,6 +499,7 @@ PANEL_SETTINGS_BASE = {
             \Dock(RIGHT)
             \SetSize(170, 0)
             \DockMargin(0, 0, 5, 0)
+            \SetSortItems(false)
             \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
             if choices
                 \AddChoice(choice) for choice in *choices
