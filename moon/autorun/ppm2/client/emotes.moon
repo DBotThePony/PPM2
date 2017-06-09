@@ -86,7 +86,9 @@ BUTTON_CLICK_FUNC = =>
         net.Start('PPM2.PlayEmote')
         net.WriteUInt(@id, 8)
         net.SendToServer()
-    hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
+        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), @sequence, @time)
+    else
+        hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
