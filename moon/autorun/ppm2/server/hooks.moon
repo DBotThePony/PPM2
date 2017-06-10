@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-PPM2.PLAYER_VIEW_OFFSET = Vector(0, 0, 64 * .66)
+PPM2.PLAYER_VIEW_OFFSET = Vector(0, 0, 64 * .64)
 PPM2.PLAYER_VIEW_OFFSET_DUCK = Vector(0, 0, 28 * 1.2)
 
 PPM2.PLAYER_VIEW_OFFSET_ORIGINAL = Vector(0, 0, 64)
