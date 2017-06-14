@@ -218,53 +218,15 @@ class PonyTextureController
                 @CompileBody()
                 @CompileWings()
                 @CompileHorn()
-            when 'Socks'
+            when 'Socks', 'Bodysuit'
                 @CompileBody()
-            when 'Bodysuit'
-                @CompileBody()
-            when 'CMark'
-                @CompileCMark()
-            when 'CMarkType'
-                @CompileCMark()
-            when 'CMarkURL'
-                @CompileCMark()
-            when 'CMarkColor'
-                @CompileCMark()
-            when 'CMarkSize'
+            when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @CompileCMark()
             when 'SocksColor'
                 @CompileSocks()
-            when 'HornURL1'
+            when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3'
                 @CompileHorn()
-            when 'SeparateHorn'
-                @CompileHorn()
-            when 'HornColor'
-                @CompileHorn()
-            when 'HornURL2'
-                @CompileHorn()
-            when 'HornURL3'
-                @CompileHorn()
-            when 'HornURLColor1'
-                @CompileHorn()
-            when 'HornURLColor2'
-                @CompileHorn()
-            when 'HornURLColor3'
-                @CompileHorn()
-            when 'WingsURL1'
-                @CompileWings()
-            when 'WingsURL2'
-                @CompileWings()
-            when 'WingsURL3'
-                @CompileWings()
-            when 'WingsURLColor1'
-                @CompileWings()
-            when 'WingsURLColor2'
-                @CompileWings()
-            when 'WingsURLColor3'
-                @CompileWings()
-            when 'SeparateWings'
-                @CompileWings()
-            when 'WingsColor'
+            when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
                 @CompileWings()
             else
                 if @@MANE_UPDATE_TRIGGER[key]
@@ -1444,48 +1406,20 @@ class NewPonyTextureController extends PonyTextureController
         return unless @isValid
         super(state)
         switch state\GetKey()
-            when 'ManeTypeNew'
+            when 'ManeTypeNew', 'ManeTypeLowerNew', 'TailTypeNew'
                 @CompileHair()
-            when 'ManeTypeLowerNew'
-                @CompileHair()
-            when 'TailTypeNew'
-                @CompileTail()
-            when 'TeethColor'
+
+            when 'TeethColor', 'MouthColor', 'TongueColor'
                 @CompileMouth()
-            when 'MouthColor'
-                @CompileMouth()
-            when 'MouthColor'
-                @CompileMouth()
-            when 'BatWingColor'
-                @CompileBatWings()
+                
             when 'SeparateWings'
                 @CompileBatWings()
                 @CompileBatWingsSkin()
-            when 'BatWingSkinColor'
-                @CompileBatWingsSkin()
-            when 'BatWingURL1'
+            
+            when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
                 @CompileBatWings()
-            when 'BatWingURL2'
-                @CompileBatWings()
-            when 'BatWingURL3'
-                @CompileBatWings()
-            when 'BatWingURLColor1'
-                @CompileBatWings()
-            when 'BatWingURLColor2'
-                @CompileBatWings()
-            when 'BatWingURLColor3'
-                @CompileBatWings()
-            when 'BatWingSkinURL1'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURL2'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURL3'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor1'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor2'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor3'
+            
+            when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
                 @CompileBatWingsSkin()
 
     GetManeType: => @GetData()\GetManeTypeNew()
