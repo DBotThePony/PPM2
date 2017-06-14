@@ -101,6 +101,8 @@ class PonyTextureController
     @LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.DownManeDetailsMaterials}
     @TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.TailDetailsMaterials}
 
+    @SessionID = math.random(1, 1000)
+
     @MAT_INDEX_EYE_LEFT = 0
     @MAT_INDEX_EYE_RIGHT = 1
     @MAT_INDEX_BODY = 2
@@ -620,7 +622,7 @@ class PonyTextureController
         bodysize = USE_HIGHRES_BODY\GetBool() and @@QUAD_SIZE_BODY_HIRES2 or USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_BODY_HIRES or @@QUAD_SIZE_BODY
 
         textureData = {
-            'name': "PPM2_#{@GetID()}_Body_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
@@ -652,7 +654,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or 'normal'}", bodysize, bodysize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
             render.PushRenderTarget(rt)
 
@@ -724,7 +726,7 @@ class PonyTextureController
     CompileHorn: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Horn"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
@@ -752,7 +754,7 @@ class PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -798,7 +800,7 @@ class PonyTextureController
     CompileSocks: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Socks"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Socks"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -834,7 +836,7 @@ class PonyTextureController
     CompileWings: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Wings"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Wings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -862,7 +864,7 @@ class PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Wings_rt", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Wings_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -914,7 +916,7 @@ class PonyTextureController
     CompileHair: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Mane_1"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -936,7 +938,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Mane_2"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -955,7 +957,7 @@ class PonyTextureController
             return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -989,7 +991,7 @@ class PonyTextureController
             @HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1042,7 +1044,7 @@ class PonyTextureController
     CompileTail: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Tail_1"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1064,7 +1066,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Tail_2"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -1084,7 +1086,7 @@ class PonyTextureController
             oldW, oldH = ScrW(), ScrH()
 
             -- First tail pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_1", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_1", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1119,7 +1121,7 @@ class PonyTextureController
             @TailColor1Material\SetTexture('$basetexture', rt)
 
             -- Second tail pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_2", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_2", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1204,7 +1206,7 @@ class PonyTextureController
         shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2_#{@GetID()}_Eye_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eye_#{prefix}"
             'shader': 'eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
@@ -1238,7 +1240,7 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         if EyeURL == '' or not EyeURL\find('^https?://')
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1295,7 +1297,7 @@ class PonyTextureController
     CompileCMark: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_CMark"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1304,7 +1306,7 @@ class PonyTextureController
         }
 
         textureDataGUI = {
-            'name': "PPM2_#{@GetID()}_CMark_GUI"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI"
             'shader': 'UnlitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1332,7 +1334,7 @@ class PonyTextureController
         if URL == '' or not URL\find('^https?://')
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1357,7 +1359,7 @@ class PonyTextureController
             @@LoadURL URL, texSize, texSize, (texture, panel, material) ->
                 oldW, oldH = ScrW(), ScrH()
 
-                rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
+                rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
                 rt\Download()
                 render.PushRenderTarget(rt)
                 render.SetViewPort(0, 0, texSize, texSize)
@@ -1461,7 +1463,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileHairInternal: (prefix = 'Upper') =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Mane_1_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1483,7 +1485,7 @@ class NewPonyTextureController extends PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Mane_2_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -1502,7 +1504,7 @@ class NewPonyTextureController extends PonyTextureController
             return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1536,7 +1538,7 @@ class NewPonyTextureController extends PonyTextureController
             HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1590,7 +1592,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileBatWings: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_BatWings"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -1617,7 +1619,7 @@ class NewPonyTextureController extends PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1666,7 +1668,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileBatWingsSkin: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_BatWingsSkin"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWingsSkin"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -1693,7 +1695,7 @@ class NewPonyTextureController extends PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
@@ -1771,19 +1773,19 @@ class NewPonyTextureController extends PonyTextureController
 
         {:r, :g, :b} = @GetData()\GetTeethColor()
         @TeethMaterialName = "!ppm2_#{@GetID()}_teeth"
-        @TeethMaterial = CreateMaterial("PPM2_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
+        @TeethMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
         @TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetMouthColor()
         @MouthMaterialName = "!ppm2_#{@GetID()}_mouth"
-        @MouthMaterial = CreateMaterial("PPM2_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
+        @MouthMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
         @MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetTongueColor()
         @TongueMaterialName = "!ppm2_#{@GetID()}_tongue"
-        @TongueMaterial = CreateMaterial("PPM2_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
+        @TongueMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
         @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
