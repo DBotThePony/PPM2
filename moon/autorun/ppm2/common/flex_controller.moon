@@ -1043,7 +1043,7 @@ class PonyFlexController
         table.insert(@hooks, id)
     
     OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
-        return if ply ~= @ent or teamOnly or isDead
+        return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
         switch text\lower()
             when 'o', ':o', 'о', 'О', ':о', ':О'
                 @RestartSequence('ooo')
