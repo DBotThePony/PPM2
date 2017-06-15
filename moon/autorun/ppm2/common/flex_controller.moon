@@ -1075,25 +1075,25 @@ class PonyFlexController
                 else
                     @RestartSequence('talk')
     PlayerStartVoice: (ply = NULL) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         @StartSequence('talk_endless')
     PlayerEndVoice: (ply = NULL) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         @EndSequence('talk_endless')
     PPM2_HurtAnimation: (ply = NULL) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         @RestartSequence('hurt')
         @EndSequence('kill_grin')
     PPM2_KillAnimation: (ply = NULL) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         @RestartSequence('kill_grin')
         @EndSequence('anger')
     PPM2_AngerAnimation: (ply = NULL) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         @EndSequence('kill_grin')
         @RestartSequence('anger')
     PPM2_EmoteAnimation: (ply = NULL, emote = '', time) =>
-        return if ply ~= @ent
+        return if ply\GetEntity() ~= @ent\GetEntity()
         for {:sequence} in *PPM2.AVALIABLE_EMOTES
             continue if sequence == emote
             @EndSequence(sequence)
