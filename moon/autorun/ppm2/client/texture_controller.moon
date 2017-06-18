@@ -303,6 +303,7 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeRotation#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["PonySize#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -1350,6 +1351,7 @@ class PonyTextureController
         HoleShiftX =        @GetData()["GetHoleShiftX#{prefixData}"](@GetData())
         HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
         EyeRotation =       @GetData()["GetEyeRotation#{prefixData}"](@GetData())
+        PonySize =          @GetData()\GetPonySize()
         
         oldW, oldH = ScrW(), ScrH()
 
@@ -1407,8 +1409,8 @@ class PonyTextureController
 
             surface.SetDrawColor(EyeIris1)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            IrisPos = texSize / 2 - texSize * IrisSize / 2
-            IrisQuadSize = texSize * IrisSize
+            IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
+            IrisQuadSize = texSize * IrisSize * PonySize
             DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeIris2)
