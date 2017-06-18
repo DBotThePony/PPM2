@@ -588,6 +588,7 @@ EditorPages = {
             @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW()
             @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
+            @NumSlider('PonySize', 'PonySize', 2)
 
             @CheckBox('Hard bone reset. Affects FPS when on.', 'OverrideBones') if ADVANCED_MODE\GetBool()
 

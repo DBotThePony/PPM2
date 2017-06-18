@@ -91,6 +91,14 @@ class PonyDataInstance
             max: PPM2.MAX_WEIGHT
         }
 
+        'ponysize': {
+            default: -> 1
+            getFunc: 'PonySize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_SCALE, PPM2.MAX_SCALE)
+            min: PPM2.MIN_SCALE
+            max: PPM2.MAX_SCALE
+        }
+
         'male_buff': {
             default: -> PPM2.DEFAULT_MALE_BUFF
             getFunc: 'MaleBuff'
