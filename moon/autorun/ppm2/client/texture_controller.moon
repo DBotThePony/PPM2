@@ -89,6 +89,35 @@ PPM2.SocksMaterials = {
     'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
     'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
     'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
+    'models/props_pony/ppm/ppm_socks/custom_textured/dark1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers10'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers11'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers12'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers13'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers14'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers15'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers16'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers17'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers18'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers19'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers20'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers3'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers4'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers5'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers6'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers7'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers8'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers9'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey3'
+    'models/props_pony/ppm/ppm_socks/custom_textured/hearts1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/hearts2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/snow1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper3'
 }
 
 PPM2.SocksMaterialsComp = [Material(id) for id in *PPM2.SocksMaterials]
@@ -661,8 +690,8 @@ class PonyTextureController
     @QUAD_SIZE_EYES = 256
     @QUAD_SIZE_EYES_HIRES = 512
 
-    @QUAD_SIZE_SOCKS = 256
-    @QUAD_SIZE_SOCKS_HIRES = 512
+    @QUAD_SIZE_SOCKS = 512
+    @QUAD_SIZE_SOCKS_HIRES = 1024
 
     @QUAD_SIZE_CMARK = 256
     @QUAD_SIZE_CMARK_HIRES = 512
