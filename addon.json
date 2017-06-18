@@ -15,6 +15,7 @@
         "lint.sh",
         "cmark_resizer.html",
         ".vscode*",
+        "socks_src/*",
         "LICENSE"
     ]
 }
