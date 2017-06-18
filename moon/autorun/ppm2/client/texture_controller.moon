@@ -860,7 +860,7 @@ class PonyTextureController
             surface.SetDrawColor(r, g, b)
             surface.DrawRect(0, 0, texSize, texSize)
 
-            socksType = @GetData()\GetSocksTexture() - 1
+            socksType = @GetData()\GetSocksTexture() + 1
             surface.SetMaterial(PPM2.SocksMaterialsComp[socksType] or PPM2.SocksMaterialsComp[1])
             surface.DrawTexturedRect(0, 0, texSize, texSize)
 
