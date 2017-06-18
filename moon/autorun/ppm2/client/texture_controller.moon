@@ -33,50 +33,52 @@ DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) ->
 USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
 USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
 
+RELOADABLE_MATERIALS = {}
+
 PPM2.BodyDetailsMaterials = {
-    Material('models/ppm/partrender/body_leggrad1.png')
-    Material('models/ppm/partrender/body_lines1.png')
-    Material('models/ppm/partrender/body_stripes1.png')
-    Material('models/ppm/partrender/body_headstripes1.png') 
-    Material('models/ppm/partrender/body_freckles.png')
-    Material('models/ppm/partrender/body_hooves1.png')
-    Material('models/ppm/partrender/body_hooves2.png')
-    Material('models/ppm/partrender/body_headmask1.png')
-    Material('models/ppm/partrender/body_hooves1_crit.png')
-    Material('models/ppm/partrender/body_hooves2_crit.png')
-    Material('models/ppm/partrender/body_spots1.png')
+    Material('models/ppm/partrender/body_leggrad1')
+    Material('models/ppm/partrender/body_lines1')
+    Material('models/ppm/partrender/body_stripes1')
+    Material('models/ppm/partrender/body_headstripes1') 
+    Material('models/ppm/partrender/body_freckles')
+    Material('models/ppm/partrender/body_hooves1')
+    Material('models/ppm/partrender/body_hooves2')
+    Material('models/ppm/partrender/body_headmask1')
+    Material('models/ppm/partrender/body_hooves1_crit')
+    Material('models/ppm/partrender/body_hooves2_crit')
+    Material('models/ppm/partrender/body_spots1')
 }
 
 PPM2.UpperManeDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/upmane_5_mask0.png')}
-    [5]: {Material('models/ppm/partrender/upmane_6_mask0.png')}
-    [7]: {Material('models/ppm/partrender/upmane_8_mask0.png'), Material('models/ppm/partrender/upmane_8_mask1.png')}
-    [8]: {Material('models/ppm/partrender/upmane_9_mask0.png'), Material('models/ppm/partrender/upmane_9_mask1.png'), Material('models/ppm/partrender/upmane_9_mask2.png')}
-    [9]: {Material('models/ppm/partrender/upmane_10_mask0.png')}
-    [10]: {Material('models/ppm/partrender/upmane_11_mask0.png'), Material('models/ppm/partrender/upmane_11_mask1.png'), Material('models/ppm/partrender/upmane_11_mask2.png')}
-    [11]: {Material('models/ppm/partrender/upmane_12_mask0.png')}
-    [12]: {Material('models/ppm/partrender/upmane_13_mask0.png')}
-    [13]: {Material('models/ppm/partrender/upmane_14_mask0.png')}
-    [14]: {Material('models/ppm/partrender/upmane_15_mask0.png')}
+    [4]: {Material('models/ppm/partrender/upmane_5_mask0')}
+    [5]: {Material('models/ppm/partrender/upmane_6_mask0')}
+    [7]: {Material('models/ppm/partrender/upmane_8_mask0'), Material('models/ppm/partrender/upmane_8_mask1')}
+    [8]: {Material('models/ppm/partrender/upmane_9_mask0'), Material('models/ppm/partrender/upmane_9_mask1'), Material('models/ppm/partrender/upmane_9_mask2')}
+    [9]: {Material('models/ppm/partrender/upmane_10_mask0')}
+    [10]: {Material('models/ppm/partrender/upmane_11_mask0'), Material('models/ppm/partrender/upmane_11_mask1'), Material('models/ppm/partrender/upmane_11_mask2')}
+    [11]: {Material('models/ppm/partrender/upmane_12_mask0')}
+    [12]: {Material('models/ppm/partrender/upmane_13_mask0')}
+    [13]: {Material('models/ppm/partrender/upmane_14_mask0')}
+    [14]: {Material('models/ppm/partrender/upmane_15_mask0')}
 }
 
 PPM2.DownManeDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/dnmane_5_mask0.png')}
-    [7]: {Material('models/ppm/partrender/dnmane_8_mask0.png'), Material('models/ppm/partrender/dnmane_8_mask1.png')}
-    [8]: {Material('models/ppm/partrender/dnmane_9_mask0.png'), Material('models/ppm/partrender/dnmane_9_mask1.png')}
-    [9]: {Material('models/ppm/partrender/dnmane_10_mask0.png'), Material('models/ppm/partrender/dnmane_10_mask1.png'), Material('models/ppm/partrender/dnmane_10_mask2.png')}
-    [10]: {Material('models/ppm/partrender/dnmane_11_mask0.png'), Material('models/ppm/partrender/dnmane_11_mask1.png')}
-    [11]: {Material('models/ppm/partrender/dnmane_12_mask0.png')}
+    [4]: {Material('models/ppm/partrender/dnmane_5_mask0')}
+    [7]: {Material('models/ppm/partrender/dnmane_8_mask0'), Material('models/ppm/partrender/dnmane_8_mask1')}
+    [8]: {Material('models/ppm/partrender/dnmane_9_mask0'), Material('models/ppm/partrender/dnmane_9_mask1')}
+    [9]: {Material('models/ppm/partrender/dnmane_10_mask0'), Material('models/ppm/partrender/dnmane_10_mask1'), Material('models/ppm/partrender/dnmane_10_mask2')}
+    [10]: {Material('models/ppm/partrender/dnmane_11_mask0'), Material('models/ppm/partrender/dnmane_11_mask1')}
+    [11]: {Material('models/ppm/partrender/dnmane_12_mask0')}
 }
 
 PPM2.TailDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/tail_5_mask0.png')}
-    [7]: {Material('models/ppm/partrender/tail_8_mask0.png'), Material('models/ppm/partrender/tail_8_mask1.png'), Material('models/ppm/partrender/tail_8_mask2.png'), Material('models/ppm/partrender/tail_8_mask3.png'), Material('models/ppm/partrender/tail_8_mask4.png')}
-    [9]: {Material('models/ppm/partrender/tail_10_mask0.png')}
-    [10]: {Material('models/ppm/partrender/tail_11_mask0.png'), Material('models/ppm/partrender/tail_11_mask1.png'), Material('models/ppm/partrender/tail_11_mask2.png')}
-    [11]: {Material('models/ppm/partrender/tail_12_mask0.png'), Material('models/ppm/partrender/tail_12_mask1.png')}
-    [12]: {Material('models/ppm/partrender/tail_13_mask0.png')}
-    [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
+    [4]: {Material('models/ppm/partrender/tail_5_mask0')}
+    [7]: {Material('models/ppm/partrender/tail_8_mask0'), Material('models/ppm/partrender/tail_8_mask1'), Material('models/ppm/partrender/tail_8_mask2'), Material('models/ppm/partrender/tail_8_mask3'), Material('models/ppm/partrender/tail_8_mask4')}
+    [9]: {Material('models/ppm/partrender/tail_10_mask0')}
+    [10]: {Material('models/ppm/partrender/tail_11_mask0'), Material('models/ppm/partrender/tail_11_mask1'), Material('models/ppm/partrender/tail_11_mask2')}
+    [11]: {Material('models/ppm/partrender/tail_12_mask0'), Material('models/ppm/partrender/tail_12_mask1')}
+    [12]: {Material('models/ppm/partrender/tail_13_mask0')}
+    [13]: {Material('models/ppm/partrender/tail_14_mask0')}
 }
 
 PPM2.SocksMaterials = {
@@ -170,8 +172,15 @@ PPM2.SocksDetails = {
 }
 
 PPM2.SocksDetailsComp = {i, [Material(mat) for mat in *data] for i, data in pairs PPM2.SocksDetails}
-
 PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
+
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.BodyDetailsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.UpperManeDetailsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DownManeDetailsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.TailDetailsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksMaterialsComp when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DefaultCutiemarksMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksDetailsComp when type(mat) ~= 'number'
 
 PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
 PPM2.ApplyMaterialData = (mat, matData) ->
@@ -450,6 +459,8 @@ class PonyTextureController
                 })
 
                 newMat\SetTexture('$basetexture', texture)
+                @URL_MATERIAL_CACHE[data.width] = @URL_MATERIAL_CACHE[data.width] or {}
+                @URL_MATERIAL_CACHE[data.width][data.height] = @URL_MATERIAL_CACHE[data.width][data.height] or {}
                 @URL_MATERIAL_CACHE[data.width][data.height][data.url] = {
                     texture: texture
                     material: newMat
@@ -2070,6 +2081,16 @@ class NewPonyTextureController extends PonyTextureController
         ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
         ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT)
         ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN)
+
+concommand.Add 'ppm2_reload_materials', ->
+    cTime = SysTime()
+    for mat in *RELOADABLE_MATERIALS
+        if mat.GetTexture
+            if texture = mat\GetTexture('$basetexture')
+                texture\Download()
+        mat\Recompute() if mat.Recompute
+    PonyTextureController.URL_MATERIAL_CACHE = {}
+    PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds. Do not forget to ppm2_reload and ppm2_require now!')
 
 PPM2.NewPonyTextureController = NewPonyTextureController
 PPM2.PonyTextureController = PonyTextureController

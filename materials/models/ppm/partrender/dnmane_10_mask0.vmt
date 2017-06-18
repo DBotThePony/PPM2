@@ -1,0 +1,9 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/ppm/partrender/dnmane_10_mask0"
+	"$ignorez"  1
+	"$vertexcolor"  1
+	"$vertexalpha"  1
+	"$nolod"  1
+	"$translucent"  1
+}
