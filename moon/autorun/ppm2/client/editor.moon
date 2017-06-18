@@ -618,6 +618,8 @@ EditorPages = {
                 @Label('Socks URL texture')
                 @URLInput('SocksTextureURL')
                 @Hr()
+                @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+                @Hr()
                 @CheckBox('Separate wings color from body', 'SeparateWings')
                 @CheckBox('Separate horn color from body', 'SeparateHorn')
                 @ColorBox('Wings color', 'WingsColor')
