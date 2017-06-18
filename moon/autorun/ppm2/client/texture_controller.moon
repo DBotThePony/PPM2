@@ -83,14 +83,14 @@ PPM2.TailDetailsMaterials = {
 
 PPM2.SocksMaterials = {
     'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
-    'models/props_pony/ppm/ppm_socks/custom/geometric1_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric2_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric3_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric4_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric5_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric1_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric2_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric3_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric4_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric5_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric6_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric7_1'
+    'models/props_pony/ppm/ppm_socks/custom/geometric8_1'
     'models/props_pony/ppm/ppm_socks/custom_textured/dark1'
     'models/props_pony/ppm/ppm_socks/custom_textured/flowers10'
     'models/props_pony/ppm/ppm_socks/custom_textured/flowers11'
@@ -126,48 +126,48 @@ PPM2.SocksMaterialsComp = [Material(id) for id in *PPM2.SocksMaterials]
 
 PPM2.SocksDetails = {
     [2]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_4.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_5.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_6.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_4'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_5'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_6'
     }
 
     [3]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric2_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric2_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_3'
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_4'
     }
 
     [4]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_5.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_2'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_3'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_5'
     }
 
     [5]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_2'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_3'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_4'
     }
 
     [6]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_4.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_5.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_6.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_4'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_5'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_6'
     }
 
     [7]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_2'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_3'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_4'
     }
 
     [8]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric7_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric7_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_3'
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_4'
     }
 
     [9]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric8_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric8_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_2'
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_3'
     }
 }
 

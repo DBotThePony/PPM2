@@ -1,0 +1,9 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/props_pony/ppm/ppm_socks/custom/geometric7_4"
+	"$ignorez"  1
+	"$vertexcolor"  1
+	"$vertexalpha"  1
+	"$nolod"  1
+	"$translucent"  1
+}
