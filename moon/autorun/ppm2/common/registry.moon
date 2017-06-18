@@ -99,6 +99,14 @@ PPM2.BodyDetailsEnum = {
 
 PPM2.SocksTypes = {
     'DEFAULT'
+    'GEOMETRIC1'
+    'GEOMETRIC2'
+    'GEOMETRIC3'
+    'GEOMETRIC4'
+    'GEOMETRIC5'
+    'GEOMETRIC6'
+    'GEOMETRIC7'
+    'GEOMETRIC8'
 }
 
 PPM2.DefaultCutiemarks = {

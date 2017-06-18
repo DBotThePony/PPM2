@@ -80,13 +80,67 @@ PPM2.TailDetailsMaterials = {
 }
 
 PPM2.SocksMaterials = {
-    'models/props_pony/ppm/ppm_socks/socks_striped'
+    'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
+    'models/props_pony/ppm/ppm_socks/custom/geometric1_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric2_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric3_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric4_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric5_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
 }
 
-PPM2.SocksMaterialsComp = [CreateMaterial(id .. 'unlit', 'UnlitGeneric', {'$basetexture': id, '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for id in *PPM2.SocksMaterials]
+PPM2.SocksMaterialsComp = [Material(id) for id in *PPM2.SocksMaterials]
 
-PPM2.SocksDetails = {}
-PPM2.SocksDetailsComp = {i, CreateMaterial(id .. 'unlit', 'UnlitGeneric', {'$basetexture': id .. 'unlit', '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for i, id in pairs PPM2.SocksDetails}
+PPM2.SocksDetails = {
+    [2]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_5.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_6.png'
+    }
+
+    [3]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_4.png'
+    }
+
+    [4]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_5.png'
+    }
+
+    [5]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_4.png'
+    }
+
+    [6]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_5.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_6.png'
+    }
+
+    [7]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_4.png'
+    }
+
+    [8]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_4.png'
+    }
+
+    [9]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_3.png'
+    }
+}
+
+PPM2.SocksDetailsComp = {i, [Material(mat) for mat in *data] for i, data in pairs PPM2.SocksDetails}
 
 PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
 
@@ -866,7 +920,7 @@ class PonyTextureController
 
             if PPM2.SocksDetailsComp[socksType]
                 for i, id in pairs PPM2.SocksDetailsComp[socksType]
-                    {:r, :g, :b} = @GetData()['SocksDetailColor' .. i](@GetData())
+                    {:r, :g, :b} = @GetData()['GetSocksDetailColor' .. i](@GetData())
                     surface.SetDrawColor(r, g, b)
                     surface.SetMaterial(id)
                     surface.DrawTexturedRect(0, 0, texSize, texSize)

@@ -4,3 +4,4 @@ lint.txt
 *.blend*
 tools/temp/
 tools/target/
+socks_src/output/

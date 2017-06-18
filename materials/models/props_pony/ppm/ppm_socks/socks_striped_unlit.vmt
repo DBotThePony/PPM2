@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_pony/ppm/ppm_socks/Socks_Striped"
+	"$ignorez"  1
+	"$vertexcolor"  1
+	"$vertexalpha"  1
+	"$nolod"  1
+}
