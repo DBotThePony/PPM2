@@ -83,6 +83,11 @@ PPM2.SocksMaterials = {
     'models/props_pony/ppm/ppm_socks/socks_striped'
 }
 
+PPM2.SocksMaterialsComp = [CreateMaterial(id .. 'unlit', 'UnlitGeneric', {'$basetexture': id, '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for id in *PPM2.SocksMaterials]
+
+PPM2.SocksDetails = {}
+PPM2.SocksDetailsComp = {i, CreateMaterial(id .. 'unlit', 'UnlitGeneric', {'$basetexture': id .. 'unlit', '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for i, id in pairs PPM2.SocksDetails}
+
 PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
 
 PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
@@ -236,7 +241,7 @@ class PonyTextureController
                 @CompileBody()
             when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @CompileCMark()
-            when 'SocksColor', 'SocksTextureURL', 'SocksTexture'
+            when 'SocksColor', 'SocksTextureURL', 'SocksTexture', 'SocksDetailColor1', 'SocksDetailColor2', 'SocksDetailColor3', 'SocksDetailColor4', 'SocksDetailColor5', 'SocksDetailColor6'
                 @CompileSocks()
             when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3'
                 @CompileHorn()
@@ -840,14 +845,34 @@ class PonyTextureController
         @SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_SOCKS_HIRES or @@QUAD_SIZE_SOCKS
 
+        {:r, :g, :b} = @GetData()\GetSocksColor()
+        @SocksMaterial\SetFloat('$alpha', 1)
+
         url = @GetData()\GetSocksTextureURL()
         if url == '' or not url\find('^https?://')
-            {:r, :g, :b} = @GetData()\GetSocksColor()
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Socks_rt", texSize, texSize, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
 
-            @SocksMaterial\SetTexture('$basetexture', PPM2.SocksMaterials[@GetData()\GetSocksTexture() - 1] or PPM2.SocksMaterials[1])
-            @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-            @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-            @SocksMaterial\SetFloat('$alpha', 1)
+            socksType = @GetData()\GetSocksTexture() - 1
+            surface.SetMaterial(PPM2.SocksMaterialsComp[socksType] or PPM2.SocksMaterialsComp[1])
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            if PPM2.SocksDetailsComp[socksType]
+                for i, id in pairs PPM2.SocksDetailsComp[socksType]
+                    {:r, :g, :b} = @GetData()['SocksDetailColor' .. i](@GetData())
+                    surface.SetDrawColor(r, g, b)
+                    surface.SetMaterial(id)
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            cam.End2D()
+            render.PopRenderTarget()
+
+            @SocksMaterial\SetTexture('$basetexture', rt)
 
             PPM2.DebugPrint('Compiled socks texture for ', @ent, ' as part of ', @)
         else

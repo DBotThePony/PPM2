@@ -570,6 +570,12 @@ class PonyDataInstance
         }
 
     for i = 1, 6
+        @PONY_DATA["socks_detail_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "SocksDetailColor#{i}"
+            fix: COLOR_FIXER()
+        }
+        
         @PONY_DATA["mane_color_#{i}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "ManeColor#{i}"

@@ -110,6 +110,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('SocksTexture',     (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SOCKS, PPM2.MAX_SOCKS)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
     @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
     @NetworkVar('SocksTextureURL',  net.ReadString, net.WriteString,          '')
+    
+    for i = 1, 6
+        @NetworkVar('SocksDetailColor' .. i, net.ReadColor, net.WriteColor, Color(255, 255, 255))
 
     @NetworkVar('BatPonyEars',      net.ReadBool, net.WriteBool,              false)
     @NetworkVar('Fangs',            net.ReadBool, net.WriteBool,              false)
