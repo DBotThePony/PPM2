@@ -182,7 +182,9 @@ table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksMaterialsComp when
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DefaultCutiemarksMaterials when type(mat) ~= 'number'
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksDetailsComp when type(mat) ~= 'number'
 
-PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
+PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.AvaliablePonySuitsMaterials when type(mat) ~= 'number'
+
 PPM2.ApplyMaterialData = (mat, matData) ->
     for k, v in pairs matData
         switch type(v)
