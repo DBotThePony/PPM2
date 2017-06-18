@@ -850,6 +850,8 @@ class PonyTextureController
 
         url = @GetData()\GetSocksTextureURL()
         if url == '' or not url\find('^https?://')
+            @SocksMaterial\SetVector('$color', Vector(1, 1, 1))
+            @SocksMaterial\SetVector('$color2', Vector(1, 1, 1))
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Socks_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
@@ -877,6 +879,8 @@ class PonyTextureController
             PPM2.DebugPrint('Compiled socks texture for ', @ent, ' as part of ', @)
         else
             @@LoadURL url, texSize, texSize, (texture, panel, material) ->
+                @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+                @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
                 @SocksMaterial\SetTexture('$basetexture', texture)
 
         return @SocksMaterial
