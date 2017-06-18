@@ -33,9 +33,6 @@ DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) ->
 USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
 USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
 
-GetRenderTarget = (name = '', width = 16, height = 16, additive = false) ->
-    return GetRenderTargetEx(name, width, height, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_SEPARATE, 2048, CREATERENDERTARGETFLAGS_HDR, IMAGE_FORMAT_RGBA8888)
-
 RELOADABLE_MATERIALS = {}
 
 PPM2.BodyDetailsMaterials = {
