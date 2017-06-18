@@ -757,6 +757,7 @@ EditorPages = {
                 if ADVANCED_MODE\GetBool()
                     @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
                     @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
                 
                 @Hr()
                 @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")

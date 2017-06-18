@@ -492,9 +492,17 @@ class PonyDataInstance
         @PONY_DATA["eye_hole_size#{internal}"] = {
             default: -> .8
             getFunc: "HoleSize#{publicName}"
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
+            fix: (arg = .8) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
             min: PPM2.MIN_HOLE
             max: PPM2.MAX_HOLE
+        }
+
+        @PONY_DATA["eye_rotation#{internal}"] = {
+            default: -> 0
+            getFunc: "EyeRotation#{publicName}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYE_ROTATION, PPM2.MAX_EYE_ROTATION)
+            min: PPM2.MIN_EYE_ROTATION
+            max: PPM2.MAX_EYE_ROTATION
         }
 
     for i = 1, 3

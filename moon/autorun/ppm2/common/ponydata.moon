@@ -70,6 +70,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
         @NetworkVar("IrisWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
         @NetworkVar("IrisHeight#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
+        @NetworkVar("EyeRotation#{publicName}",      (-> math.Clamp(net.ReadInt(12), PPM2.MIN_EYE_ROTATION, PPM2.MAX_EYE_ROTATION)), ((arg = 0) -> net.WriteInt(arg, 12)), 1)
         @NetworkVar("EyeURL#{publicName}",           net.ReadString,                                                            net.WriteString, '')
 
     @NetworkVar('SeparateMane',     net.ReadBool, net.WriteBool,              false)

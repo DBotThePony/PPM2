@@ -28,6 +28,8 @@
 -- 10   =   models/ppm/base/cmark
 -- 11   =   models/ppm/base/eyelashes
 
+DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
+
 USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
 USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
 
@@ -197,6 +199,7 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["HoleHeight#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeRotation#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -1207,6 +1210,7 @@ class PonyTextureController
         HoleHeight =        @GetData()["GetHoleHeight#{prefixData}"](@GetData())
         HoleShiftX =        @GetData()["GetHoleShiftX#{prefixData}"](@GetData())
         HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
+        EyeRotation =       @GetData()["GetEyeRotation#{prefixData}"](@GetData())
         
         oldW, oldH = ScrW(), ScrH()
 
@@ -1266,20 +1270,20 @@ class PonyTextureController
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
             IrisPos = texSize / 2 - texSize * IrisSize / 2
             IrisQuadSize = texSize * IrisSize
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeIris2)
             surface.SetMaterial(@@EYE_GRAD)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             if EyeLines
                 surface.SetDrawColor(EyeIrisLine1)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+                DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
                 surface.SetDrawColor(EyeIrisLine2)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+                DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
@@ -1290,15 +1294,15 @@ class PonyTextureController
                 holeY = texSize * (IrisSize * HoleSize * HoleHeight) / 2
                 cx = HolePos - holeX + holeX * HoleShiftX + shiftX
                 cy = HolePos - holeY + holeY * HoleShiftY + shiftY
-                surface.DrawTexturedRect(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight)
+                DrawTexturedRectRotated(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeEffect)
             surface.SetMaterial(@@EYE_EFFECT)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeReflection)
             surface.SetMaterial(@@EYE_REFLECTION)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
