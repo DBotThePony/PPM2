@@ -79,6 +79,10 @@ PPM2.TailDetailsMaterials = {
     [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
 }
 
+PPM2.SocksMaterials = {
+    'models/props_pony/ppm/ppm_socks/socks_striped'
+}
+
 PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
 
 PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
@@ -232,7 +236,7 @@ class PonyTextureController
                 @CompileBody()
             when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @CompileCMark()
-            when 'SocksColor'
+            when 'SocksColor', 'SocksTextureURL', 'SocksTexture'
                 @CompileSocks()
             when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3'
                 @CompileHorn()
@@ -598,6 +602,9 @@ class PonyTextureController
     @QUAD_SIZE_EYES = 256
     @QUAD_SIZE_EYES_HIRES = 512
 
+    @QUAD_SIZE_SOCKS = 256
+    @QUAD_SIZE_SOCKS_HIRES = 512
+
     @QUAD_SIZE_CMARK = 256
     @QUAD_SIZE_CMARK_HIRES = 512
 
@@ -831,14 +838,21 @@ class PonyTextureController
 
         @SocksMaterialName = "!#{textureData.name\lower()}"
         @SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_SOCKS_HIRES or @@QUAD_SIZE_SOCKS
 
-        {:r, :g, :b} = @GetData()\GetSocksColor()
+        url = @GetData()\GetSocksTextureURL()
+        if url == '' or not url\find('^https?://')
+            {:r, :g, :b} = @GetData()\GetSocksColor()
 
-        @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-        @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-        @SocksMaterial\SetFloat('$alpha', 1)
+            @SocksMaterial\SetTexture('$basetexture', PPM2.SocksMaterials[@GetData()\GetSocksTexture() - 1] or PPM2.SocksMaterials[1])
+            @SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+            @SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+            @SocksMaterial\SetFloat('$alpha', 1)
 
-        PPM2.DebugPrint('Compiled socks texture for ', @ent, ' as part of ', @)
+            PPM2.DebugPrint('Compiled socks texture for ', @ent, ' as part of ', @)
+        else
+            @@LoadURL url, texSize, texSize, (texture, panel, material) ->
+                @SocksMaterial\SetTexture('$basetexture', texture)
 
         return @SocksMaterial
     CompileWings: =>

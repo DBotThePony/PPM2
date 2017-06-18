@@ -170,6 +170,21 @@ class PonyDataInstance
             max: PPM2.MAX_LOWER_MANES_NEW
         }
 
+        'socks_texture': {
+            default: -> 0
+            getFunc: 'SocksTexture'
+            enum: [arg for arg in *PPM2.SocksTypes] -- fast copy
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_SOCKS, PPM2.MAX_SOCKS)
+            min: PPM2.MIN_SOCKS
+            max: PPM2.MAX_SOCKS
+        }
+
+        'socks_texture_url': {
+            default: -> ''
+            getFunc: 'SocksTextureURL'
+            fix: URL_FIXER
+        }
+
         'tailsize': {
             default: -> 1
             getFunc: 'TailSize'

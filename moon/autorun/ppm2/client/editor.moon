@@ -614,6 +614,9 @@ EditorPages = {
             @ColorBox('Socks model color', 'SocksColor')
 
             if ADVANCED_MODE\GetBool()
+                @ComboBox('Socks Texture', 'SocksTexture')
+                @Label('Socks URL texture')
+                @URLInput('SocksTextureURL')
                 @Hr()
                 @CheckBox('Separate wings color from body', 'SeparateWings')
                 @CheckBox('Separate horn color from body', 'SeparateHorn')

@@ -97,6 +97,10 @@ PPM2.BodyDetailsEnum = {
     'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS'
 }
 
+PPM2.SocksTypes = {
+    'DEFAULT'
+}
+
 PPM2.DefaultCutiemarks = {
     '8ball', 'dice', 'magichat',
     'magichat02', 'record', 'microphone',
@@ -187,6 +191,9 @@ PPM2.MAX_SUIT = #PPM2.AvaliablePonySuits - 1
 
 PPM2.MIN_WINGS = 0
 PPM2.MAX_WINGS = #PPM2.AvaliablePonyWings - 1
+
+PPM2.MIN_SOCKS = 0
+PPM2.MAX_SOCKS = #PPM2.SocksTypes - 1
 
 PPM2.GENDER_FEMALE = 0
 PPM2.GENDER_MALE = 1
