@@ -2087,6 +2087,8 @@ class NewPonyTextureController extends PonyTextureController
 concommand.Add 'ppm2_reload_materials', ->
     cTime = SysTime()
     for mat in *RELOADABLE_MATERIALS
+        if texname = mat\GetString('$basetexture')
+            mat\SetTexture('$basetexture', texname)
         if texture = mat\GetTexture('$basetexture')
             texture\Download()
         mat\Recompute()
