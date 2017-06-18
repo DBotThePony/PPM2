@@ -499,6 +499,7 @@ PANEL_SETTINGS_BASE = {
             \Dock(RIGHT)
             \SetSize(170, 0)
             \DockMargin(0, 0, 5, 0)
+            \SetSortItems(false)
             \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
             if choices
                 \AddChoice(choice) for choice in *choices
@@ -587,6 +588,7 @@ EditorPages = {
             @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW()
             @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
+            @NumSlider('Pony Size', 'PonySize', 2)
 
             @CheckBox('Hard bone reset. Affects FPS when on.', 'OverrideBones') if ADVANCED_MODE\GetBool()
 
@@ -743,11 +745,23 @@ EditorPages = {
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
                 @NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
                 @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
-                @NumSlider("#{prefix}Eye hole width", "HoleWidth#{publicName}", 2)
-                @NumSlider("#{prefix}Eye hole size", "HoleSize#{publicName}", 2)
 
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
+                
+                @NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
+                @NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
+                @NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
+
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
+                    @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
+                
+                @Hr()
                 @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
-                @ColorBox("#{prefix}Eye hole", "EyeHole#{publicName}")
+                @ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
                 @ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
                 @ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
                 @ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")
@@ -822,6 +836,12 @@ EditorPages = {
                 @ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
                 @Hr()
 
+            for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+                @Hr()
+                @Label("Tail URL Detail #{i} input field")
+                @URLInput("TailURL#{i}")
+                @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
+            
             @Label('Next options have effect only on new model')
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
@@ -834,7 +854,7 @@ EditorPages = {
                 @Hr()
                 @Label("Lower mane URL Detail #{i} input field")
                 @URLInput("LowerManeURL#{i}")
-                @ColorBox("Lower Tail URL detail color #{i}", "LowerManeURLColor#{i}")
+                @ColorBox("Lower Mane URL detail color #{i}", "LowerManeURLColor#{i}")
     }
 
     {

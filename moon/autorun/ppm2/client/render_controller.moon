@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flasglight_pass', '0', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
+ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 
 class PonyRenderController
@@ -167,16 +167,16 @@ class PonyRenderController
         render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
         cam.Start3D() if start3D
 
+        @GetTextureController()\PreDrawLegs()
+        @legsModel\DrawModel()
+        @GetTextureController()\PostDrawLegs()
+
         if ENABLE_FLASHLIGHT_PASS\GetBool()
             render.PushFlashlightMode(true)
             @GetTextureController()\PreDrawLegs()
             @legsModel\DrawModel()
             @GetTextureController()\PostDrawLegs()
             render.PopFlashlightMode()
-
-        @GetTextureController()\PreDrawLegs()
-        @legsModel\DrawModel()
-        @GetTextureController()\PostDrawLegs()
 
         render.PopCustomClipPlane()
         cam.End3D() if start3D

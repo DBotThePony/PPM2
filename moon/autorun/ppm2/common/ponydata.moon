@@ -23,16 +23,16 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @RenderTasks = {}
 
     @Setup()
-    --@NetworkVar('EntityIndex',      (-> net.ReadUInt(16)), (-> net.ReadUInt(16)), -1, ((newValue) => IsValid(@GetOwner()) and @GetOwner() or newValue))
-    @NetworkVar('Entity',           net.ReadEntity, net.WriteEntity, NULL, ((newValue) => IsValid(@GetOwner()) and @GetOwner() or newValue))
-    @NetworkVar('UpperManeModel',   net.ReadEntity, net.WriteEntity, NULL)
-    @NetworkVar('LowerManeModel',   net.ReadEntity, net.WriteEntity, NULL)
-    @NetworkVar('TailModel',        net.ReadEntity, net.WriteEntity, NULL)
-    @NetworkVar('SocksModel',       net.ReadEntity, net.WriteEntity, NULL)
+    @NetworkVar('Entity',           net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), ((newValue) => IsValid(@GetOwner()) and StrongEntity(@GetOwner()\EntIndex()) or newValue))
+    @NetworkVar('UpperManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('LowerManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('TailModel',        net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('SocksModel',       net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
 
     @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
+    @NetworkVar('PonySize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_SCALE, PPM2.MAX_SCALE)),   net.WriteFloat, 1)
 
     -- Reserved - they can be accessed/used/changed, but they do not do anything
     @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)
@@ -63,8 +63,14 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
         @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
         @NetworkVar("HoleWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat,  1)
+        @NetworkVar("HoleHeight#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat,  1)
         @NetworkVar("HoleSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
+        @NetworkVar("HoleShiftX#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)), net.WriteFloat, 0)
+        @NetworkVar("HoleShiftY#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)), net.WriteFloat, 0)
         @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
+        @NetworkVar("IrisWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
+        @NetworkVar("IrisHeight#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
+        @NetworkVar("EyeRotation#{publicName}",      (-> math.Clamp(net.ReadInt(12), PPM2.MIN_EYE_ROTATION, PPM2.MAX_EYE_ROTATION)), ((arg = 0) -> net.WriteInt(arg, 12)), 1)
         @NetworkVar("EyeURL#{publicName}",           net.ReadString,                                                            net.WriteString, '')
 
     @NetworkVar('SeparateMane',     net.ReadBool, net.WriteBool,              false)
@@ -165,14 +171,15 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     GetModel: => @modelCached
     EntIndex: => @entID
     SetupEntity: (ent) =>
-        return unless IsValid(ent)
-        @modelCached = ent\GetModel()
-        @ent = ent
-        @flightController = PPM2.PonyflyController(@)
         if ent.__PPM2_PonyData
             return if ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
             ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
+        @ent = ent
+        return unless IsValid(ent)
+        @modelCached = ent\GetModel()
+        @ent = ent
+        @flightController = PPM2.PonyflyController(@)
         @entID = ent\EntIndex()
         @ModelChanges(@modelCached, @modelCached)
         @Reset()
@@ -198,6 +205,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if state\GetKey() == 'Fly' and @flightController
             @flightController\Switch(state\GetValue())
         
+        if state\GetKey() == 'PonySize'
+            @ModifyScale()
+        
         if state\GetKey() == 'DisableTask'
             @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
         
@@ -206,8 +216,46 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state) if @GetWeightController()
             @GetRenderController()\DataChanges(state) if @GetRenderController()
-    
+
+    @STEP_SIZE = 18
+    @PONY_HULL = 19
+    @HULL_MINS = Vector(-@PONY_HULL, -@PONY_HULL, 0)
+    @HULL_MAXS = Vector(@PONY_HULL, @PONY_HULL, 72 * PPM2.PONY_HEIGHT_MODIFIER)
+    @HULL_MAXS_DUCK = Vector(@PONY_HULL, @PONY_HULL, 36 * PPM2.PONY_HEIGHT_MODIFIER_DUCK)
+
+    @DEFAULT_HULL_MINS = Vector(-16, -16, 0)
+    @DEFAULT_HULL_MAXS = Vector(16, 16, 72)
+    @DEFAULT_HULL_MAXS_DUCK = Vector(16, 16, 36)
+    @DEF_SCALE = Vector(1, 1, 1)
+
+    ResetScale: =>
+        return if not @ent
+        @ent\ResetHull() if @ent.ResetHull
+        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
+        @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
+
+        if CLIENT
+            mat = Matrix()
+            mat\Scale(@@DEF_SCALE)
+            @ent\EnableMatrix('RenderMultiply', mat)
+    ModifyScale: =>
+        return if not @ent
+        return if not @ent\IsPony()
+        size = @GetPonySize()
+        @ent\SetHull(@@HULL_MINS * size, @@HULL_MAXS * size) if @ent.SetHull
+        @ent\SetHullDuck(@@HULL_MINS * size, @@HULL_MAXS_DUCK * size) if @ent.SetHullDuck
+        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
+        @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
+
+        if CLIENT
+            mat = Matrix()
+            mat\Scale(@@DEF_SCALE * size)
+            @ent\EnableMatrix('RenderMultiply', mat)
     Reset: =>
+        @ResetScale()
+        @ModifyScale()
         if CLIENT
             @GetWeightController()\Reset() if @GetWeightController().Reset
             @GetRenderController()\Reset() if @GetRenderController().Reset
@@ -225,11 +273,15 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ApplyBodygroups(CLIENT)
         @SetFly(false) if SERVER
 
+        @ResetScale()
+        @ModifyScale()
+
         if CLIENT
             @deathRagdollMerged = false
             @GetWeightController()\UpdateWeight() if @GetWeightController()
             @GetRenderController()\PlayerRespawn() if @GetRenderController()
             @GetBodygroupController()\MergeModels(@ent) if IsValid(@ent) and @GetBodygroupController().MergeModels
+    
     PlayerDeath: =>
         return if not IsValid(@ent)
         @ent.__cachedIsPony = @ent\IsPony()
@@ -239,9 +291,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         else
             @alreadyCalledDeath = false
         @SetFly(false) if SERVER
+        @ResetScale()
         if CLIENT
             @DoRagdollMerge()
             @GetRenderController()\PlayerDeath() if @GetRenderController()
+    
     DoRagdollMerge: =>
         return if @deathRagdollMerged
         bgController = @GetBodygroupController()
@@ -340,7 +394,7 @@ if CLIENT
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
-    if @__PPM2_PonyData and @__PPM2_PonyData\GetEntity() ~= @
+    if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(@)
         @__PPM2_PonyData\SetEntity(@)
         @__PPM2_PonyData\SetupEntity(@) if CLIENT
     return @__PPM2_PonyData

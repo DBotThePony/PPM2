@@ -38,6 +38,8 @@ list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_n
 
 player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
 
+include 'autorun/strong_entity_link.lua' if not StrongEntity
+
 include_ = include
 AddCSLuaFile_ = AddCSLuaFile
 include = (f) -> include_("autorun/ppm2/#{f}")

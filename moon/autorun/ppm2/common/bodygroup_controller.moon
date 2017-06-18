@@ -109,7 +109,7 @@ class DefaultBodygroupController
             \Spawn()
             \Activate()
             \SetNoDraw(true) if CLIENT
-            \SetParent(@ent)
+            \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
@@ -131,7 +131,7 @@ class DefaultBodygroupController
         --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
         @CreateSocksModel() if not IsValid(@socksModel)
         return NULL if not IsValid(@socksModel)
-        @socksModel\SetParent(@ent) if IsValid(@ent)
+        @socksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
         @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         @GetData()\SetSocksModel(@socksModel)
         return @socksModel
@@ -371,7 +371,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetNoDraw(true) if CLIENT
             \SetBodygroup(1, bodygroupID)
-            \SetParent(@ent)
+            \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
@@ -420,7 +420,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetBodygroup(1, bodygroupID)
             \SetNoDraw(true) if CLIENT
-            \SetParent(@ent)
+            \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
@@ -469,7 +469,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \Activate()
             \SetNoDraw(true) if CLIENT
             \SetBodygroup(1, bodygroupID)
-            \SetParent(@ent)
+            \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
         
@@ -540,7 +540,7 @@ class NewBodygroupController extends DefaultBodygroupController
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
         @maneModelUP\SetModel(model) if model ~= @maneModelUP\GetModel()
         @maneModelUP\SetBodygroup(1, bodygroupID) if @maneModelUP\GetBodygroup(1) ~= bodygroupID
-        @maneModelUP\SetParent(@ent) if @maneModelUP\GetParent() ~= @ent and IsValid(@ent)
+        @maneModelUP\SetParent(@ent\GetEntity()) if @maneModelUP\GetParent() ~= @ent and IsValid(@ent)
         @GetData()\SetUpperManeModel(@maneModelUP)
         return @maneModelUP
     UpdateLowerMane: =>
@@ -554,7 +554,7 @@ class NewBodygroupController extends DefaultBodygroupController
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
         @maneModelLower\SetModel(model) if model ~= @maneModelLower\GetModel()
         @maneModelLower\SetBodygroup(1, bodygroupID) if @maneModelLower\GetBodygroup(1) ~= bodygroupID
-        @maneModelLower\SetParent(@ent) if IsValid(@ent)
+        @maneModelLower\SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetLowerManeModel(@maneModelLower)
         return @maneModelLower
     UpdateTailModel: =>
@@ -569,7 +569,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @tailModel\SetModel(model) if model ~= @tailModel\GetModel()
         @tailModel\SetBodygroup(1, bodygroupID) if @tailModel\GetBodygroup(1) ~= bodygroupID
         @tailModel\SetModelScale(@GetData()\GetTailSize())
-        @tailModel\SetParent(@ent) if IsValid(@ent)
+        @tailModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetTailModel(@tailModel)
         return @tailModel
 

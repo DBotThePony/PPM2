@@ -28,6 +28,8 @@
 -- 10   =   models/ppm/base/cmark
 -- 11   =   models/ppm/base/eyelashes
 
+DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
+
 USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
 USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
 
@@ -100,6 +102,8 @@ class PonyTextureController
     @UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.UpperManeDetailsMaterials}
     @LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.DownManeDetailsMaterials}
     @TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs PPM2.TailDetailsMaterials}
+
+    @SessionID = math.random(1, 1000)
 
     @MAT_INDEX_EYE_LEFT = 0
     @MAT_INDEX_EYE_RIGHT = 1
@@ -190,6 +194,12 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["EyeReflection#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeEffect#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeURL#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["IrisWidth#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["IrisHeight#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleHeight#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeRotation#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -218,53 +228,15 @@ class PonyTextureController
                 @CompileBody()
                 @CompileWings()
                 @CompileHorn()
-            when 'Socks'
+            when 'Socks', 'Bodysuit'
                 @CompileBody()
-            when 'Bodysuit'
-                @CompileBody()
-            when 'CMark'
-                @CompileCMark()
-            when 'CMarkType'
-                @CompileCMark()
-            when 'CMarkURL'
-                @CompileCMark()
-            when 'CMarkColor'
-                @CompileCMark()
-            when 'CMarkSize'
+            when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @CompileCMark()
             when 'SocksColor'
                 @CompileSocks()
-            when 'HornURL1'
+            when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3'
                 @CompileHorn()
-            when 'SeparateHorn'
-                @CompileHorn()
-            when 'HornColor'
-                @CompileHorn()
-            when 'HornURL2'
-                @CompileHorn()
-            when 'HornURL3'
-                @CompileHorn()
-            when 'HornURLColor1'
-                @CompileHorn()
-            when 'HornURLColor2'
-                @CompileHorn()
-            when 'HornURLColor3'
-                @CompileHorn()
-            when 'WingsURL1'
-                @CompileWings()
-            when 'WingsURL2'
-                @CompileWings()
-            when 'WingsURL3'
-                @CompileWings()
-            when 'WingsURLColor1'
-                @CompileWings()
-            when 'WingsURLColor2'
-                @CompileWings()
-            when 'WingsURLColor3'
-                @CompileWings()
-            when 'SeparateWings'
-                @CompileWings()
-            when 'WingsColor'
+            when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
                 @CompileWings()
             else
                 if @@MANE_UPDATE_TRIGGER[key]
@@ -622,11 +594,32 @@ class PonyTextureController
         return unless @compiled
         return unless @isValid
         socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
-    
+
+    @QUAD_SIZE_EYES = 256
+    @QUAD_SIZE_EYES_HIRES = 512
+
+    @QUAD_SIZE_CMARK = 256
+    @QUAD_SIZE_CMARK_HIRES = 512
+
+    @QUAD_SIZE_WING = 128
+    @QUAD_SIZE_WING_HIRES = 256
+
+    @QUAD_SIZE_HORN = 128
+    @QUAD_SIZE_HORN_HIRES = 256
+
+    @QUAD_SIZE_HAIR = 256
+    @QUAD_SIZE_HAIR_HIRES = 512
+
+    @QUAD_SIZE_TAIL = 256
+    @QUAD_SIZE_TAIL_HIRES = 512
+
     @QUAD_SIZE_CONST = 512
     @QUAD_SIZE_CONST_HIRES = 1024
-    @QUAD_SIZE_CONST_BODY = 2048
-    @QUAD_SIZE_CONST_BODY_HIRES = 4096
+
+    @QUAD_SIZE_BODY = 1024
+    @QUAD_SIZE_BODY_HIRES = 2048
+    @QUAD_SIZE_BODY_HIRES2 = 4096
+
     @GetTextureSize = => USE_HIGHRES_TEXTURES\GetBool() and @QUAD_SIZE_CONST_HIRES or @QUAD_SIZE_CONST
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
@@ -634,10 +627,10 @@ class PonyTextureController
         prefixUP = bType and 'FEMALE' or 'MALE'
         urlTextures = {}
         left = 0
-        bodysize = USE_HIGHRES_BODY\GetBool() and @@QUAD_SIZE_CONST_BODY_HIRES or @@QUAD_SIZE_CONST_BODY
+        bodysize = USE_HIGHRES_BODY\GetBool() and @@QUAD_SIZE_BODY_HIRES2 or USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_BODY_HIRES or @@QUAD_SIZE_BODY
 
         textureData = {
-            'name': "PPM2_#{@GetID()}_Body_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
@@ -669,7 +662,7 @@ class PonyTextureController
             {:r, :g, :b} = @GetData()\GetBodyColor()
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or 'normal'}", bodysize, bodysize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
             render.PushRenderTarget(rt)
 
@@ -741,7 +734,7 @@ class PonyTextureController
     CompileHorn: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Horn"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
@@ -759,6 +752,7 @@ class PonyTextureController
             }
         }
 
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HORN_HIRES or @@QUAD_SIZE_HORN
         urlTextures = {}
         left = 0
 
@@ -768,24 +762,24 @@ class PonyTextureController
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GetData()\GetBodyColor()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@HORN_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetHornURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             @HornMaterial\SetTexture('$basetexture', rt)
 
@@ -803,7 +797,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -814,7 +808,7 @@ class PonyTextureController
     CompileSocks: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Socks"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Socks"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -850,7 +844,7 @@ class PonyTextureController
     CompileWings: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_Wings"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Wings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -873,28 +867,30 @@ class PonyTextureController
         @WingsMaterialName = "!#{textureData.name\lower()}"
         @WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
+
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Wings_rt", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Wings_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GetData()\GetBodyColor()
             {:r, :g, :b} = @GetData()\GetWingsColor() if @GetData()\GetSeparateWings()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetWingsURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             @WingsMaterial\SetTexture('$basetexture', rt)
 
@@ -912,7 +908,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -928,7 +924,7 @@ class PonyTextureController
     CompileHair: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Mane_1"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -950,7 +946,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Mane_2"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -960,6 +956,8 @@ class PonyTextureController
         @HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
+
         urlTextures = {}
         left = 0
 
@@ -967,17 +965,17 @@ class PonyTextureController
             return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             -- First mane pass
             {:r, :g, :b} = @GetData()\GetManeColor1()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             maneTypeUpper = @GetManeType()
             if @@UPPER_MANE_MATERIALS[maneTypeUpper]
@@ -987,13 +985,13 @@ class PonyTextureController
                     {:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
                     surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1001,16 +999,16 @@ class PonyTextureController
             @HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             {:r, :g, :b} = @GetData()\GetManeColor2()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             maneTypeLower = @GetManeTypeLower()
             if @@LOWER_MANE_MATERIALS[maneTypeLower]
@@ -1020,13 +1018,13 @@ class PonyTextureController
                     {:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
                     surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
             
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1043,7 +1041,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -1054,7 +1052,7 @@ class PonyTextureController
     CompileTail: =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Tail_1"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_1"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1076,7 +1074,7 @@ class PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Tail_2"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_2"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -1086,6 +1084,8 @@ class PonyTextureController
         @TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         @TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_TAIL_HIRES or @@QUAD_SIZE_TAIL
+
         urlTextures = {}
         left = 0
 
@@ -1094,19 +1094,19 @@ class PonyTextureController
             oldW, oldH = ScrW(), ScrH()
 
             -- First tail pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_1", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_1", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             {:r, :g, :b} = @GetData()\GetTailColor1()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             tailType = @GetTailType()
             if @@TAIL_DETAIL_MATERIALS[tailType]
@@ -1115,13 +1115,13 @@ class PonyTextureController
                     continue if type(mat) == 'number'
                     surface.SetMaterial(mat)
                     surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1129,19 +1129,19 @@ class PonyTextureController
             @TailColor1Material\SetTexture('$basetexture', rt)
 
             -- Second tail pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_2", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Tail_rt_2", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             {:r, :g, :b} = @GetData()\GetTailColor2()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@HAIR_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             if @@TAIL_DETAIL_MATERIALS[tailType]
                 i = 1
@@ -1149,13 +1149,13 @@ class PonyTextureController
                     continue if type(mat) == 'number'
                     surface.SetMaterial(mat)
                     surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1172,7 +1172,7 @@ class PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -1189,30 +1189,39 @@ class PonyTextureController
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
-        EyeType = @GetData()["GetEyeType#{prefixData}"](@GetData())
-        EyeBackground = @GetData()["GetEyeBackground#{prefixData}"](@GetData())
-        EyeHole = @GetData()["GetEyeHole#{prefixData}"](@GetData())
-        HoleWidth = @GetData()["GetHoleWidth#{prefixData}"](@GetData())
-        IrisSize = @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
-        EyeIris1 = @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
-        EyeIris2 = @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
-        EyeIrisLine1 = @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
-        EyeIrisLine2 = @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
-        EyeLines = @GetData()["GetEyeLines#{prefixData}"](@GetData())
-        HoleSize = @GetData()["GetHoleSize#{prefixData}"](@GetData())
-        EyeReflection = @GetData()["GetEyeReflection#{prefixData}"](@GetData())
-        EyeEffect = @GetData()["GetEyeEffect#{prefixData}"](@GetData())
-        DerpEyes = @GetData()["GetDerpEyes#{prefixData}"](@GetData())
-        DerpEyesStrength = @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
-        EyeURL = @GetData()["GetEyeURL#{prefixData}"](@GetData())
+        EyeType =           @GetData()["GetEyeType#{prefixData}"](@GetData())
+        EyeBackground =     @GetData()["GetEyeBackground#{prefixData}"](@GetData())
+        EyeHole =           @GetData()["GetEyeHole#{prefixData}"](@GetData())
+        HoleWidth =         @GetData()["GetHoleWidth#{prefixData}"](@GetData())
+        IrisSize =          @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
+        EyeIris1 =          @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
+        EyeIris2 =          @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
+        EyeIrisLine1 =      @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
+        EyeIrisLine2 =      @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
+        EyeLines =          @GetData()["GetEyeLines#{prefixData}"](@GetData())
+        HoleSize =          @GetData()["GetHoleSize#{prefixData}"](@GetData())
+        EyeReflection =     @GetData()["GetEyeReflection#{prefixData}"](@GetData())
+        EyeEffect =         @GetData()["GetEyeEffect#{prefixData}"](@GetData())
+        DerpEyes =          @GetData()["GetDerpEyes#{prefixData}"](@GetData())
+        DerpEyesStrength =  @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
+        EyeURL =            @GetData()["GetEyeURL#{prefixData}"](@GetData())
+        IrisWidth =         @GetData()["GetIrisWidth#{prefixData}"](@GetData())
+        IrisHeight =        @GetData()["GetIrisHeight#{prefixData}"](@GetData())
+        HoleHeight =        @GetData()["GetHoleHeight#{prefixData}"](@GetData())
+        HoleShiftX =        @GetData()["GetHoleShiftX#{prefixData}"](@GetData())
+        HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
+        EyeRotation =       @GetData()["GetEyeRotation#{prefixData}"](@GetData())
+        
         oldW, oldH = ScrW(), ScrH()
 
-        shiftX, shiftY = 0, 0
-        shiftY += DerpEyesStrength * .15 * @@GetTextureSize() if DerpEyes and left
-        shiftY -= DerpEyesStrength * .15 * @@GetTextureSize() if DerpEyes and not left
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
+
+        shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
+        shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
+        shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2_#{@GetID()}_Eye_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eye_#{prefix}"
             'shader': 'eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
@@ -1246,49 +1255,54 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 
         if EyeURL == '' or not EyeURL\find('^https?://')
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             {:r, :g, :b, :a} = EyeBackground
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetDrawColor(EyeIris1)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            IrisPos = @@GetTextureSize() / 2 - @@GetTextureSize() * IrisSize / 2
-            IrisQuadSize = @@GetTextureSize() * IrisSize
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            IrisPos = texSize / 2 - texSize * IrisSize / 2
+            IrisQuadSize = texSize * IrisSize
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeIris2)
             surface.SetMaterial(@@EYE_GRAD)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             if EyeLines
                 surface.SetDrawColor(EyeIrisLine1)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+                DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
                 surface.SetDrawColor(EyeIrisLine2)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+                DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            HoleQuadSize = @@GetTextureSize() * IrisSize * HoleSize
-            HolePos = @@GetTextureSize() / 2
-            surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - @@GetTextureSize() * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
+            HoleQuadSize = texSize * IrisSize * HoleSize
+            HolePos = texSize / 2
+            do
+                holeX = HoleQuadSize * HoleWidth / 2
+                holeY = texSize * (IrisSize * HoleSize * HoleHeight) / 2
+                cx = HolePos - holeX + holeX * HoleShiftX + shiftX
+                cy = HolePos - holeY + holeY * HoleShiftY + shiftY
+                DrawTexturedRectRotated(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeEffect)
             surface.SetMaterial(@@EYE_EFFECT)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeReflection)
             surface.SetMaterial(@@EYE_REFLECTION)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1297,13 +1311,13 @@ class PonyTextureController
 
             PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
         else
-            @@LoadURL EyeURL, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, material) ->
+            @@LoadURL EyeURL, texSize, texSize, (texture, panel, material) ->
                 @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
         return @["EyeMaterial#{prefixUpper}"]
     CompileCMark: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_CMark"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1312,7 +1326,7 @@ class PonyTextureController
         }
 
         textureDataGUI = {
-            'name': "PPM2_#{@GetID()}_CMark_GUI"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI"
             'shader': 'UnlitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
@@ -1332,16 +1346,18 @@ class PonyTextureController
         
         URL = @GetData()\GetCMarkURL()
         size = @GetData()\GetCMarkSize()
-        sizeQuad = @@GetTextureSize() * size
-        shift = (@@GetTextureSize() - sizeQuad) / 2
+        
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_CMARK_HIRES or @@QUAD_SIZE_CMARK
+        sizeQuad = texSize * size
+        shift = (texSize - sizeQuad) / 2
 
         if URL == '' or not URL\find('^https?://')
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
             render.Clear(0, 0, 0, 0, true, true)
             cam.Start2D()
 
@@ -1360,13 +1376,13 @@ class PonyTextureController
 
             PPM2.DebugPrint('Compiled cutiemark texture for ', @ent, ' as part of ', @)
         else
-            @@LoadURL URL, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, material) ->
+            @@LoadURL URL, texSize, texSize, (texture, panel, material) ->
                 oldW, oldH = ScrW(), ScrH()
 
-                rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", @@GetTextureSize(), @@GetTextureSize(), false)
+                rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_CMark", texSize, texSize, false)
                 rt\Download()
                 render.PushRenderTarget(rt)
-                render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                render.SetViewPort(0, 0, texSize, texSize)
                 render.Clear(0, 0, 0, 0, true, true)
                 cam.Start2D()
 
@@ -1444,48 +1460,20 @@ class NewPonyTextureController extends PonyTextureController
         return unless @isValid
         super(state)
         switch state\GetKey()
-            when 'ManeTypeNew'
+            when 'ManeTypeNew', 'ManeTypeLowerNew', 'TailTypeNew'
                 @CompileHair()
-            when 'ManeTypeLowerNew'
-                @CompileHair()
-            when 'TailTypeNew'
-                @CompileTail()
-            when 'TeethColor'
+
+            when 'TeethColor', 'MouthColor', 'TongueColor'
                 @CompileMouth()
-            when 'MouthColor'
-                @CompileMouth()
-            when 'MouthColor'
-                @CompileMouth()
-            when 'BatWingColor'
-                @CompileBatWings()
+
             when 'SeparateWings'
                 @CompileBatWings()
                 @CompileBatWingsSkin()
-            when 'BatWingSkinColor'
-                @CompileBatWingsSkin()
-            when 'BatWingURL1'
+            
+            when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
                 @CompileBatWings()
-            when 'BatWingURL2'
-                @CompileBatWings()
-            when 'BatWingURL3'
-                @CompileBatWings()
-            when 'BatWingURLColor1'
-                @CompileBatWings()
-            when 'BatWingURLColor2'
-                @CompileBatWings()
-            when 'BatWingURLColor3'
-                @CompileBatWings()
-            when 'BatWingSkinURL1'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURL2'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURL3'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor1'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor2'
-                @CompileBatWingsSkin()
-            when 'BatWingSkinURLColor3'
+            
+            when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
                 @CompileBatWingsSkin()
 
     GetManeType: => @GetData()\GetManeTypeNew()
@@ -1495,7 +1483,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileHairInternal: (prefix = 'Upper') =>
         return unless @isValid
         textureFirst = {
-            'name': "PPM2_#{@GetID()}_Mane_1_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite' 
@@ -1517,7 +1505,7 @@ class NewPonyTextureController extends PonyTextureController
         }
 
         textureSecond = {
-            'name': "PPM2_#{@GetID()}_Mane_2_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {k, v for k, v in pairs textureFirst.data}
         }
@@ -1527,6 +1515,8 @@ class NewPonyTextureController extends PonyTextureController
         HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
         HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
+        
         urlTextures = {}
         left = 0
 
@@ -1534,17 +1524,17 @@ class NewPonyTextureController extends PonyTextureController
             return unless @isValid
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             -- First mane pass
             {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             maneTypeUpper = @GetManeType()
             if @@UPPER_MANE_MATERIALS[maneTypeUpper]
@@ -1554,13 +1544,13 @@ class NewPonyTextureController extends PonyTextureController
                     {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
                     surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1568,16 +1558,16 @@ class NewPonyTextureController extends PonyTextureController
             HairColor1Material\SetTexture('$basetexture', rt)
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
 
             {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             maneTypeLower = @GetManeTypeLower()
             if @@LOWER_MANE_MATERIALS[maneTypeLower]
@@ -1587,13 +1577,13 @@ class NewPonyTextureController extends PonyTextureController
                     {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
                     surface.SetDrawColor(r, g, b, a)
                     surface.SetMaterial(mat)
-                    surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
 
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1610,7 +1600,7 @@ class NewPonyTextureController extends PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -1622,7 +1612,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileBatWings: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_BatWings"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWings"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -1644,29 +1634,30 @@ class NewPonyTextureController extends PonyTextureController
         left = 0
         @BatWingsMaterialName = "!#{textureData.name\lower()}"
         @BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GetData()\GetBodyColor()
             {:r, :g, :b} = @GetData()\GetBatWingColor() if @GetData()\GetSeparateWings()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             @BatWingsMaterial\SetTexture('$basetexture', rt)
 
@@ -1684,7 +1675,7 @@ class NewPonyTextureController extends PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -1697,7 +1688,7 @@ class NewPonyTextureController extends PonyTextureController
     CompileBatWingsSkin: =>
         return unless @isValid
         textureData = {
-            'name': "PPM2_#{@GetID()}_BatWingsSkin"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWingsSkin"
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
@@ -1719,29 +1710,30 @@ class NewPonyTextureController extends PonyTextureController
         left = 0
         @BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
         @BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", @@GetTextureSize(), @@GetTextureSize(), false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GetData()\GetBodyColor()
             {:r, :g, :b} = @GetData()\GetBatWingSkinColor() if @GetData()\GetSeparateWings()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawRect(0, 0, texSize, texSize)
 
             surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, @@GetTextureSize(), @@GetTextureSize())
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             @BatWingsSkinMaterial\SetTexture('$basetexture', rt)
 
@@ -1759,7 +1751,7 @@ class NewPonyTextureController extends PonyTextureController
             {detailURL, i}
         
         for {url, i} in *validURLS
-            @@LoadURL url, @@GetTextureSize(), @@GetTextureSize(), (texture, panel, mat) ->
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
@@ -1801,19 +1793,19 @@ class NewPonyTextureController extends PonyTextureController
 
         {:r, :g, :b} = @GetData()\GetTeethColor()
         @TeethMaterialName = "!ppm2_#{@GetID()}_teeth"
-        @TeethMaterial = CreateMaterial("PPM2_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
+        @TeethMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
         @TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetMouthColor()
         @MouthMaterialName = "!ppm2_#{@GetID()}_mouth"
-        @MouthMaterial = CreateMaterial("PPM2_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
+        @MouthMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
         @MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
         {:r, :g, :b} = @GetData()\GetTongueColor()
         @TongueMaterialName = "!ppm2_#{@GetID()}_tongue"
-        @TongueMaterial = CreateMaterial("PPM2_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
+        @TongueMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
         @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
         @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 

@@ -86,7 +86,9 @@ BUTTON_CLICK_FUNC = =>
         net.Start('PPM2.PlayEmote')
         net.WriteUInt(@id, 8)
         net.SendToServer()
-    hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
+        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), @sequence, @time)
+    else
+        hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
@@ -161,23 +163,20 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
     return @
 
 hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
-    timer.Simple 0, ->
-        timer.Simple 0, ->
-            timer.Simple 0, -> -- fuk
-                return if not IsValid(@)
-                PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
-                PPM2.EmotesPanelContext = PPM2.CreateEmotesPanel(@)
-                PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
-                PPM2.EmotesPanelContext\SetVisible(true)
-                PPM2.EmotesPanelContext\SetMouseInputEnabled(true)
-                timer.Create 'PPM2.ContextMenuEmotesUpdate', 1, 0, ->
-                    if not IsValid(PPM2.EmotesPanelContext)
-                        timer.Remove 'PPM2.ContextMenuEmotesUpdate'
-                        return
-                    return if not IsValid(LocalPlayer())
-                    status = LocalPlayer()\IsPony()
-                    PPM2.EmotesPanelContext\SetVisible(status)
-                    PPM2.EmotesPanelContext\SetMouseInputEnabled(status)
+    return if not IsValid(@)
+    PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
+    PPM2.EmotesPanelContext = PPM2.CreateEmotesPanel(@)
+    PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
+    PPM2.EmotesPanelContext\SetVisible(true)
+    PPM2.EmotesPanelContext\SetMouseInputEnabled(true)
+    timer.Create 'PPM2.ContextMenuEmotesUpdate', 1, 0, ->
+        if not IsValid(PPM2.EmotesPanelContext)
+            timer.Remove 'PPM2.ContextMenuEmotesUpdate'
+            return
+        return if not IsValid(LocalPlayer())
+        status = LocalPlayer()\IsPony()
+        PPM2.EmotesPanelContext\SetVisible(status)
+        PPM2.EmotesPanelContext\SetMouseInputEnabled(status)
 
 hook.Add 'StartChat', 'PPM2.Emotes', ->
     if not IsValid(PPM2.EmotesPanel)
