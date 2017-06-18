@@ -175,12 +175,12 @@ PPM2.SocksDetailsComp = {i, [Material(mat) for mat in *data] for i, data in pair
 PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
 
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.BodyDetailsMaterials when type(mat) ~= 'number'
-table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.UpperManeDetailsMaterials when type(mat) ~= 'number'
-table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DownManeDetailsMaterials when type(mat) ~= 'number'
-table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.TailDetailsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for i, data in pairs PPM2.UpperManeDetailsMaterials for mat in *data when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for i, data in pairs PPM2.DownManeDetailsMaterials for mat in *data when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for i, data in pairs PPM2.TailDetailsMaterials for mat in *data when type(mat) ~= 'number'
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksMaterialsComp when type(mat) ~= 'number'
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DefaultCutiemarksMaterials when type(mat) ~= 'number'
-table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksDetailsComp when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for i, data in pairs PPM2.SocksDetailsComp for mat in *data when type(mat) ~= 'number'
 
 PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.AvaliablePonySuitsMaterials when type(mat) ~= 'number'
@@ -2087,10 +2087,9 @@ class NewPonyTextureController extends PonyTextureController
 concommand.Add 'ppm2_reload_materials', ->
     cTime = SysTime()
     for mat in *RELOADABLE_MATERIALS
-        if mat.GetTexture
-            if texture = mat\GetTexture('$basetexture')
-                texture\Download()
-        mat\Recompute() if mat.Recompute
+        if texture = mat\GetTexture('$basetexture')
+            texture\Download()
+        mat\Recompute()
     PonyTextureController.URL_MATERIAL_CACHE = {}
     PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds. Do not forget to ppm2_reload and ppm2_require now!')
 
