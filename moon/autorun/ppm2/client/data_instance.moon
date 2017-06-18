@@ -178,30 +178,6 @@ class PonyDataInstance
             max: PPM2.MAX_TAIL_SIZE
         }
 
-        'eye_iris_size': {
-            default: -> 1
-            getFunc: 'IrisSize'
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
-            min: PPM2.MIN_IRIS
-            max: PPM2.MAX_IRIS
-        }
-
-        'hole_width': {
-            default: -> 1
-            getFunc: 'HoleWidth'
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
-            min: PPM2.MIN_PUPIL_SIZE
-            max: PPM2.MAX_PUPIL_SIZE
-        }
-
-        'eye_hole_size': {
-            default: -> .8
-            getFunc: 'HoleSize'
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or .8, PPM2.MIN_HOLE, PPM2.MAX_HOLE)
-            min: PPM2.MIN_HOLE
-            max: PPM2.MAX_HOLE
-        }
-
         'cmark': {
             default: -> true
             getFunc: 'CMark'
@@ -255,83 +231,6 @@ class PonyDataInstance
             fix: URL_FIXER
         }
 
-        'eye_url': {
-            default: -> ''
-            getFunc: 'EyeURL'
-            fix: URL_FIXER
-        }
-
-        'eye_derp': {
-            default: -> false
-            getFunc: 'DerpEyes'
-            fix: (arg = true) -> tobool(arg)
-        }
-
-        'eye_derp_strength': {
-            default: -> 1
-            getFunc: 'DerpEyesStrength'
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
-            min: PPM2.MIN_DERP_STRENGTH
-            max: PPM2.MAX_DERP_STRENGTH
-        }
-
-        'eye_type': {
-            default: -> 0
-            getFunc: 'EyeType'
-            enum: [arg for arg in *PPM2.AvaliableEyeTypes]
-            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE)
-            min: PPM2.MIN_EYE_TYPE
-            max: PPM2.MAX_EYE_TYPE
-        }
-
-        'eye_bg': {
-            default: -> Color(255, 255, 255)
-            getFunc: 'EyeBackground'
-            fix: COLOR_FIXER()
-        }
-
-        'eye_hole': {
-            default: -> Color(0, 0, 0)
-            getFunc: 'EyeHole'
-            fix: COLOR_FIXER(0, 0, 0)
-        }
-
-        'eye_iris1': {
-            default: -> Color(200, 200, 200)
-            getFunc: 'EyeIrisTop'
-            fix: COLOR_FIXER(200, 200, 200)
-        }
-
-        'eye_iris2': {
-            default: -> Color(200, 200, 200)
-            getFunc: 'EyeIrisBottom'
-            fix: COLOR_FIXER(200, 200, 200)
-        }
-
-        'eye_irisline1': {
-            default: -> Color(255, 255, 255)
-            getFunc: 'EyeIrisLine1'
-            fix: COLOR_FIXER()
-        }
-
-        'eye_irisline2': {
-            default: -> Color(255, 255, 255)
-            getFunc: 'EyeIrisLine2'
-            fix: COLOR_FIXER()
-        }
-
-        'eye_reflection': {
-            default: -> Color(255, 255, 255, 127)
-            getFunc: 'EyeReflection'
-            fix: COLOR_FIXER(255, 255, 255, 127)
-        }
-
-        'eye_effect': {
-            default: -> Color(255, 255, 255)
-            getFunc: 'EyeEffect'
-            fix: COLOR_FIXER()
-        }
-
         'body': {
             default: -> Color(255, 255, 255)
             getFunc: 'BodyColor'
@@ -360,12 +259,6 @@ class PonyDataInstance
             default: -> false
             getFunc: 'SeparateHorn'
             fix: (arg = false) -> tobool(arg)
-        }
-
-        'eye_lines': {
-            default: -> true
-            getFunc: 'EyeLines'
-            fix: (arg = true) -> tobool(arg)
         }
 
         'separate_eyes': {
@@ -456,68 +349,68 @@ class PonyDataInstance
         }
     }
 
-    for {internal, publicName} in *{{'left', 'Left'}, {'right', 'Right'}}
-        @PONY_DATA["eye_url_#{internal}"] = {
+    for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
+        @PONY_DATA["eye_url#{internal}"] = {
             default: -> ''
             getFunc: "EyeURL#{publicName}"
             fix: URL_FIXER
         }
 
-        @PONY_DATA["eye_bg_#{internal}"] = {
+        @PONY_DATA["eye_bg#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeBackground#{publicName}"
             fix: COLOR_FIXER()
         }
 
-        @PONY_DATA["eye_hole_#{internal}"] = {
+        @PONY_DATA["eye_hole#{internal}"] = {
             default: -> Color(0, 0, 0)
             getFunc: "EyeHole#{publicName}"
             fix: COLOR_FIXER(0, 0, 0)
         }
 
-        @PONY_DATA["eye_iris1_#{internal}"] = {
+        @PONY_DATA["eye_iris1#{internal}"] = {
             default: -> Color(200, 200, 200)
             getFunc: "EyeIrisTop#{publicName}"
             fix: COLOR_FIXER(200, 200, 200)
         }
 
-        @PONY_DATA["eye_iris2_#{internal}"] = {
+        @PONY_DATA["eye_iris2#{internal}"] = {
             default: -> Color(200, 200, 200)
             getFunc: "EyeIrisBottom#{publicName}"
             fix: COLOR_FIXER(200, 200, 200)
         }
 
-        @PONY_DATA["eye_irisline1_#{internal}"] = {
+        @PONY_DATA["eye_irisline1#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeIrisLine1#{publicName}"
             fix: COLOR_FIXER()
         }
 
-        @PONY_DATA["eye_irisline2_#{internal}"] = {
+        @PONY_DATA["eye_irisline2#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeIrisLine2#{publicName}"
             fix: COLOR_FIXER()
         }
 
-        @PONY_DATA["eye_reflection_#{internal}"] = {
+        @PONY_DATA["eye_reflection#{internal}"] = {
             default: -> Color(255, 255, 255, 127)
             getFunc: "EyeReflection#{publicName}"
             fix: COLOR_FIXER(255, 255, 255, 127)
         }
 
-        @PONY_DATA["eye_effect_#{internal}"] = {
+        @PONY_DATA["eye_effect#{internal}"] = {
             default: -> Color(255, 255, 255)
             getFunc: "EyeEffect#{publicName}"
             fix: COLOR_FIXER()
         }
 
-        @PONY_DATA["eye_lines_#{internal}"] = {
+        @PONY_DATA["eye_lines#{internal}"] = {
             default: -> true
             getFunc: "EyeLines#{publicName}"
             fix: (arg = true) -> tobool(arg)
         }
 
-        @PONY_DATA["eye_iris_size_#{internal}"] = {
+        @PONY_DATA["eye_iris_size#{internal}"] = {
             default: -> 1
             getFunc: "IrisSize#{publicName}"
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_IRIS, PPM2.MAX_IRIS)
@@ -525,13 +418,13 @@ class PonyDataInstance
             max: PPM2.MAX_IRIS
         }
 
-        @PONY_DATA["eye_derp_#{internal}"] = {
+        @PONY_DATA["eye_derp#{internal}"] = {
             default: -> false
             getFunc: "DerpEyes#{publicName}"
             fix: (arg = true) -> tobool(arg)
         }
 
-        @PONY_DATA["eye_derp_strength_#{internal}"] = {
+        @PONY_DATA["eye_derp_strength#{internal}"] = {
             default: -> 1
             getFunc: "DerpEyesStrength#{publicName}"
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)
@@ -539,7 +432,7 @@ class PonyDataInstance
             max: PPM2.MAX_DERP_STRENGTH
         }
 
-        @PONY_DATA["eye_type_#{internal}"] = {
+        @PONY_DATA["eye_type#{internal}"] = {
             default: -> 0
             getFunc: "EyeType#{publicName}"
             enum: [arg for arg in *PPM2.AvaliableEyeTypes]
@@ -548,12 +441,52 @@ class PonyDataInstance
             max: PPM2.MAX_EYE_TYPE
         }
 
-        @PONY_DATA["hole_width_#{internal}"] = {
+        @PONY_DATA["hole_width#{internal}"] = {
             default: -> 1
             getFunc: "HoleWidth#{publicName}"
             fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
             min: PPM2.MIN_PUPIL_SIZE
             max: PPM2.MAX_PUPIL_SIZE
+        }
+
+        @PONY_DATA["hole_height#{internal}"] = {
+            default: -> 1
+            getFunc: "HoleHeight#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+            min: PPM2.MIN_PUPIL_SIZE
+            max: PPM2.MAX_PUPIL_SIZE
+        }
+
+        @PONY_DATA["iris_width#{internal}"] = {
+            default: -> 1
+            getFunc: "IrisWidth#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+            min: PPM2.MIN_PUPIL_SIZE
+            max: PPM2.MAX_PUPIL_SIZE
+        }
+
+        @PONY_DATA["iris_height#{internal}"] = {
+            default: -> 1
+            getFunc: "IrisHeight#{publicName}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)
+            min: PPM2.MIN_PUPIL_SIZE
+            max: PPM2.MAX_PUPIL_SIZE
+        }
+
+        @PONY_DATA["hole_shiftx#{internal}"] = {
+            default: -> 0
+            getFunc: "HoleShiftX#{publicName}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)
+            min: PPM2.MIN_HOLE_SHIFT
+            max: PPM2.MAX_HOLE_SHIFT
+        }
+
+        @PONY_DATA["hole_shifty#{internal}"] = {
+            default: -> 0
+            getFunc: "HoleShiftY#{publicName}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)
+            min: PPM2.MIN_HOLE_SHIFT
+            max: PPM2.MAX_HOLE_SHIFT
         }
 
         @PONY_DATA["eye_hole_size#{internal}"] = {
@@ -824,6 +757,7 @@ class PonyDataInstance
         return newData
     ApplyDataToObject: (target, ...) =>
         for key, value in pairs @GetAsNetworked()
+            error("Attempt to apply data to object #{target} at unknown index #{key}!") if not target["Set#{key}"]
             target["Set#{key}"](target, value, ...)
     UpdateController: (...) => @ApplyDataToObject(@nwObj, ...)
     CreateController: (...) => @CreateNetworkObject(false, ...)

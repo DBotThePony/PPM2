@@ -588,7 +588,7 @@ EditorPages = {
             @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW()
             @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
             @NumSlider('Weight', 'Weight', 2)
-            @NumSlider('PonySize', 'PonySize', 2)
+            @NumSlider('Pony Size', 'PonySize', 2)
 
             @CheckBox('Hard bone reset. Affects FPS when on.', 'OverrideBones') if ADVANCED_MODE\GetBool()
 
@@ -745,11 +745,22 @@ EditorPages = {
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
                 @NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
                 @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
-                @NumSlider("#{prefix}Eye hole width", "HoleWidth#{publicName}", 2)
-                @NumSlider("#{prefix}Eye hole size", "HoleSize#{publicName}", 2)
 
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
+                
+                @NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
+                @NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
+                @NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
+
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
+                    @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
+                
+                @Hr()
                 @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
-                @ColorBox("#{prefix}Eye hole", "EyeHole#{publicName}")
+                @ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
                 @ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
                 @ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
                 @ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")

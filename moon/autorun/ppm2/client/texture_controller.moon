@@ -192,6 +192,11 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["EyeReflection#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeEffect#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeURL#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["IrisWidth#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["IrisHeight#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleHeight#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -1181,27 +1186,33 @@ class PonyTextureController
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
-        EyeType = @GetData()["GetEyeType#{prefixData}"](@GetData())
-        EyeBackground = @GetData()["GetEyeBackground#{prefixData}"](@GetData())
-        EyeHole = @GetData()["GetEyeHole#{prefixData}"](@GetData())
-        HoleWidth = @GetData()["GetHoleWidth#{prefixData}"](@GetData())
-        IrisSize = @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
-        EyeIris1 = @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
-        EyeIris2 = @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
-        EyeIrisLine1 = @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
-        EyeIrisLine2 = @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
-        EyeLines = @GetData()["GetEyeLines#{prefixData}"](@GetData())
-        HoleSize = @GetData()["GetHoleSize#{prefixData}"](@GetData())
-        EyeReflection = @GetData()["GetEyeReflection#{prefixData}"](@GetData())
-        EyeEffect = @GetData()["GetEyeEffect#{prefixData}"](@GetData())
-        DerpEyes = @GetData()["GetDerpEyes#{prefixData}"](@GetData())
-        DerpEyesStrength = @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
-        EyeURL = @GetData()["GetEyeURL#{prefixData}"](@GetData())
+        EyeType =           @GetData()["GetEyeType#{prefixData}"](@GetData())
+        EyeBackground =     @GetData()["GetEyeBackground#{prefixData}"](@GetData())
+        EyeHole =           @GetData()["GetEyeHole#{prefixData}"](@GetData())
+        HoleWidth =         @GetData()["GetHoleWidth#{prefixData}"](@GetData())
+        IrisSize =          @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
+        EyeIris1 =          @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
+        EyeIris2 =          @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
+        EyeIrisLine1 =      @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
+        EyeIrisLine2 =      @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
+        EyeLines =          @GetData()["GetEyeLines#{prefixData}"](@GetData())
+        HoleSize =          @GetData()["GetHoleSize#{prefixData}"](@GetData())
+        EyeReflection =     @GetData()["GetEyeReflection#{prefixData}"](@GetData())
+        EyeEffect =         @GetData()["GetEyeEffect#{prefixData}"](@GetData())
+        DerpEyes =          @GetData()["GetDerpEyes#{prefixData}"](@GetData())
+        DerpEyesStrength =  @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
+        EyeURL =            @GetData()["GetEyeURL#{prefixData}"](@GetData())
+        IrisWidth =         @GetData()["GetIrisWidth#{prefixData}"](@GetData())
+        IrisHeight =        @GetData()["GetIrisHeight#{prefixData}"](@GetData())
+        HoleHeight =        @GetData()["GetHoleHeight#{prefixData}"](@GetData())
+        HoleShiftX =        @GetData()["GetHoleShiftX#{prefixData}"](@GetData())
+        HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
+        
         oldW, oldH = ScrW(), ScrH()
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
 
-        shiftX, shiftY = 0, 0
+        shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
         shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
         shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
@@ -1255,34 +1266,39 @@ class PonyTextureController
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
             IrisPos = texSize / 2 - texSize * IrisSize / 2
             IrisQuadSize = texSize * IrisSize
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
 
             surface.SetDrawColor(EyeIris2)
             surface.SetMaterial(@@EYE_GRAD)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
 
             if EyeLines
                 surface.SetDrawColor(EyeIrisLine1)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
 
                 surface.SetDrawColor(EyeIrisLine2)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
-                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+                surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
             HoleQuadSize = texSize * IrisSize * HoleSize
             HolePos = texSize / 2
-            surface.DrawTexturedRect(HolePos - HoleQuadSize * HoleWidth / 2 + shiftX, HolePos - texSize * (IrisSize * HoleSize) / 2 + shiftY, HoleQuadSize * HoleWidth, HoleQuadSize)
+            do
+                holeX = HoleQuadSize * HoleWidth / 2
+                holeY = texSize * (IrisSize * HoleSize * HoleHeight) / 2
+                cx = HolePos - holeX + holeX * HoleShiftX + shiftX
+                cy = HolePos - holeY + holeY * HoleShiftY + shiftY
+                surface.DrawTexturedRect(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight)
 
             surface.SetDrawColor(EyeEffect)
             surface.SetMaterial(@@EYE_EFFECT)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
 
             surface.SetDrawColor(EyeReflection)
             surface.SetMaterial(@@EYE_REFLECTION)
-            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize, IrisQuadSize)
+            surface.DrawTexturedRect(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight)
 
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
