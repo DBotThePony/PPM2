@@ -1445,11 +1445,11 @@ class PonyTextureController
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            HoleQuadSize = texSize * IrisSize * HoleSize
+            HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
             HolePos = texSize / 2
             do
                 holeX = HoleQuadSize * HoleWidth / 2
-                holeY = texSize * (IrisSize * HoleSize * HoleHeight) / 2
+                holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
                 cx = HolePos - holeX + holeX * HoleShiftX + shiftX
                 cy = HolePos - holeY + holeY * HoleShiftY + shiftY
                 DrawTexturedRectRotated(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
