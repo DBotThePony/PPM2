@@ -221,9 +221,6 @@ class PonyTextureController
     @MAT_INDEX_CMARK = 9
     @MAT_INDEX_EYELASHES = 10
 
-    @BODY_MATERIAL_MALE = Material('models/ppm/base/render/bodym')
-    @BODY_MATERIAL_FEMALE = Material('models/ppm/base/render/bodyf')
-
     @HAIR_MATERIAL_COLOR = CreateMaterial('PPM2.ManeTextureBase', 'UnlitGeneric', {
         '$basetexture': 'models/debug/debugwhite'
         '$ignorez': 1
