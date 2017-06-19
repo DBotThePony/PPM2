@@ -187,7 +187,7 @@ class DefaultBodygroupController
     
     UpdateTailSize: =>
         return if not CLIENT
-        size = @GetData()\GetTailSize()
+        size = @GetData()\GetTailSize() * @GetData()\GetPonySize()
         vec = Vector(1, 1, 1)
         vecTail = vec * size
         vecTailPos = Vector((size - 1) * 8, 0, 0)
