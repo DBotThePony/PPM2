@@ -259,6 +259,22 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    @BODY_MATERIAL_MALE = CreateMaterial('PPM2.MaleDrawtexture', 'UnlitGeneric', {
+        '$basetexture': 'models/ppm/base/bodym'
+        '$ignorez': 1
+        '$vertexcolor': 1
+        '$vertexalpha': 1
+        '$nolod': 1
+    })
+
+    @BODY_MATERIAL_FEMALE = CreateMaterial('PPM2.FemaleDrawtexture', 'UnlitGeneric', {
+        '$basetexture': 'models/ppm/base/body'
+        '$ignorez': 1
+        '$vertexcolor': 1
+        '$vertexalpha': 1
+        '$nolod': 1
+    })
+
     table.insert(RELOADABLE_MATERIALS, @HORN_MATERIAL_COLOR)
 
     @EYE_OVAL = Material('models/ppm/partrender/eye_oval')
