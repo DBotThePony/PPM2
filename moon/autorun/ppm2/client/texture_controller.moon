@@ -231,6 +231,8 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    table.insert(RELOADABLE_MATERIALS, @HAIR_MATERIAL_COLOR)
+
     @TAIL_MATERIAL_COLOR = CreateMaterial('PPM2.TailTextureBase', 'UnlitGeneric', {
         '$basetexture': 'models/debug/debugwhite'
         '$ignorez': 1
@@ -238,6 +240,8 @@ class PonyTextureController
         '$vertexalpha': 1
         '$nolod': 1
     })
+
+    table.insert(RELOADABLE_MATERIALS, @TAIL_MATERIAL_COLOR)
 
     @WINGS_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGeneric', {
         '$basetexture': 'models/debug/debugwhite'
@@ -247,6 +251,8 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    table.insert(RELOADABLE_MATERIALS, @WINGS_MATERIAL_COLOR)
+
     @HORN_MATERIAL_COLOR = CreateMaterial('PPM2.HornMaterialBase', 'UnlitGeneric', {
         '$basetexture': 'models/ppm/base/horn'
         '$ignorez': 1
@@ -255,24 +261,35 @@ class PonyTextureController
         '$nolod': 1
     })
 
-    @EYE_OVAL = Material('models/ppm/partrender/eye_oval.png')
+    table.insert(RELOADABLE_MATERIALS, @HORN_MATERIAL_COLOR)
+
+    @EYE_OVAL = Material('models/ppm/partrender/eye_oval')
 
     @EYE_OVALS = {
-        Material('models/ppm/partrender/eye_oval.png')
-        Material('models/ppm/partrender/eye_oval_aperture.png')
+        Material('models/ppm/partrender/eye_oval')
+        Material('models/ppm/partrender/eye_oval_aperture')
     }
 
-    @EYE_GRAD = Material('models/ppm/partrender/eye_grad.png')
-    @EYE_EFFECT = Material('models/ppm/partrender/eye_effect.png')
-    @EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection.png')
+    @EYE_GRAD = Material('models/ppm/partrender/eye_grad')
+    @EYE_EFFECT = Material('models/ppm/partrender/eye_effect')
+    @EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection')
 
-    @EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1.png')
-    @EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1.png')
+    @EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1')
+    @EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1')
 
-    @EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2.png')
-    @EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2.png')
+    @EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2')
+    @EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2')
 
-    @PONY_SOCKS = Material('models/ppm/texclothes/pony_socks.png')
+    @PONY_SOCKS = Material('models/ppm/texclothes/pony_socks')
+
+    table.insert(RELOADABLE_MATERIALS, @EYE_GRAD)
+    table.insert(RELOADABLE_MATERIALS, @EYE_EFFECT)
+    table.insert(RELOADABLE_MATERIALS, @EYE_REFLECTION)
+    table.insert(RELOADABLE_MATERIALS, @EYE_LINE_L_1)
+    table.insert(RELOADABLE_MATERIALS, @EYE_LINE_R_1)
+    table.insert(RELOADABLE_MATERIALS, @EYE_LINE_L_2)
+    table.insert(RELOADABLE_MATERIALS, @EYE_LINE_R_2)
+    table.insert(RELOADABLE_MATERIALS, @PONY_SOCKS)
 
     @NEXT_GENERATED_ID = 10000
 
