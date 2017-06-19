@@ -25,6 +25,48 @@ PPM2.BODYGROUP_TAIL = 6
 PPM2.BODYGROUP_CMARK = 7
 PPM2.BODYGROUP_EYELASH = 8
 
+-- 0	LrigPelvis
+-- 1	LrigSpine1
+-- 2	LrigSpine2
+-- 3	LrigRibcage
+-- 4	LrigNeck1
+-- 5	LrigNeck2
+-- 6	LrigNeck3
+-- 7	LrigScull
+-- 8	Lrig_LEG_BL_Femur
+-- 9	Lrig_LEG_BL_Tibia
+-- 10	Lrig_LEG_BL_LargeCannon
+-- 11	Lrig_LEG_BL_PhalanxPrima
+-- 12	Lrig_LEG_BL_RearHoof
+-- 13	Lrig_LEG_BR_Femur
+-- 14	Lrig_LEG_BR_Tibia
+-- 15	Lrig_LEG_BR_LargeCannon
+-- 16	Lrig_LEG_BR_PhalanxPrima
+-- 17	Lrig_LEG_BR_RearHoof
+-- 18	Lrig_LEG_FL_Scapula
+-- 19	Lrig_LEG_FL_Humerus
+-- 20	Lrig_LEG_FL_Radius
+-- 21	Lrig_LEG_FL_Metacarpus
+-- 22	Lrig_LEG_FL_PhalangesManus
+-- 23	Lrig_LEG_FL_FrontHoof
+-- 24	Lrig_LEG_FR_Scapula
+-- 25	Lrig_LEG_FR_Humerus
+-- 26	Lrig_LEG_FR_Radius
+-- 27	Lrig_LEG_FR_Metacarpus
+-- 28	Lrig_LEG_FR_PhalangesManus
+-- 29	Lrig_LEG_FR_FrontHoof
+-- 30	Mane01
+-- 31	Mane02
+-- 32	Mane03
+-- 33	Mane04
+-- 34	Mane05
+-- 35	Mane06
+-- 36	Mane07
+-- 37	Mane03_tip
+-- 38	Tail01
+-- 39	Tail02
+-- 40	Tail03
+
 class DefaultBodygroupController
     @AVALIABLE_CONTROLLERS = {}
     @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl'}
@@ -47,6 +89,10 @@ class DefaultBodygroupController
 
     @COOLDOWN_TIME = 5
     @COOLDOWN_MAX_COUNT = 4
+
+    @BONE_TAIL_1 = 38
+    @BONE_TAIL_2 = 39
+    @BONE_TAIL_3 = 40
 
     new: (controller) =>
         @isValid = true
