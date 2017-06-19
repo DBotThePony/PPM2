@@ -95,7 +95,6 @@ PPM2.PrePlayerDraw = =>
     data = @GetPonyData()
     renderController = data\GetRenderController()
     status = renderController\PreDraw() if renderController
-    data\GetWeightController()\UpdateWeight() if data\GetOverrideBones() and data\GetWeightController()
 PPM2.PostPlayerDraw = =>
     return unless @GetPonyData()
     return unless @__cachedIsPony

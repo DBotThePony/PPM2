@@ -590,8 +590,6 @@ EditorPages = {
             @NumSlider('Weight', 'Weight', 2)
             @NumSlider('Pony Size', 'PonySize', 2)
 
-            @CheckBox('Hard bone reset. Affects FPS when on.', 'OverrideBones') if ADVANCED_MODE\GetBool()
-
             if ADVANCED_MODE\GetBool() and IS_USING_NEW()
                 @Hr()
                 @CheckBox('No flexes on new model', 'NoFlex')

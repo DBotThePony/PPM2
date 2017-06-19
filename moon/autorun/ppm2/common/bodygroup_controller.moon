@@ -163,15 +163,43 @@ class DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, 0)
 
+    ResetTail: =>
+        return if not CLIENT
+        @ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(1, 1, 1))
+        @ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(1, 1, 1))
+        @ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(1, 1, 1))
+        @ent\ManipulateBoneAngles(@@BONE_TAIL_1, Angle(0, 0, 0))
+        @ent\ManipulateBoneAngles(@@BONE_TAIL_2, Angle(0, 0, 0))
+        @ent\ManipulateBoneAngles(@@BONE_TAIL_3, Angle(0, 0, 0))
+        @ent\ManipulateBonePosition(@@BONE_TAIL_1, Vector(0, 0, 0))
+        @ent\ManipulateBonePosition(@@BONE_TAIL_2, Vector(0, 0, 0))
+        @ent\ManipulateBonePosition(@@BONE_TAIL_3, Vector(0, 0, 0))
     ResetBodygroups: =>
         return unless @isValid
         return unless IsValid(@ent)
         return unless @ent\GetBodyGroups()
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
+        @ResetTail()
     Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
+    
+    UpdateTailSize: =>
+        return if not CLIENT
+        size = @GetData()\GetTailSize()
+        vec = Vector(1, 1, 1)
+        vecTail = vec * size
+        vecTailPos = Vector((size - 1) * 8, 0, 0)
+
+        @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
+        @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
+        @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
+
+        --@ent\ManipulateBonePosition(@@BONE_TAIL_1, vecTail)
+        @ent\ManipulateBonePosition(@@BONE_TAIL_2, vecTailPos)
+        @ent\ManipulateBonePosition(@@BONE_TAIL_3, vecTailPos)
+    
     SlowUpdate: (createModels = CLIENT) =>
         return if not IsValid(@ent)
         return if not @ent\IsPony()
@@ -180,6 +208,7 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+        @UpdateTailSize()
         @ApplyRace()
         @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
     ApplyBodygroups: (createModels = CLIENT) =>
@@ -591,10 +620,6 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
-        if CLIENT
-            @ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(1, 1, 1))
-            @ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(1, 1, 1))
-            @ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(1, 1, 1))
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
@@ -616,12 +641,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
 
-        if CLIENT
-            size = @GetData()\GetTailSize()
-            vecTail = Vector(size, size, size)
-            @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
-            @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
-            @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
+        @UpdateTailSize()
 
         @ApplyRace()
         if createModels
