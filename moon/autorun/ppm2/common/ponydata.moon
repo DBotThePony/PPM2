@@ -226,7 +226,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @PONY_HULL = 19
     @HULL_MINS = Vector(-@PONY_HULL, -@PONY_HULL, 0)
     @HULL_MAXS = Vector(@PONY_HULL, @PONY_HULL, 72 * PPM2.PONY_HEIGHT_MODIFIER)
-    @HULL_MAXS_DUCK = Vector(@PONY_HULL, @PONY_HULL, 36 * PPM2.PONY_HEIGHT_MODIFIER_DUCK)
+    @HULL_MAXS_DUCK = Vector(@PONY_HULL, @PONY_HULL, 36 * PPM2.PONY_HEIGHT_MODIFIER_DUCK_HULL)
 
     @DEFAULT_HULL_MINS = Vector(-16, -16, 0)
     @DEFAULT_HULL_MAXS = Vector(16, 16, 72)
@@ -239,6 +239,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
         @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
+
+        if @ent.SetJumpPower and @ent.__ppm2_modified_jump
+            @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
+            @ent.__ppm2_modified_jump = false
 
         if CLIENT
             mat = Matrix()
@@ -253,6 +257,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size) if @ent.SetViewOffset
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
         @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
+
+        if @ent.SetJumpPower and not @ent.__ppm2_modified_jump
+            @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
+            @ent.__ppm2_modified_jump = true
 
         if CLIENT
             mat = Matrix()
@@ -371,6 +379,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             if IsValid(@ent) and @ent.__ppm2_task_hit
                 @ent.__ppm2_task_hit = false
                 @ent\SetNoDraw(false)
+        @ResetScale() if IsValid(@ent)
         @GetBodygroupController()\Remove() if @GetBodygroupController()
         @flightController\Switch(false) if @flightController
         @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
