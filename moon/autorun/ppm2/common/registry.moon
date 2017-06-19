@@ -88,13 +88,13 @@ PPM2.EyelashTypes = {
 PPM2.BodyDetails = {
     'None', 'Leg gradient', 'Lines', 'Stripes', 'Head stripes'
     'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
-    'Hooves big rnd', 'Hooves small rnd', 'Spots 1'
+    'Hooves big rnd', 'Hooves small rnd', 'Spots 1', 'Robotic'
 }
 
 PPM2.BodyDetailsEnum = {
     'NONE', 'GRADIENT', 'LINES', 'STRIPES', 'HSTRIPES'
     'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
-    'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS'
+    'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS', 'ROBOTIC'
 }
 
 PPM2.SocksTypes = {

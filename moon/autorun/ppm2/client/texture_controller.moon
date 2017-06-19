@@ -47,6 +47,7 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/body_hooves1_crit')
     Material('models/ppm/partrender/body_hooves2_crit')
     Material('models/ppm/partrender/body_spots1')
+    Material('models/ppm/partrender/body_robotic')
 }
 
 PPM2.UpperManeDetailsMaterials = {
