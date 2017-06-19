@@ -90,6 +90,9 @@ class DefaultBodygroupController
     @COOLDOWN_TIME = 5
     @COOLDOWN_MAX_COUNT = 4
 
+    for i = 1, 7
+        @['BONE_MANE_' .. i] = 29 + i
+
     @BONE_TAIL_1 = 38
     @BONE_TAIL_2 = 39
     @BONE_TAIL_3 = 40
@@ -220,6 +223,15 @@ class DefaultBodygroupController
         @ent\ManipulateBonePosition(@@BONE_TAIL_1, Vector(0, 0, 0))
         @ent\ManipulateBonePosition(@@BONE_TAIL_2, Vector(0, 0, 0))
         @ent\ManipulateBonePosition(@@BONE_TAIL_3, Vector(0, 0, 0))
+
+    ResetMane: =>
+        return if not CLIENT
+        vec1, ang, vec2 = Vector(1, 1, 1), Angle(0, 0, 0), Vector(0, 0, 0)
+        for i = 1, 7
+            @ent\ManipulateBoneScale(@@['BONE_MANE_' .. i], vec1)
+            @ent\ManipulateBoneAngles(@@['BONE_MANE_' .. i], ang)
+            @ent\ManipulateBonePosition(@@['BONE_MANE_' .. i], vec2)
+
     ResetBodygroups: =>
         return unless @isValid
         return unless IsValid(@ent)
@@ -227,6 +239,7 @@ class DefaultBodygroupController
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
         @ResetTail()
+        @ResetMane()
     Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
@@ -238,13 +251,31 @@ class DefaultBodygroupController
         vecTail = vec * size
         vecTailPos = Vector((size - 1) * 8, 0, 0)
 
+        @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
         @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
         @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
-        @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
 
         --@ent\ManipulateBonePosition(@@BONE_TAIL_1, vecTail)
         @ent\ManipulateBonePosition(@@BONE_TAIL_2, vecTailPos)
         @ent\ManipulateBonePosition(@@BONE_TAIL_3, vecTailPos)
+    
+    UpdateManeSize: =>
+        return if not CLIENT
+        size = @GetData()\GetPonySize()
+        vecMane = Vector(1, 1, 1) * size
+
+        @ent\ManipulateBoneScale(@@BONE_MANE_1, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_2, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_3, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_4, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_5, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_6, vecMane)
+
+        @ent\ManipulateBonePosition(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 6, 0))
+        @ent\ManipulateBonePosition(@@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1))
+        @ent\ManipulateBonePosition(@@BONE_MANE_3, Vector((size - 1) * 2, 0, 0))
+        @ent\ManipulateBonePosition(@@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size))
+        @ent\ManipulateBonePosition(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3))
     
     SlowUpdate: (createModels = CLIENT) =>
         return if not IsValid(@ent)
@@ -255,6 +286,7 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         @UpdateTailSize()
+        @UpdateManeSize()
         @ApplyRace()
         @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
     ApplyBodygroups: (createModels = CLIENT) =>
@@ -282,12 +314,8 @@ class DefaultBodygroupController
                 @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
             when 'TailType'
                 @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
-            when 'TailSize'
-                size = state\GetValue()
-                vec = Vector(size, size, size)
-                @ent\ManipulateBoneScale(@@TAIL_BONE1, vec)
-                @ent\ManipulateBoneScale(@@TAIL_BONE2, vec)
-                @ent\ManipulateBoneScale(@@TAIL_BONE3, vec)
+            when 'TailSize', 'PonySize'
+                @UpdateTailSize()
             when 'EyelashType'
                 @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
             when 'Gender'
@@ -380,6 +408,14 @@ class NewBodygroupController extends DefaultBodygroupController
     @BONE_TAIL_1 = 42
     @BONE_TAIL_2 = 43
     @BONE_TAIL_3 = 44
+
+    @BONE_MANE_1 = 40
+    @BONE_MANE_2 = 33
+    @BONE_MANE_3 = 34
+    @BONE_MANE_4 = 36
+    @BONE_MANE_5 = 37
+    @BONE_MANE_6 = 38
+    @BONE_MANE_7 = 39
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
@@ -688,6 +724,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
 
         @UpdateTailSize()
+        @UpdateManeSize()
 
         @ApplyRace()
         if createModels
@@ -758,10 +795,13 @@ class NewBodygroupController extends DefaultBodygroupController
                 @UpdateUpperMane() if CLIENT
             when 'ManeTypeLowerNew'
                 @UpdateLowerMane() if CLIENT
-            when 'TailTypeNew'
-                @UpdateTailModel() if CLIENT
-            when 'TailSize'
-                @UpdateTailModel() if CLIENT
+            when 'TailSize', 'TailTypeNew'
+                return if SERVER
+                @UpdateTailModel()
+                @UpdateTailSize()
+            when 'PonySize'
+                return if SERVER
+                @UpdateTailSize()
             when 'Race'
                 @ApplyRace()
             when 'WingsType'
@@ -769,13 +809,6 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'MaleBuff'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
-            when 'TailSize'
-                return if SERVER
-                size = @GetData()\GetTailSize()
-                vecTail = Vector(size, size, size)
-                @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
-                @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
-                @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
             when 'SocksAsModel'
                 return if SERVER
                 if state\GetValue()
@@ -784,16 +817,10 @@ class NewBodygroupController extends DefaultBodygroupController
                     @socksModel\Remove() if IsValid(@socksModel)
 
 if CLIENT
-    timer.Simple 0, ->
-        timer.Simple 0, ->
-            return if not pac
-            pac.__ppm2_Bodygroups_ResetBones = pac.__ppm2_Bodygroups_ResetBones or pac.ResetBones
-            pac.ResetBones = (ent, ...) ->
-                status = pac.__ppm2_Bodygroups_ResetBones(ent, ...)
-                if data = ent\GetPonyData()
-                    if bodygroup = data\GetBodygroupController()
-                        bodygroup\UpdateTailSize()
-                return status
+    hook.Add 'PPM2_PACResetBones', 'PPM2.Bodygroups', (ent, data) ->
+        if bodygroup = data\GetBodygroupController()
+            bodygroup\UpdateTailSize()
+            bodygroup\UpdateManeSize()
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController

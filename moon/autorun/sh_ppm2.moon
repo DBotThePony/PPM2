@@ -68,6 +68,7 @@ if CLIENT
     include 'client/player_menu.lua'
     include 'client/editor.lua'
     include 'client/rag_edit.lua'
+    include 'client/pac3_patch.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel
@@ -103,6 +104,7 @@ else
     AddCSLuaFile 'client/emotes.lua'
     AddCSLuaFile 'client/player_menu.lua'
     AddCSLuaFile 'client/rag_edit.lua'
+    AddCSLuaFile 'client/pac3_patch.lua'
     include 'server/hooks.lua'
     include 'server/fastdl.lua'
     include 'server/emotes.lua'

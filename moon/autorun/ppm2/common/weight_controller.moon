@@ -126,16 +126,9 @@ class PonyWeightController
         @isValid = false
 
 if CLIENT
-    timer.Simple 0, ->
-        timer.Simple 0, ->
-            return if not pac
-            pac.__ppm2_Weight_ResetBones = pac.__ppm2_Weight_ResetBones or pac.ResetBones
-            pac.ResetBones = (ent, ...) ->
-                status = pac.__ppm2_Weight_ResetBones(ent, ...)
-                if data = ent\GetPonyData()
-                    if weight = data\GetWeightController()
-                        weight\UpdateWeight()
-                return status
+    hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
+        if weight = data\GetWeightController()
+            weight\UpdateWeight()
 --
 -- 0	LrigPelvis
 -- 1	Lrig_LEG_BL_Femur
