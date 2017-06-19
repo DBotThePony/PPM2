@@ -790,8 +790,8 @@ EditorPages = {
             @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
             @Hr()
-            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 3
-            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 3
+            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 4
+            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 4
     }
 
     {
@@ -812,8 +812,8 @@ EditorPages = {
             @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
             @Hr()
-            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
-            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
+            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
             @Hr()
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
@@ -824,8 +824,8 @@ EditorPages = {
             @ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}") for i = 1, 2
 
             @Hr()
-            @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
-            @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 2
+            @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+            @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
     }
 
     {
