@@ -128,6 +128,7 @@ class PonyWeightController
 if CLIENT
     hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
         if weight = data\GetWeightController()
+            weight.ent = ent
             weight\UpdateWeight()
 --
 -- 0	LrigPelvis

@@ -821,6 +821,7 @@ class NewBodygroupController extends DefaultBodygroupController
 if CLIENT
     hook.Add 'PPM2_PACResetBones', 'PPM2.Bodygroups', (ent, data) ->
         if bodygroup = data\GetBodygroupController()
+            bodygroup.ent = ent
             bodygroup\UpdateTailSize()
             bodygroup\UpdateManeSize()
 
