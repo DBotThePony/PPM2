@@ -1400,9 +1400,9 @@ class PonyTextureController
                 '$iris': 'models/ppm/base/face/p_base'
                 '$irisframe': '0'
                 
-                '$ambientoccltexture': 'models/ppm/base/face/black'
-                '$envmap': 'models/ppm/base/face/black'
-                '$corneatexture': 'models/ppm/base/face/white'
+                '$ambientoccltexture': 'models/ppm/partrender/null'
+                '$envmap': 'models/ppm/partrender/null'
+                '$corneatexture': 'models/ppm/partrender/null'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
                 
                 '$eyeballradius': '3.7'
@@ -1415,17 +1415,18 @@ class PonyTextureController
                 '$halflambert': '1'
                 '$nodecal': '1'
 
-                '$raytracesphere': '1'
+                '$raytracesphere': '0'
                 '$spheretexkillcombo': '0'
                 '$eyeorigin': '[0 0 0]'
                 '$irisu': '[0 1 0 0]'
                 '$irisv': '[0 0 1 0]'
-                '$entityorigin': '4.0'
+                '$entityorigin': '1.0'
             }
         }
 
         @["EyeMaterial#{prefixUpper}Name"] = "!#{textureData.name\lower()}"
-        @["EyeMaterial#{prefixUpper}"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        createdMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @["EyeMaterial#{prefixUpper}"] = createdMaterial
 
         if EyeURL == '' or not EyeURL\find('^https?://')
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
