@@ -16,6 +16,7 @@
         "cmark_resizer.html",
         ".vscode*",
         "socks_src/*",
+        "materials_hires/*",
         "LICENSE"
     ]
 }
