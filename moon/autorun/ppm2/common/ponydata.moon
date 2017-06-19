@@ -240,7 +240,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
         @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
 
-        if @ent.SetJumpPower and @ent.__ppm2_modified_jump
+        if SERVER and @ent.SetJumpPower and @ent.__ppm2_modified_jump
             @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
             @ent.__ppm2_modified_jump = false
 
@@ -258,7 +258,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
         @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
 
-        if @ent.SetJumpPower and not @ent.__ppm2_modified_jump
+        if SERVER and @ent.SetJumpPower and not @ent.__ppm2_modified_jump
             @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
             @ent.__ppm2_modified_jump = true
 
