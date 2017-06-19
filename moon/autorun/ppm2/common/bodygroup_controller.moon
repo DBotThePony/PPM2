@@ -592,9 +592,9 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         if CLIENT
-            @ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(0, 0, 0))
-            @ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(0, 0, 0))
-            @ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(0, 0, 0))
+            @ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(1, 1, 1))
+            @ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(1, 1, 1))
+            @ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(1, 1, 1))
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
