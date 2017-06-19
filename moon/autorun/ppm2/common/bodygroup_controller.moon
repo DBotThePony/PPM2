@@ -737,6 +737,17 @@ class NewBodygroupController extends DefaultBodygroupController
                 else
                     @socksModel\Remove() if IsValid(@socksModel)
 
+if CLIENT
+    timer.Simple 0, ->
+        timer.Simple 0, ->
+            return if not pac
+            pac.__ppm2_Bodygroups_ResetBones = pac.__ppm2_Bodygroups_ResetBones or pac.ResetBones
+            pac.ResetBones = (ent, ...) ->
+                status = pac.__ppm2_Bodygroups_ResetBones(ent, ...)
+                if data = ent\GetPonyData()
+                    if bodygroup = data\GetBodygroupController()
+                        bodygroup\UpdateTailSize()
+                return status
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController
