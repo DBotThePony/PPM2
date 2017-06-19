@@ -1383,7 +1383,7 @@ class PonyTextureController
         HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
         EyeRotation =       @GetData()["GetEyeRotation#{prefixData}"](@GetData())
         PonySize =          @GetData()\GetPonySize()
-        PonySize = 1 if not @ent\IsPlayer()
+        PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
         
         oldW, oldH = ScrW(), ScrH()
 
