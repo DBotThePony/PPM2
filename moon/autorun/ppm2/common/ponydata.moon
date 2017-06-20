@@ -416,7 +416,11 @@ if CLIENT
 		return if @GetPonyData()
 		--for i, obj in pairs NetworkedPonyData.NW_Objects
         --    obj.ent = 
-
+else
+    hook.Add 'PlayerJoinTeam', 'PPM2.TeamWaypoint', (ply, new) ->
+        ply.__ppm2_modified_jump = false
+    hook.Add 'OnPlayerChangedTeam', 'PPM2.TeamWaypoint', (ply, old, new) ->
+        ply.__ppm2_modified_jump = false
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
