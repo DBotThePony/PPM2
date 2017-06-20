@@ -18,6 +18,8 @@
 for ply in *player.GetAll()
     ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
 
+USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
     @RenderTasks = {}
@@ -234,33 +236,41 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @DEF_SCALE = Vector(1, 1, 1)
 
     ResetScale: =>
-        return if not @ent
-        @ent\ResetHull() if @ent.ResetHull
+        return if not IsValid(@ent)
+
+        if USE_NEW_HULL\GetBool() or @ent.__ppm2_modified_hull
+            @ent\ResetHull() if @ent.ResetHull
+            @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
+            @ent.__ppm2_modified_hull = false
+
+            if SERVER and @ent.SetJumpPower and @ent.__ppm2_modified_jump
+                @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
+                @ent.__ppm2_modified_jump = false
+        
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
-        @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
-
-        if SERVER and @ent.SetJumpPower and @ent.__ppm2_modified_jump
-            @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
-            @ent.__ppm2_modified_jump = false
 
         if CLIENT
             mat = Matrix()
             mat\Scale(@@DEF_SCALE)
             @ent\EnableMatrix('RenderMultiply', mat)
     ModifyScale: =>
-        return if not @ent
+        return if not IsValid(@ent)
         return if not @ent\IsPony()
         size = @GetPonySize()
-        @ent\SetHull(@@HULL_MINS * size, @@HULL_MAXS * size) if @ent.SetHull
-        @ent\SetHullDuck(@@HULL_MINS * size, @@HULL_MAXS_DUCK * size) if @ent.SetHullDuck
+
+        if USE_NEW_HULL\GetBool()
+            @ent.__ppm2_modified_hull = true
+            @ent\SetHull(@@HULL_MINS * size, @@HULL_MAXS * size) if @ent.SetHull
+            @ent\SetHullDuck(@@HULL_MINS * size, @@HULL_MAXS_DUCK * size) if @ent.SetHullDuck
+            @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
+
+            if SERVER and @ent.SetJumpPower and not @ent.__ppm2_modified_jump
+                @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
+                @ent.__ppm2_modified_jump = true
+
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size) if @ent.SetViewOffset
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
-        @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
-
-        if SERVER and @ent.SetJumpPower and not @ent.__ppm2_modified_jump
-            @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
-            @ent.__ppm2_modified_jump = true
 
         if CLIENT
             mat = Matrix()
