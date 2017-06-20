@@ -257,6 +257,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     ModifyScale: =>
         return if not IsValid(@ent)
         return if not @ent\IsPony()
+        return if @ent.Alive and not @ent\Alive()
         size = @GetPonySize()
 
         if USE_NEW_HULL\GetBool()
