@@ -332,7 +332,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     ApplyBodygroups: (updateModels = CLIENT) => @GetBodygroupController()\ApplyBodygroups(updateModels) if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
-    SlowUpdate: => @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
+    SlowUpdate: =>
+        @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
+        @ModifyScale()
     
     GetFlightController: => @flightController
     GetRenderController: =>
