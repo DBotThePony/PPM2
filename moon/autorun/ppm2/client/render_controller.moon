@@ -114,6 +114,12 @@ class PonyRenderController
             \SetPoseParameter('spine_yaw',    (ply\GetPoseParameter('spine_yaw')  * 180) - 90)
         
         if ply\InVehicle()
+            local bonePos
+
+            if bone = @legsModel\LookupBone('LrigNeck1')
+                if boneData = @legsModel\GetBonePosition(bone)
+                    bonePos = boneData
+            
             veh = ply\GetVehicle()
             vehAng = veh\GetAngles()
             eyepos = EyePos()
@@ -125,9 +131,12 @@ class PonyRenderController
             @legsClipPlane = clipAng\Forward()
             @legsModel\SetRenderAngles(vehAng)
 
-            legClipPlanePos = Vector(0, 0, @@LEG_CLIP_OFFSET_VEHICLE)
-            legClipPlanePos\Rotate(vehAng)
-            @legClipPlanePos = eyepos - legClipPlanePos
+            if not bonePos
+                legClipPlanePos = Vector(0, 0, @@LEG_CLIP_OFFSET_VEHICLE)
+                legClipPlanePos\Rotate(vehAng)
+                @legClipPlanePos = eyepos - legClipPlanePos
+            else
+                @legClipPlanePos = bonePos
             
             drawPos = Vector(@@LEG_SHIFT_CONST_VEHICLE, 0, @@LEG_Z_CONST_VEHICLE)
             drawPos\Rotate(vehAng)
@@ -146,8 +155,15 @@ class PonyRenderController
                 @duckOffsetHack = @@LEG_CLIP_OFFSET_DUCK
             else
                 @duckOffsetHack = Lerp(0.1, @duckOffsetHack, @@LEG_CLIP_OFFSET_STAND)
-            
-            @legClipPlanePos = Vector(x, y, z + @duckOffsetHack)
+
+            if bone = @legsModel\LookupBone('LrigNeck1')
+                if boneData = @legsModel\GetBonePosition(bone)
+                    @legClipPlanePos = boneData
+                else
+                    @legClipPlanePos = Vector(x, y, z + @duckOffsetHack)
+            else
+                @legClipPlanePos = Vector(x, y, z + @duckOffsetHack)
+
             @legsModel\SetRenderAngles(newAng)
             @legsModel\SetRenderOrigin(newPos)
         @legClipDot = @legsClipPlane\Dot(@legClipPlanePos)
