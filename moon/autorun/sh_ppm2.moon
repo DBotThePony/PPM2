@@ -75,6 +75,8 @@ if CLIENT
         if ent.isPonyLegsModel
             ent\Remove()
 else
+    resource.AddWorkshop('933203381')
+    
     util.AddNetworkString('PPM2.RequestPonyData')
     util.AddNetworkString('PPM2.PlayerRespawn')
     util.AddNetworkString('PPM2.PlayerDeath')
