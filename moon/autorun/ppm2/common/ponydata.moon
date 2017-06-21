@@ -216,6 +216,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
         
         @GetSizeController()\DataChanges(state) if @ent and @GetBodygroupController()
+        @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state) if @GetWeightController()
