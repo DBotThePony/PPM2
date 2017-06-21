@@ -106,6 +106,7 @@ class DefaultBodygroupController
         @@NEXT_OBJ_ID += 1
         @SocksModelUpdateCooldown = 0
         @SocksModelUpdateCount = 0
+        @lastPAC3BoneReset = 0
         PPM2.DebugPrint('Created new bodygroups controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
     UpdateCooldowns: =>
@@ -238,8 +239,9 @@ class DefaultBodygroupController
         return unless @ent\GetBodyGroups()
         for grp in *@ent\GetBodyGroups()
             @ent\SetBodygroup(grp.id, 0)
-        @ResetTail()
-        @ResetMane()
+        if @lastPAC3BoneReset < RealTime()
+            @ResetTail()
+            @ResetMane()
     Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
@@ -287,8 +289,9 @@ class DefaultBodygroupController
         @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
         @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
         @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
-        @UpdateTailSize()
-        @UpdateManeSize()
+        if @lastPAC3BoneReset < RealTime()
+            @UpdateTailSize()
+            @UpdateManeSize()
         @ApplyRace()
         @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
     ApplyBodygroups: (createModels = CLIENT) =>
@@ -725,8 +728,9 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
 
-        @UpdateTailSize()
-        @UpdateManeSize()
+        if @lastPAC3BoneReset < RealTime()
+            @UpdateTailSize()
+            @UpdateManeSize()
 
         @ApplyRace()
         if createModels
@@ -824,6 +828,7 @@ if CLIENT
             bodygroup.ent = ent
             bodygroup\UpdateTailSize()
             bodygroup\UpdateManeSize()
+            bodygroup.lastPAC3BoneReset = RealTime() + 1
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController
