@@ -48,6 +48,13 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/body_hooves2_crit')
     Material('models/ppm/partrender/body_spots1')
     Material('models/ppm/partrender/body_robotic')
+    Material('models/ppm/partrender/dash-e')
+    Material('models/ppm/partrender/eye_scar')
+    Material('models/ppm/partrender/eye_wound')
+    Material('models/ppm/partrender/body_scar')
+    Material('models/ppm/partrender/gear_socks')
+    Material('models/ppm/partrender/sharp_hooves')
+    Material('models/ppm/partrender/sharp_hooves2')
 }
 
 PPM2.UpperManeDetailsMaterials = {
@@ -183,7 +190,13 @@ table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.SocksMaterialsComp when
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.DefaultCutiemarksMaterials when type(mat) ~= 'number'
 table.insert(RELOADABLE_MATERIALS, mat) for i, data in pairs PPM2.SocksDetailsComp for mat in *data when type(mat) ~= 'number'
 
-PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
+PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}") for mat in *{
+    'clothes_royalguard', 'clothes_sbs_full'
+    'clothes_sbs_light', 'clothes_wbs_full'
+    'clothes_wbs_light', 'spidermane_light'
+    'spidermane_full'
+}]
+
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.AvaliablePonySuitsMaterials when type(mat) ~= 'number'
 
 PPM2.ApplyMaterialData = (mat, matData) ->
