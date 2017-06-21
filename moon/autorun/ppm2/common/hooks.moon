@@ -22,8 +22,10 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
         if ply.__ppm2_lastmodel ~= model
             data = ply\GetPonyData()
             if data and data.ModelChanges
-                data\ModelChanges(ply.__ppm2_lastmodel, model)
+                oldModel = ply.__ppm2_lastmodel
                 ply.__ppm2_lastmodel = model
+                data\ModelChanges(oldModel, model)
+                
     for task in *PPM2.NetworkedPonyData.RenderTasks
         ply = task.ent
         if IsValid(ply)
@@ -32,8 +34,9 @@ timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
             if ply.__ppm2_lastmodel ~= model
                 data = ply\GetPonyData()
                 if data and data.ModelChanges
-                    data\ModelChanges(ply.__ppm2_lastmodel, model)
+                    oldModel = ply.__ppm2_lastmodel
                     ply.__ppm2_lastmodel = model
+                    data\ModelChanges(oldModel, model)
 
 do
     catchError = (err) ->

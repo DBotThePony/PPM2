@@ -160,8 +160,9 @@ entMeta.IsPony = =>
     if @__ppm2_lastmodel ~= model
         data = @GetPonyData()
         if data and data.ModelChanges
-            data\ModelChanges(@__ppm2_lastmodel, model)
+            oldModel = @__ppm2_lastmodel
             @__ppm2_lastmodel = model
+            data\ModelChanges(oldModel, model)
     switch model
         when 'models/ppm/player_default_base.mdl'
             return true
