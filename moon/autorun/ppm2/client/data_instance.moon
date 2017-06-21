@@ -99,6 +99,14 @@ class PonyDataInstance
             max: PPM2.MAX_SCALE
         }
 
+        'necksize': {
+            default: -> 1
+            getFunc: 'NeckSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_NECK, PPM2.MAX_NECK)
+            min: PPM2.MIN_NECK
+            max: PPM2.MAX_NECK
+        }
+
         'male_buff': {
             default: -> PPM2.DEFAULT_MALE_BUFF
             getFunc: 'MaleBuff'

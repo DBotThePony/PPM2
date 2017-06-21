@@ -33,6 +33,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
     @NetworkVar('PonySize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_SCALE, PPM2.MAX_SCALE)),   net.WriteFloat, 1)
+    @NetworkVar('NeckSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_NECK, PPM2.MAX_NECK)),     net.WriteFloat, 1)
 
     -- Reserved - they can be accessed/used/changed, but they do not do anything
     @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)

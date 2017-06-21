@@ -23,5 +23,5 @@ timer.Simple 0, ->
             pac.ResetBones = (ent, ...) ->
                 status = pac.__ppm2_ResetBones(ent, ...)
                 if data = ent\GetPonyData()
-                    hook.Call('PPM2_PACResetBones', nil, ent, data)
+                    hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data)
                 return status

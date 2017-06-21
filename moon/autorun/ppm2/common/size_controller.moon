@@ -67,6 +67,11 @@ class PonySizeController
         @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
     @__inherited(@)
 
+    @NECK_BONE_1 = 4
+    @NECK_BONE_2 = 5
+    @NECK_BONE_3 = 6
+    @NECK_BONE_4 = 7
+
     @NEXT_OBJ_ID = 0
     
     new: (controller) =>
@@ -76,6 +81,7 @@ class PonySizeController
         @controller = controller
         @objID = @@NEXT_OBJ_ID
         @@NEXT_OBJ_ID += 1
+        @lastPAC3BoneReset = 0
         PPM2.DebugPrint('Created new size controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
@@ -99,6 +105,9 @@ class PonySizeController
     DataChanges: (state) =>  
         if state\GetKey() == 'PonySize'
             @ModifyScale()
+
+        if state\GetKey() == 'NeckSize'
+            @ModifyNeck()
     
     ResetViewOffset: =>
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
@@ -131,36 +140,61 @@ class PonySizeController
         
         @ResetViewOffset()
         @ResetDrawMatrix()
-    
+
+    ResetNeck: =>
+        return if not CLIENT
+        return if not IsValid(@ent)
+        @ent\ManipulateBoneScale(@@NECK_BONE_1, Vector(1, 1, 1))
+        @ent\ManipulateBoneScale(@@NECK_BONE_2, Vector(1, 1, 1))
+        @ent\ManipulateBoneScale(@@NECK_BONE_3, Vector(1, 1, 1))
+        @ent\ManipulateBoneScale(@@NECK_BONE_4, Vector(1, 1, 1))
+        @ent\ManipulateBoneAngles(@@NECK_BONE_1, Angle(0, 0, 0))
+        @ent\ManipulateBoneAngles(@@NECK_BONE_2, Angle(0, 0, 0))
+        @ent\ManipulateBoneAngles(@@NECK_BONE_3, Angle(0, 0, 0))
+        @ent\ManipulateBoneAngles(@@NECK_BONE_4, Angle(0, 0, 0))
+        @ent\ManipulateBonePosition(@@NECK_BONE_1, Vector(0, 0, 0))
+        @ent\ManipulateBonePosition(@@NECK_BONE_2, Vector(0, 0, 0))
+        @ent\ManipulateBonePosition(@@NECK_BONE_3, Vector(0, 0, 0))
+        @ent\ManipulateBonePosition(@@NECK_BONE_4, Vector(0, 0, 0))
+
     Remove: => @ResetScale()
     Reset: =>
         @ResetScale()
+        @ResetNeck()
         @ModifyScale()
     
+    GetNeckSize: => @GetData()\GetNeckSize()
+    GetNeckScale: => @GetData()\GetNeckSize()
     GetPonySize: => @GetData()\GetPonySize()
     GetPonyScale: => @GetData()\GetPonySize()
 
-    PlayerDeath: => @ResetScale()
+    PlayerDeath: =>
+        @ResetScale()
+        @ResetNeck()
     PlayerRespawn: =>
         @ResetScale()
         @ModifyScale()
     
-    SlowUpdate: => @ModifyScale()
+    SlowUpdate: =>
+        @ModifyScale()
 
     ModifyHull: =>
         @ent.__ppm2_modified_hull = true
         @ent\SetHull(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS * @GetPonySize()) if @ent.SetHull
         @ent\SetHullDuck(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS_DUCK * @GetPonySize()) if @ent.SetHullDuck
         @ent\SetStepSize(@@STEP_SIZE * @GetPonySize()) if @ent.SetStepSize
+    
     ModifyJumpHeight: =>
         return if CLIENT
         return if not @ent.SetJumpPower
         return if @ent.__ppm2_modified_jump
         @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
         @ent.__ppm2_modified_jump = true
+    
     ModifyViewOffset: =>
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * @GetPonySize()) if @ent.SetViewOffset
         @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * @GetPonySize()) if @ent.SetViewOffsetDucked
+    
     ModifyDrawMatrix: =>
         return if SERVER
         mat = Matrix()
@@ -179,6 +213,17 @@ class PonySizeController
         
         @ModifyViewOffset()
         @ModifyDrawMatrix()
+        @ModifyNeck() if @lastPAC3BoneReset < RealTime()
+    
+    ModifyNeck: =>
+        return if SERVER
+        return if not IsValid(@ent)
+        size = (@GetNeckSize() - 1) * 3
+        vec = Vector(size, -size, 0)
+        @ent\ManipulateBonePosition(@@NECK_BONE_1, vec)
+        @ent\ManipulateBonePosition(@@NECK_BONE_2, vec)
+        @ent\ManipulateBonePosition(@@NECK_BONE_3, vec)
+        @ent\ManipulateBonePosition(@@NECK_BONE_4, vec)
 
 --
 -- 0	LrigPelvis
@@ -231,7 +276,19 @@ class PonySizeController
 class NewPonySizeContoller extends PonySizeController
     @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
+    @NECK_BONE_1 = 26
+    @NECK_BONE_2 = 27
+    @NECK_BONE_3 = 28
+    @NECK_BONE_4 = 29
+
     new: (...) =>
         super(...)
+
+if CLIENT
+    hook.Add 'PPM2_PACResetBones', 'PPM2.Size', (ent, data) ->
+        if sizes = data\GetSizeController()
+            sizes.ent = ent
+            sizes\ModifyNeck()
+            sizes.lastPAC3BoneReset = RealTime() + 1
 
 PPM2.GetSizeController = (model = 'models/ppm/player_default_base.mdl') -> PonySizeController.AVALIABLE_CONTROLLERS[model\lower()] or PonySizeController

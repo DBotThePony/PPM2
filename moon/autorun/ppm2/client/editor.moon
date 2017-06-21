@@ -316,11 +316,12 @@ MODEL_BOX_PANEL = {
         @controller\GetRenderController()\DrawModels()
         @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
-        data = @model\GetPonyData()
-        if data
-            bg = data\GetBodygroupController()
-            if bg
+        
+        if data = @model\GetPonyData()
+            if bg = data\GetBodygroupController()
                 bg\ApplyBodygroups()
+            if size = data\GetSizeController()
+                size\ModifyNeck()
         @model\DrawModel()
         @controller\GetRenderController()\PostDraw(@model) if @controller
         render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
@@ -610,6 +611,7 @@ EditorPages = {
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
+            @NumSlider('Neck Height', 'NeckSize', 2) if ADVANCED_MODE\GetBool()
 
             if ADVANCED_MODE\GetBool()
                 @ComboBox('Socks Texture', 'SocksTexture')
