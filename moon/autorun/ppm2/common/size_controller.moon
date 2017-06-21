@@ -99,26 +99,38 @@ class PonySizeController
     DataChanges: (state) =>  
         if state\GetKey() == 'PonySize'
             @ModifyScale()
+    
+    ResetViewOffset: =>
+        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
+    
+    ResetHulls: =>
+        @ent\ResetHull() if @ent.ResetHull
+        @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
+        @ent.__ppm2_modified_hull = false
+    
+    ResetJumpHeight: =>
+        return if CLIENT
+        return if not @ent.SetJumpPower
+        return if not @ent.__ppm2_modified_jump
+        @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
+        @ent.__ppm2_modified_jump = false
+    
+    ResetDrawMatrix: =>
+        return if SERVER
+        mat = Matrix()
+        mat\Scale(@@DEF_SCALE)
+        @ent\EnableMatrix('RenderMultiply', mat)
 
     ResetScale: =>
         return if not IsValid(@ent)
 
         if USE_NEW_HULL\GetBool() or @ent.__ppm2_modified_hull
-            @ent\ResetHull() if @ent.ResetHull
-            @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
-            @ent.__ppm2_modified_hull = false
-
-            if SERVER and @ent.SetJumpPower and @ent.__ppm2_modified_jump
-                @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
-                @ent.__ppm2_modified_jump = false
+            @ResetHulls()
+            @ResetJumpHeight()
         
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
-
-        if CLIENT
-            mat = Matrix()
-            mat\Scale(@@DEF_SCALE)
-            @ent\EnableMatrix('RenderMultiply', mat)
+        @ResetViewOffset()
+        @ResetDrawMatrix()
     
     Remove: => @ResetScale()
     Reset: =>
@@ -134,6 +146,26 @@ class PonySizeController
         @ModifyScale()
     
     SlowUpdate: => @ModifyScale()
+
+    ModifyHull: =>
+        @ent.__ppm2_modified_hull = true
+        @ent\SetHull(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS * @GetPonySize()) if @ent.SetHull
+        @ent\SetHullDuck(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS_DUCK * @GetPonySize()) if @ent.SetHullDuck
+        @ent\SetStepSize(@@STEP_SIZE * @GetPonySize()) if @ent.SetStepSize
+    ModifyJumpHeight: =>
+        return if CLIENT
+        return if not @ent.SetJumpPower
+        return if @ent.__ppm2_modified_jump
+        @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
+        @ent.__ppm2_modified_jump = true
+    ModifyViewOffset: =>
+        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * @GetPonySize()) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * @GetPonySize()) if @ent.SetViewOffsetDucked
+    ModifyDrawMatrix: =>
+        return if SERVER
+        mat = Matrix()
+        mat\Scale(@@DEF_SCALE * @GetPonySize())
+        @ent\EnableMatrix('RenderMultiply', mat)
     
     ModifyScale: =>
         return if not IsValid(@ent)
@@ -142,22 +174,11 @@ class PonySizeController
         size = @GetPonySize()
 
         if USE_NEW_HULL\GetBool()
-            @ent.__ppm2_modified_hull = true
-            @ent\SetHull(@@HULL_MINS * size, @@HULL_MAXS * size) if @ent.SetHull
-            @ent\SetHullDuck(@@HULL_MINS * size, @@HULL_MAXS_DUCK * size) if @ent.SetHullDuck
-            @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
-
-            if SERVER and @ent.SetJumpPower and not @ent.__ppm2_modified_jump
-                @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
-                @ent.__ppm2_modified_jump = true
-
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
-
-        if CLIENT
-            mat = Matrix()
-            mat\Scale(@@DEF_SCALE * size)
-            @ent\EnableMatrix('RenderMultiply', mat)
+            @ModifyHull()
+            @ModifyJumpHeight()
+        
+        @ModifyViewOffset()
+        @ModifyDrawMatrix()
 
 --
 -- 0	LrigPelvis
