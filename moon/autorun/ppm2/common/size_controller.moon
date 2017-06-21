@@ -341,14 +341,14 @@ class PonySizeController
 
         with ent
             \ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5))
-            \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 2, 0, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 2, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0))
             
-            \ManipulateBonePosition(@@LEGS_FRONT_3, Vector(size * 1.5, 0, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_4, Vector(size * 1.5, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_3, Vector(size, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_4, Vector(size, 0, 0))
             
-            \ManipulateBonePosition(@@LEGS_FRONT_5, Vector(size * 2, 0, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_6, Vector(size * 2, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_5, Vector(size, size, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_6, Vector(size, size, 0))
 
             \ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0))
             \ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0))
@@ -418,8 +418,8 @@ class NewPonySizeContoller extends PonySizeController
     @LEGS_FRONT_1 = 19
     @LEGS_FRONT_2 = 25
 
-    @LEGS_FRONT_3 = 14
-    @LEGS_FRONT_4 = 20
+    @LEGS_FRONT_3 = 17
+    @LEGS_FRONT_4 = 23
 
     @LEGS_FRONT_5 = 16
     @LEGS_FRONT_6 = 22
