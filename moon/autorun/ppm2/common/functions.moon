@@ -120,6 +120,9 @@ do
         with object
             \SetGender(math.random(0, 1), ...)
             \SetRace(math.random(0, 3), ...)
+            \SetPonySize(math.random(85, 110) / 100, ...)
+            \SetNeckSize(math.random(92, 108) / 100, ...)
+            \SetLegsSize(math.random(90, 120) / 100, ...)
             \SetWeight(math.random(PPM2.MIN_WEIGHT * 10, PPM2.MAX_WEIGHT * 10) / 10, ...)
             \SetTailType(tail, ...)
             \SetTailTypeNew(tail, ...)
