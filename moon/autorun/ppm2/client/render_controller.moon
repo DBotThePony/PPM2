@@ -182,7 +182,7 @@ class PonyRenderController
         @CreateLegs() unless IsValid(@legsModel)
         return unless IsValid(@legsModel)
         return if @ent\ShouldDrawLocalPlayer()
-        return if @ent\GetPos()\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+        return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
         @UpdateLegs()
 
         oldClip = render.EnableClipping(true)
