@@ -322,6 +322,7 @@ MODEL_BOX_PANEL = {
                 bg\ApplyBodygroups()
             if size = data\GetSizeController()
                 size\ModifyNeck()
+                size\ModifyLegs()
                 size\ModifyScale()
         @model\DrawModel()
         @controller\GetRenderController()\PostDraw(@model) if @controller
@@ -612,7 +613,9 @@ EditorPages = {
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
-            @NumSlider('Neck Height', 'NeckSize', 2) if ADVANCED_MODE\GetBool()
+            if ADVANCED_MODE\GetBool()
+                @NumSlider('Neck Height', 'NeckSize', 2)
+                @NumSlider('Legs Height', 'LegsSize', 2)
 
             if ADVANCED_MODE\GetBool()
                 @ComboBox('Socks Texture', 'SocksTexture')

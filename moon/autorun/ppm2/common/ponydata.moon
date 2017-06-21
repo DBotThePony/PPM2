@@ -34,6 +34,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
     @NetworkVar('PonySize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_SCALE, PPM2.MAX_SCALE)),   net.WriteFloat, 1)
     @NetworkVar('NeckSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_NECK, PPM2.MAX_NECK)),     net.WriteFloat, 1)
+    @NetworkVar('LegsSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_LEGS, PPM2.MAX_LEGS)),     net.WriteFloat, 1)
 
     -- Reserved - they can be accessed/used/changed, but they do not do anything
     @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)
@@ -214,7 +215,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if state\GetKey() == 'DisableTask'
             @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
         
-        @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
+        @GetSizeController()\DataChanges(state) if @ent and @GetBodygroupController()
 
         if CLIENT and @ent
             @GetWeightController()\DataChanges(state) if @GetWeightController()

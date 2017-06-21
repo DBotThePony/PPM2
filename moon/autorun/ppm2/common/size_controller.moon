@@ -72,6 +72,19 @@ class PonySizeController
     @NECK_BONE_3 = 6
     @NECK_BONE_4 = 7
 
+    @LEGS_BONE_ROOT = 0
+
+    @LEGS_FRONT_1 = 23
+    @LEGS_FRONT_2 = 29
+
+    @LEGS_BEHIND_1_1 = 14
+    @LEGS_BEHIND_2_1 = 16
+    @LEGS_BEHIND_3_1 = 15
+
+    @LEGS_BEHIND_1_2 = 9
+    @LEGS_BEHIND_2_2 = 11
+    @LEGS_BEHIND_3_2 = 10
+
     @NEXT_OBJ_ID = 0
     
     new: (controller) =>
@@ -110,6 +123,11 @@ class PonySizeController
 
         if state\GetKey() == 'NeckSize'
             @ModifyNeck()
+            @ModifyViewOffset()
+
+        if state\GetKey() == 'LegsSize'
+            @ModifyLegs()
+            @ModifyHull()
             @ModifyViewOffset()
     
     ResetViewOffset: =>
@@ -160,12 +178,54 @@ class PonySizeController
         @ent\ManipulateBonePosition(@@NECK_BONE_3, Vector(0, 0, 0))
         @ent\ManipulateBonePosition(@@NECK_BONE_4, Vector(0, 0, 0))
 
+    ResetLegs: =>
+        return if not CLIENT
+        return if not IsValid(@ent)
+
+        vec1 = Vector(1, 1, 1)
+        vec2 = Vector(0, 0, 0)
+        ang = Angle(0, 0, 0)
+
+        with @ent
+            \ManipulateBoneScale(@@LEGS_BONE_ROOT, vec1)
+            \ManipulateBoneScale(@@LEGS_FRONT_1, vec1)
+            \ManipulateBoneScale(@@LEGS_FRONT_2, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_1_1, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_2_1, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_3_1, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_1_2, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_2_2, vec1)
+            \ManipulateBoneScale(@@LEGS_BEHIND_3_2, vec1)
+
+            \ManipulateBoneAngles(@@LEGS_BONE_ROOT, ang)
+            \ManipulateBoneAngles(@@LEGS_FRONT_1, ang)
+            \ManipulateBoneAngles(@@LEGS_FRONT_2, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_1_1, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_2_1, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_3_1, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_1_2, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_2_2, ang)
+            \ManipulateBoneAngles(@@LEGS_BEHIND_3_2, ang)
+
+            \ManipulateBonePosition(@@LEGS_BONE_ROOT, vec2)
+            \ManipulateBonePosition(@@LEGS_FRONT_1, vec2)
+            \ManipulateBonePosition(@@LEGS_FRONT_2, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_1, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_1, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_1, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_2, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_2, vec2)
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_2, vec2)
+
     Remove: => @ResetScale()
     Reset: =>
         @ResetScale()
         @ResetNeck()
+        @ResetLegs()
         @ModifyScale()
     
+    GetLegsSize: => @GetData()\GetLegsSize()
+    GetLegsScale: => @GetData()\GetLegsSize()
     GetNeckSize: => @GetData()\GetNeckSize()
     GetNeckScale: => @GetData()\GetNeckSize()
     GetPonySize: => @GetData()\GetPonySize()
@@ -174,6 +234,7 @@ class PonySizeController
     PlayerDeath: =>
         @ResetScale()
         @ResetNeck()
+        @ResetLegs()
     PlayerRespawn: =>
         @ResetScale()
         @ModifyScale()
@@ -183,9 +244,24 @@ class PonySizeController
 
     ModifyHull: =>
         @ent.__ppm2_modified_hull = true
-        @ent\SetHull(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS * @GetPonySize()) if @ent.SetHull
-        @ent\SetHullDuck(@@HULL_MINS * @GetPonySize(), @@HULL_MAXS_DUCK * @GetPonySize()) if @ent.SetHullDuck
-        @ent\SetStepSize(@@STEP_SIZE * @GetPonySize()) if @ent.SetStepSize
+        size = @GetPonySize()
+        legssize = @GetLegsModifier()
+
+        HULL_MINS = Vector(@@HULL_MINS)
+        HULL_MAXS = Vector(@@HULL_MAXS)
+        HULL_MAXS_DUCK = Vector(@@HULL_MAXS_DUCK)
+
+        HULL_MINS *= size
+        HULL_MAXS *= size
+        HULL_MAXS_DUCK *= size
+
+        HULL_MINS.z *= legssize
+        HULL_MAXS.z *= legssize
+        HULL_MAXS_DUCK.z *= legssize
+
+        @ent\SetHull(HULL_MINS, HULL_MAXS) if @ent.SetHull
+        @ent\SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if @ent.SetHullDuck
+        @ent\SetStepSize(@@STEP_SIZE * size * legssize) if @ent.SetStepSize
     
     ModifyJumpHeight: =>
         return if CLIENT
@@ -194,11 +270,24 @@ class PonySizeController
         @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
         @ent.__ppm2_modified_jump = true
     
+    GetLegsModifier: => 1 + (@GetLegsSize() - 1) * .4
+
     ModifyViewOffset: =>
         size = @GetPonySize()
         necksize = 1 + (@GetNeckSize() - 1) * .3
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size * necksize) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size * necksize) if @ent.SetViewOffsetDucked
+        legssize = @GetLegsModifier()
+
+        PLAYER_VIEW_OFFSET = Vector(PPM2.PLAYER_VIEW_OFFSET)
+        PLAYER_VIEW_OFFSET_DUCK = Vector(PPM2.PLAYER_VIEW_OFFSET_DUCK)
+
+        PLAYER_VIEW_OFFSET *= size * necksize
+        PLAYER_VIEW_OFFSET_DUCK *= size * necksize
+
+        PLAYER_VIEW_OFFSET.z *= legssize
+        PLAYER_VIEW_OFFSET_DUCK.z *= legssize
+
+        @ent\SetViewOffset(PLAYER_VIEW_OFFSET) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if @ent.SetViewOffsetDucked
     
     ModifyDrawMatrix: =>
         return if SERVER
@@ -218,7 +307,9 @@ class PonySizeController
         
         @ModifyViewOffset()
         @ModifyDrawMatrix()
-        @ModifyNeck() if @lastPAC3BoneReset < RealTime()
+        if @lastPAC3BoneReset < RealTime()
+            @ModifyNeck()
+            @ModifyLegs()
     
     ModifyNeck: =>
         return if SERVER
@@ -229,6 +320,25 @@ class PonySizeController
         @ent\ManipulateBonePosition(@@NECK_BONE_2, vec)
         @ent\ManipulateBonePosition(@@NECK_BONE_3, vec)
         @ent\ManipulateBonePosition(@@NECK_BONE_4, vec)
+    
+    ModifyLegs: =>
+        return if SERVER
+        return if not IsValid(@ent)
+        realSizeModify = @GetLegsSize() - 1
+        size = realSizeModify * 3
+
+        @ent\ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5))
+        @ent\ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 4, 0, 0))
+        @ent\ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 4, 0, 0))
+
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0))
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0))
+
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_2_1, Vector(size, 0, 0))
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_2_2, Vector(size, 0, 0))
+
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0))
+        @ent\ManipulateBonePosition(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0))
 
 --
 -- 0	LrigPelvis
@@ -286,6 +396,18 @@ class NewPonySizeContoller extends PonySizeController
     @NECK_BONE_3 = 28
     @NECK_BONE_4 = 29
 
+    @LEGS_FRONT_1 = 19
+    @LEGS_FRONT_2 = 25
+
+    @LEGS_BEHIND_1_1 = 2
+    @LEGS_BEHIND_1_2 = 7
+
+    @LEGS_BEHIND_2_1 = 4
+    @LEGS_BEHIND_2_2 = 9
+
+    @LEGS_BEHIND_3_1 = 3
+    @LEGS_BEHIND_3_2 = 8
+
     new: (...) =>
         super(...)
 
@@ -294,6 +416,7 @@ if CLIENT
         if sizes = data\GetSizeController()
             sizes.ent = ent
             sizes\ModifyNeck()
+            sizes\ModifyLegs()
             sizes.lastPAC3BoneReset = RealTime() + 1
 
 PPM2.GetSizeController = (model = 'models/ppm/player_default_base.mdl') -> PonySizeController.AVALIABLE_CONTROLLERS[model\lower()] or PonySizeController

@@ -107,6 +107,14 @@ class PonyDataInstance
             max: PPM2.MAX_NECK
         }
 
+        'legssize': {
+            default: -> 1
+            getFunc: 'LegsSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_LEGS, PPM2.MAX_LEGS)
+            min: PPM2.MIN_LEGS
+            max: PPM2.MAX_LEGS
+        }
+
         'male_buff': {
             default: -> PPM2.DEFAULT_MALE_BUFF
             getFunc: 'MaleBuff'
