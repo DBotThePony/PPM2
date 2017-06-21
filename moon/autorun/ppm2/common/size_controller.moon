@@ -102,12 +102,15 @@ class PonySizeController
     @DEFAULT_HULL_MAXS_DUCK = Vector(16, 16, 36)
     @DEF_SCALE = Vector(1, 1, 1)
 
-    DataChanges: (state) =>  
+    DataChanges: (state) =>
+        return if not IsValid(@ent)
+        return if not @ent\IsPony()
         if state\GetKey() == 'PonySize'
             @ModifyScale()
 
         if state\GetKey() == 'NeckSize'
             @ModifyNeck()
+            @ModifyViewOffset()
     
     ResetViewOffset: =>
         @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
@@ -192,8 +195,10 @@ class PonySizeController
         @ent.__ppm2_modified_jump = true
     
     ModifyViewOffset: =>
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * @GetPonySize()) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * @GetPonySize()) if @ent.SetViewOffsetDucked
+        size = @GetPonySize()
+        necksize = 1 + (@GetNeckSize() - 1) * .3
+        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size * necksize) if @ent.SetViewOffset
+        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size * necksize) if @ent.SetViewOffsetDucked
     
     ModifyDrawMatrix: =>
         return if SERVER
