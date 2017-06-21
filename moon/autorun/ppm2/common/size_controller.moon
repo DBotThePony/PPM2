@@ -130,63 +130,64 @@ class PonySizeController
             @ModifyHull()
             @ModifyViewOffset()
     
-    ResetViewOffset: =>
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
+    ResetViewOffset: (ent = @ent) =>
+        ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if ent.SetViewOffset
+        ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if ent.SetViewOffsetDucked
     
-    ResetHulls: =>
-        @ent\ResetHull() if @ent.ResetHull
-        @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
-        @ent.__ppm2_modified_hull = false
+    ResetHulls: (ent = @ent) =>
+        ent\ResetHull() if ent.ResetHull
+        ent\SetStepSize(@@STEP_SIZE) if ent.SetStepSize
+        ent.__ppm2_modified_hull = false
     
-    ResetJumpHeight: =>
+    ResetJumpHeight: (ent = @ent) =>
         return if CLIENT
-        return if not @ent.SetJumpPower
-        return if not @ent.__ppm2_modified_jump
-        @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
-        @ent.__ppm2_modified_jump = false
+        return if not ent.SetJumpPower
+        return if not ent.__ppm2_modified_jump
+        ent\SetJumpPower(ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
+        ent.__ppm2_modified_jump = false
     
-    ResetDrawMatrix: =>
+    ResetDrawMatrix: (ent = @ent) =>
         return if SERVER
         mat = Matrix()
         mat\Scale(@@DEF_SCALE)
-        @ent\EnableMatrix('RenderMultiply', mat)
+        ent\EnableMatrix('RenderMultiply', mat)
 
-    ResetScale: =>
-        return if not IsValid(@ent)
+    ResetScale: (ent = @ent) =>
+        return if not IsValid(ent)
 
-        if USE_NEW_HULL\GetBool() or @ent.__ppm2_modified_hull
-            @ResetHulls()
-            @ResetJumpHeight()
+        if USE_NEW_HULL\GetBool() or ent.__ppm2_modified_hull
+            @ResetHulls(ent)
+            @ResetJumpHeight(ent)
         
-        @ResetViewOffset()
-        @ResetDrawMatrix()
+        @ResetViewOffset(ent)
+        @ResetDrawMatrix(ent)
 
-    ResetNeck: =>
+    ResetNeck: (ent = @ent) =>
         return if not CLIENT
         return if not IsValid(@ent)
-        @ent\ManipulateBoneScale(@@NECK_BONE_1, Vector(1, 1, 1))
-        @ent\ManipulateBoneScale(@@NECK_BONE_2, Vector(1, 1, 1))
-        @ent\ManipulateBoneScale(@@NECK_BONE_3, Vector(1, 1, 1))
-        @ent\ManipulateBoneScale(@@NECK_BONE_4, Vector(1, 1, 1))
-        @ent\ManipulateBoneAngles(@@NECK_BONE_1, Angle(0, 0, 0))
-        @ent\ManipulateBoneAngles(@@NECK_BONE_2, Angle(0, 0, 0))
-        @ent\ManipulateBoneAngles(@@NECK_BONE_3, Angle(0, 0, 0))
-        @ent\ManipulateBoneAngles(@@NECK_BONE_4, Angle(0, 0, 0))
-        @ent\ManipulateBonePosition(@@NECK_BONE_1, Vector(0, 0, 0))
-        @ent\ManipulateBonePosition(@@NECK_BONE_2, Vector(0, 0, 0))
-        @ent\ManipulateBonePosition(@@NECK_BONE_3, Vector(0, 0, 0))
-        @ent\ManipulateBonePosition(@@NECK_BONE_4, Vector(0, 0, 0))
+        with ent
+            \ManipulateBoneScale(@@NECK_BONE_1, Vector(1, 1, 1))
+            \ManipulateBoneScale(@@NECK_BONE_2, Vector(1, 1, 1))
+            \ManipulateBoneScale(@@NECK_BONE_3, Vector(1, 1, 1))
+            \ManipulateBoneScale(@@NECK_BONE_4, Vector(1, 1, 1))
+            \ManipulateBoneAngles(@@NECK_BONE_1, Angle(0, 0, 0))
+            \ManipulateBoneAngles(@@NECK_BONE_2, Angle(0, 0, 0))
+            \ManipulateBoneAngles(@@NECK_BONE_3, Angle(0, 0, 0))
+            \ManipulateBoneAngles(@@NECK_BONE_4, Angle(0, 0, 0))
+            \ManipulateBonePosition(@@NECK_BONE_1, Vector(0, 0, 0))
+            \ManipulateBonePosition(@@NECK_BONE_2, Vector(0, 0, 0))
+            \ManipulateBonePosition(@@NECK_BONE_3, Vector(0, 0, 0))
+            \ManipulateBonePosition(@@NECK_BONE_4, Vector(0, 0, 0))
 
-    ResetLegs: =>
+    ResetLegs: (ent = @ent) =>
         return if not CLIENT
-        return if not IsValid(@ent)
+        return if not IsValid(ent)
 
         vec1 = Vector(1, 1, 1)
         vec2 = Vector(0, 0, 0)
         ang = Angle(0, 0, 0)
 
-        with @ent
+        with ent
             \ManipulateBoneScale(@@LEGS_BONE_ROOT, vec1)
             \ManipulateBoneScale(@@LEGS_FRONT_1, vec1)
             \ManipulateBoneScale(@@LEGS_FRONT_2, vec1)
@@ -242,8 +243,8 @@ class PonySizeController
     SlowUpdate: =>
         @ModifyScale()
 
-    ModifyHull: =>
-        @ent.__ppm2_modified_hull = true
+    ModifyHull: (ent = @ent) =>
+        ent.__ppm2_modified_hull = true
         size = @GetPonySize()
         legssize = @GetLegsModifier()
 
@@ -259,20 +260,21 @@ class PonySizeController
         HULL_MAXS.z *= legssize
         HULL_MAXS_DUCK.z *= legssize
 
-        @ent\SetHull(HULL_MINS, HULL_MAXS) if @ent.SetHull
-        @ent\SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if @ent.SetHullDuck
-        @ent\SetStepSize(@@STEP_SIZE * size * legssize) if @ent.SetStepSize
+        with ent
+            \SetHull(HULL_MINS, HULL_MAXS) if .SetHull
+            \SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if .SetHullDuck
+            \SetStepSize(@@STEP_SIZE * size * legssize) if .SetStepSize
     
-    ModifyJumpHeight: =>
+    ModifyJumpHeight: (ent = @ent) =>
         return if CLIENT
         return if not @ent.SetJumpPower
-        return if @ent.__ppm2_modified_jump
-        @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
-        @ent.__ppm2_modified_jump = true
+        return if ent.__ppm2_modified_jump
+        ent\SetJumpPower(ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
+        ent.__ppm2_modified_jump = true
     
     GetLegsModifier: => 1 + (@GetLegsSize() - 1) * .4
 
-    ModifyViewOffset: =>
+    ModifyViewOffset: (ent = @ent) =>
         size = @GetPonySize()
         necksize = 1 + (@GetNeckSize() - 1) * .3
         legssize = @GetLegsModifier()
@@ -286,59 +288,62 @@ class PonySizeController
         PLAYER_VIEW_OFFSET.z *= legssize
         PLAYER_VIEW_OFFSET_DUCK.z *= legssize
 
-        @ent\SetViewOffset(PLAYER_VIEW_OFFSET) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if @ent.SetViewOffsetDucked
+        ent\SetViewOffset(PLAYER_VIEW_OFFSET) if ent.SetViewOffset
+        ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if ent.SetViewOffsetDucked
     
-    ModifyDrawMatrix: =>
+    ModifyDrawMatrix: (ent = @ent) =>
         return if SERVER
         mat = Matrix()
         mat\Scale(@@DEF_SCALE * @GetPonySize())
-        @ent\EnableMatrix('RenderMultiply', mat)
+        ent\EnableMatrix('RenderMultiply', mat)
     
-    ModifyScale: =>
-        return if not IsValid(@ent)
-        return if not @ent\IsPony()
-        return if @ent.Alive and not @ent\Alive()
+    ModifyScale: (ent = @ent) =>
+        return if not IsValid(ent)
+        return if not ent\IsPony()
+        return if ent.Alive and not ent\Alive()
         size = @GetPonySize()
 
         if USE_NEW_HULL\GetBool()
-            @ModifyHull()
-            @ModifyJumpHeight()
+            @ModifyHull(ent)
+            @ModifyJumpHeight(ent)
         
-        @ModifyViewOffset()
-        @ModifyDrawMatrix()
+        @ModifyViewOffset(ent)
+        @ModifyDrawMatrix(ent)
         if @lastPAC3BoneReset < RealTime()
-            @ModifyNeck()
-            @ModifyLegs()
+            @ModifyNeck(ent)
+            @ModifyLegs(ent)
     
-    ModifyNeck: =>
+    ModifyNeck: (ent = @ent) =>
         return if SERVER
-        return if not IsValid(@ent)
+        return if not IsValid(ent)
         size = (@GetNeckSize() - 1) * 3
         vec = Vector(size, -size, 0)
-        @ent\ManipulateBonePosition(@@NECK_BONE_1, vec)
-        @ent\ManipulateBonePosition(@@NECK_BONE_2, vec)
-        @ent\ManipulateBonePosition(@@NECK_BONE_3, vec)
-        @ent\ManipulateBonePosition(@@NECK_BONE_4, vec)
+
+        with ent
+            \ManipulateBonePosition(@@NECK_BONE_1, vec)
+            \ManipulateBonePosition(@@NECK_BONE_2, vec)
+            \ManipulateBonePosition(@@NECK_BONE_3, vec)
+            \ManipulateBonePosition(@@NECK_BONE_4, vec)
     
-    ModifyLegs: =>
+    ModifyLegs: (ent = @ent) =>
         return if SERVER
-        return if not IsValid(@ent)
+        return if not IsValid(ent)
         realSizeModify = @GetLegsSize() - 1
         size = realSizeModify * 3
 
-        @ent\ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5))
-        @ent\ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 4, 0, 0))
-        @ent\ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 4, 0, 0))
+        with ent
+            \ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5))
+            \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 4, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 4, 0, 0))
 
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0))
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0))
 
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_2_1, Vector(size, 0, 0))
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_2_2, Vector(size, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_1, Vector(size, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_2, Vector(size, 0, 0))
 
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0))
-        @ent\ManipulateBonePosition(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0))
 
 --
 -- 0	LrigPelvis

@@ -168,12 +168,20 @@ class PonyRenderController
         cam.Start3D() if start3D
 
         @GetTextureController()\PreDrawLegs()
+        if sizes = @GetData()\GetSizeController()
+            sizes\ModifyNeck(@legsModel)
+            sizes\ModifyLegs(@legsModel)
+            sizes\ModifyScale(@legsModel)
         @legsModel\DrawModel()
         @GetTextureController()\PostDrawLegs()
 
         if ENABLE_FLASHLIGHT_PASS\GetBool()
             render.PushFlashlightMode(true)
             @GetTextureController()\PreDrawLegs()
+            if sizes = @GetData()\GetSizeController()
+                sizes\ModifyNeck(@legsModel)
+                sizes\ModifyLegs(@legsModel)
+                sizes\ModifyScale(@legsModel)
             @legsModel\DrawModel()
             @GetTextureController()\PostDrawLegs()
             render.PopFlashlightMode()
