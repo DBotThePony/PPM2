@@ -131,6 +131,8 @@ class PonyRenderController
             @legsClipPlane = clipAng\Forward()
             @legsModel\SetRenderAngles(vehAng)
 
+            drawPos = Vector(@@LEG_SHIFT_CONST_VEHICLE, 0, @@LEG_Z_CONST_VEHICLE)
+            drawPos\Rotate(vehAng)
             @legsModel\SetPos(eyepos - drawPos)
             @legsModel\SetRenderOrigin(eyepos - drawPos)
 
@@ -140,9 +142,7 @@ class PonyRenderController
                 @legClipPlanePos = eyepos - legClipPlanePos
             else
                 @legClipPlanePos = bonePos
-            
-            drawPos = Vector(@@LEG_SHIFT_CONST_VEHICLE, 0, @@LEG_Z_CONST_VEHICLE)
-            drawPos\Rotate(vehAng)
+
         else
             @legsClipPlane = @@LEG_CLIP_VECTOR
             eangles = EyeAngles()
