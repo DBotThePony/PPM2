@@ -271,7 +271,7 @@ class PonySizeController
         with ent
             \SetHull(HULL_MINS, HULL_MAXS) if .SetHull
             \SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if .SetHullDuck
-            \SetStepSize(@@STEP_SIZE * size * legssize) if .SetStepSize
+            \SetStepSize(@@STEP_SIZE * size * @GetLegsModifier(1.2)) if .SetStepSize
     
     ModifyJumpHeight: (ent = @ent) =>
         return if CLIENT
@@ -280,7 +280,7 @@ class PonySizeController
         ent\SetJumpPower(ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
         ent.__ppm2_modified_jump = true
     
-    GetLegsModifier: => 1 + (@GetLegsSize() - 1) * .4
+    GetLegsModifier: (mult = 0.4) => 1 + (@GetLegsSize() - 1) * mult
 
     ModifyViewOffset: (ent = @ent) =>
         size = @GetPonySize()
