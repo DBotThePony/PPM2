@@ -322,6 +322,7 @@ MODEL_BOX_PANEL = {
                 bg\ApplyBodygroups()
             if size = data\GetSizeController()
                 size\ModifyNeck()
+                size\ModifyScale()
         @model\DrawModel()
         @controller\GetRenderController()\PostDraw(@model) if @controller
         render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
