@@ -25,3 +25,10 @@ timer.Simple 0, ->
                 if data = ent\GetPonyData()
                     hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data)
                 return status
+
+hook.Add 'PAC3ResetBones', 'PPM2.ResetBones', (ent) ->
+    if pac.__ppm2_ResetBones
+        pac.ResetBones = pac.__ppm2_ResetBones
+        pac.__ppm2_ResetBones = nil
+    if data = ent\GetPonyData()
+        hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data)
