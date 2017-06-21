@@ -90,7 +90,7 @@ class DefaultBodygroupController
     @COOLDOWN_TIME = 5
     @COOLDOWN_MAX_COUNT = 4
 
-    for i = 1, 7
+    for i = 1, 8
         @['BONE_MANE_' .. i] = 29 + i
 
     @BONE_TAIL_1 = 38
@@ -274,12 +274,16 @@ class DefaultBodygroupController
         @ent\ManipulateBoneScale(@@BONE_MANE_4, vecMane)
         @ent\ManipulateBoneScale(@@BONE_MANE_5, vecMane)
         @ent\ManipulateBoneScale(@@BONE_MANE_6, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_7, vecMane)
+        @ent\ManipulateBoneScale(@@BONE_MANE_8, vecMane)
 
-        @ent\ManipulateBonePosition(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 6, 0))
+        @ent\ManipulateBonePosition(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0))
         @ent\ManipulateBonePosition(@@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1))
         @ent\ManipulateBonePosition(@@BONE_MANE_3, Vector((size - 1) * 2, 0, 0))
         @ent\ManipulateBonePosition(@@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size))
         @ent\ManipulateBonePosition(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3))
+        @ent\ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2))
+        @ent\ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2))
     
     SlowUpdate: (createModels = CLIENT) =>
         return if not IsValid(@ent)
@@ -421,6 +425,7 @@ class NewBodygroupController extends DefaultBodygroupController
     @BONE_MANE_5 = 37
     @BONE_MANE_6 = 38
     @BONE_MANE_7 = 39
+    @BONE_MANE_8 = 35
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
