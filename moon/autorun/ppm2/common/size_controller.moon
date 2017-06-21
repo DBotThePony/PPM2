@@ -167,6 +167,8 @@ class PonySizeController
         
         @ResetViewOffset(ent)
         @ResetDrawMatrix(ent)
+        @ResetNeck(ent)
+        @ResetLegs(ent)
 
     ResetNeck: (ent = @ent) =>
         return if not CLIENT
