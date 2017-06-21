@@ -18,8 +18,6 @@
 for ply in *player.GetAll()
     ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
 
-USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
-
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
     @RenderTasks = {}
@@ -212,9 +210,6 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if state\GetKey() == 'Fly' and @flightController
             @flightController\Switch(state\GetValue())
         
-        if state\GetKey() == 'PonySize'
-            @ModifyScale()
-        
         if state\GetKey() == 'DisableTask'
             @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
         
@@ -224,62 +219,17 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetWeightController()\DataChanges(state) if @GetWeightController()
             @GetRenderController()\DataChanges(state) if @GetRenderController()
 
-    @STEP_SIZE = 18
-    @PONY_HULL = 19
-    @HULL_MINS = Vector(-@PONY_HULL, -@PONY_HULL, 0)
-    @HULL_MAXS = Vector(@PONY_HULL, @PONY_HULL, 72 * PPM2.PONY_HEIGHT_MODIFIER)
-    @HULL_MAXS_DUCK = Vector(@PONY_HULL, @PONY_HULL, 36 * PPM2.PONY_HEIGHT_MODIFIER_DUCK_HULL)
-
-    @DEFAULT_HULL_MINS = Vector(-16, -16, 0)
-    @DEFAULT_HULL_MAXS = Vector(16, 16, 72)
-    @DEFAULT_HULL_MAXS_DUCK = Vector(16, 16, 36)
-    @DEF_SCALE = Vector(1, 1, 1)
-
     ResetScale: =>
-        return if not IsValid(@ent)
+        if scale = @GetSizeController()
+            scale\ResetScale()
 
-        if USE_NEW_HULL\GetBool() or @ent.__ppm2_modified_hull
-            @ent\ResetHull() if @ent.ResetHull
-            @ent\SetStepSize(@@STEP_SIZE) if @ent.SetStepSize
-            @ent.__ppm2_modified_hull = false
-
-            if SERVER and @ent.SetJumpPower and @ent.__ppm2_modified_jump
-                @ent\SetJumpPower(@ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
-                @ent.__ppm2_modified_jump = false
-        
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if @ent.SetViewOffsetDucked
-
-        if CLIENT
-            mat = Matrix()
-            mat\Scale(@@DEF_SCALE)
-            @ent\EnableMatrix('RenderMultiply', mat)
     ModifyScale: =>
-        return if not IsValid(@ent)
-        return if not @ent\IsPony()
-        return if @ent.Alive and not @ent\Alive()
-        size = @GetPonySize()
+        if scale = @GetSizeController()
+            scale\ModifyScale()
 
-        if USE_NEW_HULL\GetBool()
-            @ent.__ppm2_modified_hull = true
-            @ent\SetHull(@@HULL_MINS * size, @@HULL_MAXS * size) if @ent.SetHull
-            @ent\SetHullDuck(@@HULL_MINS * size, @@HULL_MAXS_DUCK * size) if @ent.SetHullDuck
-            @ent\SetStepSize(@@STEP_SIZE * size) if @ent.SetStepSize
-
-            if SERVER and @ent.SetJumpPower and not @ent.__ppm2_modified_jump
-                @ent\SetJumpPower(@ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
-                @ent.__ppm2_modified_jump = true
-
-        @ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET * size) if @ent.SetViewOffset
-        @ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK * size) if @ent.SetViewOffsetDucked
-
-        if CLIENT
-            mat = Matrix()
-            mat\Scale(@@DEF_SCALE * size)
-            @ent\EnableMatrix('RenderMultiply', mat)
     Reset: =>
-        @ResetScale()
-        @ModifyScale()
+        if scale = @GetSizeController()
+            scale\Reset()
         if CLIENT
             @GetWeightController()\Reset() if @GetWeightController().Reset
             @GetRenderController()\Reset() if @GetRenderController().Reset
@@ -297,8 +247,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @ApplyBodygroups(CLIENT)
         @SetFly(false) if SERVER
 
-        @ResetScale()
-        @ModifyScale()
+        if scale = @GetSizeController()
+            scale\PlayerRespawn()
 
         if CLIENT
             @deathRagdollMerged = false
@@ -315,7 +265,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         else
             @alreadyCalledDeath = false
         @SetFly(false) if SERVER
-        @ResetScale()
+
+        if scale = @GetSizeController()
+            scale\PlayerDeath()
+
         if CLIENT
             @DoRagdollMerge()
             @GetRenderController()\PlayerDeath() if @GetRenderController()
@@ -335,7 +288,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     NetworkDataChanges: (state) => @GenericDataChange(state)
     SlowUpdate: =>
         @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
-        @ModifyScale()
+        if scale = @GetSizeController()
+            scale\SlowUpdate()
     
     GetFlightController: => @flightController
     GetRenderController: =>
@@ -367,6 +321,21 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @weightController = cls(@)
         @weightController.ent = @ent
         return @weightController
+    GetSizeController: =>
+        return @scaleController if not @isValid
+        if not @scaleController or @modelCached ~= @modelScale
+            @modelCached = @modelCached or @ent\GetModel()
+            @modelScale = @modelCached
+            cls = PPM2.GetSizeController(@modelCached)
+            if @scaleController and cls == @scaleController.__class
+                @scaleController.ent = @ent
+                PPM2.DebugPrint('Skipping size controller recreation for ', @ent, ' as part of ', @)
+                return @scaleController
+            @scaleController\Remove() if @scaleController
+            @scaleController = cls(@)
+        @scaleController.ent = @ent
+        return @scaleController
+    GetScaleController: => @GetSizeController()
     GetBodygroupController: =>
         return @bodygroups if not @isValid
         if not @bodygroups or @modelBodygroups ~= @modelCached
@@ -392,8 +361,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             if IsValid(@ent) and @ent.__ppm2_task_hit
                 @ent.__ppm2_task_hit = false
                 @ent\SetNoDraw(false)
-        @ResetScale() if IsValid(@ent)
         @GetBodygroupController()\Remove() if @GetBodygroupController()
+        @GetSizeController()\Remove() if @GetSizeController()
         @flightController\Switch(false) if @flightController
         @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
     __tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
