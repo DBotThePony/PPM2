@@ -76,7 +76,7 @@ if CLIENT
             ent\Remove()
 else
     resource.AddWorkshop('933203381')
-    
+
     util.AddNetworkString('PPM2.RequestPonyData')
     util.AddNetworkString('PPM2.PlayerRespawn')
     util.AddNetworkString('PPM2.PlayerDeath')
@@ -110,7 +110,6 @@ else
     AddCSLuaFile 'client/rag_edit.lua'
     AddCSLuaFile 'client/pac3_patch.lua'
     include 'server/hooks.lua'
-    include 'server/fastdl.lua'
     include 'server/emotes.lua'
     include 'server/hitgroups.lua'
     include 'server/rag_edit.lua'
