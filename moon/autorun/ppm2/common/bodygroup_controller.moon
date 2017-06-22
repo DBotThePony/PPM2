@@ -246,53 +246,62 @@ class DefaultBodygroupController
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
     
-    UpdateTailSize: =>
+    UpdateTailSize: (ent = @ent) =>
         return if not CLIENT
         size = @GetData()\GetTailSize()
-        size *= @GetData()\GetPonySize() if not @ent\IsRagdoll()
+        size *= @GetData()\GetPonySize() if not ent\IsRagdoll()
         vec = Vector(1, 1, 1)
         vecTail = vec * size
         vecTailPos = Vector((size - 1) * 8, 0, 0)
 
-        @ent\ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
-        @ent\ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
-        @ent\ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
+        boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
+        emptyVector = Vector(0, 0, 0)
 
-        --@ent\ManipulateBonePosition(@@BONE_TAIL_1, vecTail)
-        @ent\ManipulateBonePosition(@@BONE_TAIL_2, vecTailPos)
-        @ent\ManipulateBonePosition(@@BONE_TAIL_3, vecTailPos)
+        with ent
+            \ManipulateBoneScale(@@BONE_TAIL_1, vecTail)
+            \ManipulateBoneScale(@@BONE_TAIL_2, vecTail)
+            \ManipulateBoneScale(@@BONE_TAIL_3, vecTail)
+
+            --\ManipulateBonePosition(@@BONE_TAIL_1, vecTail + (boneAnimTable[@@BONE_TAIL_1] or emptyVector))
+            \ManipulateBonePosition(@@BONE_TAIL_2, vecTailPos + (boneAnimTable[@@BONE_TAIL_2] or emptyVector))
+            \ManipulateBonePosition(@@BONE_TAIL_3, vecTailPos + (boneAnimTable[@@BONE_TAIL_3] or emptyVector))
     
-    UpdateManeSize: =>
+    UpdateManeSize: (ent = @ent) =>
         return if not CLIENT
-        return if @ent\IsRagdoll()
+        return if ent\IsRagdoll()
         size = @GetData()\GetPonySize()
         vecMane = Vector(1, 1, 1) * size
 
-        @ent\ManipulateBoneScale(@@BONE_MANE_1, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_2, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_3, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_4, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_5, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_6, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_7, vecMane)
-        @ent\ManipulateBoneScale(@@BONE_MANE_8, vecMane)
+        boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
+        emptyVector = Vector(0, 0, 0)
 
-        @ent\ManipulateBonePosition(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0))
-        @ent\ManipulateBonePosition(@@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1))
-        @ent\ManipulateBonePosition(@@BONE_MANE_3, Vector((size - 1) * 2, 0, 0))
-        @ent\ManipulateBonePosition(@@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size))
-        @ent\ManipulateBonePosition(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3))
-        @ent\ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2))
-        @ent\ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2))
+        with ent
+            \ManipulateBoneScale(@@BONE_MANE_1, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_2, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_3, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_4, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_5, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_6, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_7, vecMane)
+            \ManipulateBoneScale(@@BONE_MANE_8, vecMane)
+
+            \ManipulateBonePosition(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0) + (boneAnimTable[@@BONE_MANE_1] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1) + (boneAnimTable[@@BONE_MANE_2] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_3, Vector((size - 1) * 2, 0, 0) +               (boneAnimTable[@@BONE_MANE_3] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size) + (boneAnimTable[@@BONE_MANE_4] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@@BONE_MANE_5] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_6] or emptyVector))
+            \ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_7] or emptyVector))
     
-    SlowUpdate: (createModels = CLIENT) =>
-        return if not IsValid(@ent)
-        return if not @ent\IsPony()
-        @ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
-        @ent\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
-        @ent\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
-        @ent\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
-        @ent\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+    SlowUpdate: (createModels = CLIENT, ent = @ent) =>
+        return if not IsValid(ent)
+        return if not ent\IsPony()
+        with ent
+            \SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
+            \SetBodygroup(@@BODYGROUP_MANE_LOWER, @GetData()\GetManeTypeLower())
+            \SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
+            \SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
+            \SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
         if @lastPAC3BoneReset < RealTime()
             @UpdateTailSize()
             @UpdateManeSize()
