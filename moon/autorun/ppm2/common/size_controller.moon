@@ -327,11 +327,14 @@ class PonySizeController
         size = (@GetNeckSize() - 1) * 3
         vec = Vector(size, -size, 0)
 
+        boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
+        emptyVector = Vector(0, 0, 0)
+
         with ent
-            \ManipulateBonePosition(@@NECK_BONE_1, vec)
-            \ManipulateBonePosition(@@NECK_BONE_2, vec)
-            \ManipulateBonePosition(@@NECK_BONE_3, vec)
-            \ManipulateBonePosition(@@NECK_BONE_4, vec)
+            \ManipulateBonePosition(@@NECK_BONE_1, vec + (boneAnimTable[@@NECK_BONE_1] or emptyVector))
+            \ManipulateBonePosition(@@NECK_BONE_2, vec + (boneAnimTable[@@NECK_BONE_2] or emptyVector))
+            \ManipulateBonePosition(@@NECK_BONE_3, vec + (boneAnimTable[@@NECK_BONE_3] or emptyVector))
+            \ManipulateBonePosition(@@NECK_BONE_4, vec + (boneAnimTable[@@NECK_BONE_4] or emptyVector))
     
     ModifyLegs: (ent = @ent) =>
         return if SERVER
@@ -339,25 +342,28 @@ class PonySizeController
         realSizeModify = @GetLegsSize() - 1
         size = realSizeModify * 3
 
+        boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
+        emptyVector = Vector(0, 0, 0)
+
         with ent
-            \ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5))
-            \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + (boneAnimTable[@@LEGS_BONE_ROOT] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_1] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_2] or emptyVector))
             
-            \ManipulateBonePosition(@@LEGS_FRONT_3, Vector(size, 0, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_4, Vector(size, 0, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_3, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_3] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_FRONT_4, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_4] or emptyVector))
             
-            \ManipulateBonePosition(@@LEGS_FRONT_5, Vector(size, size, 0))
-            \ManipulateBonePosition(@@LEGS_FRONT_6, Vector(size, size, 0))
+            \ManipulateBonePosition(@@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_5] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_6] or emptyVector))
 
-            \ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0))
-            \ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0) + (boneAnimTable[@@LEGS_BEHIND_1_1] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0) + (boneAnimTable[@@LEGS_BEHIND_1_2] or emptyVector))
 
-            \ManipulateBonePosition(@@LEGS_BEHIND_2_1, Vector(size, 0, 0))
-            \ManipulateBonePosition(@@LEGS_BEHIND_2_2, Vector(size, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_1, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_2_1] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_BEHIND_2_2, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_2_2] or emptyVector))
 
-            \ManipulateBonePosition(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0))
-            \ManipulateBonePosition(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0))
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_1] or emptyVector))
+            \ManipulateBonePosition(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_2] or emptyVector))
 
 --
 -- 0	LrigPelvis
