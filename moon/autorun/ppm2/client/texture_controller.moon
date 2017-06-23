@@ -425,6 +425,7 @@ class PonyTextureController
         table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}})
         --PPM2.Message 'Queuing to download ', url
     @BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
+        url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
         return "<html>
                     <head>
                         <style>
