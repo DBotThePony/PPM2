@@ -381,10 +381,10 @@ if CLIENT
         return if not data
         data\Remove()
 
-	hook.Add 'NetworkEntityCreated', 'PPM2.NetworkedObjectCheck', =>
-		return if @GetPonyData()
-		--for i, obj in pairs NetworkedPonyData.NW_Objects
-        --    obj.ent = 
+	hook.Add 'StrongEntityLinkUpdates', 'PPM2.NetworkedObjectCheck', =>
+		if @__PPM2_PonyData
+            @__PPM2_PonyData\SetEntity(@GetEntity())
+            @__PPM2_PonyData\SetupEntity(@)
 else
     hook.Add 'PlayerJoinTeam', 'PPM2.TeamWaypoint', (ply, new) ->
         ply.__ppm2_modified_jump = false
