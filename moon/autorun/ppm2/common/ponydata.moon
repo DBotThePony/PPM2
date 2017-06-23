@@ -179,7 +179,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     EntIndex: => @entID
     SetupEntity: (ent) =>
         if ent.__PPM2_PonyData
-            return if ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
+            return if ent.__PPM2_PonyData\GetOwner() and IsValid(ent.__PPM2_PonyData\GetOwner()) and StrongEntity(ent.__PPM2_PonyData\GetOwner()) ~= StrongEntity(@GetOwner())
             ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
         ent.__PPM2_PonyData = @
         @ent = ent

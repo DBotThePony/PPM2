@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+checkForEntity = (ent) -> isentity(ent) or type(ent) == 'table' and ent.GetEntity and isentity(ent\GetEntity())
+
 class NetworkChangeState
 	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
 		@key = key
@@ -295,7 +297,7 @@ class NetworkedObject
 				@NetworkDataChanges(state) unless silent
 	
 	NetworkedIterable: (grabEntities = true) =>
-		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars when grabEntities or not isentity(@[strName])]
+		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars when grabEntities or not checkForEntity(@[strName])]
 		return data
     
     ApplyDataToObject: (target, applyEntities = false) =>
