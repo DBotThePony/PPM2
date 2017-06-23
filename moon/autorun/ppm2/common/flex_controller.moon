@@ -666,6 +666,10 @@ class PonyFlexController
                     elseif rand >= .75
                         rand *= .4
                         {1.5 * rand, 0, 1 * rand, 0}
+                @SetModifierSpeed(1, 2)
+                @SetModifierSpeed(2, 2)
+                @SetModifierSpeed(3, 2)
+                @SetModifierSpeed(4, 2)
             'func': (delta, timeOfAnim) =>
                 JawOpen = @GetModifierID(1)
                 JawOpenState = @GetFlexState(1)
@@ -705,6 +709,10 @@ class PonyFlexController
                     elseif rand >= .75
                         rand *= .4
                         {1.5 * rand, 0, 1 * rand, 0}
+                @SetModifierSpeed(1, 2)
+                @SetModifierSpeed(2, 2)
+                @SetModifierSpeed(3, 2)
+                @SetModifierSpeed(4, 2)
             'func': (delta, timeOfAnim) =>
                 JawOpen = @GetModifierID(1)
                 JawOpenState = @GetFlexState(1)
@@ -761,11 +769,11 @@ class PonyFlexController
             'repeat': false
             'time': 4
             'ids': {'JawOpen', 'Frown', 'Grin', 'Scrunch'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, .08)
-                @SetModifierWeight(2, .69)
-                @SetModifierWeight(3, .36)
-                @SetModifierWeight(4, .81)
+            'reset': (delta, timeOfAnim) =>
+                @SetModifierWeight(1, math.random(4, 16) / 100)
+                @SetModifierWeight(2, math.random(60, 70) / 100)
+                @SetModifierWeight(3, math.random(30, 40) / 100)
+                @SetModifierWeight(4, math.random(70, 90) / 100)
         }
 
         {
