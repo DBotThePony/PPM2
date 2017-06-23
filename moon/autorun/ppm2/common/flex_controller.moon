@@ -80,6 +80,8 @@ class FlexState
         @speedModifiers = {}
         @scaleModifiers = {}
         @modifiers = {}
+        @modifiersSpeeds = {}
+        @modifiersTargets = {}
         @modifiersNames = {}
         @useModifiers = useModifiers
         @nextModifierID = 0
@@ -107,11 +109,17 @@ class FlexState
         @speedModifiers[id] = 0
         @scaleModifiers[id] = 0
         @modifiers[id] = 0
+        @modifiersSpeeds[id] = 1
+        @modifiersTargets[id] = 0
         return id
     SetModifierWeight: (modifID, val = 0) =>
         return if not modifID
-        return if not @modifiers[modifID]
-        @modifiers[modifID] = val
+        return if not @modifiersTargets[modifID]
+        @modifiersTargets[modifID] = val
+    SetModifierSpeed: (modifID, val = 0) =>
+        return if not modifID
+        return if not @modifiersSpeeds[modifID]
+        @modifiersSpeeds[modifID] = val
     SetModifierScale: (modifID, val = 0) =>
         return if not modifID
         return if not @scaleModifiers[modifID]
@@ -120,12 +128,14 @@ class FlexState
         return if not modifID
         return if not @speedModifiers[modifID]
         @speedModifiers[modifID] = val
-    ResetModifiers: (name = '') =>
+    ResetModifiers: (name = '', hard = false) =>
         return false if not @modifiersNames[name]
         id = @modifiersNames[name]
         @speedModifiers[id] = 0
         @scaleModifiers[id] = 0
-        @modifiers[id] = 0
+        @modifiers[id] = 0 if hard
+        @modifiersTargets[id] = 0
+        @modifiersSpeeds[id] = 1 if hard
         return true
     GetEntity: => @ent
     GetData: => @controller
@@ -156,22 +166,23 @@ class FlexState
     AddRealValue: (val = 0) => @SetRealValue(@target + val)
     Think: (ent = @ent, delta = 0) =>
         return if not @active
+        
         if @useModifiers
-            @target = 0
+            @current = 0
             @scale = @originalscale * @scaleModify
             @speed = @originalspeed * @speedModify
-            @target += modif for modif in *@modifiers
+            
+            for i = 1, #@modifiers
+                @modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
+                @current += @modifiers[i]
+            
             @scale += modif for modif in *@scaleModifiers
             @speed += modif for modif in *@speedModifiers
-            @target = math.Clamp(@target, @min, @max) * @scale
+            @current = math.Clamp(@current, @min, @max) * @scale
+        
         if not IsValid(@ent)
             @ent = @controller.ent
             ent = @ent
-        
-        if @useLerp
-            @current = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier, @current, @target) if @current ~= @target
-        else
-            @current = @target
 
         ent\SetFlexWeight(@flexID, @current)
     DataChanges: (state) =>
@@ -184,6 +195,8 @@ class FlexState
             @speedModifiers[id] = 0
             @scaleModifiers[id] = 0
             @modifiers[id] = 0
+            @modifiersTargets[id] = 0
+            @modifiersSpeeds[id] = 1
         if resetVars
             @scaleModify = 1
             @speedModify = 1
@@ -266,6 +279,7 @@ class FlexSequence
     GetFlexState: (id = '') => @flexStates[id]
 
     SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
+    SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
 
     IsValid: => @valid
     Think: (delta = 0) =>
@@ -722,22 +736,22 @@ class PonyFlexController
             'time': 7
             'ids': {'Left_Blink', 'Right_Blink'}
             'create': =>
+                @SetModifierSpeed(1, 5)
+                @SetModifierSpeed(2, 5)
+            'reset': =>
                 @nextBlink = math.random(300, 600) / 1000
-                @nextBlinkLength = math.random(50, 75) / 1000
+                @nextBlinkLength = math.random(15, 30) / 1000
                 @min, @max = @nextBlink, @nextBlink + @nextBlinkLength
             'func': (delta, timeOfAnim) =>
                 if @min > timeOfAnim or @max < timeOfAnim
                     if @blinkHit
                         @blinkHit = false
-                        left, right = @GetModifierID(1), @GetModifierID(2)
-                        leftState, rightState = @GetFlexState(1), @GetFlexState(2)
-                        leftState\SetModifierWeight(left, 0)
-                        rightState\SetModifierWeight(right, 0)
+                        @SetModifierWeight(1, 0)
+                        @SetModifierWeight(2, 0)
                     return
-                left, right = @GetModifierID(1), @GetModifierID(2)
-                leftState, rightState = @GetFlexState(1), @GetFlexState(2)
-                leftState\SetModifierWeight(left, .9)
-                rightState\SetModifierWeight(right, .9)
+                len = (timeOfAnim - @min) / @nextBlinkLength
+                @SetModifierWeight(1, math.sin(len * math.pi))
+                @SetModifierWeight(2, math.sin(len * math.pi))
                 @blinkHit = true
         }
 
