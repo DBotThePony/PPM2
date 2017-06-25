@@ -26,31 +26,31 @@ Addon extends the original PonyPlayerModels idea about customizable ponies for p
 ```
 cvar list
 --------------
-ppm2_bots                                : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Whatever spawn bots as ponies
+ppm2_bots                                : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Whatever spawn bots as ponies
 ppm2_debug                               : 0        : , "sv", "demo", "clientcmd_can_execute", "lua_server" : Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.
 ppm2_disable_flexes                      : 0        : , "sv", "demo", "clientcmd_can_execute", "lua_server" : Disable pony flexes controllers. Saves some FPS.
-ppm2_fly                                 : cmd      :                  :
+ppm2_fly                                 : cmd      :                  : 
 ppm2_no_hoofsound                        : 0        : , "sv", "rep", "demo", "clientcmd_can_execute", "lua_server" : Disable hoofstep sound play time
-ppm2_sv_dmg                              : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Enable hitbox damage scailing
-ppm2_sv_dmg_chest                        : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in chest
-ppm2_sv_dmg_head                         : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in head
+ppm2_sv_dmg                              : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Enable hitbox damage scailing
+ppm2_sv_dmg_chest                        : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in chest
+ppm2_sv_dmg_head                         : 2        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in head
 ppm2_sv_dmg_lbhoof                       : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in back-forward hoof
 ppm2_sv_dmg_lfhoof                       : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in left-forward hoof
 ppm2_sv_dmg_rbhoof                       : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in back-forward hoof
 ppm2_sv_dmg_rfhoof                       : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in right-forward hoof
-ppm2_sv_dmg_stomach                      : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in stomach
-ppm2_sv_edit_no_players                  : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : When unrestricted edit allowed, do not allow to edit players.
+ppm2_sv_dmg_stomach                      : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in stomach
+ppm2_sv_edit_no_players                  : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : When unrestricted edit allowed, do not allow to edit players.
 ppm2_sv_edit_ragdolls_only               : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow to edit only ragdolls
-ppm2_sv_flight                           : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.
+ppm2_sv_flight                           : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.
 ppm2_sv_flight_force                     : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Ignore PlayerNoClip hook
-ppm2_sv_flightdmg                        : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Damage players in flight
-ppm2_sv_new_ragdolls                     : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Enable new ragdolls
-ppm2_sv_newhull                          : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.
-ppm2_sv_ragdoll_damage                   : 0        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Should death ragdoll cause damage?
-ppm2_sv_ragdoll_physgun                  : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow physgun usage on player death ragdolls
-ppm2_sv_ragdoll_toolgun                  : 0        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow toolgun usage on player death ragdolls
+ppm2_sv_flightdmg                        : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Damage players in flight
+ppm2_sv_new_ragdolls                     : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Enable new ragdolls
+ppm2_sv_newhull                          : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.
+ppm2_sv_ragdoll_damage                   : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Should death ragdoll cause damage?
+ppm2_sv_ragdoll_physgun                  : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow physgun usage on player death ragdolls
+ppm2_sv_ragdoll_toolgun                  : 1        : , "sv", "nf", "rep", "demo", "clientcmd_can_execute", "lua_server" : Allow toolgun usage on player death ragdolls
 --------------
- 23 convars/concommands for [ppm2]
+ 23 convars/concommands for [ppm2_]
 ```
 
 ## Clientside Accessable CVars
