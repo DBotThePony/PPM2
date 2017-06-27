@@ -255,11 +255,19 @@ hook.Add 'FinishMove', 'PPM2.Ponyfly', (movedata) =>
     return flight\FinishMove(movedata)
 
 hook.Add 'CalcMainActivity', 'PPM2.Ponyfly', (movedata) =>
-    return if not @IsPonyCached()
-    data = @GetPonyData()
-    return if not data
-    return if not data\GetFly()
-    return ACT_SWIM, 370
+    return if not @IsNewPonyCached()
+    if data = @GetPonyData()
+        if data\GetFly()
+            if not @isPlayingPPM2Anim
+                @isPlayingPPM2Anim = true
+                @AnimRestartGesture(GESTURE_SLOT_CUSTOM, ACT_GMOD_NOCLIP_LAYER, false)
+                @SetIK(false) if CLIENT
+            return ACT_GMOD_NOCLIP_LAYER, 370
+        else
+            if @isPlayingPPM2Anim
+                @isPlayingPPM2Anim = false
+                @AnimResetGestureSlot(GESTURE_SLOT_CUSTOM)
+                @SetIK(true) if CLIENT
 
 if SERVER
     concommand.Add 'ppm2_fly', =>
