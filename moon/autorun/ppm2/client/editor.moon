@@ -335,6 +335,14 @@ MODEL_BOX_PANEL = {
 
 vgui.Register('PPM2ModelPanel', MODEL_BOX_PANEL, 'EditablePanel')
 
+CALC_VIEW_PANEL = {
+    Init: =>
+        @playingOpenAnim = true
+        @lock = false
+        @mousex, @mousey = 0, 0
+    CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = 90, znear = 0, zfar = 1000) =>
+}
+
 PANEL_SETTINGS_BASE = {
     Init: =>
         @shouldSaveData = false
@@ -1039,6 +1047,12 @@ if IsValid(PPM2.OldEditorFrame)
     net.WriteBool(false)
     net.SendToServer()
 
+if IsValid(PPM2.EditorTopFrame)
+    PPM2.EditorTopFrame\Remove()
+    net.Start('PPM2.EditorStatus')
+    net.WriteBool(false)
+    net.SendToServer()
+
 STRETCHING_PANEL = {
     Init: =>
         @size = PANEL_WIDTH\GetInt()
@@ -1174,7 +1188,8 @@ PPM2.OpenNewEditor = ->
     topframe = PPM2.EditorTopFrame
     @SetPos(0, 0)
     @MakePopup()
-    @SetSize(ScrW(), 70)
+    topSize = 55
+    @SetSize(ScrW(), topSize)
     sysTime = SysTime()
 
     @btnClose = vgui.Create('DButton', @)
@@ -1190,6 +1205,7 @@ PPM2.OpenNewEditor = ->
 
     @lblTitle = vgui.Create('DLabel', @)
     @lblTitle\SetPos(5, 0)
+    @lblTitle\SetSize(200, 20)
     @SetTitle = (text = '') => @lblTitle\SetText(text)
     @GetTitle = => @lblTitle\GetText()
 
@@ -1200,8 +1216,8 @@ PPM2.OpenNewEditor = ->
         @leftPanel\SetVisible(false)
 
     @leftPanel = vgui.Create('EditablePanel')
-    @leftPanel\SetPos(0, 70)
-    @leftPanel\SetSize(350, ScrH() - 70)
+    @leftPanel\SetPos(0, topSize)
+    @leftPanel\SetSize(350, ScrH() - topSize)
     @leftPanel\SetMouseInputEnabled(true)
     @leftPanel\SetKeyboardInputEnabled(true)
 
