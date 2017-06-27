@@ -778,13 +778,13 @@ class NewBodygroupController extends DefaultBodygroupController
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
             when PPM2.RACE_PEGASUS
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
             when PPM2.RACE_UNICORN
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
             when PPM2.RACE_ALICORN
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
                 @ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
