@@ -147,6 +147,9 @@ MODEL_BOX_PANEL = {
         @lastTick = RealTime()
         @SetCursor('none')
 
+        @buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
+        @buildingModel\SetNoDraw(true)
+
         -- @animButton = vgui.Create('DButton', @)
         -- with @animButton
         --     \SetSize(120, 20)
@@ -313,6 +316,8 @@ MODEL_BOX_PANEL = {
             render.SuppressEngineLighting(true)
             render.ResetModelLighting(1, 1, 1)
             render.SetColorModulation(1, 1, 1)
+        
+        @buildingModel\DrawModel()
         @controller\GetRenderController()\DrawModels()
         @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
@@ -331,6 +336,7 @@ MODEL_BOX_PANEL = {
         cam.End3D()
     OnRemove: =>
         @model\Remove() if IsValid(@model)
+        @buildingModel\Remove() if IsValid(@buildingModel)
 }
 
 vgui.Register('PPM2ModelPanel', MODEL_BOX_PANEL, 'EditablePanel')
