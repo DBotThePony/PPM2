@@ -1033,8 +1033,8 @@ EditorPages = {
     }
 }
 
-if IsValid(PPM2.EditorFrame)
-    PPM2.EditorFrame\Remove()
+if IsValid(PPM2.OldEditorFrame)
+    PPM2.OldEditorFrame\Remove()
     net.Start('PPM2.EditorStatus')
     net.WriteBool(false)
     net.SendToServer()
@@ -1072,11 +1072,11 @@ STRETCHING_PANEL = {
 
 vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
-PPM2.OpenEditor = ->
-    if IsValid(PPM2.EditorFrame)
-        PPM2.EditorFrame\SetVisible(true)
-        PPM2.EditorFrame\Center()
-        PPM2.EditorFrame\MakePopup()
+PPM2.OpenOldEditor = ->
+    if IsValid(PPM2.OldEditorFrame)
+        PPM2.OldEditorFrame\SetVisible(true)
+        PPM2.OldEditorFrame\Center()
+        PPM2.OldEditorFrame\MakePopup()
         net.Start('PPM2.EditorStatus')
         net.WriteBool(true)
         net.SendToServer()
@@ -1091,7 +1091,7 @@ PPM2.OpenEditor = ->
     @MakePopup()
     @SetTitle('PPM2 Pony Editor')
     @SetDeleteOnClose(false)
-    PPM2.EditorFrame = @
+    PPM2.OldEditorFrame = @
 
     @OnClose = ->
         net.Start('PPM2.EditorStatus')
@@ -1235,18 +1235,18 @@ PPM2.OpenEditor = ->
     iTime = math.floor((SysTime() - sysTime) * 1000)
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
-concommand.Add 'ppm2_editor', PPM2.OpenEditor
-concommand.Add 'ppm2_editor_reload', -> PPM2.EditorFrame\Remove() if IsValid(PPM2.EditorFrame)
+concommand.Add 'ppm2_old_editor', PPM2.OpenOldEditor
+concommand.Add 'ppm2_old_editor_reload', -> PPM2.OldEditorFrame\Remove() if IsValid(PPM2.OldEditorFrame)
 
 IconData =
-	title: 'PPM V2.0',
+	title: 'PPM V2.0 Old Editor',
 	icon: 'gui/pped_icon.png',
 	width: 960,
 	height: 700,
 	onewindow: true,
 	init: (icon, window) ->
 		window\Remove()
-		RunConsoleCommand('ppm2_editor')
+		RunConsoleCommand('ppm2_old_editor')
 
 list.Set('DesktopWindows', 'PPM2', IconData)
 CreateContextMenu() if IsValid(g_ContextMenu)
