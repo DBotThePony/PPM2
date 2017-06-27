@@ -1171,6 +1171,8 @@ PPM2.OpenEditor = ->
                     nwdata\Create()
             copy\ApplyDataToObject(mainData, false) -- no save on apply
     @selectModelBox = vgui.Create('DComboBox', @)
+    editorModelSelect = USE_MODEL\GetString()\upper()
+    editorModelSelect = EditorModels[editorModelSelect] and editorModelSelect or 'DEFAULT'
     with @selectModelBox
         \SetSize(120, 20)
         \SetPos(W - 475, 5)
