@@ -340,8 +340,36 @@ CALC_VIEW_PANEL = {
         @playingOpenAnim = true
         @lock = false
         @mousex, @mousey = 0, 0
+        @SetMouseInputEnabled(true)
+        @SetKeyboardInputEnabled(true)
+        ply = LocalPlayer()
+        eyeang = ply\EyeAngles()
+        eyepos = ply\EyePos()
+        @drawPos = eyeang\Forward() * 100
+        @drawAngle = (@drawPos - eyepos)\Angle()
     CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = 90, znear = 0, zfar = 1000) =>
+    
+    OnMousePressed: (code = MOUSE_LEFT) =>
+        return if code ~= MOUSE_LEFT
+        @hold = true
+        @SetCursor('sizeall')
+        @holdLast = RealTime() + .1
+        @oldPlaying = @playing
+        @playing = false
+        @mouseX, @mouseY = gui.MousePos()
+    OnMouseReleased: (code = MOUSE_LEFT) =>
+        return if code ~= MOUSE_LEFT
+        @hold = false
+        @SetCursor('none')
+        if @holdLast > RealTime()
+            @playing = true
+            if not @oldPlaying
+                @editorSeq = 1
+                @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
+                @ResetPosition()
 }
+
+vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
 
 PANEL_SETTINGS_BASE = {
     Init: =>
