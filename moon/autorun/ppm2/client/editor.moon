@@ -1213,14 +1213,14 @@ createTopButtons = (createModelSelect = true) =>
         confirm = (txt = '') ->
             txt = txt\Trim()
             return if txt == ''
-            copy\SetFilename(txt)
-            copy\Save()
+            @data\SetFilename(txt)
+            @data\Save()
             @unsavedChanges = false
-            @model.unsavedChanges = false
-            @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+            @model.unsavedChanges = false if IsValid(@model)
+            @SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
             @panels.saves.rebuildFileList()
             callback(txt)
-        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', copy\GetFilename(), confirm)
+        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
     
     @saveButton = vgui.Create('DButton', @)
     with @saveButton
@@ -1245,7 +1245,7 @@ createTopButtons = (createModelSelect = true) =>
                 if nwdata.netID == -1
                     nwdata.NETWORKED = false
                     nwdata\Create()
-            copy\ApplyDataToObject(mainData, false) -- no save on apply
+            @data\ApplyDataToObject(mainData, false) -- no save on apply
     
     if createModelSelect
         @selectModelBox = vgui.Create('DComboBox', @)
