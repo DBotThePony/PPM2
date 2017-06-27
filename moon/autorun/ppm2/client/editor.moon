@@ -1358,7 +1358,7 @@ PPM2.OpenNewEditor = ->
 
     @lblTitle = vgui.Create('DLabel', @)
     @lblTitle\SetPos(5, 0)
-    @lblTitle\SetSize(200, 20)
+    @lblTitle\SetSize(300, 20)
     @SetTitle = (text = '') => @lblTitle\SetText(text)
     @GetTitle = => @lblTitle\GetText()
 
