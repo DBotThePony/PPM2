@@ -768,7 +768,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
     SelectWingsType: =>
         wtype = @GetData()\GetWingsType()
-        if @GetData()\GetFly() or @ent.GetMoveType and @ent\GetMoveType() == MOVETYPE_NOCLIP
+        if (@GetData()\GetFly() or @ent.GetMoveType and @ent\GetMoveType() == MOVETYPE_NOCLIP) and (not @ent.InVehicle or not @ent\InVehicle())
             wtype += PPM2.MAX_WINGS + 1
         return wtype
     
