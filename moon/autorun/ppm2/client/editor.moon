@@ -1239,6 +1239,10 @@ PPM2.OpenEditor = ->
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
     
+    net.Start('PPM2.EditorStatus')
+    net.WriteBool(true)
+    net.SendToServer()
+
     iTime = math.floor((SysTime() - sysTime) * 1000)
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
