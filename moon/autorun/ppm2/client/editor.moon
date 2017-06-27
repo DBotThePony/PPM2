@@ -360,6 +360,7 @@ CALC_VIEW_PANEL = {
         @fov = 90
         @lastTick = RealTime()
         hook.Add('CalcView', @, @CalcView)
+        hook.Add('PrePlayerDraw', @, @PrePlayerDraw)
 
         @slow = false
         @fast = false
@@ -385,6 +386,12 @@ CALC_VIEW_PANEL = {
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
         @moveAngle = angles
         return newData
+    
+    PrePlayerDraw: (ply = LocalPlayer()) =>
+        return if ply ~= LocalPlayer()
+        if data = ply\GetPonyData()
+            if bg = data\GetBodygroupController()
+                bg\ApplyBodygroups()
     
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
@@ -468,6 +475,10 @@ CALC_VIEW_PANEL = {
                 @resizedToScreen = false
                 @SetPos(@realX, @realY)
                 @SetSize(@realW, @realH)
+    
+    OnRemove: =>
+        hook.Remove('CalcView', @)
+        hook.Remove('PrePlayerDraw', @)
 }
 
 vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
