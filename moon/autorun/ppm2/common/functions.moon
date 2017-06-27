@@ -157,6 +157,7 @@ do
         return object
 
 entMeta = FindMetaTable('Entity')
+
 entMeta.IsPony = =>
     model = @GetModel()
     @__ppm2_lastmodel = @__ppm2_lastmodel or model
@@ -181,6 +182,43 @@ entMeta.IsPony = =>
             return true
         else
             return false
+
+entMeta.IsNJPony = =>
+    model = @GetModel()
+    @__ppm2_lastmodel = @__ppm2_lastmodel or model
+    if @__ppm2_lastmodel ~= model
+        data = @GetPonyData()
+        if data and data.ModelChanges
+            oldModel = @__ppm2_lastmodel
+            @__ppm2_lastmodel = model
+            data\ModelChanges(oldModel, model)
+    switch model
+        when 'models/ppm/player_default_base_new_nj.mdl'
+            return true
+        when 'models/ppm/player_default_base_nj.mdl'
+            return true
+        when 'models/cppm/player_default_base_nj.mdl'
+            return true
+        else
+            return false
+
+entMeta.IsNewPony = =>
+    model = @GetModel()
+    @__ppm2_lastmodel = @__ppm2_lastmodel or model
+    if @__ppm2_lastmodel ~= model
+        data = @GetPonyData()
+        if data and data.ModelChanges
+            oldModel = @__ppm2_lastmodel
+            @__ppm2_lastmodel = model
+            data\ModelChanges(oldModel, model)
+    switch model
+        when 'models/ppm/player_default_base_new.mdl'
+            return true
+        when 'models/ppm/player_default_base_new_nj.mdl'
+            return true
+        else
+            return false
+
 entMeta.IsPonyCached = =>
     switch @__ppm2_lastmodel
         when 'models/ppm/player_default_base.mdl'
@@ -197,4 +235,25 @@ entMeta.IsPonyCached = =>
             return true
         else
             return false
+
+entMeta.IsNewPonyCached = =>
+    switch @__ppm2_lastmodel
+        when 'models/ppm/player_default_base_new.mdl'
+            return true
+        when 'models/ppm/player_default_base_new_nj.mdl'
+            return true
+        else
+            return false
+
+entMeta.IsNJPonyCached = =>
+    switch @__ppm2_lastmodel
+        when 'models/ppm/player_default_base_new_nj.mdl'
+            return true
+        when 'models/ppm/player_default_base_nj.mdl'
+            return true
+        when 'models/cppm/player_default_base_nj.mdl'
+            return true
+        else
+            return false
+
 entMeta.HasPonyModel = entMeta.IsPony
