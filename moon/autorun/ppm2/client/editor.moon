@@ -149,6 +149,7 @@ MODEL_BOX_PANEL = {
 
         @buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
         @buildingModel\SetNoDraw(true)
+        @buildingModel\SetModelScale(0.9)
 
         -- @animButton = vgui.Create('DButton', @)
         -- with @animButton
