@@ -367,6 +367,8 @@ CALC_VIEW_PANEL = {
         @backward = false
         @left = false
         @right = false
+        @up = false
+        @down = false
 
         @realX, @realY = 0, 0
         @realW, @realH = ScrW(), ScrH()
@@ -406,6 +408,8 @@ CALC_VIEW_PANEL = {
                 @left = status
             when KEY_D
                 @right = status
+            when KEY_SPACE
+                @up = status
     
     OnKeyCodePressed: (code = KEY_NONE) =>
         @CheckCode(code, true)
@@ -450,7 +454,10 @@ CALC_VIEW_PANEL = {
         if @left
             @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
         
-        if @forward or @backward or @left or @right or @hold
+        if @up
+            @drawPos += @moveAngle\Up() * speedModifier * delta * 100
+        
+        if @forward or @backward or @left or @right or @hold or @down or @up
             if not @resizedToScreen
                 @resizedToScreen = true
                 @SetPos(0, 0)
