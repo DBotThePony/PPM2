@@ -356,7 +356,8 @@ CALC_VIEW_PANEL = {
         eyeang.r = 0
         @drawPos = eyeang\Forward() * 100
         @drawPos.z += 70
-        @drawAngle = (@drawPos - eyepos)\Angle()
+        eyeang.y -= 180
+        @drawAngle = eyeang
         @fov = 90
         @lastTick = RealTime()
         hook.Add('CalcView', @, @CalcView)
@@ -382,7 +383,7 @@ CALC_VIEW_PANEL = {
         return hook.Remove('CalcView', @) if not @IsValid()
         return if not @IsVisible()
         origin = LocalPlayer()\GetPos() + @drawPos
-        angles += @drawAngle
+        angles = @drawAngle
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
         @moveAngle = angles
         return newData
