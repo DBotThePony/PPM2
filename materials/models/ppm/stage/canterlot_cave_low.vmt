@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"mlp_canterlot\canterlot_cave_low"
+	"$surfaceprop"	"dirt"
+}
