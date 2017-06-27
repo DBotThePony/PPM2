@@ -804,6 +804,8 @@ class PonyDataInstance
 
     new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
         @SetFilename(filename)
+        @updateNWObject = true
+        @networkNWObject = true
         @valid = @isOpen
         @rawData = data
         @dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
@@ -850,9 +852,9 @@ class PonyDataInstance
             else
                 @dataTable[key] = mapData.fix(value)
     ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
-        if @nwObj
+        if @nwObj and @updateNWObject
             {:getFunc} = @@PONY_DATA[key]
-            @nwObj["Set#{getFunc}"](@nwObj, newVal)
+            @nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
         @Save() if saveNow
     SetFilename: (filename) =>
         @filename = filename
@@ -869,6 +871,12 @@ class PonyDataInstance
     SetPonyController: (nwObj) => @nwObj = nwObj
     SetController: (nwObj) => @nwObj = nwObj
     SetDataController: (nwObj) => @nwObj = nwObj
+
+    SetNetworkOnChange: (newVal = true) => @networkNWObject = newVal
+    SetUpdateOnChange: (newVal = true) => @updateNWObject = newVal
+
+    GetNetworkOnChange: => @networkNWObject
+    GetUpdateOnChange: => @updateNWObject
 
     GetNetworkData: => @nwObj
     GetPonyData: => @nwObj
