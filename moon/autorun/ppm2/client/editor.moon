@@ -372,6 +372,7 @@ CALC_VIEW_PANEL = {
 
         @realX, @realY = 0, 0
         @realW, @realH = ScrW(), ScrH()
+        @SetCursor('hand')
     
     SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
     SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
@@ -420,7 +421,7 @@ CALC_VIEW_PANEL = {
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = false
-        @SetCursor('none')
+        @SetCursor('hand')
     
     Think: =>
         rtime = RealTime()
