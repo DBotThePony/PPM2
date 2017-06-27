@@ -1528,6 +1528,10 @@ concommand.Add 'ppm2_editor', PPM2.OpenEditor
 concommand.Add 'ppm2_new_editor', PPM2.OpenNewEditor
 concommand.Add 'ppm2_old_editor', PPM2.OpenOldEditor
 concommand.Add 'ppm2_old_editor_reload', -> PPM2.OldEditorFrame\Remove() if IsValid(PPM2.OldEditorFrame)
+concommand.Add 'ppm2_new_editor_reload', -> PPM2.EditorTopFrame\Remove() if IsValid(PPM2.EditorTopFrame)
+concommand.Add 'ppm2_editor_reload', ->
+    PPM2.OldEditorFrame\Remove() if IsValid(PPM2.OldEditorFrame)
+    PPM2.EditorTopFrame\Remove() if IsValid(PPM2.EditorTopFrame)
 
 IconData =
 	title: 'PPM/2 Editor',
