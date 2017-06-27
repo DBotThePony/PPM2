@@ -1393,7 +1393,18 @@ IconData =
 		window\Remove()
 		RunConsoleCommand('ppm2_editor')
 
+IconDataOld =
+	title: 'PPM/2 Old Editor',
+	icon: 'gui/pped_icon.png',
+	width: 960,
+	height: 700,
+	onewindow: true,
+	init: (icon, window) ->
+		window\Remove()
+		RunConsoleCommand('ppm2_old_editor')
+
 list.Set('DesktopWindows', 'PPM2', IconData)
+list.Set('DesktopWindows', 'PPM2_Old', IconDataOld)
 CreateContextMenu() if IsValid(g_ContextMenu)
 
 hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption 'Utilities', 'User', 'PPM2.Posing', 'PPM2', '', '', =>
