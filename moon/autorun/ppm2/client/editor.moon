@@ -1072,6 +1072,175 @@ STRETCHING_PANEL = {
 
 vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
+createTopButtons = (createModelSelect = true) =>
+    W, H = @GetSize()
+    saveAs = (callback = (->)) ->
+        confirm = (txt = '') ->
+            txt = txt\Trim()
+            return if txt == ''
+            copy\SetFilename(txt)
+            copy\Save()
+            @unsavedChanges = false
+            @model.unsavedChanges = false
+            @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+            @panels.saves.rebuildFileList()
+            callback(txt)
+        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', copy\GetFilename(), confirm)
+    
+    @saveButton = vgui.Create('DButton', @)
+    with @saveButton
+        \SetText('Save')
+        \SetPos(W - 205, 5)
+        \SetSize(90, 20)
+        .DoClick = -> saveAs()
+    
+    @wearButton = vgui.Create('DButton', @)
+    with @wearButton
+        \SetText('Apply changes (wear)')
+        \SetPos(W - 350, 5)
+        \SetSize(140, 20)
+        lastWear = 0
+        .DoClick = ->
+            return if RealTime() < lastWear
+            lastWear = RealTime() + 5
+            mainData = PPM2.GetMainData()
+            nwdata = LocalPlayer()\GetPonyData()
+            if nwdata
+                mainData\SetNetworkData(nwdata)
+                if nwdata.netID == -1
+                    nwdata.NETWORKED = false
+                    nwdata\Create()
+            copy\ApplyDataToObject(mainData, false) -- no save on apply
+    
+    if createModelSelect
+        @selectModelBox = vgui.Create('DComboBox', @)
+        with @selectModelBox
+            \SetSize(120, 20)
+            \SetPos(W - 475, 5)
+            \SetValue(editorModelSelect)
+            \AddChoice(choice) for choice in *{'default', 'cppm', 'new'}
+            .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+                @SetDeleteOnClose(true)
+                RunConsoleCommand('ppm2_editor_model', value)
+
+                confirm = ->
+                    @Close()
+                    timer.Simple 0.1, PPM2.OpenEditor
+                Derma_Query(
+                    'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
+                    'Editor restart required',
+                    'Yas!',
+                    confirm,
+                    'Noh!'
+                )
+    
+    @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
+    with @enableAdvanced
+        \SetSize(120, 20)
+        \SetPos(W - 590, 7)
+        \SetConVar('ppm2_editor_advanced')
+        \SetText('Advanced mode')
+        .ingore = true
+        .OnChange = (pnl = box, newVal) ->
+            return if newVal == ADVANCED_MODE\GetBool()
+            @SetDeleteOnClose(true)
+            confirm = ->
+                @Close()
+                timer.Simple 0.1, PPM2.OpenEditor
+            Derma_Query(
+                'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
+                'Editor restart required',
+                'Yas!',
+                confirm,
+                'Noh!'
+            )
+
+    @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
+    with @fullbrightSwitch
+        \SetSize(120, 20)
+        \SetPos(W - 670, 7)
+        \SetConVar('ppm2_editor_fullbright')
+        \SetText('Fullbright')
+
+PPM2.OpenNewEditor = ->
+    if IsValid(PPM2.EditorTopFrame)
+        PPM2.EditorTopFrame\SetVisible(true)
+        PPM2.EditorTopFrame.data\ApplyDataToObject(PPM2.EditorTopFrame.controller, false)
+        PPM2.EditorTopFrame.leftPanel\SetVisible(true)
+        return
+    
+    PPM2.EditorTopFrame = vgui.Create('EditablePanel')
+    self = PPM2.EditorTopFrame
+    topframe = PPM2.EditorTopFrame
+    @SetPos(0, 0)
+    @MakePopup()
+    @SetSize(ScrW(), 70)
+    sysTime = SysTime()
+
+    @btnClose = vgui.Create('DButton', @)
+	@btnClose\SetText('')
+	@btnClose.DoClick = -> @Close()
+	@btnClose.Paint = (w = 0, h = 0) => derma.SkinHook('Paint', 'WindowCloseButton', @, w, h)
+    @btnClose\SetSize(31, 31)
+    @btnClose\SetPos(ScrW() - 40, 0)
+
+    @Paint = (w = 0, h = 0) => derma.SkinHook('Paint', 'Frame', @, w, h)
+    @DockPadding(5, 29, 5, 5)
+    createTopButtons(@, false)
+
+    @lblTitle = vgui.Create('DLabel', @)
+    @lblTitle\SetPos(5, 0)
+    @SetTitle = (text = '') => @lblTitle\SetText(text)
+    @GetTitle = => @lblTitle\GetText()
+
+    @Close = =>
+        data = PPM2.GetMainData()
+        data\ApplyDataToObject(@controller, false)
+        @SetVisible(false)
+        @leftPanel\SetVisible(false)
+
+    @leftPanel = vgui.Create('EditablePanel')
+    @leftPanel\SetPos(0, 70)
+    @leftPanel\SetSize(350, ScrH() - 70)
+    @leftPanel\SetMouseInputEnabled(true)
+    @leftPanel\SetKeyboardInputEnabled(true)
+
+    @menus = vgui.Create('DPropertySheet', @leftPanel)
+    @menus\Dock(FILL)
+    @menus\SetSize(PANEL_WIDTH\GetInt(), 0)
+    @menusBar = @menus.tabScroller
+    @menusBar\SetParent(@)
+    @menusBar\Dock(FILL)
+    @menusBar\SetSize(0, 20)
+
+    copy = PPM2.GetMainData()\Copy()
+    ply = LocalPlayer()
+    @controller = ply\GetPonyData()
+    copy\SetNetworkData(@controller)
+    copy\SetNetworkOnChange(false)
+    @data = copy
+    @DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
+
+    @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+
+    @panels = {}
+
+    createdPanels = 9
+
+    for {:name, :func, :internal, :display} in *EditorPages
+        continue if display and not display()
+        pnl = vgui.Create('PPM2SettingsBase', @menus)
+        @menus\AddSheet(name, pnl)
+        pnl\SetTargetData(copy)
+        pnl\Dock(FILL)
+        pnl.frame = @
+        func(pnl, @menus)
+        createdPanels += pnl.createdPanels
+        @panels[internal] = pnl
+    
+    iTime = math.floor((SysTime() - sysTime) * 1000)
+    PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
+
 PPM2.OpenOldEditor = ->
     if IsValid(PPM2.OldEditorFrame)
         PPM2.OldEditorFrame\SetVisible(true)
@@ -1126,91 +1295,8 @@ PPM2.OpenOldEditor = ->
     frame.data = copy
     frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
-    saveAs = (callback = (->)) ->
-        confirm = (txt = '') ->
-            txt = txt\Trim()
-            return if txt == ''
-            copy\SetFilename(txt)
-            copy\Save()
-            @unsavedChanges = false
-            @model.unsavedChanges = false
-            @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
-            @panels.saves.rebuildFileList()
-            callback(txt)
-        Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', copy\GetFilename(), confirm)
+    createTopButtons(@)
     
-    @saveButton = vgui.Create('DButton', @)
-    with @saveButton
-        \SetText('Save')
-        \SetPos(W - 205, 5)
-        \SetSize(90, 20)
-        .DoClick = -> saveAs()
-    
-    @wearButton = vgui.Create('DButton', @)
-    with @wearButton
-        \SetText('Apply changes (wear)')
-        \SetPos(W - 350, 5)
-        \SetSize(140, 20)
-        lastWear = 0
-        .DoClick = ->
-            return if RealTime() < lastWear
-            lastWear = RealTime() + 5
-            mainData = PPM2.GetMainData()
-            nwdata = LocalPlayer()\GetPonyData()
-            if nwdata
-                mainData\SetNetworkData(nwdata)
-                if nwdata.netID == -1
-                    nwdata.NETWORKED = false
-                    nwdata\Create()
-            copy\ApplyDataToObject(mainData, false) -- no save on apply
-    @selectModelBox = vgui.Create('DComboBox', @)
-    with @selectModelBox
-        \SetSize(120, 20)
-        \SetPos(W - 475, 5)
-        \SetValue(editorModelSelect)
-        \AddChoice(choice) for choice in *{'default', 'cppm', 'new'}
-        .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
-            @SetDeleteOnClose(true)
-            RunConsoleCommand('ppm2_editor_model', value)
-
-            confirm = ->
-                @Close()
-                timer.Simple 0.1, PPM2.OpenEditor
-            Derma_Query(
-                'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
-                'Editor restart required',
-                'Yas!',
-                confirm,
-                'Noh!'
-            )
-    @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
-    with @enableAdvanced
-        \SetSize(120, 20)
-        \SetPos(W - 590, 7)
-        \SetConVar('ppm2_editor_advanced')
-        \SetText('Advanced mode')
-        .ingore = true
-        .OnChange = (pnl = box, newVal) ->
-            return if newVal == ADVANCED_MODE\GetBool()
-            @SetDeleteOnClose(true)
-            confirm = ->
-                @Close()
-                timer.Simple 0.1, PPM2.OpenEditor
-            Derma_Query(
-                'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
-                'Editor restart required',
-                'Yas!',
-                confirm,
-                'Noh!'
-            )
-
-    @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
-    with @fullbrightSwitch
-        \SetSize(120, 20)
-        \SetPos(W - 670, 7)
-        \SetConVar('ppm2_editor_fullbright')
-        \SetText('Fullbright')
-
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
     @model\SetController(controller)
@@ -1235,18 +1321,26 @@ PPM2.OpenOldEditor = ->
     iTime = math.floor((SysTime() - sysTime) * 1000)
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
+PPM2.OpenEditor = ->
+    if LocalPlayer()\IsPony()
+        PPM2.OpenNewEditor()
+    else
+        PPM2.OpenOldEditor()
+
+concommand.Add 'ppm2_editor', PPM2.OpenEditor
+concommand.Add 'ppm2_new_editor', PPM2.OpenNewEditor
 concommand.Add 'ppm2_old_editor', PPM2.OpenOldEditor
 concommand.Add 'ppm2_old_editor_reload', -> PPM2.OldEditorFrame\Remove() if IsValid(PPM2.OldEditorFrame)
 
 IconData =
-	title: 'PPM V2.0 Old Editor',
+	title: 'PPM/2 Editor',
 	icon: 'gui/pped_icon.png',
 	width: 960,
 	height: 700,
 	onewindow: true,
 	init: (icon, window) ->
 		window\Remove()
-		RunConsoleCommand('ppm2_old_editor')
+		RunConsoleCommand('ppm2_editor')
 
 list.Set('DesktopWindows', 'PPM2', IconData)
 CreateContextMenu() if IsValid(g_ContextMenu)
