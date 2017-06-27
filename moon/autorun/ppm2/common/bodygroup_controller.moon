@@ -764,22 +764,30 @@ class NewBodygroupController extends DefaultBodygroupController
         return @RemoveModels() if not @ent\IsPony()
         @SlowUpdate(createModels)
     
+    @NOCLIP_ANIMATIONS = {9, 10, 11}
+
+    SelectWingsType: =>
+        wtype = @GetData()\GetWingsType()
+        if @GetData()\GetFly() or @ent.GetMoveType and @ent\GetMoveType() == MOVETYPE_NOCLIP
+            wtype += PPM2.MAX_WINGS + 1
+        return wtype
+    
     ApplyRace: =>
         return unless @isValid
         return if not IsValid(@ent)
         switch @GetData()\GetRace()
             when PPM2.RACE_EARTH
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS + 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 1)
             when PPM2.RACE_PEGASUS
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, @GetData()\GetWingsType())
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
             when PPM2.RACE_UNICORN
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS + 1)
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 1)
             when PPM2.RACE_ALICORN
                 @ent\SetBodygroup(@@BODYGROUP_HORN, 0)
-                @ent\SetBodygroup(@@BODYGROUP_WINGS, @GetData()\GetWingsType())
+                @ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
 
     DataChanges: (state) =>
         return unless @isValid
@@ -796,6 +804,8 @@ class NewBodygroupController extends DefaultBodygroupController
                     @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
                     @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
+            when 'Fly'
+                @ApplyRace()
             when 'NewMuzzle'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
                 if @GetData()\GetNewMuzzle()
@@ -843,6 +853,13 @@ if CLIENT
             bodygroup\UpdateTailSize()
             bodygroup\UpdateManeSize()
             bodygroup.lastPAC3BoneReset = RealTime() + 1
+else
+    hook.Add 'PlayerNoClip', 'PPM2.WingsCheck', =>
+        timer.Simple 0, ->
+            return if not IsValid(@)
+            if data = @GetPonyData()
+                if bg = data\GetBodygroupController()
+                    bg\SlowUpdate()
 
 PPM2.CPPMBodygroupController = CPPMBodygroupController
 PPM2.DefaultBodygroupController = DefaultBodygroupController
