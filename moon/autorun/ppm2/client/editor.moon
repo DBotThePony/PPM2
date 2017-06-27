@@ -388,6 +388,8 @@ CALC_VIEW_PANEL = {
         return newData
     
     PrePlayerDraw: (ply = LocalPlayer()) =>
+        return hook.Remove('PrePlayerDraw', @) if not @IsValid()
+        return if not @IsVisible()
         return if ply ~= LocalPlayer()
         if data = ply\GetPonyData()
             if bg = data\GetBodygroupController()
