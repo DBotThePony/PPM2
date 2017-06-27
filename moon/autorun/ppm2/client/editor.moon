@@ -355,6 +355,7 @@ CALC_VIEW_PANEL = {
         eyeang.p = 0
         eyeang.r = 0
         @drawPos = eyeang\Forward() * 100
+        @drawPos.z += 70
         @drawAngle = (@drawPos - eyepos)\Angle()
         @fov = 90
         @lastTick = RealTime()
@@ -366,11 +367,17 @@ CALC_VIEW_PANEL = {
         @backward = false
         @left = false
         @right = false
+
+        @realX, @realY = 0, 0
+        @realW, @realH = ScrW(), ScrH()
+    
+    SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
+    SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
     
     CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
         return hook.Remove('CalcView', @) if not @IsValid()
         return if not @IsVisible()
-        origin += @drawPos
+        origin = LocalPlayer()\GetPos() + @drawPos
         angles += @drawAngle
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
         @moveAngle = angles
@@ -442,6 +449,17 @@ CALC_VIEW_PANEL = {
         
         if @left
             @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
+        
+        if @forward or @backward or @left or @right or @hold
+            if not @resizedToScreen
+                @resizedToScreen = true
+                @SetPos(0, 0)
+                @SetSize(ScrW(), ScrH())
+        else
+            if @resizedToScreen
+                @resizedToScreen = false
+                @SetPos(@realX, @realY)
+                @SetSize(@realW, @realH)
 }
 
 vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
@@ -1326,7 +1344,9 @@ PPM2.OpenNewEditor = ->
     
     @calcPanel = vgui.Create('PPM2CalcViewPanel')
     @calcPanel\SetPos(350, topSize)
+    @calcPanel\SetRealPos(350, topSize)
     @calcPanel\SetSize(ScrW() - 350, ScrH() - topSize)
+    @calcPanel\SetRealSize(ScrW() - 350, ScrH() - topSize)
     @calcPanel\MakePopup()
     @MakePopup()
 
