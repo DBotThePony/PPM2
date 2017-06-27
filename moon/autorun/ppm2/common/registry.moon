@@ -99,7 +99,7 @@ PPM2.BodyDetails = {
     'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
     'Hooves big rnd', 'Hooves small rnd', 'Spots 1', 'Robotic'
     'DASH-E', 'Eye Scar', 'Eye Wound', 'Scars', 'MGS Socks'
-    'Sharp Hooves', 'Sharp Hooves 2'
+    'Sharp Hooves', 'Sharp Hooves 2', 'Muzzle'
 }
 
 PPM2.BodyDetailsEnum = {
@@ -107,7 +107,7 @@ PPM2.BodyDetailsEnum = {
     'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
     'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS', 'ROBOTIC'
     'DASH_E', 'EYE_SCAR', 'EYE_WOUND', 'SCARS', 'MGS_SOCKS'
-    'SHARP_HOOVES', 'SHARP_HOOVES_2'
+    'SHARP_HOOVES', 'SHARP_HOOVES_2', 'MUZZLE'
 }
 
 PPM2.SocksTypes = {
