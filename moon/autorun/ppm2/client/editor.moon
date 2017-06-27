@@ -345,16 +345,36 @@ vgui.Register('PPM2ModelPanel', MODEL_BOX_PANEL, 'EditablePanel')
 CALC_VIEW_PANEL = {
     Init: =>
         @playingOpenAnim = true
-        @lock = false
+        @hold = false
         @mousex, @mousey = 0, 0
         @SetMouseInputEnabled(true)
         @SetKeyboardInputEnabled(true)
         ply = LocalPlayer()
         eyeang = ply\EyeAngles()
         eyepos = ply\EyePos()
+        eyeang.p = 0
+        eyeang.r = 0
         @drawPos = eyeang\Forward() * 100
         @drawAngle = (@drawPos - eyepos)\Angle()
-    CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = 90, znear = 0, zfar = 1000) =>
+        @fov = 90
+        @lastTick = RealTime()
+        hook.Add('CalcView', @, @CalcView)
+
+        @slow = false
+        @fast = false
+        @forward = false
+        @backward = false
+        @left = false
+        @right = false
+    
+    CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
+        return hook.Remove('CalcView', @) if not @IsValid()
+        return if not @IsVisible()
+        origin += @drawPos
+        angles += @drawAngle
+        newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
+        @moveAngle = angles
+        return newData
     
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
@@ -364,16 +384,64 @@ CALC_VIEW_PANEL = {
         @oldPlaying = @playing
         @playing = false
         @mouseX, @mouseY = gui.MousePos()
+    
+    CheckCode: (code = KEY_NONE, status = false) =>
+        switch code
+            when KEY_RCONTROL, KEY_LCONTROL
+                @slow = status
+            when KEY_LSHIFT, KEY_RSHIFT
+                @fast = status
+            when KEY_W
+                @forward = status
+            when KEY_S
+                @backward = status
+            when KEY_A
+                @left = status
+            when KEY_D
+                @right = status
+    
+    OnKeyCodePressed: (code = KEY_NONE) =>
+        @CheckCode(code, true)
+    
+    OnKeyCodeReleased: (code = KEY_NONE) =>
+        @CheckCode(code, false)
+    
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = false
         @SetCursor('none')
-        if @holdLast > RealTime()
-            @playing = true
-            if not @oldPlaying
-                @editorSeq = 1
-                @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
-                @ResetPosition()
+    
+    Think: =>
+        rtime = RealTime()
+        delta = rtime - @lastTick
+        @lastTick = rtime
+
+        @hold = @IsHovered() if @hold
+        
+        if @hold
+            x, y = gui.MousePos()
+            deltaX, deltaY = x - @mouseX, y - @mouseY
+            @mouseX, @mouseY = x, y
+            {:pitch, :yaw, :roll} = @drawAngle
+            yaw -= deltaX * .3
+            pitch += deltaY * .3
+            @drawAngle = Angle(pitch, yaw, roll)
+        
+        speedModifier = 1 
+        speedModifier *= 2 if @fast
+        speedModifier *= 0.5 if @slow
+
+        if @forward
+            @drawPos += @moveAngle\Forward() * speedModifier * delta * 100
+        
+        if @backward
+            @drawPos -= @moveAngle\Forward() * speedModifier * delta * 100
+        
+        if @right
+            @drawPos += @moveAngle\Right() * speedModifier * delta * 100
+        
+        if @left
+            @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
 }
 
 vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
@@ -1216,6 +1284,7 @@ PPM2.OpenNewEditor = ->
         PPM2.EditorTopFrame\SetVisible(true)
         PPM2.EditorTopFrame.data\ApplyDataToObject(PPM2.EditorTopFrame.controller, false)
         PPM2.EditorTopFrame.leftPanel\SetVisible(true)
+        PPM2.EditorTopFrame.calcPanel\SetVisible(true)
         return
     
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
@@ -1249,12 +1318,24 @@ PPM2.OpenNewEditor = ->
         data\ApplyDataToObject(@controller, false)
         @SetVisible(false)
         @leftPanel\SetVisible(false)
+        @calcPanel\SetVisible(false)
+    
+    @OnRemove = =>
+        @leftPanel\Remove()
+        @calcPanel\Remove()
+    
+    @calcPanel = vgui.Create('PPM2CalcViewPanel')
+    @calcPanel\SetPos(350, topSize)
+    @calcPanel\SetSize(ScrW() - 350, ScrH() - topSize)
+    @calcPanel\MakePopup()
+    @MakePopup()
 
     @leftPanel = vgui.Create('EditablePanel')
     @leftPanel\SetPos(0, topSize)
     @leftPanel\SetSize(350, ScrH() - topSize)
     @leftPanel\SetMouseInputEnabled(true)
     @leftPanel\SetKeyboardInputEnabled(true)
+    @leftPanel\MakePopup()
 
     @menus = vgui.Create('DPropertySheet', @leftPanel)
     @menus\Dock(FILL)
@@ -1289,6 +1370,9 @@ PPM2.OpenNewEditor = ->
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
     
+    @leftPanel\MakePopup()
+    @MakePopup()
+
     iTime = math.floor((SysTime() - sysTime) * 1000)
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
