@@ -1229,7 +1229,7 @@ STRETCHING_PANEL = {
 
 vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
-createTopButtons = (createModelSelect = true) =>
+createTopButtons = (isNewEditor = false) =>
     W, H = @GetSize()
     saveAs = (callback = (->)) ->
         confirm = (txt = '') ->
@@ -1269,7 +1269,7 @@ createTopButtons = (createModelSelect = true) =>
                     nwdata\Create()
             @data\ApplyDataToObject(mainData, false) -- no save on apply
     
-    if createModelSelect
+    if not isNewEditor
         @selectModelBox = vgui.Create('DComboBox', @)
         with @selectModelBox
             \SetSize(120, 20)
@@ -1312,12 +1312,13 @@ createTopButtons = (createModelSelect = true) =>
                 'Noh!'
             )
 
-    @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
-    with @fullbrightSwitch
-        \SetSize(120, 20)
-        \SetPos(W - 670, 7)
-        \SetConVar('ppm2_editor_fullbright')
-        \SetText('Fullbright')
+    if not isNewEditor
+        @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
+        with @fullbrightSwitch
+            \SetSize(120, 20)
+            \SetPos(W - 670, 7)
+            \SetConVar('ppm2_editor_fullbright')
+            \SetText('Fullbright')
 
 PPM2.OpenNewEditor = ->
     if IsValid(PPM2.EditorTopFrame)
@@ -1328,6 +1329,9 @@ PPM2.OpenNewEditor = ->
             .data\SetNetworkData(.controller)
             .leftPanel\SetVisible(true)
             .calcPanel\SetVisible(true)
+            net.Start('PPM2.EditorStatus')
+            net.WriteBool(true)
+            net.SendToServer()
         return
     
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
@@ -1348,7 +1352,7 @@ PPM2.OpenNewEditor = ->
 
     @Paint = (w = 0, h = 0) => derma.SkinHook('Paint', 'Frame', @, w, h)
     @DockPadding(5, 29, 5, 5)
-    createTopButtons(@, false)
+    createTopButtons(@, true)
 
     @lblTitle = vgui.Create('DLabel', @)
     @lblTitle\SetPos(5, 0)
@@ -1362,6 +1366,9 @@ PPM2.OpenNewEditor = ->
         @SetVisible(false)
         @leftPanel\SetVisible(false)
         @calcPanel\SetVisible(false)
+        net.Start('PPM2.EditorStatus')
+        net.WriteBool(false)
+        net.SendToServer()
     
     @OnRemove = =>
         @leftPanel\Remove()
@@ -1417,6 +1424,10 @@ PPM2.OpenNewEditor = ->
     
     @leftPanel\MakePopup()
     @MakePopup()
+
+    net.Start('PPM2.EditorStatus')
+    net.WriteBool(true)
+    net.SendToServer()
 
     iTime = math.floor((SysTime() - sysTime) * 1000)
     PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
