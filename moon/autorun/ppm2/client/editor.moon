@@ -1321,10 +1321,13 @@ createTopButtons = (createModelSelect = true) =>
 
 PPM2.OpenNewEditor = ->
     if IsValid(PPM2.EditorTopFrame)
-        PPM2.EditorTopFrame\SetVisible(true)
-        PPM2.EditorTopFrame.data\ApplyDataToObject(PPM2.EditorTopFrame.controller, false)
-        PPM2.EditorTopFrame.leftPanel\SetVisible(true)
-        PPM2.EditorTopFrame.calcPanel\SetVisible(true)
+        with PPM2.EditorTopFrame
+            \SetVisible(true)
+            .controller = LocalPlayer()\GetPonyData() or .controller
+            .data\ApplyDataToObject(.controller, false)
+            .data\SetNetworkData(.controller)
+            .leftPanel\SetVisible(true)
+            .calcPanel\SetVisible(true)
         return
     
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
