@@ -410,9 +410,16 @@ class CPPMBodygroupController extends DefaultBodygroupController
 -- 39	Mane07
 -- 40	Mane01
 -- 41	Lrigweaponbone
--- 42	Tail01
--- 43	Tail02
--- 44	Tail03
+-- 42	right_hand
+-- 43	Tail01
+-- 44	Tail02
+-- 45	Tail03
+-- 46	wing_l
+-- 47	wing_r
+-- 48	wing_l_bat
+-- 49	wing_r_bat
+-- 50	wing_open_l
+-- 51	wing_open_r
 --
 
 class NewBodygroupController extends DefaultBodygroupController
@@ -423,9 +430,9 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
 
-    @BONE_TAIL_1 = 42
-    @BONE_TAIL_2 = 43
-    @BONE_TAIL_3 = 44
+    @BONE_TAIL_1 = 43
+    @BONE_TAIL_2 = 44
+    @BONE_TAIL_3 = 45
 
     @BONE_MANE_1 = 40
     @BONE_MANE_2 = 33
