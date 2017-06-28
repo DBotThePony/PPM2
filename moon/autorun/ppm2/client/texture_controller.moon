@@ -58,6 +58,11 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/separated_muzzle')
 }
 
+PPM2.BodyGlowingDetailsMaterials = {
+    [12]: Material('models/ppm/partrender/body_robotic')
+    [13]: Material('models/ppm/partrender/dash-e')
+}
+
 PPM2.UpperManeDetailsMaterials = {
     [4]: {Material('models/ppm/partrender/upmane_5_mask0')}
     [5]: {Material('models/ppm/partrender/upmane_6_mask0')}
@@ -791,6 +796,8 @@ class PonyTextureController
                 '$basetexture': 'models/ppm/base/bodym'
                 '$lightwarptexture': 'models/ppm/base/lightwrap'
                 '$halflambert': '1'
+                '$selfillum': '1'
+                '$selfillummask': 'models/ppm/partrender/null'
 
                 '$color': '{255 255 255}'
                 '$color2': '{255 255 255}'
@@ -821,6 +828,10 @@ class PonyTextureController
 
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
+
+            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
+            rtIllum\Download()
+
             render.PushRenderTarget(rt)
 
             render.Clear(r, g, b, 255, true, true)
@@ -834,11 +845,10 @@ class PonyTextureController
 
             for i = 1, PPM2.MAX_BODY_DETAILS
                 detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
-                mat = PPM2.BodyDetailsMaterials[detailID]
-                continue if not mat
-                surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
-                surface.SetMaterial(mat)
-                surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+                if mat = PPM2.BodyDetailsMaterials[detailID]
+                    surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, bodysize, bodysize)
             
             surface.SetDrawColor(255, 255, 255)
 
@@ -865,7 +875,31 @@ class PonyTextureController
 
             @["#{prefix}Material"]\SetTexture('$basetexture', rt)
 
+            render.PushRenderTarget(rtIllum)
+
+            r, g, b = 0, 0, 0
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.DisableClipping(true)
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, bodysize, bodysize)
+
+            surface.SetDrawColor(255, 255, 255)
+
+            for i = 1, PPM2.MAX_BODY_DETAILS
+                detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
+                if mat = PPM2.BodyGlowingDetailsMaterials[detailID]
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
+            surface.DisableClipping(false)
+            cam.End2D()
+            render.PopRenderTarget()
+
+            @["#{prefix}Material"]\SetTexture('$selfillummask', rtIllum)
+
             PPM2.DebugPrint('Compiled body texture for ', @ent, ' as part of ', @)
+
         
         data = @GetData()
         validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
