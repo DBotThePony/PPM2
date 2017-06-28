@@ -166,10 +166,16 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
     @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  wFloat,                    1)
     @NetworkVar('NewMuzzle',            rBool,   wBool,                  true)
+
     @NetworkVar('SeparateWings',        rBool,   wBool,                 false)
     @NetworkVar('SeparateHorn',         rBool,   wBool,                 false)
+    @NetworkVar('UseHornDetail',        rBool,   wBool,                 false)
+    @NetworkVar('HornGlow',             rBool,   wBool,                 false)
+    @NetworkVar('HornGlowSrength',      rFloat(0, 1), wFloat,          1)
+
     @NetworkVar('WingsColor',           rColor,  wColor,  Color(255, 255, 255))
     @NetworkVar('HornColor',            rColor,  wColor,  Color(255, 255, 255))
+    @NetworkVar('HornDetailColor',      rColor,  wColor,  Color(255, 255, 255))
 
     @NetworkVar('WingsType',            rUInt(8, PPM2.MIN_WINGS, PPM2.MAX_WINGS), wUInt(0, 8), 0)
     @NetworkVar('MaleBuff',             rFloat(PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF), wFloat, PPM2.DEFAULT_MALE_BUFF)

@@ -292,6 +292,32 @@ class PonyDataInstance
             fix: (arg = false) -> tobool(arg)
         }
 
+        'use_horn_detail': {
+            default: -> false
+            getFunc: 'UseHornDetail'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'horn_glow': {
+            default: -> false
+            getFunc: 'HornGlow'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'horn_glow_strength': {
+            default: -> 1
+            getFunc: 'HornGlowSrength'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 0, 0, 1)
+            min: 0
+            max: 1
+        }
+
+        'horn_detail_color': {
+            default: -> Color(255, 255, 255)
+            getFunc: 'HornDetailColor'
+            fix: COLOR_FIXER()
+        }
+
         'separate_eyes': {
             default: -> false
             getFunc: 'SeparateEyes'

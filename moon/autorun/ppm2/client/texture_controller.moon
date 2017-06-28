@@ -273,6 +273,8 @@ class PonyTextureController
         '$nolod': 1
     })
 
+    @HORN_DETAIL_COLOR = Material('models/ppm/base/horn_detail')
+
     @BODY_MATERIAL_MALE = CreateMaterial('PPM2.MaleDrawtexture', 'UnlitGeneric', {
         '$basetexture': 'models/ppm/base/bodym'
         '$ignorez': 1
@@ -290,6 +292,7 @@ class PonyTextureController
     })
 
     table.insert(RELOADABLE_MATERIALS, @HORN_MATERIAL_COLOR)
+    table.insert(RELOADABLE_MATERIALS, @HORN_DETAIL_COLOR)
 
     @EYE_OVAL = Material('models/ppm/partrender/eye_oval')
 
@@ -385,7 +388,7 @@ class PonyTextureController
                 @CompileCMark()
             when 'SocksColor', 'SocksTextureURL', 'SocksTexture', 'SocksDetailColor1', 'SocksDetailColor2', 'SocksDetailColor3', 'SocksDetailColor4', 'SocksDetailColor5', 'SocksDetailColor6'
                 @CompileSocks()
-            when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3'
+            when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3', 'UseHornDetail', 'HornGlow', 'HornGlowSrength', 'HornDetailColor'
                 @CompileHorn()
             when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
                 @CompileWings()
@@ -826,9 +829,6 @@ class PonyTextureController
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
 
-            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
-            rtIllum\Download()
-
             render.PushRenderTarget(rt)
 
             render.Clear(r, g, b, 255, true, true)
@@ -872,6 +872,9 @@ class PonyTextureController
 
             @["#{prefix}Material"]\SetTexture('$basetexture', rt)
 
+            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
+            rtIllum\Download()
+
             render.PushRenderTarget(rtIllum)
 
             r, g, b = 0, 0, 0
@@ -898,7 +901,6 @@ class PonyTextureController
             @["#{prefix}Material"]\SetTexture('$selfillummask', rtIllum)
 
             PPM2.DebugPrint('Compiled body texture for ', @ent, ' as part of ', @)
-
         
         data = @GetData()
         validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
@@ -928,6 +930,8 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
+                '$selfillum': '1'
+                '$selfillummask': 'models/ppm/partrender/null'
 
                 '$model': '1'
                 '$phong': '1'
@@ -954,9 +958,11 @@ class PonyTextureController
 
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", texSize, texSize, false)
             rt\Download()
+            
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetHornColor() if @GetData()\GetSeparateHorn()
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -964,6 +970,12 @@ class PonyTextureController
 
             surface.SetMaterial(@@HORN_MATERIAL_COLOR)
             surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            if @GetData()\GetUseHornDetail()
+                {:r, :g, :b} = @GetData()\GetHornDetailColor()
+                surface.SetDrawColor(r, g, b)
+                surface.SetMaterial(@@HORN_DETAIL_COLOR)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetHornURLColor#{i}"](@GetData())
@@ -976,6 +988,29 @@ class PonyTextureController
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
+
+            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rtIllum", texSize, texSize, false)
+            rtIllum\Download()
+
+            render.PushRenderTarget(rtIllum)
+
+            r, g, b = 0, 0, 0
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.DisableClipping(true)
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            if @GetData()\GetHornGlow()
+                surface.SetDrawColor(255, 255, 255, @GetData()\GetHornGlowSrength() * 255)
+                surface.SetMaterial(@@HORN_DETAIL_COLOR)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            surface.DisableClipping(false)
+            cam.End2D()
+            render.PopRenderTarget()
+
+            @HornMaterial\SetTexture('$selfillummask', rtIllum)
 
             PPM2.DebugPrint('Compiled Horn texture for ', @ent, ' as part of ', @)
 

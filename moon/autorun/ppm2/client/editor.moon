@@ -790,10 +790,16 @@ EditorPages = {
             @Hr()
             @ColorBox('Wings color', 'WingsColor')
             @ColorBox('Horn color', 'HornColor')
-            return if not IS_USING_NEW()
             @Hr()
             @ColorBox('Bat Wings color', 'BatWingColor')
             @ColorBox('Bat Wings skin color', 'BatWingSkinColor')
+            return if not ADVANCED_MODE\GetBool()
+            @Hr()
+            @Label('You might want to use "Glowing Horn"\nwith "Use Horn Detail"')
+            @CheckBox('Use Horn Detail', 'UseHornDetail')
+            @ColorBox('Horn Detail Color', 'HornDetailColor')
+            @CheckBox('Glowing Horn', 'HornGlow')
+            @NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
     }
 
     {
