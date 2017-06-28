@@ -18,148 +18,167 @@
 for ply in *player.GetAll()
     ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
 
+wUInt = (def = 0, size = 8) ->
+    return (arg = def) -> net.WriteUInt(arg, size)
+
+rUInt = (size = 8, min = 0, max = 255) ->
+    return -> math.Clamp(net.ReadUInt(size), min, max)
+
+rFloat = (min = 0, max = 255) ->
+    return -> math.Clamp(net.ReadFloat(), min, max)
+
+wFloat = net.WriteFloat
+rSEnt = net.ReadStrongEntity
+wSEnt = net.WriteStrongEntity
+rBool = net.ReadBool
+wBool = net.WriteBool
+rColor = net.ReadColor
+wColor = net.WriteColor
+rString = net.ReadString
+wString = net.WriteString
+
 class NetworkedPonyData extends PPM2.NetworkedObject
     @NW_ClientsideCreation = true
     @RenderTasks = {}
 
     @Setup()
-    @NetworkVar('Entity',           net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), ((newValue) => IsValid(@GetOwner()) and StrongEntity(@GetOwner()\EntIndex()) or newValue))
-    @NetworkVar('UpperManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
-    @NetworkVar('LowerManeModel',   net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
-    @NetworkVar('TailModel',        net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
-    @NetworkVar('SocksModel',       net.ReadStrongEntity, net.WriteStrongEntity, StrongEntity(-1), nil, false)
+    @NetworkVar('Entity',           rSEnt, wSEnt, StrongEntity(-1), ((newValue) => IsValid(@GetOwner()) and StrongEntity(@GetOwner()\EntIndex()) or newValue))
+    @NetworkVar('UpperManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
+    @NetworkVar('LowerManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
+    @NetworkVar('TailModel',        rSEnt, wSEnt, StrongEntity(-1), nil, false)
+    @NetworkVar('SocksModel',       rSEnt, wSEnt, StrongEntity(-1), nil, false)
 
-    @NetworkVar('Race',             (-> math.Clamp(net.ReadUInt(4), 0, 3)), ((arg = PPM2.RACE_EARTH) -> net.WriteUInt(arg, 4)), PPM2.RACE_EARTH)
-    @NetworkVar('Gender',           (-> math.Clamp(net.ReadUInt(4), 0, 1)), ((arg = PPM2.GENDER_FEMALE) -> net.WriteUInt(arg, 4)), PPM2.GENDER_FEMALE)
-    @NetworkVar('Weight',           (-> math.Clamp(net.ReadFloat(), PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT)), net.WriteFloat, 1)
-    @NetworkVar('PonySize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_SCALE, PPM2.MAX_SCALE)),   net.WriteFloat, 1)
-    @NetworkVar('NeckSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_NECK, PPM2.MAX_NECK)),     net.WriteFloat, 1)
-    @NetworkVar('LegsSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_LEGS, PPM2.MAX_LEGS)),     net.WriteFloat, 1)
+    @NetworkVar('Race',             rUInt(4, 0, 3), wUInt(PPM2.RACE_EARTH, 4), PPM2.RACE_EARTH)
+    @NetworkVar('Gender',           rUInt(4, 0, 1), wUInt(PPM2.GENDER_FEMALE, 4), PPM2.GENDER_FEMALE)
+    @NetworkVar('Weight',           rFloat(PPM2.MIN_WEIGHT, PPM2.MAX_WEIGHT), wFloat, 1)
+    @NetworkVar('PonySize',         rFloat(PPM2.MIN_SCALE, PPM2.MAX_SCALE),   wFloat, 1)
+    @NetworkVar('NeckSize',         rFloat(PPM2.MIN_NECK, PPM2.MAX_NECK),     wFloat, 1)
+    @NetworkVar('LegsSize',         rFloat(PPM2.MIN_LEGS, PPM2.MAX_LEGS),     wFloat, 1)
 
     -- Reserved - they can be accessed/used/changed, but they do not do anything
-    @NetworkVar('Age',              (-> math.Clamp(net.ReadUInt(4), 0, 2)), ((arg = PPM2.AGE_ADULT) -> net.WriteUInt(arg, 4)), PPM2.AGE_ADULT)
+    @NetworkVar('Age',              rUInt(4, 0, 2), wUInt(PPM2.AGE_ADULT, 4), PPM2.AGE_ADULT)
 
-    @NetworkVar('EyelashType',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES)),           ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('TailType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_TAILS, PPM2.MAX_TAILS)),                   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('ManeType',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES)),       ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('ManeTypeLower',    (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES)),       ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('EyelashType',      rUInt(8, PPM2.MIN_EYELASHES, PPM2.MAX_EYELASHES),           wUInt(0, 8), 0)
+    @NetworkVar('TailType',         rUInt(8, PPM2.MIN_TAILS, PPM2.MAX_TAILS),                   wUInt(0, 8), 0)
+    @NetworkVar('ManeType',         rUInt(8, PPM2.MIN_UPPER_MANES, PPM2.MAX_UPPER_MANES),       wUInt(0, 8), 0)
+    @NetworkVar('ManeTypeLower',    rUInt(8, PPM2.MIN_LOWER_MANES, PPM2.MAX_LOWER_MANES),       wUInt(0, 8), 0)
 
-    @NetworkVar('TailTypeNew',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_TAILS_NEW, PPM2.MAX_TAILS_NEW)),               ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('ManeTypeNew',      (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('ManeTypeLowerNew', (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW)),   ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
+    @NetworkVar('TailTypeNew',      rUInt(8, PPM2.MIN_TAILS_NEW, PPM2.MAX_TAILS_NEW),               wUInt(0, 8), 0)
+    @NetworkVar('ManeTypeNew',      rUInt(8, PPM2.MIN_UPPER_MANES_NEW, PPM2.MAX_UPPER_MANES_NEW),   wUInt(0, 8), 0)
+    @NetworkVar('ManeTypeLowerNew', rUInt(8, PPM2.MIN_LOWER_MANES_NEW, PPM2.MAX_LOWER_MANES_NEW),   wUInt(0, 8), 0)
 
-    @NetworkVar('BodyColor',        net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
+    @NetworkVar('BodyColor',        rColor, wColor, 	    Color(255, 255, 255))
 
-    @NetworkVar('SeparateEyes',     net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('SeparateEyes',     rBool, wBool,              false)
     for publicName in *{'', 'Left', 'Right'}
-        @NetworkVar("EyeType#{publicName}",          (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-        @NetworkVar("EyeBackground#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-        @NetworkVar("EyeHole#{publicName}",          net.ReadColor, net.WriteColor, 	    Color(0,   0,   0  ))
-        @NetworkVar("EyeIrisTop#{publicName}",       net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
-        @NetworkVar("EyeIrisBottom#{publicName}",    net.ReadColor, net.WriteColor, 	    Color(200, 200, 200))
-        @NetworkVar("EyeIrisLine1#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-        @NetworkVar("EyeIrisLine2#{publicName}",     net.ReadColor, net.WriteColor, 	    Color(255, 255, 255))
-        @NetworkVar("EyeReflection#{publicName}",    net.ReadColor, net.WriteColor,    Color(255, 255, 255, 127))
-        @NetworkVar("EyeEffect#{publicName}",        net.ReadColor, net.WriteColor,         Color(255, 255, 255))
-        @NetworkVar("EyeLines#{publicName}",         net.ReadBool, net.WriteBool,                           true)
-        @NetworkVar("DerpEyes#{publicName}",         net.ReadBool, net.WriteBool,                          false)
-        @NetworkVar("DerpEyesStrength#{publicName}", (-> math.Clamp(net.ReadFloat(), PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH)), net.WriteFloat, 1)
-        @NetworkVar("HoleWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat,  1)
-        @NetworkVar("HoleHeight#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE)), net.WriteFloat,  1)
-        @NetworkVar("HoleSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE, PPM2.MAX_HOLE)),             net.WriteFloat, .8)
-        @NetworkVar("HoleShiftX#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)), net.WriteFloat, 0)
-        @NetworkVar("HoleShiftY#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT)), net.WriteFloat, 0)
-        @NetworkVar("IrisSize#{publicName}",         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, .8)
-        @NetworkVar("IrisWidth#{publicName}",        (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
-        @NetworkVar("IrisHeight#{publicName}",       (-> math.Clamp(net.ReadFloat(), PPM2.MIN_IRIS, PPM2.MAX_IRIS)),             net.WriteFloat, 1)
-        @NetworkVar("EyeRotation#{publicName}",      (-> math.Clamp(net.ReadInt(12), PPM2.MIN_EYE_ROTATION, PPM2.MAX_EYE_ROTATION)), ((arg = 0) -> net.WriteInt(arg, 12)), 1)
-        @NetworkVar("EyeURL#{publicName}",           net.ReadString,                                                            net.WriteString, '')
+        @NetworkVar("EyeType#{publicName}",          rUInt(8, PPM2.MIN_EYE_TYPE, PPM2.MAX_EYE_TYPE), wUInt(0, 8), 0)
+        @NetworkVar("EyeBackground#{publicName}",    rColor, wColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeHole#{publicName}",          rColor, wColor, 	    Color(0,   0,   0  ))
+        @NetworkVar("EyeIrisTop#{publicName}",       rColor, wColor, 	    Color(200, 200, 200))
+        @NetworkVar("EyeIrisBottom#{publicName}",    rColor, wColor, 	    Color(200, 200, 200))
+        @NetworkVar("EyeIrisLine1#{publicName}",     rColor, wColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeIrisLine2#{publicName}",     rColor, wColor, 	    Color(255, 255, 255))
+        @NetworkVar("EyeReflection#{publicName}",    rColor, wColor,    Color(255, 255, 255, 127))
+        @NetworkVar("EyeEffect#{publicName}",        rColor, wColor,         Color(255, 255, 255))
+        @NetworkVar("EyeLines#{publicName}",         rBool, wBool,                           true)
+        @NetworkVar("DerpEyes#{publicName}",         rBool, wBool,                          false)
+        @NetworkVar("DerpEyesStrength#{publicName}", rFloat(PPM2.MIN_DERP_STRENGTH, PPM2.MAX_DERP_STRENGTH), wFloat, 1)
+        @NetworkVar("HoleWidth#{publicName}",        rFloat(PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE), wFloat,  1)
+        @NetworkVar("HoleHeight#{publicName}",       rFloat(PPM2.MIN_PUPIL_SIZE, PPM2.MAX_PUPIL_SIZE), wFloat,  1)
+        @NetworkVar("HoleSize#{publicName}",         rFloat(PPM2.MIN_HOLE, PPM2.MAX_HOLE),             wFloat, .8)
+        @NetworkVar("HoleShiftX#{publicName}",       rFloat(PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT), wFloat, 0)
+        @NetworkVar("HoleShiftY#{publicName}",       rFloat(PPM2.MIN_HOLE_SHIFT, PPM2.MAX_HOLE_SHIFT), wFloat, 0)
+        @NetworkVar("IrisSize#{publicName}",         rFloat(PPM2.MIN_IRIS, PPM2.MAX_IRIS),             wFloat, .8)
+        @NetworkVar("IrisWidth#{publicName}",        rFloat(PPM2.MIN_IRIS, PPM2.MAX_IRIS),             wFloat, 1)
+        @NetworkVar("IrisHeight#{publicName}",       rFloat(PPM2.MIN_IRIS, PPM2.MAX_IRIS),             wFloat, 1)
+        @NetworkVar("EyeRotation#{publicName}",      rUInt(12, PPM2.MIN_EYE_ROTATION, PPM2.MAX_EYE_ROTATION), wUInt(0, 12), 0)
+        @NetworkVar("EyeURL#{publicName}",           rString,                                                            wString, '')
 
-    @NetworkVar('SeparateMane',     net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('SeparateMane',     rBool, wBool,              false)
     for i = 1, 6
-        @NetworkVar("ManeColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("ManeDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("ManeURLColor#{i}",         net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("ManeURL#{i}",              net.ReadString, net.WriteString,   '')
+        @NetworkVar("ManeColor#{i}",            rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("ManeDetailColor#{i}",      rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("ManeURLColor#{i}",         rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("ManeURL#{i}",              rString, wString,   '')
 
-        @NetworkVar("TailColor#{i}",            net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("TailDetailColor#{i}",      net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("TailURLColor#{i}",         net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("TailURL#{i}",              net.ReadString, net.WriteString,   '')
+        @NetworkVar("TailColor#{i}",            rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("TailDetailColor#{i}",      rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("TailURLColor#{i}",         rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("TailURL#{i}",              rString, wString,   '')
 
-        @NetworkVar("LowerManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("LowerManeURL#{i}",         net.ReadString, net.WriteString,   '')
-        @NetworkVar("LowerManeURLColor#{i}",    net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("LowerManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeColor#{i}",       rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeURL#{i}",         rString, wString,   '')
+        @NetworkVar("LowerManeURLColor#{i}",    rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("LowerManeDetailColor#{i}", rColor, wColor,     Color(255, 255, 255))
 
-        @NetworkVar("UpperManeColor#{i}",       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("UpperManeURL#{i}",         net.ReadString, net.WriteString,   '')
-        @NetworkVar("UpperManeDetailColor#{i}", net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-        @NetworkVar("UpperManeURLColor#{i}",    net.ReadColor, net.WriteColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeColor#{i}",       rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeURL#{i}",         rString, wString,   '')
+        @NetworkVar("UpperManeDetailColor#{i}", rColor, wColor,     Color(255, 255, 255))
+        @NetworkVar("UpperManeURLColor#{i}",    rColor, wColor,     Color(255, 255, 255))
     
-    @NetworkVar('CMark',            net.ReadBool, net.WriteBool,              true)
-    @NetworkVar('CMarkSize',        (-> math.Clamp(net.ReadFloat(), 0, 1)), net.WriteFloat, 1)
-    @NetworkVar('CMarkColor',       net.ReadColor, net.WriteColor,     Color(255, 255, 255))
-    @NetworkVar('CMarkURL',         net.ReadString, net.WriteString,            '')
-    @NetworkVar('CMarkType',        (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_CMARK, PPM2.MAX_CMARK)),           ((arg = 4) -> net.WriteUInt(arg, 8)), 4)
-    @NetworkVar('TailSize',         (-> math.Clamp(net.ReadFloat(), PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE)),   net.WriteFloat, 1)
+    @NetworkVar('CMark',            rBool, wBool,                    true)
+    @NetworkVar('CMarkSize',        rFloat(0, 1), wFloat,            1)
+    @NetworkVar('CMarkColor',       rColor, wColor,                  Color(255, 255, 255))
+    @NetworkVar('CMarkURL',         rString, wString,                '')
+    @NetworkVar('CMarkType',        rUInt(8, PPM2.MIN_CMARK, PPM2.MAX_CMARK),       wUInt(4, 8), 4)
+    @NetworkVar('TailSize',         rFloat(PPM2.MIN_TAIL_SIZE, PPM2.MAX_TAIL_SIZE), wFloat, 1)
 
-    @NetworkVar('Bodysuit',         (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SUIT, PPM2.MAX_SUIT)),             ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('Socks',            net.ReadBool, net.WriteBool,              false)
-    @NetworkVar('NoFlex',           net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('Bodysuit',         rUInt(8, PPM2.MIN_SUIT, PPM2.MAX_SUIT),   wUInt(0, 8), 0)
+    @NetworkVar('Socks',            rBool, wBool,              false)
+    @NetworkVar('NoFlex',           rBool, wBool,              false)
 
-    @NetworkVar('SocksAsModel',     net.ReadBool, net.WriteBool,              false)
-    @NetworkVar('SocksTexture',     (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_SOCKS, PPM2.MAX_SOCKS)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('SocksColor',       net.ReadColor, net.WriteColor,            Color(255, 255, 255))
-    @NetworkVar('SocksTextureURL',  net.ReadString, net.WriteString,          '')
+    @NetworkVar('SocksAsModel',     rBool, wBool,              false)
+    @NetworkVar('SocksTexture',     rUInt(8, PPM2.MIN_SOCKS, PPM2.MAX_SOCKS), wUInt(0, 8), 0)
+    @NetworkVar('SocksColor',       rColor, wColor,            Color(255, 255, 255))
+    @NetworkVar('SocksTextureURL',  rString, wString,          '')
     
     for i = 1, 6
-        @NetworkVar('SocksDetailColor' .. i, net.ReadColor, net.WriteColor, Color(255, 255, 255))
+        @NetworkVar('SocksDetailColor' .. i, rColor, wColor, Color(255, 255, 255))
 
-    @NetworkVar('BatPonyEars',      net.ReadBool, net.WriteBool,              false)
-    @NetworkVar('Fangs',            net.ReadBool, net.WriteBool,              false)
-    @NetworkVar('ClawTeeth',        net.ReadBool, net.WriteBool,              false)
+    @NetworkVar('BatPonyEars',      rBool, wBool,              false)
+    @NetworkVar('Fangs',            rBool, wBool,              false)
+    @NetworkVar('ClawTeeth',        rBool, wBool,              false)
 
-    @NetworkVar('TeethColor',       net.ReadColor, net.WriteColor,    Color(255, 255, 255))
-    @NetworkVar('MouthColor',       net.ReadColor, net.WriteColor,    Color(219, 65, 155))
-    @NetworkVar('TongueColor',      net.ReadColor, net.WriteColor,    Color(235, 131, 59))
+    @NetworkVar('TeethColor',       rColor, wColor,    Color(255, 255, 255))
+    @NetworkVar('MouthColor',       rColor, wColor,    Color(219, 65, 155))
+    @NetworkVar('TongueColor',      rColor, wColor,    Color(235, 131, 59))
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-        @NetworkVar("DisableFlex#{flex}", net.ReadBool, net.WriteBool, false) if active
+        @NetworkVar("DisableFlex#{flex}", rBool, wBool, false) if active
 
     for i = 1, PPM2.MAX_BODY_DETAILS
-        @NetworkVar("BodyDetail#{i}",       (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_DETAIL, PPM2.MAX_DETAIL)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-        @NetworkVar("BodyDetailColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
-        @NetworkVar("BodyDetailURL#{i}",    net.ReadString, net.WriteString, '')
-        @NetworkVar("BodyDetailURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+        @NetworkVar("BodyDetail#{i}",       rUInt(8, PPM2.MIN_DETAIL, PPM2.MAX_DETAIL), wUInt(0, 8), 0)
+        @NetworkVar("BodyDetailColor#{i}",  rColor,  wColor, Color(255, 255, 255))
+        @NetworkVar("BodyDetailURL#{i}",    rString, wString, '')
+        @NetworkVar("BodyDetailURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
     
     for i = 1, 3
-        @NetworkVar("HornURL#{i}",       net.ReadString, net.WriteString, '')
-        @NetworkVar("WingsURL#{i}",      net.ReadString, net.WriteString, '')
-        @NetworkVar("HornURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
-        @NetworkVar("WingsURLColor#{i}", net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+        @NetworkVar("HornURL#{i}",       rString, wString, '')
+        @NetworkVar("WingsURL#{i}",      rString, wString, '')
+        @NetworkVar("HornURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
+        @NetworkVar("WingsURLColor#{i}", rColor,  wColor, Color(255, 255, 255))
     
-    @NetworkVar('Fly',                  net.ReadBool,   net.WriteBool,                 false)
-    @NetworkVar('DisableTask',          net.ReadBool,   net.WriteBool,                 false)
-    @NetworkVar('UseFlexLerp',          net.ReadBool,   net.WriteBool,                  true)
-    @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  net.WriteFloat,                    1)
-    @NetworkVar('NewMuzzle',            net.ReadBool,   net.WriteBool,                  true)
-    @NetworkVar('SeparateWings',        net.ReadBool,   net.WriteBool,                 false)
-    @NetworkVar('SeparateHorn',         net.ReadBool,   net.WriteBool,                 false)
-    @NetworkVar('WingsColor',           net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
-    @NetworkVar('HornColor',            net.ReadColor,  net.WriteColor,  Color(255, 255, 255))
+    @NetworkVar('Fly',                  rBool,   wBool,                 false)
+    @NetworkVar('DisableTask',          rBool,   wBool,                 false)
+    @NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
+    @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  wFloat,                    1)
+    @NetworkVar('NewMuzzle',            rBool,   wBool,                  true)
+    @NetworkVar('SeparateWings',        rBool,   wBool,                 false)
+    @NetworkVar('SeparateHorn',         rBool,   wBool,                 false)
+    @NetworkVar('WingsColor',           rColor,  wColor,  Color(255, 255, 255))
+    @NetworkVar('HornColor',            rColor,  wColor,  Color(255, 255, 255))
 
-    @NetworkVar('WingsType',            (-> math.Clamp(net.ReadUInt(8), PPM2.MIN_WINGS, PPM2.MAX_WINGS)), ((arg = 0) -> net.WriteUInt(arg, 8)), 0)
-    @NetworkVar('MaleBuff',             (-> math.Clamp(net.ReadFloat(), PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF)), net.WriteFloat, PPM2.DEFAULT_MALE_BUFF)
+    @NetworkVar('WingsType',            rUInt(8, PPM2.MIN_WINGS, PPM2.MAX_WINGS), wUInt(0, 8), 0)
+    @NetworkVar('MaleBuff',             rFloat(PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF), wFloat, PPM2.DEFAULT_MALE_BUFF)
 
-    @NetworkVar('BatWingColor',         net.ReadColor, net.WriteColor,    Color(255, 255, 255))
-    @NetworkVar('BatWingSkinColor',     net.ReadColor, net.WriteColor,    Color(255, 255, 255))
+    @NetworkVar('BatWingColor',         rColor, wColor,    Color(255, 255, 255))
+    @NetworkVar('BatWingSkinColor',     rColor, wColor,    Color(255, 255, 255))
 
     for i = 1, 3
-        @NetworkVar("BatWingURL#{i}",           net.ReadString, net.WriteString, '')
-        @NetworkVar("BatWingSkinURL#{i}",       net.ReadString, net.WriteString, '')
-        @NetworkVar("BatWingURLColor#{i}",      net.ReadColor,  net.WriteColor, Color(255, 255, 255))
-        @NetworkVar("BatWingSkinURLColor#{i}",  net.ReadColor,  net.WriteColor, Color(255, 255, 255))
+        @NetworkVar("BatWingURL#{i}",           rString, wString, '')
+        @NetworkVar("BatWingSkinURL#{i}",       rString, wString, '')
+        @NetworkVar("BatWingURLColor#{i}",      rColor,  wColor, Color(255, 255, 255))
+        @NetworkVar("BatWingSkinURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
     
     Clone: (target = @ent) =>
         copy = @@(nil, target)
