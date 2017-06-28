@@ -895,8 +895,6 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
-                '$lightwarptexture': 'models/ppm/base/lightwrap'
-                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
@@ -1038,8 +1036,6 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
-                '$lightwarptexture': 'models/ppm/base/lightwrap'
-                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
