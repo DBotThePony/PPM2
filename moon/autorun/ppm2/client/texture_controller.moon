@@ -895,6 +895,8 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
@@ -1036,6 +1038,8 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
@@ -1115,7 +1119,9 @@ class PonyTextureController
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/debug/debugwhite' 
+                '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
                 '$model': '1'
                 '$phong': '1'
                 '$basemapalphaphongmask': '1'
@@ -1243,7 +1249,9 @@ class PonyTextureController
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_1"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/debug/debugwhite' 
+                '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
                 '$model': '1'
                 '$phong': '1'
                 '$basemapalphaphongmask': '1'
@@ -1513,6 +1521,8 @@ class PonyTextureController
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
                 '$translucent': '1'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
             }
         }
 
@@ -1522,6 +1532,8 @@ class PonyTextureController
             'data': {
                 '$basetexture': 'models/ppm/partrender/null'
                 '$translucent': '1'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
             }
         }
 
@@ -1677,7 +1689,9 @@ class NewPonyTextureController extends PonyTextureController
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/debug/debugwhite' 
+                '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
                 '$model': '1'
                 '$phong': '1'
                 '$basemapalphaphongmask': '1'
@@ -1807,6 +1821,8 @@ class NewPonyTextureController extends PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
@@ -1883,6 +1899,8 @@ class NewPonyTextureController extends PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/debug/debugwhite'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
 
                 '$model': '1'
                 '$phong': '1'
@@ -1965,7 +1983,9 @@ class NewPonyTextureController extends PonyTextureController
     
     CompileMouth: =>
         textureData = {
-            '$basetexture': 'models/debug/debugwhite' 
+            '$basetexture': 'models/debug/debugwhite'
+            '$lightwarptexture': 'models/ppm/base/lightwrap'
+            '$halflambert': '1'
             '$phong': '1'
             '$phongexponent': '20'
             '$phongboost': '.1'	
