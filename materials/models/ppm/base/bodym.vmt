@@ -1,6 +1,8 @@
 "VertexLitGeneric"
 {
 	"$basetexture" "models/ppm/base/bodym"
+	"$lightwarptexture" "models/ppm/base/lightwrap"
+	"$halflambert" "1"
 
 	"$model" "1"
 	"$phong" "1"

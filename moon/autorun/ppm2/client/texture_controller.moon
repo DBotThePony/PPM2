@@ -789,6 +789,8 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/bodym'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
+                '$halflambert': '1'
 
                 '$color': '{255 255 255}'
                 '$color2': '{255 255 255}'
