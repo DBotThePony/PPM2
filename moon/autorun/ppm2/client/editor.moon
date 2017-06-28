@@ -849,6 +849,9 @@ EditorPages = {
             for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
                 @ComboBox("Detail #{i}", "BodyDetail#{i}")
                 @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+                if ADVANCED_MODE\GetBool()
+                    @CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
+                    @NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
                 @Hr()
 
             @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')

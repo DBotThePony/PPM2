@@ -715,6 +715,20 @@ class PonyDataInstance
             fix: COLOR_FIXER()
         }
 
+        @PONY_DATA["body_detail_glow_#{i}"] = {
+            default: -> false
+            getFunc: "BodyDetailGlow#{i}"
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        @PONY_DATA["body_detail_glow_strength_#{i}"] = {
+            default: -> 1
+            getFunc: "BodyDetailGlowStrength#{i}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 0, 0, 1)
+            min: 0
+            max: 1
+        }
+
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
         continue if not active
         @PONY_DATA["flex_disable_#{flex\lower()}"] = {

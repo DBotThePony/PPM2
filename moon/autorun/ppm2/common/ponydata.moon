@@ -151,6 +151,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BodyDetailColor#{i}",  rColor,  wColor, Color(255, 255, 255))
         @NetworkVar("BodyDetailURL#{i}",    rString, wString, '')
         @NetworkVar("BodyDetailURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
+
+        @NetworkVar("BodyDetailGlow#{i}",           rBool, wBool,           false)
+        @NetworkVar("BodyDetailGlowStrength#{i}",   rFloat(0, 1), wFloat,   1)
     
     for i = 1, 3
         @NetworkVar("HornURL#{i}",       rString, wString, '')

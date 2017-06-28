@@ -58,11 +58,6 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/separated_muzzle')
 }
 
-PPM2.BodyGlowingDetailsMaterials = {
-    [12]: Material('models/ppm/partrender/body_robotic')
-    [13]: Material('models/ppm/partrender/dash-e')
-}
-
 PPM2.UpperManeDetailsMaterials = {
     [4]: {Material('models/ppm/partrender/upmane_5_mask0')}
     [5]: {Material('models/ppm/partrender/upmane_6_mask0')}
@@ -372,6 +367,8 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["BodyDetailColor#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailURLColor#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
+        @BODY_UPDATE_TRIGGER["BodyDetailGlow#{i}"] = true
+        @BODY_UPDATE_TRIGGER["BodyDetailGlowStrength#{i}"] = true
     
     DataChanges: (state) =>
         return unless @isValid
@@ -887,10 +884,12 @@ class PonyTextureController
             surface.SetDrawColor(255, 255, 255)
 
             for i = 1, PPM2.MAX_BODY_DETAILS
-                detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
-                if mat = PPM2.BodyGlowingDetailsMaterials[detailID]
-                    surface.SetMaterial(mat)
-                    surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+                if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
+                    if mat = PPM2.BodyDetailsMaterials[@GetData()["GetBodyDetail#{i}"](@GetData())]
+                        alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
+                        surface.SetDrawColor(255, 255, 255, alpha * 255)
+                        surface.SetMaterial(mat)
+                        surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             surface.DisableClipping(false)
             cam.End2D()
