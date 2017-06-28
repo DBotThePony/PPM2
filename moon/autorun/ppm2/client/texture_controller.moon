@@ -887,10 +887,15 @@ class PonyTextureController
             surface.SetDrawColor(255, 255, 255)
 
             for i = 1, PPM2.MAX_BODY_DETAILS
-                if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
-                    if mat = PPM2.BodyDetailsMaterials[@GetData()["GetBodyDetail#{i}"](@GetData())]
-                        alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
+                if mat = PPM2.BodyDetailsMaterials[@GetData()["GetBodyDetail#{i}"](@GetData())]
+                    alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
+                    
+                    if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
                         surface.SetDrawColor(255, 255, 255, alpha * 255)
+                        surface.SetMaterial(mat)
+                        surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+                    else
+                        surface.SetDrawColor(0, 0, 0, alpha * 255)
                         surface.SetMaterial(mat)
                         surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
