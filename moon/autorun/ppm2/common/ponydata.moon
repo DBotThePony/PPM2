@@ -164,7 +164,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('Fly',                  rBool,   wBool,                 false)
     @NetworkVar('DisableTask',          rBool,   wBool,                 false)
     @NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
-    @NetworkVar('FlexLerpMultiplier',   net.ReadFloat,  wFloat,                    1)
+    @NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,                    1)
     @NetworkVar('NewMuzzle',            rBool,   wBool,                  true)
 
     @NetworkVar('SeparateWings',        rBool,   wBool,                 false)
