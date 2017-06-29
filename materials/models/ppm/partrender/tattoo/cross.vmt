@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
-	"$basetexture" "models/ppm/partrender/tattoocross"
+	"$basetexture" "models/ppm/partrender/tattoo/cross"
 	"$ignorez"  1
 	"$vertexcolor"  1
 	"$vertexalpha"  1
