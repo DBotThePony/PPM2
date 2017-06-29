@@ -18,6 +18,7 @@
 ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
+LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 
 class PonyRenderController
     @AVALIABLE_CONTROLLERS = {}
@@ -190,6 +191,8 @@ class PonyRenderController
                 @legsModel.RenderOverride = -> @DrawLegsOverride()
                 @legsModel\DrawModel()
             return
+        else
+            @legsModel\SetNoDraw(true)
         @UpdateLegs()
 
         oldClip = render.EnableClipping(true)
@@ -204,7 +207,7 @@ class PonyRenderController
         @legsModel\DrawModel()
         @GetTextureController()\PostDrawLegs(@legsModel)
 
-        if ENABLE_FLASHLIGHT_PASS\GetBool()
+        if LEGS_RENDER_TYPE\GetBool() and NABLE_FLASHLIGHT_PASS\GetBool()
             render.PushFlashlightMode(true)
             @GetTextureController()\PreDrawLegs(@legsModel)
             if sizes = @GetData()\GetSizeController()
@@ -236,17 +239,6 @@ class PonyRenderController
             sizes\ModifyScale(@legsModel)
         @legsModel\DrawModel()
         @GetTextureController()\PostDrawLegs(@legsModel)
-
-        if ENABLE_FLASHLIGHT_PASS\GetBool()
-            render.PushFlashlightMode(true)
-            @GetTextureController()\PreDrawLegs(@legsModel)
-            if sizes = @GetData()\GetSizeController()
-                sizes\ModifyNeck(@legsModel)
-                sizes\ModifyLegs(@legsModel)
-                sizes\ModifyScale(@legsModel)
-            @legsModel\DrawModel()
-            @GetTextureController()\PostDrawLegs(@legsModel)
-            render.PopFlashlightMode()
 
         render.PopCustomClipPlane()
         render.EnableClipping(oldClip)
