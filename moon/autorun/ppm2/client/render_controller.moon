@@ -17,6 +17,7 @@
 
 ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
+USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
 
 class PonyRenderController
     @AVALIABLE_CONTROLLERS = {}
@@ -183,6 +184,12 @@ class PonyRenderController
         return unless IsValid(@legsModel)
         return if @ent\ShouldDrawLocalPlayer()
         return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+        if USE_RENDER_OVERRIDE\GetBool()
+            @legsModel\SetNoDraw(false)
+            if not @legsModel.RenderOverride
+                @legsModel.RenderOverride = -> @DrawLegsOverride()
+                @legsModel\DrawModel()
+            return
         @UpdateLegs()
 
         oldClip = render.EnableClipping(true)
@@ -210,6 +217,38 @@ class PonyRenderController
 
         render.PopCustomClipPlane()
         cam.End3D() if start3D
+        render.EnableClipping(oldClip)
+    
+    DrawLegsOverride: =>
+        return if not @isValid
+        return if not ENABLE_LEGS\GetBool()
+        return if @ent\ShouldDrawLocalPlayer()
+        return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+        @UpdateLegs()
+
+        oldClip = render.EnableClipping(true)
+        render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
+
+        @GetTextureController()\PreDrawLegs(@legsModel)
+        if sizes = @GetData()\GetSizeController()
+            sizes\ModifyNeck(@legsModel)
+            sizes\ModifyLegs(@legsModel)
+            sizes\ModifyScale(@legsModel)
+        @legsModel\DrawModel()
+        @GetTextureController()\PostDrawLegs(@legsModel)
+
+        if ENABLE_FLASHLIGHT_PASS\GetBool()
+            render.PushFlashlightMode(true)
+            @GetTextureController()\PreDrawLegs(@legsModel)
+            if sizes = @GetData()\GetSizeController()
+                sizes\ModifyNeck(@legsModel)
+                sizes\ModifyLegs(@legsModel)
+                sizes\ModifyScale(@legsModel)
+            @legsModel\DrawModel()
+            @GetTextureController()\PostDrawLegs(@legsModel)
+            render.PopFlashlightMode()
+
+        render.PopCustomClipPlane()
         render.EnableClipping(oldClip)
     
     DrawLegsDepth: (start3D = false) =>
