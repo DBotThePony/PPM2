@@ -16,6 +16,9 @@
 --
 
 TASK_RENDER_TYPE = CreateConVar('ppm2_task_render_type', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Task rendering type (e.g. pony ragdolls and NPCs). 1 - better render; less conflicts; more FPS. 0 - "old-style" render; possible conflicts;')
+DRAW_LEGS_DEPTH = CreateConVar('ppm2_render_legsdepth', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Render legs in depth pass. Useful with Boken DoF enabled')
+LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
+ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
 
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
     for task in *PPM2.NetworkedPonyData.RenderTasks
@@ -38,10 +41,15 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
                 wep\SetNoDraw(false)
                 ply.__ppm2_weapon_hit = false
 
-ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
+    if not LEGS_RENDER_TYPE\GetBool()
+        with LocalPlayer()
+            if .__cachedIsPony and \Alive()
+                if data = \GetPonyData()
+                    data\GetRenderController()\DrawLegs()
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
-    if bDrawingDepth
+    if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
                 if data = \GetPonyData()
@@ -89,10 +97,11 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                             rag\DrawModel()
                             renderController\PostDraw(rag)
     
-    with LocalPlayer()
-        if .__cachedIsPony and \Alive()
-            if data = \GetPonyData()
-                data\GetRenderController()\DrawLegs()
+    if LEGS_RENDER_TYPE\GetBool()
+        with LocalPlayer()
+            if .__cachedIsPony and \Alive()
+                if data = \GetPonyData()
+                    data\GetRenderController()\DrawLegs()
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()
@@ -116,6 +125,7 @@ PPM2.PostPlayerDraw = =>
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
+hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, 2
 
 SHOULD_DRAW_VIEWMODEL = CreateConVar('cl_ppm2_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 
