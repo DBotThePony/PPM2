@@ -1026,6 +1026,29 @@ EditorPages = {
     }
 
     {
+        'name': 'Tattoos'
+        'internal': 'tattoos'
+        'display': -> ADVANCED_MODE\GetBool()
+        'func': (sheet) =>
+            @ScrollPanel()
+            @Label('WORK IN PROGRESS')
+
+            for i = 1, PPM2.MAX_TATTOOS
+                spoiler = @Spoiler("Tattoo layer #{i}")
+                @ComboBox('Type', "TattooType#{i}", nil, spoiler)
+                @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler)
+                @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler)
+                @NumSlider('Y Position', "TattooPosY#{i}", 2, spoiler)
+                @NumSlider('Width Scale', "TattooScaleX#{i}", 2, spoiler)
+                @NumSlider('Height Scale', "TattooScaleY#{i}", 2, spoiler)
+                @CheckBox('Tattoo over body details', "TattooOverDetail#{i}", spoiler)
+                @CheckBox('Tattoo is glowing', "TattooGlow#{i}", spoiler)
+                @NumSlider('Tattoo glow strength', "TattooGlowStrength#{i}", 2, spoiler)
+                box, collapse = @ColorBox('Color of Tattoo', "TattooColor#{i}", spoiler)
+                collapse\SetExpanded(true)
+    }
+
+    {
         'name': 'Cutiemark'
         'internal': 'cmark'
         'func': (sheet) =>

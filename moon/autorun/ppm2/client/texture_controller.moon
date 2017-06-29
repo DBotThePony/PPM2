@@ -198,7 +198,10 @@ PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}") for
     'spidermane_full'
 }]
 
+PPM2.TattoosMaterials = [Material("models/ppm/partrender/tattoo/#{fil\lower()}") for fil in *PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
+
 table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.AvaliablePonySuitsMaterials when type(mat) ~= 'number'
+table.insert(RELOADABLE_MATERIALS, mat) for mat in *PPM2.TattoosMaterials when type(mat) ~= 'number'
 
 PPM2.ApplyMaterialData = (mat, matData) ->
     for k, v in pairs matData
@@ -372,6 +375,18 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailGlow#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailGlowStrength#{i}"] = true
+    
+    for i = 1, PPM2.MAX_TATTOOS
+        @BODY_UPDATE_TRIGGER["TattooType#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooPosX#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooPosY#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooRotate#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooScaleX#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooScaleY#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooColor#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooGlow#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
+        @BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
     
     DataChanges: (state) =>
         return unless @isValid
@@ -593,6 +608,7 @@ class PonyTextureController
     GetData: =>
         @ent = @networkedData\GetEntity()
         return @networkedData
+    GrabData: (str, ...) => @GetData()['Get' .. str](@GetData(), ...)
     GetEntity: => @ent
     GetBody: =>
         if @GetData()\GetGender() == PPM2.GENDER_FEMALE
@@ -780,14 +796,40 @@ class PonyTextureController
     @QUAD_SIZE_BODY_HIRES = 2048
     @QUAD_SIZE_BODY_HIRES2 = 4096
 
+    @TATTOO_DEF_SIZE = 128
+    @TATTOO_MEDIUM_SIZE = 256
+    @TATTOO_BIG_SIZE = 512
+
     @GetTextureSize = => USE_HIGHRES_TEXTURES\GetBool() and @QUAD_SIZE_CONST_HIRES or @QUAD_SIZE_CONST
+    @GetBodySize = => USE_HIGHRES_BODY\GetBool() and @QUAD_SIZE_BODY_HIRES2 or USE_HIGHRES_TEXTURES\GetBool() and @QUAD_SIZE_BODY_HIRES or @QUAD_SIZE_BODY
+
+    DrawTattoo: (index = 1, drawingGlow = false, texSize = @@GetBodySize()) =>
+        mat = PPM2.TattoosMaterials[@GrabData("TattooType#{index}")]
+        return if not mat
+        X, Y = @GrabData("TattooPosX#{index}"), @GrabData("TattooPosY#{index}")
+        TattooRotate = @GrabData("TattooRotate#{index}")
+        TattooScaleX = @GrabData("TattooScaleX#{index}")
+        TattooScaleY = @GrabData("TattooScaleY#{index}")
+        if not drawingGlow
+            {:r, :g, :b} = @GrabData("TattooColor#{index}")
+            surface.SetDrawColor(r, g, b)
+        else
+            if @GrabData("TattooGlow#{index}")
+                surface.SetDrawColor(255, 255, 255, 255 * @GrabData("TattooGlowStrength#{index}"))
+            else
+                surface.SetDrawColor(0, 0, 0)
+        surface.SetMaterial(mat)
+        tSize = USE_HIGHRES_BODY\GetBool() and @@TATTOO_BIG_SIZE or USE_HIGHRES_TEXTURES\GetBool() and @@TATTOO_MEDIUM_SIZE or @@TATTOO_DEF_SIZE
+        sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
+        surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
+
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
         prefixUP = bType and 'FEMALE' or 'MALE'
         urlTextures = {}
         left = 0
-        bodysize = USE_HIGHRES_BODY\GetBool() and @@QUAD_SIZE_BODY_HIRES2 or USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_BODY_HIRES or @@QUAD_SIZE_BODY
+        bodysize = @@GetBodySize()
 
         textureData = {
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}"
@@ -840,6 +882,10 @@ class PonyTextureController
             surface.SetMaterial(@@["BODY_MATERIAL_#{prefixUP}"])
             surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
+            for i = 1, PPM2.MAX_TATTOOS
+                if not @GrabData("TattooOverDetail#{i}")
+                    @DrawTattoo(i)
+
             for i = 1, PPM2.MAX_BODY_DETAILS
                 detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
                 if mat = PPM2.BodyDetailsMaterials[detailID]
@@ -854,6 +900,10 @@ class PonyTextureController
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+            
+            for i = 1, PPM2.MAX_TATTOOS
+                if @GrabData("TattooOverDetail#{i}")
+                    @DrawTattoo(i)
             
             suitType = @GetData()\GetBodysuit()
             if PPM2.AvaliablePonySuitsMaterials[suitType]
@@ -886,6 +936,10 @@ class PonyTextureController
 
             surface.SetDrawColor(255, 255, 255)
 
+            for i = 1, PPM2.MAX_TATTOOS
+                if not @GrabData("TattooOverDetail#{i}")
+                    @DrawTattoo(i, true)
+
             for i = 1, PPM2.MAX_BODY_DETAILS
                 if mat = PPM2.BodyDetailsMaterials[@GetData()["GetBodyDetail#{i}"](@GetData())]
                     alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
@@ -899,6 +953,10 @@ class PonyTextureController
                         surface.SetMaterial(mat)
                         surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
+            for i = 1, PPM2.MAX_TATTOOS
+                if @GrabData("TattooOverDetail#{i}")
+                    @DrawTattoo(i, true)
+            
             surface.DisableClipping(false)
             cam.End2D()
             render.PopRenderTarget()

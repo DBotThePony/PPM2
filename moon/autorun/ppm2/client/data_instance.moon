@@ -765,9 +765,17 @@ class PonyDataInstance
             max: PPM2.MAX_TATTOOS
         }
         
-        @PONY_DATA["tattoo_pos_#{i}"] = {
+        @PONY_DATA["tattoo_posx_#{i}"] = {
             default: -> 0
-            getFunc: "TattooPos#{i}"
+            getFunc: "TattooPosX#{i}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, -100, 100)
+            min: -100
+            max: 100
+        }
+        
+        @PONY_DATA["tattoo_posy_#{i}"] = {
+            default: -> 0
+            getFunc: "TattooPosY#{i}"
             fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, -100, 100)
             min: -100
             max: 100
@@ -808,6 +816,12 @@ class PonyDataInstance
         @PONY_DATA["tattoo_glow_#{i}"] = {
             default: -> false
             getFunc: "TattooGlow#{i}"
+            fix: (arg = false) -> tobool(arg)
+        }
+        
+        @PONY_DATA["tattoo_over_detail_#{i}"] = {
+            default: -> false
+            getFunc: "TattooOverDetail#{i}"
             fix: (arg = false) -> tobool(arg)
         }
         

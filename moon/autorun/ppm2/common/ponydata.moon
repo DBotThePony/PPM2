@@ -197,11 +197,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     
     for i = 1, PPM2.MAX_TATTOOS
         @NetworkVar("TattooType#{i}",   rUInt(8, 0, PPM2.MAX_TATTOOS),  wUInt(0, 8), 0)
-        @NetworkVar("TattooPos#{i}",    rFloat(-100, 100),              wFloat,      0)
+        @NetworkVar("TattooPosX#{i}",   rFloat(-100, 100),              wFloat,      0)
+        @NetworkVar("TattooPosY#{i}",   rFloat(-100, 100),              wFloat,      0)
         @NetworkVar("TattooRotate#{i}", rInt(16, -180, 180),            wInt(0, 16), 0)
         @NetworkVar("TattooScaleX#{i}", rFloat(0, 10),                  wFloat,      1)
         @NetworkVar("TattooScaleY#{i}", rFloat(0, 10),                  wFloat,      1)
         @NetworkVar("TattooColor#{i}",  rColor, wColor, Color(255, 255, 255))
+        @NetworkVar("TattooOverDetail#{i}", rBool, wBool, false)
         @NetworkVar("TattooGlow#{i}",  rBool, wBool, false)
         @NetworkVar("TattooGlowStrength#{i}", rFloat(0, 1), wFloat, 1)
     
