@@ -21,8 +21,14 @@ for ply in *player.GetAll()
 wUInt = (def = 0, size = 8) ->
     return (arg = def) -> net.WriteUInt(arg, size)
 
+wInt = (def = 0, size = 8) ->
+    return (arg = def) -> net.WriteInt(arg, size)
+
 rUInt = (size = 8, min = 0, max = 255) ->
     return -> math.Clamp(net.ReadUInt(size), min, max)
+
+rInt = (size = 8, min = -128, max = 127) ->
+    return -> math.Clamp(net.ReadInt(size), min, max)
 
 rFloat = (min = 0, max = 255) ->
     return -> math.Clamp(net.ReadFloat(), min, max)
@@ -188,6 +194,16 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BatWingSkinURL#{i}",       rString, wString, '')
         @NetworkVar("BatWingURLColor#{i}",      rColor,  wColor, Color(255, 255, 255))
         @NetworkVar("BatWingSkinURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
+    
+    for i = 1, PPM2.MAX_TATTOOS
+        @NetworkVar("TattooType#{i}",   rUInt(8, 0, PPM2.MAX_TATTOOS),  wUInt(0, 8), 0)
+        @NetworkVar("TattooPos#{i}",    rFloat(-100, 100),              wFloat,      0)
+        @NetworkVar("TattooRotate#{i}", rInt(16, -180, 180),            wInt(0, 16), 0)
+        @NetworkVar("TattooScaleX#{i}", rFloat(0, 10),                  wFloat,      1)
+        @NetworkVar("TattooScaleY#{i}", rFloat(0, 10),                  wFloat,      1)
+        @NetworkVar("TattooColor#{i}",  rColor, wColor, Color(255, 255, 255))
+        @NetworkVar("TattooGlow#{i}",  rBool, wBool, false)
+        @NetworkVar("TattooGlowStrength#{i}", rFloat(0, 1), wFloat, 1)
     
     Clone: (target = @ent) =>
         copy = @@(nil, target)

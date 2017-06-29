@@ -754,6 +754,68 @@ class PonyDataInstance
             min: 0
             max: 1
         }
+    
+    for i = 1, PPM2.MAX_TATTOOS
+        @PONY_DATA["tattoo_type_#{i}"] = {
+            default: -> 0
+            getFunc: "TattooType#{i}"
+            enum: [arg for arg in *PPM2.TATTOOS_REGISTRY]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, 0, PPM2.MAX_TATTOOS)
+            min: 0
+            max: PPM2.MAX_TATTOOS
+        }
+        
+        @PONY_DATA["tattoo_pos_#{i}"] = {
+            default: -> 0
+            getFunc: "TattooPos#{i}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, -100, 100)
+            min: -100
+            max: 100
+        }
+        
+        @PONY_DATA["tattoo_rotate_#{i}"] = {
+            default: -> 0
+            getFunc: "TattooRotate#{i}"
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, -180, 180)
+            min: -180
+            max: 180
+        }
+        
+        @PONY_DATA["tattoo_scalex_#{i}"] = {
+            default: -> 1
+            getFunc: "TattooScaleX#{i}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, 0, 10)
+            min: 0
+            max: 10
+        }
+        
+        @PONY_DATA["tattoo_glow_strength_#{i}"] = {
+            default: -> 1
+            getFunc: "TattooGlowStrength#{i}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, 0, 1)
+            min: 0
+            max: 1
+        }
+        
+        @PONY_DATA["tattoo_scaley_#{i}"] = {
+            default: -> 1
+            getFunc: "TattooScaleY#{i}"
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, 0, 10)
+            min: 0
+            max: 10
+        }
+        
+        @PONY_DATA["tattoo_glow_#{i}"] = {
+            default: -> false
+            getFunc: "TattooGlow#{i}"
+            fix: (arg = false) -> tobool(arg)
+        }
+        
+        @PONY_DATA["tattoo_color_#{i}"] = {
+            default: -> Color(255, 255, 255)
+            getFunc: "TattooColor#{i}"
+            fix: COLOR_FIXER()
+        }
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
         continue if not active
