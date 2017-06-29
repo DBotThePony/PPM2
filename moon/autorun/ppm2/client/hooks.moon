@@ -40,8 +40,14 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
 
 ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
 
-PPM2.PostDrawOpaqueRenderables = (a, b) ->
-    return if a or b
+PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
+    if bDrawingDepth
+        with LocalPlayer()
+            if .__cachedIsPony and \Alive()
+                if data = \GetPonyData()
+                    data\GetRenderController()\DrawLegsDepth()
+    
+    return if bDrawingDepth or bDrawingSkybox
 
     for task in *PPM2.NetworkedPonyData.RenderTasks
         ent = task.ent
@@ -82,6 +88,11 @@ PPM2.PostDrawOpaqueRenderables = (a, b) ->
                             renderController\PreDraw(rag)
                             rag\DrawModel()
                             renderController\PostDraw(rag)
+    
+    with LocalPlayer()
+        if .__cachedIsPony and \Alive()
+            if data = \GetPonyData()
+                data\GetRenderController()\DrawLegs()
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()
@@ -105,11 +116,6 @@ PPM2.PostPlayerDraw = =>
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
-hook.Add 'RenderScreenspaceEffects', 'PPM2.RenderScreenspaceEffects', ->
-    self = LocalPlayer()
-
-    if @__cachedIsPony and @GetPonyData() and @Alive()
-        @GetPonyData()\GetRenderController()\DrawLegs()
 
 SHOULD_DRAW_VIEWMODEL = CreateConVar('cl_ppm2_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 

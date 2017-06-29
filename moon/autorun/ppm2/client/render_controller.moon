@@ -176,7 +176,7 @@ class PonyRenderController
     
     @LEG_CLIP_VECTOR = Vector(0, 0, -1)
     @LEGS_MAX_DISTANCE = 60 ^ 2
-    DrawLegs: (start3D = true) =>
+    DrawLegs: (start3D = false) =>
         return if not @isValid
         return if not ENABLE_LEGS\GetBool()
         @CreateLegs() unless IsValid(@legsModel)
@@ -189,24 +189,49 @@ class PonyRenderController
         render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
         cam.Start3D() if start3D
 
-        @GetTextureController()\PreDrawLegs()
+        @GetTextureController()\PreDrawLegs(@legsModel)
+        if sizes = @GetData()\GetSizeController()
+            sizes\ModifyNeck(@legsModel)
+            sizes\ModifyLegs(@legsModel)
+            sizes\ModifyScale(@legsModel)
+        @legsModel\DrawModel()
+        @GetTextureController()\PostDrawLegs(@legsModel)
+
+        if ENABLE_FLASHLIGHT_PASS\GetBool()
+            render.PushFlashlightMode(true)
+            @GetTextureController()\PreDrawLegs(@legsModel)
+            if sizes = @GetData()\GetSizeController()
+                sizes\ModifyNeck(@legsModel)
+                sizes\ModifyLegs(@legsModel)
+                sizes\ModifyScale(@legsModel)
+            @legsModel\DrawModel()
+            @GetTextureController()\PostDrawLegs(@legsModel)
+            render.PopFlashlightMode()
+
+        render.PopCustomClipPlane()
+        cam.End3D() if start3D
+        render.EnableClipping(oldClip)
+    
+    DrawLegsDepth: (start3D = false) =>
+        return if not @isValid
+        return if not ENABLE_LEGS\GetBool()
+        @CreateLegs() unless IsValid(@legsModel)
+        return unless IsValid(@legsModel)
+        return if @ent\ShouldDrawLocalPlayer()
+        return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+        @UpdateLegs()
+
+        oldClip = render.EnableClipping(true)
+        render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
+        cam.Start3D() if start3D
+
+        @GetTextureController()\PreDrawLegs(@legsModel)
         if sizes = @GetData()\GetSizeController()
             sizes\ModifyNeck(@legsModel)
             sizes\ModifyLegs(@legsModel)
             sizes\ModifyScale(@legsModel)
         @legsModel\DrawModel()
         @GetTextureController()\PostDrawLegs()
-
-        if ENABLE_FLASHLIGHT_PASS\GetBool()
-            render.PushFlashlightMode(true)
-            @GetTextureController()\PreDrawLegs()
-            if sizes = @GetData()\GetSizeController()
-                sizes\ModifyNeck(@legsModel)
-                sizes\ModifyLegs(@legsModel)
-                sizes\ModifyScale(@legsModel)
-            @legsModel\DrawModel()
-            @GetTextureController()\PostDrawLegs()
-            render.PopFlashlightMode()
 
         render.PopCustomClipPlane()
         cam.End3D() if start3D
