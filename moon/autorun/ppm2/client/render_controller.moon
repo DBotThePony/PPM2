@@ -63,6 +63,7 @@ class PonyRenderController
         @legsModel = ClientsideModel(@modelCached)
         with @legsModel
             .isPonyLegsModel = true
+            .lastRedrawFix = 0
             \SetNoDraw(true)
             .__PPM2_PonyData = @GetData()
         
@@ -187,6 +188,10 @@ class PonyRenderController
         return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
         if USE_RENDER_OVERRIDE\GetBool()
             @legsModel\SetNoDraw(false)
+            rTime = RealTime()
+            if @legsModel.lastRedrawFix < rTime
+                @legsModel\DrawModel()
+                @legsModel.lastRedrawFix = rTime + 5
             if not @legsModel.RenderOverride
                 @legsModel.RenderOverride = -> @DrawLegsOverride()
                 @legsModel\DrawModel()
