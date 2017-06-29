@@ -42,6 +42,14 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
                 ply.__ppm2_weapon_hit = false
 
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
+    if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
+        with LocalPlayer()
+            if .__cachedIsPony and \Alive()
+                if data = \GetPonyData()
+                    data\GetRenderController()\DrawLegsDepth()
+
+    return if bDrawingDepth or bDrawingSkybox
+
     if not LEGS_RENDER_TYPE\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
