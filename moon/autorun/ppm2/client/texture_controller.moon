@@ -373,35 +373,59 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["BodyDetailGlow#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailGlowStrength#{i}"] = true
     
+    DelayCompile: (func = '', ...) =>
+        return if not @[func]
+        args = {...}
+        for data in *@delayCompilation
+            if data.func == func and #args == #data.args
+                hit = false
+                for i = 1, #args
+                    if args[i] ~= data.args[i]
+                        hit = true
+                        break
+                for i = 1, #data.args
+                    if args[i] ~= data.args[i]
+                        hit = true
+                        break
+                return if not hit
+        
+        table.insert(@delayCompilation, {:func, :args})
+        timer.Create "#{@}_DelayCompile", 0, 1, ->
+            return if not @IsValid()
+            return if not IsValid(@ent)
+            for data in *@delayCompilation
+                @[data.func](@, unpack(data.args))
+            @delayCompilation = {}
+    
     DataChanges: (state) =>
         return unless @isValid
         return if not @ent
         key = state\GetKey()
         switch key
             when 'BodyColor'
-                @CompileBody()
-                @CompileWings()
-                @CompileHorn()
+                @DelayCompile('CompileBody')
+                @DelayCompile('CompileWings')
+                @DelayCompile('CompileHorn')
             when 'Socks', 'Bodysuit'
-                @CompileBody()
+                @DelayCompile('CompileBody')
             when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
-                @CompileCMark()
+                @DelayCompile('CompileCMark')
             when 'SocksColor', 'SocksTextureURL', 'SocksTexture', 'SocksDetailColor1', 'SocksDetailColor2', 'SocksDetailColor3', 'SocksDetailColor4', 'SocksDetailColor5', 'SocksDetailColor6'
-                @CompileSocks()
+                @DelayCompile('CompileSocks')
             when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3', 'UseHornDetail', 'HornGlow', 'HornGlowSrength', 'HornDetailColor'
-                @CompileHorn()
+                @DelayCompile('CompileHorn')
             when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
-                @CompileWings()
+                @DelayCompile('CompileWings')
             else
                 if @@MANE_UPDATE_TRIGGER[key]
-                    @CompileHair()
+                    @DelayCompile('CompileHair')
                 elseif @@TAIL_UPDATE_TRIGGER[key]
-                    @CompileTail()
+                    @DelayCompile('CompileTail')
                 elseif @@EYE_UPDATE_TRIGGER[key]
-                    @CompileEye(true)
-                    @CompileEye(false)
+                    @DelayCompile('CompileEye', true)
+                    @DelayCompile('CompileEye', false)
                 elseif @@BODY_UPDATE_TRIGGER[key]
-                    @CompileBody()
+                    @DelayCompile('CompileBody')
         
     @HTML_MATERIAL_QUEUE = {}
     @URL_MATERIAL_CACHE = {}
@@ -574,6 +598,7 @@ class PonyTextureController
         @compiled = false
         @lastMaterialUpdate = 0
         @lastMaterialUpdateEnt = NULL
+        @delayCompilation = {}
         @CompileTextures() if compile
         PPM2.DebugPrint('Created new texture controller for ', @ent, ' as part of ', controller, '; internal ID is ', @id)
     __tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
@@ -1733,20 +1758,20 @@ class NewPonyTextureController extends PonyTextureController
         super(state)
         switch state\GetKey()
             when 'ManeTypeNew', 'ManeTypeLowerNew', 'TailTypeNew'
-                @CompileHair()
+                @DelayCompile('CompileHair')
 
             when 'TeethColor', 'MouthColor', 'TongueColor'
-                @CompileMouth()
+                @DelayCompile('CompileMouth')
 
             when 'SeparateWings'
-                @CompileBatWings()
-                @CompileBatWingsSkin()
+                @DelayCompile('CompileBatWings')
+                @DelayCompile('CompileBatWingsSkin')
             
             when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
-                @CompileBatWings()
+                @DelayCompile('CompileBatWings')
             
             when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
-                @CompileBatWingsSkin()
+                @DelayCompile('CompileBatWingsSkin')
 
     GetManeType: => @GetData()\GetManeTypeNew()
     GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
