@@ -54,12 +54,14 @@ EditorModels = {
 USE_MODEL = CreateConVar('ppm2_editor_model', 'new', {FCVAR_ARCHIVE}, 'What model to use in editor. Valids are "default", "cppm", "new"')
 PANEL_WIDTH = CreateConVar('ppm2_editor_width', '370', {FCVAR_ARCHIVE}, 'Width of editor panel, in pixels')
 
-IS_USING_NEW = ->
-    switch USE_MODEL\GetString()
-        when 'new'
-            return true
-        else
-            return false
+IS_USING_NEW = (newEditor = false) ->
+    if newEditor
+        return LocalPlayer()\IsNewPony()
+    else
+        switch USE_MODEL\GetString()
+            when 'new'
+                return true
+    return false
 
 MODEL_BOX_PANEL = {
     SEQUENCE_STAND: 22
@@ -495,6 +497,11 @@ PANEL_SETTINGS_BASE = {
         @unsavedChanges = false
         @updateFuncs = {}
         @createdPanels = 1
+        @isNewEditor = false
+    
+    IsNewEditor: => @isNewEditor
+    GetIsNewEditor: => @isNewEditor
+    SetIsNewEditor: (val) => @isNewEditor = val
     ValueChanges: (valID, newVal, pnl) =>
         @unsavedChanges = true
         @frame.unsavedChanges = true
@@ -737,14 +744,14 @@ EditorPages = {
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
             
             @ComboBox('Race', 'Race')
-            @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW()
+            @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW(@IsNewEditor())
             @CheckBox('Gender', 'Gender')
-            @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW()
-            @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW()
+            @CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW(@IsNewEditor())
+            @NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW(@IsNewEditor())
             @NumSlider('Weight', 'Weight', 2)
             @NumSlider('Pony Size', 'PonySize', 2)
 
-            if ADVANCED_MODE\GetBool() and IS_USING_NEW()
+            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
                 @Hr()
                 @CheckBox('No flexes on new model', 'NoFlex')
                 @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
@@ -816,7 +823,7 @@ EditorPages = {
     {
         'name': 'Wings and horn details'
         'internal': 'wings_horn_details'
-        'display': -> ADVANCED_MODE\GetBool()
+        'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
         'func': (sheet) =>
             @ScrollPanel()
 
@@ -887,7 +894,7 @@ EditorPages = {
         'func': (sheet) =>
             @ScrollPanel()
             @ComboBox('Eyelashes', 'EyelashType')
-            if IS_USING_NEW()
+            if IS_USING_NEW(@IsNewEditor())
                 @CheckBox('Bat pony ears', 'BatPonyEars')
                 @CheckBox('Fangs', 'Fangs')
                 @CheckBox('Claw teeth', 'ClawTeeth')
@@ -952,7 +959,7 @@ EditorPages = {
     {
         'name': 'Mane and tail'
         'internal': 'manetail_old'
-        'display': -> not IS_USING_NEW()
+        'display': (editorMode = false) -> not IS_USING_NEW(editorMode)
         'func': (sheet) =>
             @ScrollPanel()
             @ComboBox('Mane type', 'ManeType')
@@ -976,10 +983,9 @@ EditorPages = {
         'display': IS_USING_NEW
         'func': (sheet) =>
             @ScrollPanel()
-            @Label('"New" affect only new model')
-            @ComboBox('New Mane type', 'ManeTypeNew')
-            @ComboBox('New Lower Mane type', 'ManeTypeLowerNew')
-            @ComboBox('New Tail type', 'TailTypeNew')
+            @ComboBox('Mane type', 'ManeTypeNew')
+            @ComboBox('Lower Mane type', 'ManeTypeLowerNew')
+            @ComboBox('Tail type', 'TailTypeNew')
 
             @NumSlider('Tail size', 'TailSize', 2)
 
@@ -993,7 +999,6 @@ EditorPages = {
 
             @Hr()
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
-            @Label('These options have effect only on new model')
 
             @Hr()
             @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
@@ -1457,9 +1462,10 @@ PPM2.OpenNewEditor = ->
     createdPanels = 9
 
     for {:name, :func, :internal, :display} in *EditorPages
-        continue if display and not display()
+        continue if display and not display(true)
         pnl = vgui.Create('PPM2SettingsBase', @menus)
         @menus\AddSheet(name, pnl)
+        pnl\SetIsNewEditor(true)
         pnl\SetTargetData(copy)
         pnl\Dock(FILL)
         pnl.frame = @
@@ -1544,7 +1550,7 @@ PPM2.OpenOldEditor = ->
     createdPanels = 17
 
     for {:name, :func, :internal, :display} in *EditorPages
-        continue if display and not display()
+        continue if display and not display(false)
         pnl = vgui.Create('PPM2SettingsBase', @menus)
         @menus\AddSheet(name, pnl)
         pnl\SetTargetData(copy)
