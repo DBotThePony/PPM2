@@ -738,7 +738,16 @@ class NewBodygroupController extends DefaultBodygroupController
     UpdateWings: =>
         return if SERVER
         left = @GetData()\GetLWingSize() * Vector(1, 1, 1)
+        leftX = @GetData()\GetLWingX()
+        leftY = @GetData()\GetLWingY()
+        leftZ = @GetData()\GetLWingZ()
         right = @GetData()\GetRWingSize() * Vector(1, 1, 1)
+        rightX = @GetData()\GetRWingX()
+        rightY = @GetData()\GetRWingY()
+        rightZ = @GetData()\GetRWingZ()
+        leftPos = Vector(leftX, leftY, leftZ)
+        rightPos = Vector(rightX, rightY, rightZ)
+
         with @ent
             \ManipulateBoneScale(@@WING_LEFT_1, left)
             \ManipulateBoneScale(@@WING_LEFT_2, left)
@@ -746,6 +755,13 @@ class NewBodygroupController extends DefaultBodygroupController
             \ManipulateBoneScale(@@WING_RIGHT_1, right)
             \ManipulateBoneScale(@@WING_RIGHT_2, right)
             \ManipulateBoneScale(@@WING_OPEN_RIGHT, right)
+
+            \ManipulateBonePosition(@@WING_LEFT_1, leftPos)
+            \ManipulateBonePosition(@@WING_LEFT_2, leftPos)
+            \ManipulateBonePosition(@@WING_OPEN_LEFT, leftPos)
+            \ManipulateBonePosition(@@WING_RIGHT_1, rightPos)
+            \ManipulateBonePosition(@@WING_RIGHT_2, rightPos)
+            \ManipulateBonePosition(@@WING_OPEN_RIGHT, rightPos)
 
     ResetBodygroups: =>
         return unless @isValid
@@ -874,7 +890,7 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ApplyRace()
             when 'WingsType'
                 @ApplyRace()
-            when 'LWingSize', 'RWingSize'
+            when 'LWingSize', 'RWingSize', 'LWingX', 'RWingX', 'LWingY', 'RWingY', 'LWingZ', 'RWingZ'
                 @UpdateWings()
             when 'MaleBuff'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0

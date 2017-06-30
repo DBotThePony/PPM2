@@ -179,7 +179,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('WingsType',            rUInt(8, PPM2.MIN_WINGS, PPM2.MAX_WINGS), wUInt(0, 8), 0)
     @NetworkVar('LWingSize',            rFloat(PPM2.MIN_WING, PPM2.MAX_WING), wFloat, 1)
+    @NetworkVar('LWingX',               rFloat(PPM2.MIN_WINGX, PPM2.MAX_WINGX), wFloat, 0)
+    @NetworkVar('LWingY',               rFloat(PPM2.MIN_WINGY, PPM2.MAX_WINGY), wFloat, 0)
+    @NetworkVar('LWingZ',               rFloat(PPM2.MIN_WINGZ, PPM2.MAX_WINGZ), wFloat, 0)
     @NetworkVar('RWingSize',            rFloat(PPM2.MIN_WING, PPM2.MAX_WING), wFloat, 1)
+    @NetworkVar('RWingX',               rFloat(PPM2.MIN_WINGX, PPM2.MAX_WINGX), wFloat, 0)
+    @NetworkVar('RWingY',               rFloat(PPM2.MIN_WINGY, PPM2.MAX_WINGY), wFloat, 0)
+    @NetworkVar('RWingZ',               rFloat(PPM2.MIN_WINGZ, PPM2.MAX_WINGZ), wFloat, 0)
     @NetworkVar('MaleBuff',             rFloat(PPM2.MIN_MALE_BUFF, PPM2.MAX_MALE_BUFF), wFloat, PPM2.DEFAULT_MALE_BUFF)
 
     @NetworkVar('BatWingColor',         rColor, wColor,    Color(255, 255, 255))
