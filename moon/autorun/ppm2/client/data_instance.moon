@@ -369,6 +369,22 @@ class PonyDataInstance
             max: PPM2.MAX_SUIT
         }
 
+        'left_wing_size': {
+            default: -> 1
+            getFunc: 'LWingSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WING, PPM2.MAX_WING)
+            min: PPM2.MIN_WING
+            max: PPM2.MAX_WING
+        }
+
+        'right_wing_size': {
+            default: -> 1
+            getFunc: 'RWingSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WING, PPM2.MAX_WING)
+            min: PPM2.MIN_WING
+            max: PPM2.MAX_WING
+        }
+
         'teeth_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'TeethColor'
