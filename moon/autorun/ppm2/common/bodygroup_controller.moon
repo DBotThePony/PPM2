@@ -434,6 +434,14 @@ class NewBodygroupController extends DefaultBodygroupController
     @BONE_TAIL_2 = 44
     @BONE_TAIL_3 = 45
 
+    @WING_LEFT_1 = 46
+    @WING_LEFT_2 = 48
+    @WING_RIGHT_1 = 47
+    @WING_RIGHT_2 = 49
+
+    @WING_OPEN_LEFT = 50
+    @WING_OPEN_RIGHT = 51
+
     @BONE_MANE_1 = 40
     @BONE_MANE_2 = 33
     @BONE_MANE_3 = 34
@@ -718,6 +726,43 @@ class NewBodygroupController extends DefaultBodygroupController
     @FLEX_ID_FANGS = 31
     @FLEX_ID_CLAW_TEETH = 30
 
+    ResetWings: =>
+        return if SERVER
+        ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
+        for wing in *{@@WING_LEFT_1, @@WING_LEFT_2, @@WING_RIGHT_1, @@WING_RIGHT_2, @@WING_OPEN_LEFT, @@WING_OPEN_RIGHT}
+            with @ent
+                \ManipulateBoneAngles(wing, ang)
+                \ManipulateBoneScale(wing, vec1)
+                \ManipulateBonePosition(wing, vec2)
+
+    UpdateWings: =>
+        return if SERVER
+        left = @GetData()\GetLWingSize() * Vector(1, 1, 1)
+        leftX = @GetData()\GetLWingX()
+        leftY = @GetData()\GetLWingY()
+        leftZ = @GetData()\GetLWingZ()
+        right = @GetData()\GetRWingSize() * Vector(1, 1, 1)
+        rightX = @GetData()\GetRWingX()
+        rightY = @GetData()\GetRWingY()
+        rightZ = @GetData()\GetRWingZ()
+        leftPos = Vector(leftX, leftY, leftZ)
+        rightPos = Vector(rightX, rightY, rightZ)
+
+        with @ent
+            \ManipulateBoneScale(@@WING_LEFT_1, left)
+            \ManipulateBoneScale(@@WING_LEFT_2, left)
+            \ManipulateBoneScale(@@WING_OPEN_LEFT, left)
+            \ManipulateBoneScale(@@WING_RIGHT_1, right)
+            \ManipulateBoneScale(@@WING_RIGHT_2, right)
+            \ManipulateBoneScale(@@WING_OPEN_RIGHT, right)
+
+            \ManipulateBonePosition(@@WING_LEFT_1, leftPos)
+            \ManipulateBonePosition(@@WING_LEFT_2, leftPos)
+            \ManipulateBonePosition(@@WING_OPEN_LEFT, leftPos)
+            \ManipulateBonePosition(@@WING_RIGHT_1, rightPos)
+            \ManipulateBonePosition(@@WING_RIGHT_2, rightPos)
+            \ManipulateBonePosition(@@WING_OPEN_RIGHT, rightPos)
+
     ResetBodygroups: =>
         return unless @isValid
         return unless IsValid(@ent)
@@ -728,6 +773,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
+        @ResetWings()
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
@@ -752,6 +798,7 @@ class NewBodygroupController extends DefaultBodygroupController
         if @lastPAC3BoneReset < RealTime()
             @UpdateTailSize()
             @UpdateManeSize()
+            @UpdateWings()
 
         @ApplyRace()
         if createModels
@@ -843,6 +890,8 @@ class NewBodygroupController extends DefaultBodygroupController
                 @ApplyRace()
             when 'WingsType'
                 @ApplyRace()
+            when 'LWingSize', 'RWingSize', 'LWingX', 'RWingX', 'LWingY', 'RWingY', 'LWingZ', 'RWingZ'
+                @UpdateWings()
             when 'MaleBuff'
                 maleModifier = @GetData()\GetGender() == PPM2.GENDER_MALE and 1 or 0
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
@@ -859,6 +908,7 @@ if CLIENT
             bodygroup.ent = ent
             bodygroup\UpdateTailSize()
             bodygroup\UpdateManeSize()
+            bodygroup\UpdateWings() if bodygroup.UpdateWings
             bodygroup.lastPAC3BoneReset = RealTime() + 1
 else
     hook.Add 'PlayerNoClip', 'PPM2.WingsCheck', =>

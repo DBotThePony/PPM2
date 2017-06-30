@@ -369,6 +369,70 @@ class PonyDataInstance
             max: PPM2.MAX_SUIT
         }
 
+        'left_wing_size': {
+            default: -> 1
+            getFunc: 'LWingSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_WING, PPM2.MAX_WING)
+            min: PPM2.MIN_WING
+            max: PPM2.MAX_WING
+        }
+
+        'left_wing_x': {
+            default: -> 0
+            getFunc: 'LWingX'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGX, PPM2.MAX_WINGX)
+            min: PPM2.MIN_WINGX
+            max: PPM2.MAX_WINGX
+        }
+
+        'left_wing_y': {
+            default: -> 0
+            getFunc: 'LWingY'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGY, PPM2.MAX_WINGY)
+            min: PPM2.MIN_WINGY
+            max: PPM2.MAX_WINGY
+        }
+
+        'left_wing_z': {
+            default: -> 0
+            getFunc: 'LWingZ'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGZ, PPM2.MAX_WINGZ)
+            min: PPM2.MIN_WINGZ
+            max: PPM2.MAX_WINGZ
+        }
+
+        'right_wing_size': {
+            default: -> 1
+            getFunc: 'RWingSize'
+            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 1, PPM2.MIN_WING, PPM2.MAX_WING)
+            min: PPM2.MIN_WING
+            max: PPM2.MAX_WING
+        }
+
+        'right_wing_x': {
+            default: -> 0
+            getFunc: 'RWingX'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGX, PPM2.MAX_WINGX)
+            min: PPM2.MIN_WINGX
+            max: PPM2.MAX_WINGX
+        }
+
+        'right_wing_y': {
+            default: -> 0
+            getFunc: 'RWingY'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGY, PPM2.MAX_WINGY)
+            min: PPM2.MIN_WINGY
+            max: PPM2.MAX_WINGY
+        }
+
+        'right_wing_z': {
+            default: -> 0
+            getFunc: 'RWingZ'
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, PPM2.MIN_WINGZ, PPM2.MAX_WINGZ)
+            min: PPM2.MIN_WINGZ
+            max: PPM2.MAX_WINGZ
+        }
+
         'teeth_color': {
             default: -> Color(255, 255, 255)
             getFunc: 'TeethColor'
