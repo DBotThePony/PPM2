@@ -550,20 +550,20 @@ To rotate left/right use Q/E")
     HandleKey: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_W
+                @moveUpTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveUp = status
-                @moveUpTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooPosY', @DEFAULT_STEP) if status
             when KEY_S
+                @moveDownTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveDown = status
-                @moveDownTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooPosY', -@DEFAULT_STEP) if status
             when KEY_A
+                @moveLeftTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveLeft = status
-                @moveLeftTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooPosX', -@DEFAULT_STEP) if status
             when KEY_D
+                @moveRightTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveRight = status
-                @moveRightTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooPosX', @DEFAULT_STEP) if status
             when KEY_UP
                 @scaleUp = status
@@ -1226,7 +1226,7 @@ EditorPages = {
 
             for i = 1, PPM2.MAX_TATTOOS
                 spoiler = @Spoiler("Tattoo layer #{i}")
-                @Button('Edit', (-> @GetFrame()\EditTattoo(i)), spoiler)
+                @Button('Edit using keyboard', (-> @GetFrame()\EditTattoo(i)), spoiler)
                 @ComboBox('Type', "TattooType#{i}", nil, spoiler)
                 @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler)
                 @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler)
