@@ -491,12 +491,12 @@ vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
 TATTOO_INPUT_GRABBER = {
     WatchButtons: {KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_Q, KEY_E}
     BUTTONS_DELAY: 0.5
-    DEFAULT_STEP: 1
-    ROTATE_STEP: 1
-    SCALE_STEP: 0.1
-    CONTINIOUS_STEP_MULTIPLIER: 1
-    CONTINIOUS_SCALE_STEP: 1
-    CONTINIOUS_ROTATE_STEP: 1
+    DEFAULT_STEP: 0.25
+    ROTATE_STEP: 6
+    SCALE_STEP: 0.05
+    CONTINIOUS_STEP_MULTIPLIER: 2
+    CONTINIOUS_SCALE_STEP: 0.25
+    CONTINIOUS_ROTATE_STEP: 3
 
     SetTargetData: (data) => @targetData = data
     GetTargetData: => @targetData
@@ -539,7 +539,7 @@ TATTOO_INPUT_GRABBER = {
         with @helpLabel = vgui.Create('DLabel', @)
             \SetFont('HudHintTextLarge')
             \Dock(FILL)
-            \DockMargin(5, 5, 5, 5)
+            \DockMargin(10, 10, 10, 10)
             \SetTextColor(color_white)
             \SetText("To exit edit mode, press Escape or click anywhere with mouse
 To move tatto use WASD
@@ -595,6 +595,27 @@ To rotate left/right use Q/E")
         @HandleKey(code, false)
     Think: =>
         return @Remove() if not @HasFocus() and @ignoreFocus < RealTime()
+        ftime = FrameTime()
+        if @moveUp and @moveUpTime < RealTime()
+            @DataAdd('TattooPosY', @CONTINIOUS_STEP_MULTIPLIER * ftime)
+        if @moveDown and @moveDownTime < RealTime()
+            @DataAdd('TattooPosY', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
+        if @moveRight and @moveRightTime < RealTime()
+            @DataAdd('TattooPosX', @CONTINIOUS_STEP_MULTIPLIER * ftime)
+        if @moveLeft and @moveLeftTime < RealTime()
+            @DataAdd('TattooPosX', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
+        if @scaleUp and @scaleUpTime < RealTime()
+            @DataAdd('TattooScaleY', @CONTINIOUS_SCALE_STEP * ftime)
+        if @scaleDown and @scaleDownTime < RealTime()
+            @DataAdd('TattooScaleY', -@CONTINIOUS_SCALE_STEP * ftime)
+        if @scaleLeft and @scaleLeftTime < RealTime()
+            @DataAdd('TattooScaleX', -@CONTINIOUS_SCALE_STEP * ftime)
+        if @scaleRight and @scaleRightTime < RealTime()
+            @DataAdd('TattooScaleX', @CONTINIOUS_SCALE_STEP * ftime)
+        if @rotateLeft and @rotateLeftTime < RealTime()
+            @DataAdd('TattooRotate', -@CONTINIOUS_ROTATE_STEP * ftime)
+        if @rotateRight and @rotateRightTime < RealTime()
+            @DataAdd('TattooRotate', @CONTINIOUS_ROTATE_STEP * ftime)
     
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0, 150)
