@@ -849,71 +849,64 @@ EditorPages = {
     }
 
     {
-        'name': 'Wings and horn details'
-        'internal': 'wings_horn_details'
-        'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
+        'name': 'Mane and tail'
+        'internal': 'manetail_old'
+        'display': (editorMode = false) -> not IS_USING_NEW(editorMode)
         'func': (sheet) =>
             @ScrollPanel()
+            @ComboBox('Mane type', 'ManeType')
+            @ComboBox('Lower Mane type', 'ManeTypeLower')
+            @ComboBox('Tail type', 'TailType')
 
-            for i = 1, 3
-                @Label("Horn URL detail #{i}")
-                @URLInput("HornURL#{i}")
-                @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
-                @Hr()
-            
-            @Hr()
-            @Label('Normal wings')
-            @Hr()
+            @NumSlider('Tail size', 'TailSize', 2)
 
-            for i = 1, 3
-                @Label("Wings URL detail #{i}")
-                @URLInput("WingsURL#{i}")
-                @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
-                @Hr()
-            
             @Hr()
-            @Label('Bat wings')
+            @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
+            @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
+
             @Hr()
-            
-            for i = 1, 3
-                @Label("Bat Wings URL detail #{i}")
-                @URLInput("BatWingURL#{i}")
-                @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
-                @Hr()
-            
-            @Hr()
-            @Label('Bat wings skin')
-            @Hr()
-            
-            for i = 1, 3
-                @Label("Bat Wings skin URL detail #{i}")
-                @URLInput("BatWingSkinURL#{i}")
-                @ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
-                @Hr()
+            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 4
+            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 4
     }
 
     {
-        'name': 'Body details'
-        'internal': 'bodydetails'
+        'name': 'Mane and tail'
+        'internal': 'manetail_new'
+        'display': IS_USING_NEW
         'func': (sheet) =>
             @ScrollPanel()
+            @ComboBox('Mane type', 'ManeTypeNew')
+            @ComboBox('Lower Mane type', 'ManeTypeLowerNew')
+            @ComboBox('Tail type', 'TailTypeNew')
 
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
-                @ComboBox("Detail #{i}", "BodyDetail#{i}")
-                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
-                if ADVANCED_MODE\GetBool()
-                    @CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
-                    @NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
-                @Hr()
+            @NumSlider('Tail size', 'TailSize', 2)
 
-            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
             @Hr()
+            @CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
+            @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
+            @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
-                @Label("Body detail #{i}")
-                @URLInput("BodyDetailURL#{i}")
-                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
-                @Hr()
+            @Hr()
+            @CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
+            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+
+            return if not ADVANCED_MODE\GetBool()
+
+            @Hr()
+            @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+            doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings')
+            doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings')
+
+            @Hr()
+            @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
+            @ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}") for i = 1, 2
+
+            @Hr()
+            @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+            @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
     }
 
     {
@@ -985,64 +978,71 @@ EditorPages = {
     }
 
     {
-        'name': 'Mane and tail'
-        'internal': 'manetail_old'
-        'display': (editorMode = false) -> not IS_USING_NEW(editorMode)
+        'name': 'Wings and horn details'
+        'internal': 'wings_horn_details'
+        'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
         'func': (sheet) =>
             @ScrollPanel()
-            @ComboBox('Mane type', 'ManeType')
-            @ComboBox('Lower Mane type', 'ManeTypeLower')
-            @ComboBox('Tail type', 'TailType')
 
-            @NumSlider('Tail size', 'TailSize', 2)
-
+            for i = 1, 3
+                @Label("Horn URL detail #{i}")
+                @URLInput("HornURL#{i}")
+                @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+                @Hr()
+            
             @Hr()
-            @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
-            @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
-
+            @Label('Normal wings')
             @Hr()
-            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 4
-            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 4
+
+            for i = 1, 3
+                @Label("Wings URL detail #{i}")
+                @URLInput("WingsURL#{i}")
+                @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+                @Hr()
+            
+            @Hr()
+            @Label('Bat wings')
+            @Hr()
+            
+            for i = 1, 3
+                @Label("Bat Wings URL detail #{i}")
+                @URLInput("BatWingURL#{i}")
+                @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
+                @Hr()
+            
+            @Hr()
+            @Label('Bat wings skin')
+            @Hr()
+            
+            for i = 1, 3
+                @Label("Bat Wings skin URL detail #{i}")
+                @URLInput("BatWingSkinURL#{i}")
+                @ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
+                @Hr()
     }
 
     {
-        'name': 'Mane and tail'
-        'internal': 'manetail_new'
-        'display': IS_USING_NEW
+        'name': 'Body details'
+        'internal': 'bodydetails'
         'func': (sheet) =>
             @ScrollPanel()
-            @ComboBox('Mane type', 'ManeTypeNew')
-            @ComboBox('Lower Mane type', 'ManeTypeLowerNew')
-            @ComboBox('Tail type', 'TailTypeNew')
 
-            @NumSlider('Tail size', 'TailSize', 2)
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
+                @ComboBox("Detail #{i}", "BodyDetail#{i}")
+                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+                if ADVANCED_MODE\GetBool()
+                    @CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
+                    @NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
+                @Hr()
 
+            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
             @Hr()
-            @CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
-            doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
-            @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
-            @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
-            @Hr()
-            @CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
-            doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
-            @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-            @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-
-            return if not ADVANCED_MODE\GetBool()
-
-            @Hr()
-            @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
-            doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings')
-            doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings')
-
-            @Hr()
-            @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
-            @ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}") for i = 1, 2
-
-            @Hr()
-            @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-            @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
+                @Label("Body detail #{i}")
+                @URLInput("BodyDetailURL#{i}")
+                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+                @Hr()
     }
 
     {
