@@ -329,9 +329,14 @@ class PonyTextureController
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
     @EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
-    @PHONG_UPDATE_TRIGGER = {}
+    @PHONG_UPDATE_TRIGGER = {
+        'SeparateHornPhong': true
+        'SeparateWingsPhong': true
+        'SeparateManePhong': true
+        'SeparateTailPhong': true
+    }
 
-    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks'}
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
@@ -841,6 +846,12 @@ class PonyTextureController
         table.insert(output, @FemaleMaterial) if @FemaleMaterial
         table.insert(output, @HornMaterial) if @HornMaterial and not @GrabData('SeparateHornPhong')
         table.insert(output, @WingsMaterial) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
+        if not @GrabData('SeparateManePhong')
+            table.insert(output, @HairColor1Material) if @HairColor1Material
+            table.insert(output, @HairColor2Material) if @HairColor2Material
+        if not @GrabData('SeparateTailPhong')
+            table.insert(output, @TailColor1Material) if @TailColor1Material
+            table.insert(output, @TailColor2Material) if @TailColor2Material
 
     UpdatePhongData: =>
         PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData()
@@ -875,6 +886,36 @@ class PonyTextureController
                 \SetFloat('$phongboost', PhongBoost)
                 \SetVector('$phongtint', PhongTint)
                 \SetVector('$phongfresnelranges', PhongFresnel)
+        
+        if @GrabData('SeparateManePhong')
+            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Mane')
+            if @HairColor1Material
+                with @HairColor1Material
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+            if @HairColor2Material
+                with @HairColor2Material
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+        
+        if @GrabData('SeparateTailPhong')
+            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Tail')
+            if @TailColor1Material
+                with @TailColor1Material
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+            if @TailColor2Material
+                with @TailColor2Material
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
     
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
@@ -2004,6 +2045,35 @@ class NewPonyTextureController extends PonyTextureController
             if @BatWingsSkinMaterial
                 PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('BatWingsSkin')
                 with @BatWingsSkinMaterial
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+        
+        if @GrabData('SeparateManePhong')
+            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('UpperMane')
+            if @UpperManeColor1
+                with @UpperManeColor1
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+            if @UpperManeColor2
+                with @UpperManeColor2
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+            
+            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('LowerMane')
+            if @LowerManeColor1
+                with @LowerManeColor1
+                    \SetFloat('$phongexponent', PhongExponent)
+                    \SetFloat('$phongboost', PhongBoost)
+                    \SetVector('$phongtint', PhongTint)
+                    \SetVector('$phongfresnelranges', PhongFresnel)
+            if @LowerManeColor2
+                with @LowerManeColor2
                     \SetFloat('$phongexponent', PhongExponent)
                     \SetFloat('$phongboost', PhongBoost)
                     \SetVector('$phongtint', PhongTint)

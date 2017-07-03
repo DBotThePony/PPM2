@@ -816,7 +816,9 @@ EditorPages = {
         'func': (sheet) =>
             @ScrollPanel()
             @CheckBox('Separate wings color from body', 'SeparateWings')
+            @CheckBox('Separate wings phong settings from body', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
             @CheckBox('Separate horn color from body', 'SeparateHorn')
+            @CheckBox('Separate horn phong settings from body', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
             @Hr()
             @ColorBox('Wings color', 'WingsColor')
             doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
@@ -1016,15 +1018,23 @@ EditorPages = {
             @NumSlider('Tail size', 'TailSize', 2)
 
             @Hr()
+            @CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
             @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
             @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
             @Hr()
+            @CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
             @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
             @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
+            return if not ADVANCED_MODE\GetBool()
+
             @Hr()
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+            doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings')
+            doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings')
 
             @Hr()
             @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2

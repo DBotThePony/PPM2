@@ -477,6 +477,18 @@ class PonyDataInstance
             getFunc: 'SeparateWingsPhong'
             fix: (arg = false) -> tobool(arg)
         }
+
+        'separate_mane_phong': {
+            default: -> false
+            getFunc: 'SeparateManePhong'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'separate_tail_phong': {
+            default: -> false
+            getFunc: 'SeparateTailPhong'
+            fix: (arg = false) -> tobool(arg)
+        }
     }
 
     for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
@@ -834,7 +846,7 @@ class PonyDataInstance
             max: 1
         }
 
-    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks'}
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
         @PONY_DATA[ttype\lower() .. '_phong_exponent'] = {
             default: -> 3
             getFunc: ttype .. 'PhongExponent'

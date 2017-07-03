@@ -199,8 +199,10 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
     @NetworkVar('SeparateHornPhong', rBool, wBool, false)
     @NetworkVar('SeparateWingsPhong', rBool, wBool, false)
+    @NetworkVar('SeparateManePhong', rBool, wBool, false)
+    @NetworkVar('SeparateTailPhong', rBool, wBool, false)
     
-    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks'}
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
         @NetworkVar(ttype .. 'PhongExponent', rFloat(0.04, 10), wFloat, 3)
         @NetworkVar(ttype .. 'PhongBoost', rFloat(0.01, 1), wFloat, 0.09)
         @NetworkVar(ttype .. 'PhongTint', rColor, wColor, Color(255, 200, 200))
