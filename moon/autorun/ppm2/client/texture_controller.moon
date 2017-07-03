@@ -56,6 +56,8 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/sharp_hooves')
     Material('models/ppm/partrender/sharp_hooves2')
     Material('models/ppm/partrender/separated_muzzle')
+    Material('models/ppm/partrender/eye_scar_left')
+    Material('models/ppm/partrender/eye_scar_right')
 }
 
 PPM2.UpperManeDetailsMaterials = {
