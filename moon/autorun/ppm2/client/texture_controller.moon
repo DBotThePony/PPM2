@@ -855,7 +855,7 @@ class PonyTextureController
             \SetVector('$phongfresnelranges', PhongFresnel)
         
         if LightwarpURL == '' or not LightwarpURL\find('^https?://')
-            myTex = PPM2.AvaliableLightwarps[id + 1] or PPM2.AvaliableLightwarps[1]
+            myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
             matTarget\SetTexture('$lightwarptexture', myTex)
         else
             @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->

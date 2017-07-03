@@ -749,8 +749,8 @@ doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
     @Label('Phong Sliding - Fresnel 90 degree reflection angle multiplier', spoiler)
     @NumSlider('Phong Sliding', ttype .. 'PhongSliding', 2, spoiler)
     @ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
-    @Label('Lightwarp texture URL input\nIt must be 256x16!')
-    @URLInput(ttype .. 'LightwarpURL')
+    @Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
+    @URLInput(ttype .. 'LightwarpURL', spoiler)
 
 EditorPages = {
     {
