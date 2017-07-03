@@ -76,21 +76,6 @@ class PonyDataInstance
             min: PPM2.MIN_WINGS
             max: PPM2.MAX_WINGS
         }
-        
-        'lightwarp_texture': {
-            default: -> 0
-            getFunc: 'Lightwarp'
-            enum: [arg for arg in *PPM2.AvaliableLightwarps]
-            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, 0, PPM2.MAX_LIGHTWARP)
-            min: 0
-            max: PPM2.MAX_LIGHTWARP
-        }
-        
-        'lightwarp_texture_url': {
-            default: -> ''
-            getFunc: 'LightwarpURL'
-            fix: URL_FIXER
-        }
 
         'gender': {
             default: -> PPM2.GENDER_FEMALE
@@ -906,6 +891,21 @@ class PonyDataInstance
             default: -> Color(255, 200, 200)
             getFunc: ttype .. 'PhongTint'
             fix: COLOR_FIXER(255, 200, 200)
+        }
+
+        @PONY_DATA[ttype\lower() .. '_lightwarp_texture'] = {
+            default: -> 0
+            getFunc: ttype .. 'Lightwarp'
+            enum: [arg for arg in *PPM2.AvaliableLightwarps]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, 0, PPM2.MAX_LIGHTWARP)
+            min: 0
+            max: PPM2.MAX_LIGHTWARP
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_lightwarp_texture_url'] = {
+            default: -> ''
+            getFunc: ttype .. 'LightwarpURL'
+            fix: URL_FIXER
         }
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
