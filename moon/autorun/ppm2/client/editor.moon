@@ -488,6 +488,121 @@ CALC_VIEW_PANEL = {
 
 vgui.Register('PPM2CalcViewPanel', CALC_VIEW_PANEL, 'EditablePanel')
 
+TATTOO_INPUT_GRABBER = {
+    WatchButtons: {KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_Q, KEY_E}
+    BUTTONS_DELAY: 0.5
+    DEFAULT_STEP: 1
+    ROTATE_STEP: 1
+    SCALE_STEP: 0.1
+    CONTINIOUS_STEP_MULTIPLIER: 1
+    CONTINIOUS_SCALE_STEP: 1
+    CONTINIOUS_ROTATE_STEP: 1
+
+    SetTargetData: (data) => @targetData = data
+    GetTargetData: => @targetData
+
+    SetTargetID: (id = @targetID) => @targetID = id
+    GetTargetID: => @targetID
+    DataCall: (key = '', ...) => @targetData[key .. @targetID](@targetData, ...)
+    DataSet: (key = '', ...) => @targetData['Set' .. key .. @targetID](@targetData, ...)
+    DataGet: (key = '', ...) => @targetData['Get' .. key .. @targetID](@targetData, ...)
+    DataAdd: (key = '', val = 0) => @DataSet(key, @DataGet(key) + val)
+    
+    Init: =>
+        @targetID = 1
+        @MakePopup()
+        @SetSize(400, 90)
+        @SetPos(ScrW() / 2 - 200, ScrH() * .2)
+        @SetMouseInputEnabled(false)
+        @SetKeyboardInputEnabled(true)
+        @ignoreFocus = RealTime() + 1
+        @scaleUp = false
+        @scaleDown = false
+        @scaleLeft = false
+        @scaleRight = false
+        @rotateLeft = false
+        @rotateRight = false
+        @moveLeft = false
+        @moveRight = false
+        @moveUp = false
+        @moveDown = false
+        @scaleUpTime = 0
+        @scaleDownTime = 0
+        @scaleLeftTime = 0
+        @scaleRightTime = 0
+        @rotateLeftTime = 0
+        @rotateRightTime = 0
+        @moveLeftTime = 0
+        @moveRightTime = 0
+        @moveUpTime = 0
+        @moveDownTime = 0
+        with @helpLabel = vgui.Create('DLabel', @)
+            \SetFont('HudHintTextLarge')
+            \Dock(FILL)
+            \DockMargin(5, 5, 5, 5)
+            \SetTextColor(color_white)
+            \SetText("To exit edit mode, press Escape or click anywhere with mouse
+To move tatto use WASD
+To Scale higher/lower use Up/Down arrows
+To Scale wider/smaller use Right/Left arrows
+To rotate left/right use Q/E")
+    
+    HandleKey: (code = KEY_NONE, status = false) =>
+        switch code
+            when KEY_W
+                @moveUp = status
+                @moveUpTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooPosY', @DEFAULT_STEP) if status
+            when KEY_S
+                @moveDown = status
+                @moveDownTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooPosY', -@DEFAULT_STEP) if status
+            when KEY_A
+                @moveLeft = status
+                @moveLeftTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooPosX', -@DEFAULT_STEP) if status
+            when KEY_D
+                @moveRight = status
+                @moveRightTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooPosX', @DEFAULT_STEP) if status
+            when KEY_UP
+                @scaleUp = status
+                @scaleUpTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooScaleY', @SCALE_STEP) if status
+            when KEY_DOWN
+                @scaleDown = status
+                @scaleDownTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooScaleY', -@SCALE_STEP) if status
+            when KEY_LEFT
+                @scaleLeft = status
+                @scaleLeftTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooScaleX', -@SCALE_STEP) if status
+            when KEY_RIGHT
+                @scaleRight = status
+                @scaleRightTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooScaleX', @SCALE_STEP) if status
+            when KEY_Q
+                @rotateLeft = status
+                @rotateLeftTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooRotate', -@ROTATE_STEP) if status
+            when KEY_E
+                @rotateRight = status
+                @rotateRightTime = RealTime() + @BUTTONS_DELAY
+                @DataAdd('TattooRotate', @ROTATE_STEP) if status
+    OnKeyCodePressed: (code = KEY_NONE) =>
+        @HandleKey(code, true)
+    OnKeyCodeReleased: (code = KEY_NONE) =>
+        @HandleKey(code, false)
+    Think: =>
+        return @Remove() if not @HasFocus() and @ignoreFocus < RealTime()
+    
+    Paint: (w = 0, h = 0) =>
+        surface.SetDrawColor(0, 0, 0, 150)
+        surface.DrawRect(0, 0, w, h)
+}
+
+vgui.Register('PPM2TattooEditor', TATTOO_INPUT_GRABBER, 'EditablePanel')
+
 PANEL_SETTINGS_BASE = {
     Init: =>
         @shouldSaveData = false
@@ -506,6 +621,7 @@ PANEL_SETTINGS_BASE = {
         @unsavedChanges = true
         @frame.unsavedChanges = true
         @frame\SetTitle("#{@GetTargetData() and @GetTargetData()\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor; *Unsaved changes*")
+    GetFrame: => @frame
     GetShouldSaveData: => @shouldSaveData
     ShouldSaveData: => @shouldSaveData
     SetShouldSaveData: (val = false) => @shouldSaveData = val
@@ -1086,10 +1202,10 @@ EditorPages = {
         'display': -> ADVANCED_MODE\GetBool()
         'func': (sheet) =>
             @ScrollPanel()
-            @Label('WORK IN PROGRESS')
 
             for i = 1, PPM2.MAX_TATTOOS
                 spoiler = @Spoiler("Tattoo layer #{i}")
+                @Button('Edit', (-> @GetFrame()\EditTattoo(i)), spoiler)
                 @ComboBox('Type', "TattooType#{i}", nil, spoiler)
                 @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler)
                 @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler)
@@ -1495,6 +1611,11 @@ PPM2.OpenNewEditor = ->
     @DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+
+    @EditTattoo = (index = 1) =>
+        editor = vgui.Create('PPM2TattooEditor')
+        editor\SetTargetData(copy)
+        editor\SetTargetID(index)
 
     @panels = {}
 
