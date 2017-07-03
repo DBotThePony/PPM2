@@ -418,6 +418,8 @@ class PonyTextureController
         return if not @ent
         key = state\GetKey()
         switch key
+            when 'Lightwarp'
+                @UpdateLightwrap()
             when 'BodyColor'
                 @DelayCompile('CompileBody')
                 @DelayCompile('CompileWings')
@@ -832,6 +834,8 @@ class PonyTextureController
         PhongTint = @GrabData(prefix .. 'PhongTint')
         PhongFront = @GrabData(prefix .. 'PhongFront')
         PhongMiddle = @GrabData(prefix .. 'PhongMiddle')
+        Lightwarp = @GrabData(prefix .. 'Lightwarp')
+        LightwarpURL = @GrabData(prefix .. 'LightwarpURL')
         PhongSliding = @GrabData(prefix .. 'PhongSliding')
         {:r, :g, :b} = PhongTint
         r /= 255
@@ -839,7 +843,23 @@ class PonyTextureController
         b /= 255
         PhongTint = Vector(r, g, b)
         PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
-        return PhongExponent, PhongBoost, PhongTint, PhongFresnel
+        return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
+    
+    ApplyPhongData: (matTarget, prefix = 'Body') =>
+        return if not matTarget
+        PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
+        with matTarget
+            \SetFloat('$phongexponent', PhongExponent)
+            \SetFloat('$phongboost', PhongBoost)
+            \SetVector('$phongtint', PhongTint)
+            \SetVector('$phongfresnelranges', PhongFresnel)
+        
+        if LightwarpURL == '' or not LightwarpURL\find('^https?://')
+            myTex = PPM2.AvaliableLightwarps[id + 1] or PPM2.AvaliableLightwarps[1]
+            matTarget\SetTexture('$lightwarptexture', myTex)
+        else
+            @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
+                matTarget\SetTexture('$lightwarptexture', tex)
 
     GetBodyPhongMaterials: (output = {}) =>
         table.insert(output, @MaleMaterial) if @MaleMaterial
@@ -854,68 +874,27 @@ class PonyTextureController
             table.insert(output, @TailColor2Material) if @TailColor2Material
 
     UpdatePhongData: =>
-        PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData()
         proceed = {}
         @GetBodyPhongMaterials(proceed)
         for mat in *proceed
-            mat\SetFloat('$phongexponent', PhongExponent)
-            mat\SetFloat('$phongboost', PhongBoost)
-            mat\SetVector('$phongtint', PhongTint)
-            mat\SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(mat, 'Body')
         
         if @GrabData('SeparateHornPhong') and @HornMaterial
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Horn')
-            with @HornMaterial
-                \SetFloat('$phongexponent', PhongExponent)
-                \SetFloat('$phongboost', PhongBoost)
-                \SetVector('$phongtint', PhongTint)
-                \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@HornMaterial, 'Horn')
         
         if @GrabData('SeparateWingsPhong') and @WingsMaterial
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Wings')
-            with @WingsMaterial
-                \SetFloat('$phongexponent', PhongExponent)
-                \SetFloat('$phongboost', PhongBoost)
-                \SetVector('$phongtint', PhongTint)
-                \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@WingsMaterial, 'Wings')
         
         if @SocksMaterial
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Socks')
-            with @SocksMaterial
-                \SetFloat('$phongexponent', PhongExponent)
-                \SetFloat('$phongboost', PhongBoost)
-                \SetVector('$phongtint', PhongTint)
-                \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@SocksMaterial, 'Socks')
         
         if @GrabData('SeparateManePhong')
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Mane')
-            if @HairColor1Material
-                with @HairColor1Material
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            if @HairColor2Material
-                with @HairColor2Material
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@HairColor1Material, 'Mane')
+            @ApplyPhongData(@HairColor2Material, 'Mane')
         
         if @GrabData('SeparateTailPhong')
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Tail')
-            if @TailColor1Material
-                with @TailColor1Material
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            if @TailColor2Material
-                with @TailColor2Material
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@TailColor1Material, 'Tail')
+            @ApplyPhongData(@TailColor2Material, 'Tail')
     
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
@@ -2034,50 +2013,14 @@ class NewPonyTextureController extends PonyTextureController
     UpdatePhongData: =>
         super()
         if @GrabData('SeparateWingsPhong')
-            if @BatWingsMaterial
-                PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('Wings')
-                with @BatWingsMaterial
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            
-            if @BatWingsSkinMaterial
-                PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('BatWingsSkin')
-                with @BatWingsSkinMaterial
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@BatWingsMaterial, 'Wings')
+            @ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
         
         if @GrabData('SeparateManePhong')
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('UpperMane')
-            if @UpperManeColor1
-                with @UpperManeColor1
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            if @UpperManeColor2
-                with @UpperManeColor2
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            
-            PhongExponent, PhongBoost, PhongTint, PhongFresnel = @GetPhongData('LowerMane')
-            if @LowerManeColor1
-                with @LowerManeColor1
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
-            if @LowerManeColor2
-                with @LowerManeColor2
-                    \SetFloat('$phongexponent', PhongExponent)
-                    \SetFloat('$phongboost', PhongBoost)
-                    \SetVector('$phongtint', PhongTint)
-                    \SetVector('$phongfresnelranges', PhongFresnel)
+            @ApplyPhongData(@UpperManeColor1, 'UpperMane')
+            @ApplyPhongData(@UpperManeColor2, 'UpperMane')
+            @ApplyPhongData(@LowerManeColor1, 'LowerMane')
+            @ApplyPhongData(@LowerManeColor2, 'LowerMane')
 
     CompileBatWings: =>
         return unless @isValid

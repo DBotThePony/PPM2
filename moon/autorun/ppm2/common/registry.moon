@@ -153,6 +153,22 @@ PPM2.SocksTypes = {
     'WALLPAPER3'
 }
 
+PPM2.AvaliableLightwarps = {
+    'SFM_PONY'
+    'AIRBRUSH'
+    'HARD_LIGHT'
+    'PURPLE_SKY'
+    'SPAWN'
+    'TF2'
+    'TF2_CINEMATIC'
+    'TF2_CLASSIC'
+    'WELL_OILED'
+}
+
+PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
+
+PPM2.AvaliableLightwarpsPaths = ['models/ppm/lightwarps/' .. mat\lower() for mat in *PPM2.AvaliableLightwraps]
+
 PPM2.DefaultCutiemarks = {
     '8ball', 'dice', 'magichat',
     'magichat02', 'record', 'microphone',

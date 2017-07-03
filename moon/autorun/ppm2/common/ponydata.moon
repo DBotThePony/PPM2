@@ -209,6 +209,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar(ttype .. 'PhongFront', rFloat(0, 20), wFloat, 1)
         @NetworkVar(ttype .. 'PhongMiddle', rFloat(0, 20), wFloat, 5)
         @NetworkVar(ttype .. 'PhongSliding', rFloat(0, 20), wFloat, 10)
+    
+        @NetworkVar(ttype .. 'Lightwarp', rUInt(4, 0, PPM2.MAX_LIGHTWARP), wUInt(0, 4), 0)
+        @NetworkVar(ttype .. 'LightwarpURL', rString, wString, '')
 
     Clone: (target = @ent) =>
         copy = @@(nil, target)

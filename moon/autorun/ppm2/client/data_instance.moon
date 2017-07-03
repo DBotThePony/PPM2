@@ -76,6 +76,21 @@ class PonyDataInstance
             min: PPM2.MIN_WINGS
             max: PPM2.MAX_WINGS
         }
+        
+        'lightwarp_texture': {
+            default: -> 0
+            getFunc: 'Lightwarp'
+            enum: [arg for arg in *PPM2.AvaliableLightwarps]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, 0, PPM2.MAX_LIGHTWARP)
+            min: 0
+            max: PPM2.MAX_LIGHTWARP
+        }
+        
+        'lightwarp_texture_url': {
+            default: -> ''
+            getFunc: 'LightwarpURL'
+            fix: URL_FIXER
+        }
 
         'gender': {
             default: -> PPM2.GENDER_FEMALE
