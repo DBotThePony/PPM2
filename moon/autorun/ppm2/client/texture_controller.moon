@@ -343,6 +343,8 @@ class PonyTextureController
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongFront'] = true
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongMiddle'] = true
         @PHONG_UPDATE_TRIGGER[ttype .. 'PhongSliding'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'Lightwarp'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
 
     for publicName in *{'', 'Left', 'Right'}
         @EYE_UPDATE_TRIGGER["EyeType#{publicName}"] = true
