@@ -181,12 +181,12 @@ MODEL_BOX_PANEL = {
         @targetAngle = Angle(0, 0, 0)
         @targetDistToPony = 100
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
-    
+
     PerformLayout: (w = 0, h = 0) =>
         --@animButton\SetPos(w - 130, 10)
         @seqButton\SetPos(10, 10)
         @emotesPanel\SetPos(10, 40) if IsValid(@emotesPanel)
-    
+
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = true
@@ -249,9 +249,9 @@ MODEL_BOX_PANEL = {
             @model\FrameAdvance(delta * @animRate)
             @model\SetPlaybackRate(1)
             @model\SetPoseParameter('move_x', 1)
-        
+
         @hold = @IsHovered() if @hold
-        
+
         -- if @playing
         --     cseq = @EDITOR_SEQUENCES[@editorSeq]
         --     if @nextSeq < rtime
@@ -259,7 +259,7 @@ MODEL_BOX_PANEL = {
         --         @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
         --         cseq = @EDITOR_SEQUENCES[@editorSeq]
         --         @nextSeq = rtime + cseq.time
-            
+
         --     {:p, :y, :r} = @targetAngle
         --     @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
         --     @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
@@ -273,7 +273,7 @@ MODEL_BOX_PANEL = {
         --         yaw -= deltaX * .5
         --         pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
         --         @targetAngle = Angle(pitch, yaw, roll)
-        
+
         if @hold
             x, y = gui.MousePos()
             deltaX, deltaY = x - @mouseX, y - @mouseY
@@ -282,13 +282,13 @@ MODEL_BOX_PANEL = {
             yaw -= deltaX * .5
             pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
             @targetAngle = Angle(pitch, yaw, roll)
-        
+
         @angle = LerpAngle(delta * 4, @angle, @targetAngle)
         @distToPony = Lerp(delta * 4, @distToPony, @targetDistToPony)
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
         @vectorPos\Rotate(@angle)
         @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .7) - @vectorPos)\Angle()
-    
+
     FLOOR_VECTOR: Vector(0, 0, -30)
     FLOOR_ANGLE: Vector(0, 0, 1)
 
@@ -319,12 +319,12 @@ MODEL_BOX_PANEL = {
             render.SuppressEngineLighting(true)
             render.ResetModelLighting(1, 1, 1)
             render.SetColorModulation(1, 1, 1)
-        
+
         @buildingModel\DrawModel()
         @controller\GetRenderController()\DrawModels()
         @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
-        
+
         if data = @model\GetPonyData()
             if bg = data\GetBodygroupController()
                 bg\ApplyBodygroups()
@@ -377,10 +377,10 @@ CALC_VIEW_PANEL = {
         @realX, @realY = 0, 0
         @realW, @realH = ScrW(), ScrH()
         @SetCursor('hand')
-    
+
     SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
     SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
-    
+
     CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
         return hook.Remove('CalcView', @) if not @IsValid()
         return if not @IsVisible()
@@ -389,7 +389,7 @@ CALC_VIEW_PANEL = {
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
         @moveAngle = angles
         return newData
-    
+
     PrePlayerDraw: (ply = LocalPlayer()) =>
         return hook.Remove('PrePlayerDraw', @) if not @IsValid()
         return if not @IsVisible()
@@ -397,7 +397,7 @@ CALC_VIEW_PANEL = {
         if data = ply\GetPonyData()
             if bg = data\GetBodygroupController()
                 bg\ApplyBodygroups()
-    
+
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = true
@@ -406,7 +406,7 @@ CALC_VIEW_PANEL = {
         @oldPlaying = @playing
         @playing = false
         @mouseX, @mouseY = gui.MousePos()
-    
+
     CheckCode: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_RCONTROL, KEY_LCONTROL
@@ -423,25 +423,25 @@ CALC_VIEW_PANEL = {
                 @right = status
             when KEY_SPACE
                 @up = status
-    
+
     OnKeyCodePressed: (code = KEY_NONE) =>
         @CheckCode(code, true)
-    
+
     OnKeyCodeReleased: (code = KEY_NONE) =>
         @CheckCode(code, false)
-    
+
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = false
         @SetCursor('hand')
-    
+
     Think: =>
         rtime = RealTime()
         delta = rtime - @lastTick
         @lastTick = rtime
 
         @hold = @IsHovered() if @hold
-        
+
         if @hold
             x, y = gui.MousePos()
             deltaX, deltaY = x - @mouseX, y - @mouseY
@@ -450,26 +450,26 @@ CALC_VIEW_PANEL = {
             yaw -= deltaX * .3
             pitch += deltaY * .3
             @drawAngle = Angle(pitch, yaw, roll)
-        
-        speedModifier = 1 
+
+        speedModifier = 1
         speedModifier *= 2 if @fast
         speedModifier *= 0.5 if @slow
 
         if @forward
             @drawPos += @moveAngle\Forward() * speedModifier * delta * 100
-        
+
         if @backward
             @drawPos -= @moveAngle\Forward() * speedModifier * delta * 100
-        
+
         if @right
             @drawPos += @moveAngle\Right() * speedModifier * delta * 100
-        
+
         if @left
             @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
-        
+
         if @up
             @drawPos += @moveAngle\Up() * speedModifier * delta * 100
-        
+
         if @forward or @backward or @left or @right or @hold or @down or @up
             if not @resizedToScreen
                 @resizedToScreen = true
@@ -480,7 +480,7 @@ CALC_VIEW_PANEL = {
                 @resizedToScreen = false
                 @SetPos(@realX, @realY)
                 @SetSize(@realW, @realH)
-    
+
     OnRemove: =>
         hook.Remove('CalcView', @)
         hook.Remove('PrePlayerDraw', @)
@@ -498,7 +498,7 @@ PANEL_SETTINGS_BASE = {
         @updateFuncs = {}
         @createdPanels = 1
         @isNewEditor = false
-    
+
     IsNewEditor: => @isNewEditor
     GetIsNewEditor: => @isNewEditor
     SetIsNewEditor: (val) => @isNewEditor = val
@@ -762,7 +762,7 @@ EditorPages = {
                     PPM2.Randomize(data, false)
                     @ValueChanges()
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
-            
+
             @ComboBox('Race', 'Race')
             @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW(@IsNewEditor())
             @CheckBox('Gender', 'Gender')
@@ -943,7 +943,7 @@ EditorPages = {
                 if publicName ~= ''
                     prefix = publicName .. ' '
                     @Label("'#{publicName}' Eye settings")
-                
+
                 @Label('Eye URL texture')
                 @URLInput("EyeURL#{publicName}")
                 @Label('When uring eye URL texture; options below have no effect')
@@ -956,7 +956,7 @@ EditorPages = {
                 if ADVANCED_MODE\GetBool()
                     @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
                     @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
-                
+
                 @NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
                 @NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
                 @NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
@@ -965,7 +965,7 @@ EditorPages = {
                     @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
                     @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
                     @NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
-                
+
                 @Hr()
                 @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
                 @ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
@@ -989,7 +989,7 @@ EditorPages = {
                 @URLInput("HornURL#{i}")
                 @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
                 @Hr()
-            
+
             @Hr()
             @Label('Normal wings')
             @Hr()
@@ -999,21 +999,21 @@ EditorPages = {
                 @URLInput("WingsURL#{i}")
                 @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
                 @Hr()
-            
+
             @Hr()
             @Label('Bat wings')
             @Hr()
-            
+
             for i = 1, 3
                 @Label("Bat Wings URL detail #{i}")
                 @URLInput("BatWingURL#{i}")
                 @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
                 @Hr()
-            
+
             @Hr()
             @Label('Bat wings skin')
             @Hr()
-            
+
             for i = 1, 3
                 @Label("Bat Wings skin URL detail #{i}")
                 @URLInput("BatWingSkinURL#{i}")
@@ -1061,7 +1061,7 @@ EditorPages = {
                 @Label("Tail URL Detail #{i} input field")
                 @URLInput("TailURL#{i}")
                 @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
-            
+
             @Label('Next options have effect only on new model')
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
@@ -1119,7 +1119,7 @@ EditorPages = {
                     surface.SetDrawColor(255, 255, 255)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, w, h)
-            
+
             @NumSlider('Cutiemark size', 'CMarkSize', 2)
             @ColorBox('Cutiemark color', 'CMarkColor')
             @Hr()
@@ -1304,14 +1304,14 @@ createTopButtons = (isNewEditor = false) =>
             @panels.saves.rebuildFileList()
             callback(txt)
         Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
-    
+
     @saveButton = vgui.Create('DButton', @)
     with @saveButton
         \SetText('Save')
         \SetPos(W - 205, 5)
         \SetSize(90, 20)
         .DoClick = -> saveAs()
-    
+
     @wearButton = vgui.Create('DButton', @)
     with @wearButton
         \SetText('Apply changes (wear)')
@@ -1329,7 +1329,7 @@ createTopButtons = (isNewEditor = false) =>
                     nwdata.NETWORKED = false
                     nwdata\Create()
             @data\ApplyDataToObject(mainData, false) -- no save on apply
-    
+
     if not isNewEditor
         @selectModelBox = vgui.Create('DComboBox', @)
         editorModelSelect = USE_MODEL\GetString()\upper()
@@ -1353,7 +1353,7 @@ createTopButtons = (isNewEditor = false) =>
                     confirm,
                     'Noh!'
                 )
-    
+
     @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
     with @enableAdvanced
         \SetSize(120, 20)
@@ -1396,7 +1396,7 @@ PPM2.OpenNewEditor = ->
             net.WriteBool(true)
             net.SendToServer()
         return
-    
+
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
     self = PPM2.EditorTopFrame
     topframe = PPM2.EditorTopFrame
@@ -1432,11 +1432,11 @@ PPM2.OpenNewEditor = ->
         net.Start('PPM2.EditorStatus')
         net.WriteBool(false)
         net.SendToServer()
-    
+
     @OnRemove = =>
         @leftPanel\Remove()
         @calcPanel\Remove()
-    
+
     @calcPanel = vgui.Create('PPM2CalcViewPanel')
     @calcPanel\SetPos(350, topSize)
     @calcPanel\SetRealPos(350, topSize)
@@ -1485,7 +1485,7 @@ PPM2.OpenNewEditor = ->
         func(pnl, @menus)
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
-    
+
     @leftPanel\MakePopup()
     @MakePopup()
 
@@ -1505,7 +1505,7 @@ PPM2.OpenOldEditor = ->
         net.WriteBool(true)
         net.SendToServer()
         return
-    
+
     sysTime = SysTime()
     frame = vgui.Create('DFrame')
     self = frame
@@ -1551,7 +1551,7 @@ PPM2.OpenOldEditor = ->
     frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
     createTopButtons(@)
-    
+
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
     @model\SetController(controller)
@@ -1572,7 +1572,7 @@ PPM2.OpenOldEditor = ->
         func(pnl, @menus)
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
-    
+
     net.Start('PPM2.EditorStatus')
     net.WriteBool(true)
     net.SendToServer()
