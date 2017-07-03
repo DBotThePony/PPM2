@@ -515,7 +515,7 @@ PANEL_SETTINGS_BASE = {
     DoUpdate: => func() for func in *@updateFuncs
     NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
         @createdPanels += 3
-		with vgui.Create('DNumSlider', parent)
+		with withPanel = vgui.Create('DNumSlider', parent)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
 			\SetTooltip("#{name}\nData value: #{option}")
@@ -538,22 +538,25 @@ PANEL_SETTINGS_BASE = {
                 \SetMin(@GetTargetData()["GetMin#{option}"](@GetTargetData())) if @GetTargetData()
                 \SetMax(@GetTargetData()["GetMax#{option}"](@GetTargetData())) if @GetTargetData()
                 \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     Label: (text = '', parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DLabel', parent)
+        with withPanel = vgui.Create('DLabel', parent)
             \SetText(text)
+            \SetTooltip(text)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
             \SetTextColor(color_white)
             \SizeToContents()
+            \SetMouseInputEnabled(true)
             w, h = \GetSize()
             \SetSize(w, h + 5)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     URLLabel: (text = '', url = '', parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DLabel', parent)
+        with withPanel = vgui.Create('DLabel', parent)
             \SetText(text)
+            \SetTooltip(text .. '\n\nLink goes to: ' .. url)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
             \SetTextColor(Color(158, 208, 208))
@@ -563,28 +566,28 @@ PANEL_SETTINGS_BASE = {
             \SetSize(w, h + 5)
             \SetMouseInputEnabled(true)
             .DoClick = -> gui.OpenURL(url) if url ~= ''
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     Hr: (parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('EditablePanel', parent)
+        with withPanel = vgui.Create('EditablePanel', parent)
             \Dock(TOP)
             \SetSize(200, 15)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
             .Paint = (w = 0, h = 0) =>
                 surface.SetDrawColor(150, 162, 162)
                 surface.DrawLine(0, h / 2, w, h / 2)
     Button: (text = 'Perfectly generic button', doClick = (->), parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DButton', parent)
+        with withPanel = vgui.Create('DButton', parent)
             \Dock(TOP)
             \SetSize(200, 20)
             \DockMargin(2, 2, 2, 2)
             \SetText(text)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
             .DoClick = -> doClick()
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
         @createdPanels += 3
-		with vgui.Create('DCheckBoxLabel', parent)
+		with withPanel = vgui.Create('DCheckBoxLabel', parent)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
@@ -599,7 +602,7 @@ PANEL_SETTINGS_BASE = {
                 @ValueChanges(option, newVal and 1 or 0, pnl)
             table.insert @updateFuncs, ->
                 \SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     ColorBox: (name = 'Colorful Box', option = '', parent = @scroll or @) =>
         @createdPanels += 7
         collapse = vgui.Create('DCollapsibleCategory', parent)
@@ -729,6 +732,23 @@ PANEL_SETTINGS_BASE = {
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
 
+doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
+    spoiler = @Spoiler(spoilerName)
+    @URLLabel('More info about Phong on wiki', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
+    @Label('Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin', spoiler)
+    @NumSlider('Phong Exponent', ttype .. 'PhongExponent', 3, spoiler)
+    @Label('Phong Boost - multiplies specular map reflections', spoiler)
+    @NumSlider('Phong Boost', ttype .. 'PhongBoost', 3, spoiler)
+    @Label('Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)', spoiler)
+    picker, pickerSpoiler = @ColorBox('Phong Tint', ttype .. 'PhongTint', spoiler)
+    pickerSpoiler\SetExpanded(true)
+    @Label('Phong Front - Fresnel 0 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Front', ttype .. 'PhongFront', 2, spoiler)
+    @Label('Phong Middle - Fresnel 45 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Middle', ttype .. 'PhongMiddle', 2, spoiler)
+    @Label('Phong Sliding - Fresnel 90 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Sliding', ttype .. 'PhongSliding', 2, spoiler)
+
 EditorPages = {
     {
         'name': 'Main'
@@ -768,23 +788,26 @@ EditorPages = {
             @ScrollPanel()
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
+            doAddPhongData(@, 'Body') if ADVANCED_MODE\GetBool()
             @NumSlider('Neck Height', 'NeckSize', 2)
             @NumSlider('Legs Height', 'LegsSize', 2)
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
 
-            if ADVANCED_MODE\GetBool()
-                @ComboBox('Socks Texture', 'SocksTexture')
-                @Label('Socks URL texture')
-                @URLInput('SocksTextureURL')
-                @Hr()
-                @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
-                @Hr()
-                @CheckBox('Separate wings color from body', 'SeparateWings')
-                @CheckBox('Separate horn color from body', 'SeparateHorn')
-                @ColorBox('Wings color', 'WingsColor')
-                @ColorBox('Horn color', 'HornColor')
+            doAddPhongData(@, 'Socks') if ADVANCED_MODE\GetBool()
+
+            return if not ADVANCED_MODE\GetBool()
+            @ComboBox('Socks Texture', 'SocksTexture')
+            @Label('Socks URL texture')
+            @URLInput('SocksTextureURL')
+            @Hr()
+            @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+            @Hr()
+            @CheckBox('Separate wings color from body', 'SeparateWings')
+            @CheckBox('Separate horn color from body', 'SeparateHorn')
+            @ColorBox('Wings color', 'WingsColor')
+            @ColorBox('Horn color', 'HornColor')
     }
 
     {
@@ -796,10 +819,13 @@ EditorPages = {
             @CheckBox('Separate horn color from body', 'SeparateHorn')
             @Hr()
             @ColorBox('Wings color', 'WingsColor')
+            doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
             @ColorBox('Horn color', 'HornColor')
+            doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
             @Hr()
             @ColorBox('Bat Wings color', 'BatWingColor')
             @ColorBox('Bat Wings skin color', 'BatWingSkinColor')
+            doAddPhongData(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
             @Hr()
             left = @Spoiler('Left wing settings')
             @NumSlider('Left Wing Size', 'LWingSize', 2, left)
