@@ -420,8 +420,6 @@ class PonyTextureController
         return if not @ent
         key = state\GetKey()
         switch key
-            when 'Lightwarp'
-                @UpdateLightwrap()
             when 'BodyColor'
                 @DelayCompile('CompileBody')
                 @DelayCompile('CompileWings')
