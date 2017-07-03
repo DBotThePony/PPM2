@@ -167,7 +167,7 @@ PPM2.AvaliableLightwarps = {
 
 PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
 
-PPM2.AvaliableLightwarpsPaths = ['models/ppm/lightwarps/' .. mat\lower() for mat in *PPM2.AvaliableLightwraps]
+PPM2.AvaliableLightwarpsPaths = ['models/ppm/lightwarps/' .. mat\lower() for mat in *PPM2.AvaliableLightwarps]
 
 PPM2.DefaultCutiemarks = {
     '8ball', 'dice', 'magichat',
