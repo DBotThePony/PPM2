@@ -498,8 +498,10 @@ TATTOO_INPUT_GRABBER = {
     CONTINIOUS_SCALE_STEP: 0.25
     CONTINIOUS_ROTATE_STEP: 3
 
+    SetPanelsToUpdate: (data = {}) => @panelsToUpdate = data
     SetTargetData: (data) => @targetData = data
     GetTargetData: => @targetData
+    GetPanelsToUpdate: => @panelsToUpdate
 
     SetTargetID: (id = @targetID) => @targetID = id
     GetTargetID: => @targetID
@@ -507,6 +509,8 @@ TATTOO_INPUT_GRABBER = {
     DataSet: (key = '', ...) => @targetData['Set' .. key .. @targetID](@targetData, ...)
     DataGet: (key = '', ...) => @targetData['Get' .. key .. @targetID](@targetData, ...)
     DataAdd: (key = '', val = 0) => @DataSet(key, @DataGet(key) + val)
+
+    TriggerUpdate: => pnl\DoUpdate() for pnl in *@panelsToUpdate when IsValid(pnl)
     
     Init: =>
         @targetID = 1
@@ -536,6 +540,7 @@ TATTOO_INPUT_GRABBER = {
         @moveRightTime = 0
         @moveUpTime = 0
         @moveDownTime = 0
+        @panelsToUpdate = {}
         with @helpLabel = vgui.Create('DLabel', @)
             \SetFont('HudHintTextLarge')
             \Dock(FILL)
@@ -553,42 +558,52 @@ To rotate left/right use Q/E")
                 @moveUpTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveUp = status
                 @DataAdd('TattooPosY', @DEFAULT_STEP) if status
+                @TriggerUpdate()
             when KEY_S
                 @moveDownTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveDown = status
                 @DataAdd('TattooPosY', -@DEFAULT_STEP) if status
+                @TriggerUpdate()
             when KEY_A
                 @moveLeftTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveLeft = status
                 @DataAdd('TattooPosX', -@DEFAULT_STEP) if status
+                @TriggerUpdate()
             when KEY_D
                 @moveRightTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
                 @moveRight = status
                 @DataAdd('TattooPosX', @DEFAULT_STEP) if status
+                @TriggerUpdate()
             when KEY_UP
                 @scaleUp = status
                 @scaleUpTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooScaleY', @SCALE_STEP) if status
+                @TriggerUpdate()
             when KEY_DOWN
                 @scaleDown = status
                 @scaleDownTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooScaleY', -@SCALE_STEP) if status
+                @TriggerUpdate()
             when KEY_LEFT
                 @scaleLeft = status
                 @scaleLeftTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooScaleX', -@SCALE_STEP) if status
+                @TriggerUpdate()
             when KEY_RIGHT
                 @scaleRight = status
                 @scaleRightTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooScaleX', @SCALE_STEP) if status
+                @TriggerUpdate()
             when KEY_Q
                 @rotateLeft = status
                 @rotateLeftTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooRotate', -@ROTATE_STEP) if status
+                @TriggerUpdate()
             when KEY_E
                 @rotateRight = status
                 @rotateRightTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooRotate', @ROTATE_STEP) if status
+                @TriggerUpdate()
     OnKeyCodePressed: (code = KEY_NONE) =>
         @HandleKey(code, true)
     OnKeyCodeReleased: (code = KEY_NONE) =>
@@ -598,24 +613,34 @@ To rotate left/right use Q/E")
         ftime = FrameTime()
         if @moveUp and @moveUpTime < RealTime()
             @DataAdd('TattooPosY', @CONTINIOUS_STEP_MULTIPLIER * ftime)
+            @TriggerUpdate()
         if @moveDown and @moveDownTime < RealTime()
             @DataAdd('TattooPosY', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
+            @TriggerUpdate()
         if @moveRight and @moveRightTime < RealTime()
             @DataAdd('TattooPosX', @CONTINIOUS_STEP_MULTIPLIER * ftime)
+            @TriggerUpdate()
         if @moveLeft and @moveLeftTime < RealTime()
             @DataAdd('TattooPosX', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
+            @TriggerUpdate()
         if @scaleUp and @scaleUpTime < RealTime()
             @DataAdd('TattooScaleY', @CONTINIOUS_SCALE_STEP * ftime)
+            @TriggerUpdate()
         if @scaleDown and @scaleDownTime < RealTime()
             @DataAdd('TattooScaleY', -@CONTINIOUS_SCALE_STEP * ftime)
+            @TriggerUpdate()
         if @scaleLeft and @scaleLeftTime < RealTime()
             @DataAdd('TattooScaleX', -@CONTINIOUS_SCALE_STEP * ftime)
+            @TriggerUpdate()
         if @scaleRight and @scaleRightTime < RealTime()
             @DataAdd('TattooScaleX', @CONTINIOUS_SCALE_STEP * ftime)
+            @TriggerUpdate()
         if @rotateLeft and @rotateLeftTime < RealTime()
             @DataAdd('TattooRotate', -@CONTINIOUS_ROTATE_STEP * ftime)
+            @TriggerUpdate()
         if @rotateRight and @rotateRightTime < RealTime()
             @DataAdd('TattooRotate', @CONTINIOUS_ROTATE_STEP * ftime)
+            @TriggerUpdate()
     
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0, 150)
@@ -665,6 +690,7 @@ PANEL_SETTINGS_BASE = {
             \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.TextArea\SetTextColor(color_white)
 			.Label\SetTextColor(color_white)
+            .DoUpdate = -> \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
             .OnValueChanged = (pnl, newVal = 1) ->
                 return if option == ''
                 data = @GetTargetData()
@@ -1226,13 +1252,14 @@ EditorPages = {
 
             for i = 1, PPM2.MAX_TATTOOS
                 spoiler = @Spoiler("Tattoo layer #{i}")
-                @Button('Edit using keyboard', (-> @GetFrame()\EditTattoo(i)), spoiler)
+                updatePanels = {}
+                @Button('Edit using keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
                 @ComboBox('Type', "TattooType#{i}", nil, spoiler)
-                @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler)
-                @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler)
-                @NumSlider('Y Position', "TattooPosY#{i}", 2, spoiler)
-                @NumSlider('Width Scale', "TattooScaleX#{i}", 2, spoiler)
-                @NumSlider('Height Scale', "TattooScaleY#{i}", 2, spoiler)
+                table.insert(updatePanels, @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler))
+                table.insert(updatePanels, @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler))
+                table.insert(updatePanels, @NumSlider('Y Position', "TattooPosY#{i}", 2, spoiler))
+                table.insert(updatePanels, @NumSlider('Width Scale', "TattooScaleX#{i}", 2, spoiler))
+                table.insert(updatePanels, @NumSlider('Height Scale', "TattooScaleY#{i}", 2, spoiler))
                 @CheckBox('Tattoo over body details', "TattooOverDetail#{i}", spoiler)
                 @CheckBox('Tattoo is glowing', "TattooGlow#{i}", spoiler)
                 @NumSlider('Tattoo glow strength', "TattooGlowStrength#{i}", 2, spoiler)
@@ -1633,10 +1660,11 @@ PPM2.OpenNewEditor = ->
 
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
-    @EditTattoo = (index = 1) =>
+    @EditTattoo = (index = 1, panelsToUpdate = {}) =>
         editor = vgui.Create('PPM2TattooEditor')
         editor\SetTargetData(copy)
         editor\SetTargetID(index)
+        editor\SetPanelsToUpdate(panelsToUpdate)
 
     @panels = {}
 
