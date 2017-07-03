@@ -269,6 +269,7 @@ class DefaultBodygroupController
     UpdateManeSize: (ent = @ent) =>
         return if not CLIENT
         return if ent\IsRagdoll()
+        return if ent\IsNJPony()
         size = @GetData()\GetPonySize()
         vecMane = Vector(1, 1, 1) * size
 

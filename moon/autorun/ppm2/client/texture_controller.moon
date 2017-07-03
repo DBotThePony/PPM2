@@ -56,6 +56,8 @@ PPM2.BodyDetailsMaterials = {
     Material('models/ppm/partrender/sharp_hooves')
     Material('models/ppm/partrender/sharp_hooves2')
     Material('models/ppm/partrender/separated_muzzle')
+    Material('models/ppm/partrender/eye_scar_left')
+    Material('models/ppm/partrender/eye_scar_right')
 }
 
 PPM2.UpperManeDetailsMaterials = {
@@ -330,6 +332,22 @@ class PonyTextureController
     @MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
     @TAIL_UPDATE_TRIGGER = {'TailType': true}
     @EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
+    @PHONG_UPDATE_TRIGGER = {
+        'SeparateHornPhong': true
+        'SeparateWingsPhong': true
+        'SeparateManePhong': true
+        'SeparateTailPhong': true
+    }
+
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongFront'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongMiddle'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'PhongSliding'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'Lightwarp'] = true
+        @PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
 
     for publicName in *{'', 'Left', 'Right'}
         @EYE_UPDATE_TRIGGER["EyeType#{publicName}"] = true
@@ -441,6 +459,8 @@ class PonyTextureController
                     @DelayCompile('CompileEye', false)
                 elseif @@BODY_UPDATE_TRIGGER[key]
                     @DelayCompile('CompileBody')
+                elseif @@PHONG_UPDATE_TRIGGER[key]
+                    @UpdatePhongData()
         
     @HTML_MATERIAL_QUEUE = {}
     @URL_MATERIAL_CACHE = {}
@@ -848,6 +868,75 @@ class PonyTextureController
         sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
         surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
+
+    GetPhongData: (prefix = 'Body') =>
+        PhongExponent = @GrabData(prefix .. 'PhongExponent')
+        PhongBoost = @GrabData(prefix .. 'PhongBoost')
+        PhongTint = @GrabData(prefix .. 'PhongTint')
+        PhongFront = @GrabData(prefix .. 'PhongFront')
+        PhongMiddle = @GrabData(prefix .. 'PhongMiddle')
+        Lightwarp = @GrabData(prefix .. 'Lightwarp')
+        LightwarpURL = @GrabData(prefix .. 'LightwarpURL')
+        PhongSliding = @GrabData(prefix .. 'PhongSliding')
+        {:r, :g, :b} = PhongTint
+        r /= 255
+        g /= 255
+        b /= 255
+        PhongTint = Vector(r, g, b)
+        PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
+        return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
+    
+    ApplyPhongData: (matTarget, prefix = 'Body') =>
+        return if not matTarget
+        PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
+        with matTarget
+            \SetFloat('$phongexponent', PhongExponent)
+            \SetFloat('$phongboost', PhongBoost)
+            \SetVector('$phongtint', PhongTint)
+            \SetVector('$phongfresnelranges', PhongFresnel)
+        
+        if LightwarpURL == '' or not LightwarpURL\find('^https?://')
+            myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
+            matTarget\SetTexture('$lightwarptexture', myTex)
+        else
+            @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
+                matTarget\SetTexture('$lightwarptexture', tex)
+
+    GetBodyPhongMaterials: (output = {}) =>
+        table.insert(output, @MaleMaterial) if @MaleMaterial
+        table.insert(output, @FemaleMaterial) if @FemaleMaterial
+        table.insert(output, @HornMaterial) if @HornMaterial and not @GrabData('SeparateHornPhong')
+        table.insert(output, @WingsMaterial) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
+        if not @GrabData('SeparateManePhong')
+            table.insert(output, @HairColor1Material) if @HairColor1Material
+            table.insert(output, @HairColor2Material) if @HairColor2Material
+        if not @GrabData('SeparateTailPhong')
+            table.insert(output, @TailColor1Material) if @TailColor1Material
+            table.insert(output, @TailColor2Material) if @TailColor2Material
+
+    UpdatePhongData: =>
+        proceed = {}
+        @GetBodyPhongMaterials(proceed)
+        for mat in *proceed
+            @ApplyPhongData(mat, 'Body')
+        
+        if @GrabData('SeparateHornPhong') and @HornMaterial
+            @ApplyPhongData(@HornMaterial, 'Horn')
+        
+        if @GrabData('SeparateWingsPhong') and @WingsMaterial
+            @ApplyPhongData(@WingsMaterial, 'Wings')
+        
+        if @SocksMaterial
+            @ApplyPhongData(@SocksMaterial, 'Socks')
+        
+        if @GrabData('SeparateManePhong')
+            @ApplyPhongData(@HairColor1Material, 'Mane')
+            @ApplyPhongData(@HairColor2Material, 'Mane')
+        
+        if @GrabData('SeparateTailPhong')
+            @ApplyPhongData(@TailColor1Material, 'Tail')
+            @ApplyPhongData(@TailColor2Material, 'Tail')
+    
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
@@ -871,15 +960,15 @@ class PonyTextureController
                 '$model': '1'
                 '$phong': '1'
                 '$basemapalphaphongmask': '1'
-                '$phongexponent': '6'
-                '$phongboost': '0.05'
+                '$phongexponent': '3'
+                '$phongboost': '0.15'
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
                 
-                '$rimlight': 1
-                '$rimlightexponent': 2
-                '$rimlightboost': 1
+                '$rimlight': '1'
+                '$rimlightexponent': '2'
+                '$rimlightboost': '1'
             }
         }
 
@@ -1011,6 +1100,7 @@ class PonyTextureController
         return unless @isValid
         @__compileBodyInternal(true)
         @__compileBodyInternal(false)
+        @UpdatePhongData()
     CompileHorn: =>
         return unless @isValid
         textureData = {
@@ -1023,8 +1113,8 @@ class PonyTextureController
 
                 '$model': '1'
                 '$phong': '1'
-                '$phongexponent': '0.1'
-                '$phongboost': '0.1'
+                '$phongexponent': '3'
+                '$phongboost': '0.05'
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
@@ -1040,6 +1130,7 @@ class PonyTextureController
 
         @HornMaterialName = "!#{textureData.name\lower()}"
         @HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
 
         continueCompilation = ->
             oldW, oldH = ScrW(), ScrH()
@@ -1128,11 +1219,13 @@ class PonyTextureController
 
                 '$model': '1'
                 '$ambientocclusion': '1'
-                '$lightwarptexture': 'models/props_pony/ppm/ppm_socks/socks_lightwarp'
+                '$lightwarptexture': 'models/ppm/base/lightwrap'
                 '$phong': '1'
-                '$phongexponent': '5.0'
+                '$phongexponent': '6'
                 '$phongboost': '0.1'
-                '$phongfresnelranges': '[.25 .5 1]'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[1 5 10]'
                 '$rimlight': '1'
                 '$rimlightexponent': '4.0'
                 '$rimlightboost': '2'
@@ -1144,6 +1237,7 @@ class PonyTextureController
 
         @SocksMaterialName = "!#{textureData.name\lower()}"
         @SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_SOCKS_HIRES or @@QUAD_SIZE_SOCKS
 
         {:r, :g, :b} = @GetData()\GetSocksColor()
@@ -1195,8 +1289,8 @@ class PonyTextureController
 
                 '$model': '1'
                 '$phong': '1'
-                '$phongexponent': '0.1'
-                '$phongboost': '0.1'
+                '$phongexponent': '3'
+                '$phongboost': '0.05'
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
@@ -1210,6 +1304,7 @@ class PonyTextureController
         left = 0
         @WingsMaterialName = "!#{textureData.name\lower()}"
         @WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
@@ -1578,7 +1673,7 @@ class PonyTextureController
                 '$irisframe': '0'
                 
                 '$ambientoccltexture': 'models/ppm/partrender/null'
-                '$envmap': 'models/ppm/partrender/null'
+                --'$envmap': 'models/ppm/partrender/null'
                 '$corneatexture': 'models/ppm/partrender/null'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
                 
@@ -1965,6 +2060,24 @@ class NewPonyTextureController extends PonyTextureController
         if left == 0
             continueCompilation()
         return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
+    
+    GetBodyPhongMaterials: (output = {}) =>
+        super(output)
+        if not @GrabData('SeparateWingsPhong')
+            table.insert(output, @BatWingsMaterial) if @BatWingsMaterial
+            table.insert(output, @BatWingsSkinMaterial) if @BatWingsSkinMaterial
+
+    UpdatePhongData: =>
+        super()
+        if @GrabData('SeparateWingsPhong')
+            @ApplyPhongData(@BatWingsMaterial, 'Wings')
+            @ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
+        
+        if @GrabData('SeparateManePhong')
+            @ApplyPhongData(@UpperManeColor1, 'UpperMane')
+            @ApplyPhongData(@UpperManeColor2, 'UpperMane')
+            @ApplyPhongData(@LowerManeColor1, 'LowerMane')
+            @ApplyPhongData(@LowerManeColor2, 'LowerMane')
 
     CompileBatWings: =>
         return unless @isValid
@@ -1993,6 +2106,7 @@ class NewPonyTextureController extends PonyTextureController
         left = 0
         @BatWingsMaterialName = "!#{textureData.name\lower()}"
         @BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->
@@ -2071,6 +2185,7 @@ class NewPonyTextureController extends PonyTextureController
         left = 0
         @BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
         @BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->

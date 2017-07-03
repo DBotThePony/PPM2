@@ -181,12 +181,12 @@ MODEL_BOX_PANEL = {
         @targetAngle = Angle(0, 0, 0)
         @targetDistToPony = 100
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
-    
+
     PerformLayout: (w = 0, h = 0) =>
         --@animButton\SetPos(w - 130, 10)
         @seqButton\SetPos(10, 10)
         @emotesPanel\SetPos(10, 40) if IsValid(@emotesPanel)
-    
+
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = true
@@ -249,9 +249,9 @@ MODEL_BOX_PANEL = {
             @model\FrameAdvance(delta * @animRate)
             @model\SetPlaybackRate(1)
             @model\SetPoseParameter('move_x', 1)
-        
+
         @hold = @IsHovered() if @hold
-        
+
         -- if @playing
         --     cseq = @EDITOR_SEQUENCES[@editorSeq]
         --     if @nextSeq < rtime
@@ -259,7 +259,7 @@ MODEL_BOX_PANEL = {
         --         @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
         --         cseq = @EDITOR_SEQUENCES[@editorSeq]
         --         @nextSeq = rtime + cseq.time
-            
+
         --     {:p, :y, :r} = @targetAngle
         --     @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
         --     @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
@@ -273,7 +273,7 @@ MODEL_BOX_PANEL = {
         --         yaw -= deltaX * .5
         --         pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
         --         @targetAngle = Angle(pitch, yaw, roll)
-        
+
         if @hold
             x, y = gui.MousePos()
             deltaX, deltaY = x - @mouseX, y - @mouseY
@@ -282,13 +282,13 @@ MODEL_BOX_PANEL = {
             yaw -= deltaX * .5
             pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
             @targetAngle = Angle(pitch, yaw, roll)
-        
+
         @angle = LerpAngle(delta * 4, @angle, @targetAngle)
         @distToPony = Lerp(delta * 4, @distToPony, @targetDistToPony)
         @vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
         @vectorPos\Rotate(@angle)
         @drawAngle = (Vector(0, 0, @PONY_VEC_Z * .7) - @vectorPos)\Angle()
-    
+
     FLOOR_VECTOR: Vector(0, 0, -30)
     FLOOR_ANGLE: Vector(0, 0, 1)
 
@@ -319,12 +319,12 @@ MODEL_BOX_PANEL = {
             render.SuppressEngineLighting(true)
             render.ResetModelLighting(1, 1, 1)
             render.SetColorModulation(1, 1, 1)
-        
+
         @buildingModel\DrawModel()
         @controller\GetRenderController()\DrawModels()
         @controller\GetRenderController()\HideModels(true) if @controller
         @controller\GetRenderController()\PreDraw(@model) if @controller
-        
+
         if data = @model\GetPonyData()
             if bg = data\GetBodygroupController()
                 bg\ApplyBodygroups()
@@ -377,10 +377,10 @@ CALC_VIEW_PANEL = {
         @realX, @realY = 0, 0
         @realW, @realH = ScrW(), ScrH()
         @SetCursor('hand')
-    
+
     SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
     SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
-    
+
     CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
         return hook.Remove('CalcView', @) if not @IsValid()
         return if not @IsVisible()
@@ -389,7 +389,7 @@ CALC_VIEW_PANEL = {
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
         @moveAngle = angles
         return newData
-    
+
     PrePlayerDraw: (ply = LocalPlayer()) =>
         return hook.Remove('PrePlayerDraw', @) if not @IsValid()
         return if not @IsVisible()
@@ -397,7 +397,7 @@ CALC_VIEW_PANEL = {
         if data = ply\GetPonyData()
             if bg = data\GetBodygroupController()
                 bg\ApplyBodygroups()
-    
+
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = true
@@ -406,7 +406,7 @@ CALC_VIEW_PANEL = {
         @oldPlaying = @playing
         @playing = false
         @mouseX, @mouseY = gui.MousePos()
-    
+
     CheckCode: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_RCONTROL, KEY_LCONTROL
@@ -423,25 +423,25 @@ CALC_VIEW_PANEL = {
                 @right = status
             when KEY_SPACE
                 @up = status
-    
+
     OnKeyCodePressed: (code = KEY_NONE) =>
         @CheckCode(code, true)
-    
+
     OnKeyCodeReleased: (code = KEY_NONE) =>
         @CheckCode(code, false)
-    
+
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
         @hold = false
         @SetCursor('hand')
-    
+
     Think: =>
         rtime = RealTime()
         delta = rtime - @lastTick
         @lastTick = rtime
 
         @hold = @IsHovered() if @hold
-        
+
         if @hold
             x, y = gui.MousePos()
             deltaX, deltaY = x - @mouseX, y - @mouseY
@@ -450,26 +450,26 @@ CALC_VIEW_PANEL = {
             yaw -= deltaX * .3
             pitch += deltaY * .3
             @drawAngle = Angle(pitch, yaw, roll)
-        
-        speedModifier = 1 
+
+        speedModifier = 1
         speedModifier *= 2 if @fast
         speedModifier *= 0.5 if @slow
 
         if @forward
             @drawPos += @moveAngle\Forward() * speedModifier * delta * 100
-        
+
         if @backward
             @drawPos -= @moveAngle\Forward() * speedModifier * delta * 100
-        
+
         if @right
             @drawPos += @moveAngle\Right() * speedModifier * delta * 100
-        
+
         if @left
             @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
-        
+
         if @up
             @drawPos += @moveAngle\Up() * speedModifier * delta * 100
-        
+
         if @forward or @backward or @left or @right or @hold or @down or @up
             if not @resizedToScreen
                 @resizedToScreen = true
@@ -480,7 +480,7 @@ CALC_VIEW_PANEL = {
                 @resizedToScreen = false
                 @SetPos(@realX, @realY)
                 @SetSize(@realW, @realH)
-    
+
     OnRemove: =>
         hook.Remove('CalcView', @)
         hook.Remove('PrePlayerDraw', @)
@@ -498,7 +498,7 @@ PANEL_SETTINGS_BASE = {
         @updateFuncs = {}
         @createdPanels = 1
         @isNewEditor = false
-    
+
     IsNewEditor: => @isNewEditor
     GetIsNewEditor: => @isNewEditor
     SetIsNewEditor: (val) => @isNewEditor = val
@@ -515,7 +515,7 @@ PANEL_SETTINGS_BASE = {
     DoUpdate: => func() for func in *@updateFuncs
     NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
         @createdPanels += 3
-		with vgui.Create('DNumSlider', parent)
+		with withPanel = vgui.Create('DNumSlider', parent)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
 			\SetTooltip("#{name}\nData value: #{option}")
@@ -538,22 +538,25 @@ PANEL_SETTINGS_BASE = {
                 \SetMin(@GetTargetData()["GetMin#{option}"](@GetTargetData())) if @GetTargetData()
                 \SetMax(@GetTargetData()["GetMax#{option}"](@GetTargetData())) if @GetTargetData()
                 \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     Label: (text = '', parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DLabel', parent)
+        with withPanel = vgui.Create('DLabel', parent)
             \SetText(text)
+            \SetTooltip(text)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
             \SetTextColor(color_white)
             \SizeToContents()
+            \SetMouseInputEnabled(true)
             w, h = \GetSize()
             \SetSize(w, h + 5)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     URLLabel: (text = '', url = '', parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DLabel', parent)
+        with withPanel = vgui.Create('DLabel', parent)
             \SetText(text)
+            \SetTooltip(text .. '\n\nLink goes to: ' .. url)
             \Dock(TOP)
             \DockMargin(2, 2, 2, 2)
             \SetTextColor(Color(158, 208, 208))
@@ -563,28 +566,28 @@ PANEL_SETTINGS_BASE = {
             \SetSize(w, h + 5)
             \SetMouseInputEnabled(true)
             .DoClick = -> gui.OpenURL(url) if url ~= ''
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     Hr: (parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('EditablePanel', parent)
+        with withPanel = vgui.Create('EditablePanel', parent)
             \Dock(TOP)
             \SetSize(200, 15)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
             .Paint = (w = 0, h = 0) =>
                 surface.SetDrawColor(150, 162, 162)
                 surface.DrawLine(0, h / 2, w, h / 2)
     Button: (text = 'Perfectly generic button', doClick = (->), parent = @scroll or @) =>
         @createdPanels += 1
-        with vgui.Create('DButton', parent)
+        with withPanel = vgui.Create('DButton', parent)
             \Dock(TOP)
             \SetSize(200, 20)
             \DockMargin(2, 2, 2, 2)
             \SetText(text)
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
             .DoClick = -> doClick()
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
         @createdPanels += 3
-		with vgui.Create('DCheckBoxLabel', parent)
+		with withPanel = vgui.Create('DCheckBoxLabel', parent)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
@@ -599,7 +602,7 @@ PANEL_SETTINGS_BASE = {
                 @ValueChanges(option, newVal and 1 or 0, pnl)
             table.insert @updateFuncs, ->
                 \SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            @scroll\AddItem(_with_0) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
     ColorBox: (name = 'Colorful Box', option = '', parent = @scroll or @) =>
         @createdPanels += 7
         collapse = vgui.Create('DCollapsibleCategory', parent)
@@ -729,6 +732,26 @@ PANEL_SETTINGS_BASE = {
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
 
+doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
+    spoiler = @Spoiler(spoilerName)
+    @URLLabel('More info about Phong on wiki', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
+    @Label('Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin', spoiler)
+    @NumSlider('Phong Exponent', ttype .. 'PhongExponent', 3, spoiler)
+    @Label('Phong Boost - multiplies specular map reflections', spoiler)
+    @NumSlider('Phong Boost', ttype .. 'PhongBoost', 3, spoiler)
+    @Label('Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)', spoiler)
+    picker, pickerSpoiler = @ColorBox('Phong Tint', ttype .. 'PhongTint', spoiler)
+    pickerSpoiler\SetExpanded(true)
+    @Label('Phong Front - Fresnel 0 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Front', ttype .. 'PhongFront', 2, spoiler)
+    @Label('Phong Middle - Fresnel 45 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Middle', ttype .. 'PhongMiddle', 2, spoiler)
+    @Label('Phong Sliding - Fresnel 90 degree reflection angle multiplier', spoiler)
+    @NumSlider('Phong Sliding', ttype .. 'PhongSliding', 2, spoiler)
+    @ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
+    @Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
+    @URLInput(ttype .. 'LightwarpURL', spoiler)
+
 EditorPages = {
     {
         'name': 'Main'
@@ -742,7 +765,7 @@ EditorPages = {
                     PPM2.Randomize(data, false)
                     @ValueChanges()
                 Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
-            
+
             @ComboBox('Race', 'Race')
             @ComboBox('Wings Type', 'WingsType') if IS_USING_NEW(@IsNewEditor())
             @CheckBox('Gender', 'Gender')
@@ -768,23 +791,26 @@ EditorPages = {
             @ScrollPanel()
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
+            doAddPhongData(@, 'Body') if ADVANCED_MODE\GetBool()
             @NumSlider('Neck Height', 'NeckSize', 2)
             @NumSlider('Legs Height', 'LegsSize', 2)
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
 
-            if ADVANCED_MODE\GetBool()
-                @ComboBox('Socks Texture', 'SocksTexture')
-                @Label('Socks URL texture')
-                @URLInput('SocksTextureURL')
-                @Hr()
-                @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
-                @Hr()
-                @CheckBox('Separate wings color from body', 'SeparateWings')
-                @CheckBox('Separate horn color from body', 'SeparateHorn')
-                @ColorBox('Wings color', 'WingsColor')
-                @ColorBox('Horn color', 'HornColor')
+            doAddPhongData(@, 'Socks') if ADVANCED_MODE\GetBool()
+
+            return if not ADVANCED_MODE\GetBool()
+            @ComboBox('Socks Texture', 'SocksTexture')
+            @Label('Socks URL texture')
+            @URLInput('SocksTextureURL')
+            @Hr()
+            @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+            @Hr()
+            @CheckBox('Separate wings color from body', 'SeparateWings')
+            @CheckBox('Separate horn color from body', 'SeparateHorn')
+            @ColorBox('Wings color', 'WingsColor')
+            @ColorBox('Horn color', 'HornColor')
     }
 
     {
@@ -793,13 +819,18 @@ EditorPages = {
         'func': (sheet) =>
             @ScrollPanel()
             @CheckBox('Separate wings color from body', 'SeparateWings')
+            @CheckBox('Separate wings phong settings from body', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
             @CheckBox('Separate horn color from body', 'SeparateHorn')
+            @CheckBox('Separate horn phong settings from body', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
             @Hr()
             @ColorBox('Wings color', 'WingsColor')
+            doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
             @ColorBox('Horn color', 'HornColor')
+            doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
             @Hr()
             @ColorBox('Bat Wings color', 'BatWingColor')
             @ColorBox('Bat Wings skin color', 'BatWingSkinColor')
+            doAddPhongData(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
             @Hr()
             left = @Spoiler('Left wing settings')
             @NumSlider('Left Wing Size', 'LWingSize', 2, left)
@@ -818,142 +849,6 @@ EditorPages = {
             @ColorBox('Horn Detail Color', 'HornDetailColor')
             @CheckBox('Glowing Horn', 'HornGlow')
             @NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
-    }
-
-    {
-        'name': 'Wings and horn details'
-        'internal': 'wings_horn_details'
-        'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
-        'func': (sheet) =>
-            @ScrollPanel()
-
-            for i = 1, 3
-                @Label("Horn URL detail #{i}")
-                @URLInput("HornURL#{i}")
-                @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
-                @Hr()
-            
-            @Hr()
-            @Label('Normal wings')
-            @Hr()
-
-            for i = 1, 3
-                @Label("Wings URL detail #{i}")
-                @URLInput("WingsURL#{i}")
-                @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
-                @Hr()
-            
-            @Hr()
-            @Label('Bat wings')
-            @Hr()
-            
-            for i = 1, 3
-                @Label("Bat Wings URL detail #{i}")
-                @URLInput("BatWingURL#{i}")
-                @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
-                @Hr()
-            
-            @Hr()
-            @Label('Bat wings skin')
-            @Hr()
-            
-            for i = 1, 3
-                @Label("Bat Wings skin URL detail #{i}")
-                @URLInput("BatWingSkinURL#{i}")
-                @ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
-                @Hr()
-    }
-
-    {
-        'name': 'Body details'
-        'internal': 'bodydetails'
-        'func': (sheet) =>
-            @ScrollPanel()
-
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
-                @ComboBox("Detail #{i}", "BodyDetail#{i}")
-                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
-                if ADVANCED_MODE\GetBool()
-                    @CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
-                    @NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
-                @Hr()
-
-            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
-            @Hr()
-
-            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
-                @Label("Body detail #{i}")
-                @URLInput("BodyDetailURL#{i}")
-                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
-                @Hr()
-    }
-
-    {
-        'name': 'Face'
-        'internal': 'face'
-        'func': (sheet) =>
-            @ScrollPanel()
-            @ComboBox('Eyelashes', 'EyelashType')
-            if IS_USING_NEW(@IsNewEditor())
-                @CheckBox('Bat pony ears', 'BatPonyEars')
-                @CheckBox('Fangs', 'Fangs')
-                @CheckBox('Claw teeth', 'ClawTeeth')
-
-                if ADVANCED_MODE\GetBool()
-                    @Hr()
-                    @ColorBox('Teeth color', 'TeethColor')
-                    @ColorBox('Mouth color', 'MouthColor')
-                    @ColorBox('Tongue color', 'TongueColor')
-    }
-
-    {
-        'name': 'Eyes'
-        'internal': 'eyes'
-        'func': (sheet) =>
-            @ScrollPanel()
-            if ADVANCED_MODE\GetBool()
-                @Hr()
-                @CheckBox('Use separated settings for eyes', 'SeparateEyes')
-            eyes = {''}
-            eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
-            for publicName in *eyes
-                @Hr()
-                prefix = ''
-                if publicName ~= ''
-                    prefix = publicName .. ' '
-                    @Label("'#{publicName}' Eye settings")
-                
-                @Label('Eye URL texture')
-                @URLInput("EyeURL#{publicName}")
-                @Label('When uring eye URL texture; options below have no effect')
-                @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
-                @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
-                @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
-                @NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
-                @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
-
-                if ADVANCED_MODE\GetBool()
-                    @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
-                    @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
-                
-                @NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
-                @NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
-                @NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
-
-                if ADVANCED_MODE\GetBool()
-                    @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
-                    @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
-                    @NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
-                
-                @Hr()
-                @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
-                @ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
-                @ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
-                @ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
-                @ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")
-                @ColorBox("#{prefix}Eye line 2", "EyeIrisLine2#{publicName}")
-                @ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
-                @ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
     }
 
     {
@@ -990,15 +885,23 @@ EditorPages = {
             @NumSlider('Tail size', 'TailSize', 2)
 
             @Hr()
+            @CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
             @ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
             @ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
 
             @Hr()
+            @CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
+            doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
             @ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
             @ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
+            return if not ADVANCED_MODE\GetBool()
+
             @Hr()
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+            doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings')
+            doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings')
 
             @Hr()
             @ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
@@ -1007,6 +910,142 @@ EditorPages = {
             @Hr()
             @ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
             @ColorBox("Lower Tail detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+    }
+
+    {
+        'name': 'Face'
+        'internal': 'face'
+        'func': (sheet) =>
+            @ScrollPanel()
+            @ComboBox('Eyelashes', 'EyelashType')
+            if IS_USING_NEW(@IsNewEditor())
+                @CheckBox('Bat pony ears', 'BatPonyEars')
+                @CheckBox('Fangs', 'Fangs')
+                @CheckBox('Claw teeth', 'ClawTeeth')
+
+                if ADVANCED_MODE\GetBool()
+                    @Hr()
+                    @ColorBox('Teeth color', 'TeethColor')
+                    @ColorBox('Mouth color', 'MouthColor')
+                    @ColorBox('Tongue color', 'TongueColor')
+    }
+
+    {
+        'name': 'Eyes'
+        'internal': 'eyes'
+        'func': (sheet) =>
+            @ScrollPanel()
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                @CheckBox('Use separated settings for eyes', 'SeparateEyes')
+            eyes = {''}
+            eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
+            for publicName in *eyes
+                @Hr()
+                prefix = ''
+                if publicName ~= ''
+                    prefix = publicName .. ' '
+                    @Label("'#{publicName}' Eye settings")
+
+                @Label('Eye URL texture')
+                @URLInput("EyeURL#{publicName}")
+                @Label('When uring eye URL texture; options below have no effect')
+                @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
+                @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
+                @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
+                @NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
+                @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
+
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
+
+                @NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
+                @NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
+                @NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
+
+                if ADVANCED_MODE\GetBool()
+                    @NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
+                    @NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
+                    @NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
+
+                @Hr()
+                @ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
+                @ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
+                @ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
+                @ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
+                @ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")
+                @ColorBox("#{prefix}Eye line 2", "EyeIrisLine2#{publicName}")
+                @ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
+                @ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
+    }
+
+    {
+        'name': 'Wings and horn details'
+        'internal': 'wings_horn_details'
+        'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
+        'func': (sheet) =>
+            @ScrollPanel()
+
+            for i = 1, 3
+                @Label("Horn URL detail #{i}")
+                @URLInput("HornURL#{i}")
+                @ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+                @Hr()
+
+            @Hr()
+            @Label('Normal wings')
+            @Hr()
+
+            for i = 1, 3
+                @Label("Wings URL detail #{i}")
+                @URLInput("WingsURL#{i}")
+                @ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+                @Hr()
+
+            @Hr()
+            @Label('Bat wings')
+            @Hr()
+
+            for i = 1, 3
+                @Label("Bat Wings URL detail #{i}")
+                @URLInput("BatWingURL#{i}")
+                @ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
+                @Hr()
+
+            @Hr()
+            @Label('Bat wings skin')
+            @Hr()
+
+            for i = 1, 3
+                @Label("Bat Wings skin URL detail #{i}")
+                @URLInput("BatWingSkinURL#{i}")
+                @ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
+                @Hr()
+    }
+
+    {
+        'name': 'Body details'
+        'internal': 'bodydetails'
+        'func': (sheet) =>
+            @ScrollPanel()
+
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
+                @ComboBox("Detail #{i}", "BodyDetail#{i}")
+                @ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+                if ADVANCED_MODE\GetBool()
+                    @CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
+                    @NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
+                @Hr()
+
+            @Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+            @Hr()
+
+            for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
+                @Label("Body detail #{i}")
+                @URLInput("BodyDetailURL#{i}")
+                @ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+                @Hr()
     }
 
     {
@@ -1025,7 +1064,7 @@ EditorPages = {
                 @Label("Tail URL Detail #{i} input field")
                 @URLInput("TailURL#{i}")
                 @ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
-            
+
             @Label('Next options have effect only on new model')
             @CheckBox('Separate upper and lower mane colors', 'SeparateMane')
             for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
@@ -1106,7 +1145,7 @@ EditorPages = {
                     surface.SetDrawColor(255, 255, 255)
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, w, h)
-            
+
             @NumSlider('Cutiemark size', 'CMarkSize', 2)
             @ColorBox('Cutiemark color', 'CMarkColor')
             @Hr()
@@ -1291,14 +1330,14 @@ createTopButtons = (isNewEditor = false) =>
             @panels.saves.rebuildFileList()
             callback(txt)
         Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
-    
+
     @saveButton = vgui.Create('DButton', @)
     with @saveButton
         \SetText('Save')
         \SetPos(W - 205, 5)
         \SetSize(90, 20)
         .DoClick = -> saveAs()
-    
+
     @wearButton = vgui.Create('DButton', @)
     with @wearButton
         \SetText('Apply changes (wear)')
@@ -1316,7 +1355,7 @@ createTopButtons = (isNewEditor = false) =>
                     nwdata.NETWORKED = false
                     nwdata\Create()
             @data\ApplyDataToObject(mainData, false) -- no save on apply
-    
+
     if not isNewEditor
         @selectModelBox = vgui.Create('DComboBox', @)
         editorModelSelect = USE_MODEL\GetString()\upper()
@@ -1340,7 +1379,7 @@ createTopButtons = (isNewEditor = false) =>
                     confirm,
                     'Noh!'
                 )
-    
+
     @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
     with @enableAdvanced
         \SetSize(120, 20)
@@ -1383,7 +1422,7 @@ PPM2.OpenNewEditor = ->
             net.WriteBool(true)
             net.SendToServer()
         return
-    
+
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
     self = PPM2.EditorTopFrame
     topframe = PPM2.EditorTopFrame
@@ -1419,11 +1458,11 @@ PPM2.OpenNewEditor = ->
         net.Start('PPM2.EditorStatus')
         net.WriteBool(false)
         net.SendToServer()
-    
+
     @OnRemove = =>
         @leftPanel\Remove()
         @calcPanel\Remove()
-    
+
     @calcPanel = vgui.Create('PPM2CalcViewPanel')
     @calcPanel\SetPos(350, topSize)
     @calcPanel\SetRealPos(350, topSize)
@@ -1472,7 +1511,7 @@ PPM2.OpenNewEditor = ->
         func(pnl, @menus)
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
-    
+
     @leftPanel\MakePopup()
     @MakePopup()
 
@@ -1492,7 +1531,7 @@ PPM2.OpenOldEditor = ->
         net.WriteBool(true)
         net.SendToServer()
         return
-    
+
     sysTime = SysTime()
     frame = vgui.Create('DFrame')
     self = frame
@@ -1538,7 +1577,7 @@ PPM2.OpenOldEditor = ->
     frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
     createTopButtons(@)
-    
+
     @SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
     @model\SetController(controller)
@@ -1559,7 +1598,7 @@ PPM2.OpenOldEditor = ->
         func(pnl, @menus)
         createdPanels += pnl.createdPanels
         @panels[internal] = pnl
-    
+
     net.Start('PPM2.EditorStatus')
     net.WriteBool(true)
     net.SendToServer()

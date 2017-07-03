@@ -202,6 +202,22 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("BatWingSkinURL#{i}",       rString, wString, '')
         @NetworkVar("BatWingURLColor#{i}",      rColor,  wColor, Color(255, 255, 255))
         @NetworkVar("BatWingSkinURLColor#{i}",  rColor,  wColor, Color(255, 255, 255))
+
+    @NetworkVar('SeparateHornPhong', rBool, wBool, false)
+    @NetworkVar('SeparateWingsPhong', rBool, wBool, false)
+    @NetworkVar('SeparateManePhong', rBool, wBool, false)
+    @NetworkVar('SeparateTailPhong', rBool, wBool, false)
+    
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+        @NetworkVar(ttype .. 'PhongExponent', rFloat(0.04, 10), wFloat, 3)
+        @NetworkVar(ttype .. 'PhongBoost', rFloat(0.01, 1), wFloat, 0.09)
+        @NetworkVar(ttype .. 'PhongTint', rColor, wColor, Color(255, 200, 200))
+        @NetworkVar(ttype .. 'PhongFront', rFloat(0, 20), wFloat, 1)
+        @NetworkVar(ttype .. 'PhongMiddle', rFloat(0, 20), wFloat, 5)
+        @NetworkVar(ttype .. 'PhongSliding', rFloat(0, 20), wFloat, 10)
+    
+        @NetworkVar(ttype .. 'Lightwarp', rUInt(4, 0, PPM2.MAX_LIGHTWARP), wUInt(0, 4), 0)
+        @NetworkVar(ttype .. 'LightwarpURL', rString, wString, '')
     
     for i = 1, PPM2.MAX_TATTOOS
         @NetworkVar("TattooType#{i}",   rUInt(8, 0, PPM2.MAX_TATTOOS),  wUInt(0, 8), 0)
@@ -214,7 +230,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("TattooOverDetail#{i}", rBool, wBool, false)
         @NetworkVar("TattooGlow#{i}",  rBool, wBool, false)
         @NetworkVar("TattooGlowStrength#{i}", rFloat(0, 1), wFloat, 1)
-    
+
     Clone: (target = @ent) =>
         copy = @@(nil, target)
         @ApplyDataToObject(copy)

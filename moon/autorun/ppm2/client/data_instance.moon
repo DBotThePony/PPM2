@@ -34,6 +34,9 @@ URL_FIXER = (arg = '') ->
     else
         return ''
 
+FLOAT_FIXER = (def = 1, min = 0, max = 1) ->
+    return (arg = def) -> math.Clamp(tonumber(arg) or def, min, max)
+
 class PonyDataInstance
     @DATA_DIR = "ppm2/"
     @DATA_DIR_BACKUP = "ppm2/backups/"
@@ -462,6 +465,30 @@ class PonyDataInstance
             getFunc: 'BatWingSkinColor'
             fix: COLOR_FIXER()
         }
+
+        'separate_horn_phong': {
+            default: -> false
+            getFunc: 'SeparateHornPhong'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'separate_wings_phong': {
+            default: -> false
+            getFunc: 'SeparateWingsPhong'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'separate_mane_phong': {
+            default: -> false
+            getFunc: 'SeparateManePhong'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'separate_tail_phong': {
+            default: -> false
+            getFunc: 'SeparateTailPhong'
+            fix: (arg = false) -> tobool(arg)
+        }
     }
 
     for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
@@ -814,7 +841,7 @@ class PonyDataInstance
         @PONY_DATA["body_detail_glow_strength_#{i}"] = {
             default: -> 1
             getFunc: "BodyDetailGlowStrength#{i}"
-            fix: (arg = 1) -> math.Clamp(tonumber(arg) or 0, 0, 1)
+            fix: FLOAT_FIXER(1, 0, 1)
             min: 0
             max: 1
         }
@@ -893,6 +920,68 @@ class PonyDataInstance
             default: -> Color(255, 255, 255)
             getFunc: "TattooColor#{i}"
             fix: COLOR_FIXER()
+        }
+
+    for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+        @PONY_DATA[ttype\lower() .. '_phong_exponent'] = {
+            default: -> 3
+            getFunc: ttype .. 'PhongExponent'
+            fix: FLOAT_FIXER(3, 0.04, 10)
+            min: 0.04
+            max: 10
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_phong_boost'] = {
+            default: -> 0.09
+            getFunc: ttype .. 'PhongBoost'
+            fix: FLOAT_FIXER(0.09, 0.01, 1)
+            min: 0.01
+            max: 1
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_phong_front'] = {
+            default: -> 1
+            getFunc: ttype .. 'PhongFront'
+            fix: FLOAT_FIXER(1, 0, 20)
+            min: 0
+            max: 20
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_phong_middle'] = {
+            default: -> 5
+            getFunc: ttype .. 'PhongMiddle'
+            fix: FLOAT_FIXER(5, 0, 20)
+            min: 0
+            max: 20
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_phong_sliding'] = {
+            default: -> 10
+            getFunc: ttype .. 'PhongSliding'
+            fix: FLOAT_FIXER(10, 0, 20)
+            min: 0
+            max: 20
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_phong_tint'] = {
+            default: -> Color(255, 200, 200)
+            getFunc: ttype .. 'PhongTint'
+            fix: COLOR_FIXER(255, 200, 200)
+        }
+
+        @PONY_DATA[ttype\lower() .. '_lightwarp_texture'] = {
+            default: -> 0
+            getFunc: ttype .. 'Lightwarp'
+            enum: [arg for arg in *PPM2.AvaliableLightwarps]
+            fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, 0, PPM2.MAX_LIGHTWARP)
+            min: 0
+            max: PPM2.MAX_LIGHTWARP
+        }
+        
+        @PONY_DATA[ttype\lower() .. '_lightwarp_texture_url'] = {
+            default: -> ''
+            getFunc: ttype .. 'LightwarpURL'
+            fix: URL_FIXER
         }
 
     for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
