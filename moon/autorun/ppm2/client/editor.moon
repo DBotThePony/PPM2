@@ -604,6 +604,8 @@ To rotate left/right use Q/E")
                 @rotateRightTime = RealTime() + @BUTTONS_DELAY
                 @DataAdd('TattooRotate', @ROTATE_STEP) if status
                 @TriggerUpdate()
+            when KEY_ESCAPE
+                @Remove()
     OnKeyCodePressed: (code = KEY_NONE) =>
         @HandleKey(code, true)
     OnKeyCodeReleased: (code = KEY_NONE) =>
