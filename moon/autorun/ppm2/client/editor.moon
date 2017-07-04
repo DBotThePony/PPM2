@@ -1756,6 +1756,12 @@ PPM2.OpenOldEditor = ->
     controller\SetupEntity(ent)
     controller\SetDisableTask(true)
 
+    @EditTattoo = (index = 1, panelsToUpdate = {}) =>
+        editor = vgui.Create('PPM2TattooEditor')
+        editor\SetTargetData(copy)
+        editor\SetTargetID(index)
+        editor\SetPanelsToUpdate(panelsToUpdate)
+
     @panels = {}
 
     createdPanels = 17
