@@ -230,6 +230,7 @@ class PonyRenderController
     DrawLegsOverride: =>
         return if not @isValid
         return if not ENABLE_LEGS\GetBool()
+        return if not @ent\Alive()
         return if @ent\ShouldDrawLocalPlayer()
         return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
         @UpdateLegs()
