@@ -108,7 +108,7 @@ PPM2.DebugPrint = (...) ->
 
 PPM2.TransformNewModelID = (id = 0) ->
     bgID = id % 16
-    maneModelID = math.floor(id / 16 - .01) + 1
+    maneModelID = math.floor(id / 16) + 1
     maneModelID = 1 if maneModelID == 0
     return maneModelID, bgID
 
