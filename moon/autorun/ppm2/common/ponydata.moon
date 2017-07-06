@@ -367,6 +367,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     NetworkDataChanges: (state) => @GenericDataChange(state)
     SlowUpdate: =>
         @GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
+        @GetWeightController()\SlowUpdate() if @GetWeightController()
         if scale = @GetSizeController()
             scale\SlowUpdate()
     

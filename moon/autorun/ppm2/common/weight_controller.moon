@@ -78,6 +78,7 @@ class PonyWeightController
         @ent = data.ent
         @objID = @@NEXT_OBJ_ID
         @@NEXT_OBJ_ID += 1
+        @lastPAC3BoneReset = 0
         @SetWeight(data\GetWeight())
         @UpdateWeight() if IsValid(@ent) and applyWeight
         PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
@@ -106,6 +107,7 @@ class PonyWeightController
         @UpdateWeight()
 
     SetWeight: (weight = 1) => @weight = math.Clamp(weight, @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
+    SlowUpdate: => @UpdateWeight() if @lastPAC3BoneReset < RealTime()
 
     @DEFAULT_BONE_SIZE = Vector(1, 1, 1)
     ResetBones: (ent = @ent) =>
@@ -129,6 +131,7 @@ if CLIENT
     hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
         if weight = data\GetWeightController()
             weight.ent = ent
+            weight.lastPAC3BoneReset = RealTime() + 1
             weight\UpdateWeight()
 --
 -- 0	LrigPelvis
