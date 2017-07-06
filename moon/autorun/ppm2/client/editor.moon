@@ -964,6 +964,9 @@ EditorPages = {
             @ColorBox('Socks model color', 'SocksColor')
 
             doAddPhongData(@, 'Socks') if ADVANCED_MODE\GetBool()
+            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
+                @CheckBox('Hoof Fluffers', 'HoofFluffers')
+                @NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
 
             return if not ADVANCED_MODE\GetBool()
             @ComboBox('Socks Texture', 'SocksTexture')
@@ -1085,10 +1088,15 @@ EditorPages = {
             @ComboBox('Eyelashes', 'EyelashType')
             if IS_USING_NEW(@IsNewEditor())
                 @CheckBox('Bat pony ears', 'BatPonyEars')
+                @NumSlider('Bat pony ears', 'BatPonyEarsStrength', 2) if ADVANCED_MODE\GetBool()
                 @CheckBox('Fangs', 'Fangs')
+                @CheckBox('Alternative Fangs', 'AlternativeFangs')
+                @NumSlider('Fangs', 'FangsStrength', 2) if ADVANCED_MODE\GetBool()
                 @CheckBox('Claw teeth', 'ClawTeeth')
+                @NumSlider('Claw teeth', 'ClawTeethStrength', 2) if ADVANCED_MODE\GetBool()
 
                 if ADVANCED_MODE\GetBool()
+                    @NumSlider('Ears Size', 'EarsSize', 2)
                     @Hr()
                     @ColorBox('Teeth color', 'TeethColor')
                     @ColorBox('Mouth color', 'MouthColor')

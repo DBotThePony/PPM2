@@ -489,6 +489,58 @@ class PonyDataInstance
             getFunc: 'SeparateTailPhong'
             fix: (arg = false) -> tobool(arg)
         }
+
+        'alternative_fangs': {
+            default: -> false
+            getFunc: 'AlternativeFangs'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'hoof_fluffers': {
+            default: -> false
+            getFunc: 'HoofFluffers'
+            fix: (arg = false) -> tobool(arg)
+        }
+
+        'hoof_fluffers_strength': {
+            default: -> 1
+            getFunc: 'HoofFluffersStrength'
+            fix: FLOAT_FIXER(1)
+            min: 0
+            max: 1
+        }
+
+        'ears_size': {
+            default: -> 1
+            getFunc: 'EarsSize'
+            fix: FLOAT_FIXER(1, 0.1, 2)
+            min: 0.1
+            max: 2
+        }
+
+        'bat_pony_ears_strength': {
+            default: -> 1
+            getFunc: 'BatPonyEarsStrength'
+            fix: FLOAT_FIXER(1)
+            min: 0
+            max: 1
+        }
+
+        'fangs_strength': {
+            default: -> 1
+            getFunc: 'FangsStrength'
+            fix: FLOAT_FIXER(1)
+            min: 0
+            max: 1
+        }
+
+        'clawteeth_strength': {
+            default: -> 1
+            getFunc: 'ClawTeethStrength'
+            fix: FLOAT_FIXER(1)
+            min: 0
+            max: 1
+        }
     }
 
     for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}

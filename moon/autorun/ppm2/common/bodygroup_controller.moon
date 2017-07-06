@@ -121,6 +121,7 @@ class DefaultBodygroupController
     __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
     IsValid: => @isValid
     GetData: => @controller
+    GrabData: (str, ...) => @controller['Get' .. str](@controller, ...)
     GetEntity: => @ent
     GetEntityID: => @entID
     GetDataID: => @entID
@@ -431,6 +432,9 @@ class NewBodygroupController extends DefaultBodygroupController
     @BODYGROUP_HORN = 1
     @BODYGROUP_WINGS = 2
 
+    @EAR_L = 31
+    @EAR_R = 32
+
     @BONE_TAIL_1 = 43
     @BONE_TAIL_2 = 44
     @BONE_TAIL_3 = 45
@@ -725,7 +729,9 @@ class NewBodygroupController extends DefaultBodygroupController
     @FLEX_ID_MALE_BODY = 36
     @FLEX_ID_BAT_PONY_EARS = 28
     @FLEX_ID_FANGS = 31
+    @FLEX_ID_FANGS2 = 29
     @FLEX_ID_CLAW_TEETH = 30
+    @FLEX_ID_HOOF_FLUFF = 26
 
     ResetWings: =>
         return if SERVER
@@ -764,6 +770,19 @@ class NewBodygroupController extends DefaultBodygroupController
             \ManipulateBonePosition(@@WING_RIGHT_2, rightPos)
             \ManipulateBonePosition(@@WING_OPEN_RIGHT, rightPos)
 
+    UpdateEars: =>
+        vec = Vector(1, 1, 1) * @GrabData('EarsSize')
+        @ent\ManipulateBoneScale(@@EAR_L, vec)
+        @ent\ManipulateBoneScale(@@EAR_R, vec)
+
+    ResetEars: =>
+        ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
+        for part in *{@@EAR_L, @@EAR_R}
+            with @ent
+                \ManipulateBoneAngles(part, ang)
+                \ManipulateBoneScale(part, vec1)
+                \ManipulateBonePosition(part, vec2)
+
     ResetBodygroups: =>
         return unless @isValid
         return unless IsValid(@ent)
@@ -775,6 +794,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
         @ResetWings()
+        @ResetEars()
         super()
 
     SlowUpdate: (createModels = CLIENT) =>
@@ -792,14 +812,26 @@ class NewBodygroupController extends DefaultBodygroupController
 
         @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GetData()\GetMaleBuff())
         
-        @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
-        @ent\SetFlexWeight(@@FLEX_ID_FANGS,         @GetData()\GetFangs() and 1 or 0)
-        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GetData()\GetClawTeeth() and 1 or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GrabData('ClawTeeth') and @GrabData('ClawTeethStrength') or 0)
+        @ent\SetFlexWeight(@@FLEX_ID_HOOF_FLUFF,    @GrabData('HoofFluffers') and @GrabData('HoofFluffersStrength') or 0)
+
+        if @GrabData('Fangs')
+            if @GrabData('AlternativeFangs')
+                @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+                @ent\SetFlexWeight(@@FLEX_ID_FANGS2, @GrabData('FangsStrength'))
+            else
+                @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GrabData('FangsStrength'))
+                @ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
+        else
+            @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+            @ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
 
         if @lastPAC3BoneReset < RealTime()
             @UpdateTailSize()
             @UpdateManeSize()
             @UpdateWings()
+            @UpdateEars()
 
         @ApplyRace()
         if createModels
@@ -870,12 +902,25 @@ class NewBodygroupController extends DefaultBodygroupController
                     @ent\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
                     @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
                 @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY, maleModifier * @GetData()\GetMaleBuff())
-            when 'BatPonyEars'
-                @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GetData()\GetBatPonyEars() and 1 or 0)
-            when 'Fangs'
-                @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GetData()\GetFangs() and 1 or 0)
-            when 'ClawTeeth'
-                @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GetData()\GetClawTeeth() and 1 or 0)
+            when 'BatPonyEars', 'BatPonyEarsStrength'
+                @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
+            when 'Fangs', 'AlternativeFangs', 'FangsStrength'
+                if @GrabData('Fangs')
+                    if @GrabData('AlternativeFangs')
+                        @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+                        @ent\SetFlexWeight(@@FLEX_ID_FANGS2, @GrabData('FangsStrength'))
+                    else
+                        @ent\SetFlexWeight(@@FLEX_ID_FANGS, @GrabData('FangsStrength'))
+                        @ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
+                else
+                    @ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+                    @ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
+            when 'EarFluffers', 'EarFluffersStrength'
+                @UpdateEars()
+            when 'HoofFluffers', 'HoofFluffersStrength'
+                @ent\SetFlexWeight(@@FLEX_ID_HOOF_FLUFF, @GrabData('HoofFluffers') and @GrabData('HoofFluffersStrength') or 0)
+            when 'ClawTeeth', 'ClawTeethStrength'
+                @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, @GrabData('ClawTeeth') and @GrabData('ClawTeethStrength') or 0)
             when 'ManeTypeNew'
                 @UpdateUpperMane() if CLIENT
             when 'ManeTypeLowerNew'
@@ -910,6 +955,7 @@ if CLIENT
             bodygroup\UpdateTailSize()
             bodygroup\UpdateManeSize()
             bodygroup\UpdateWings() if bodygroup.UpdateWings
+            bodygroup\UpdateEars() if bodygroup.UpdateEars
             bodygroup.lastPAC3BoneReset = RealTime() + 1
 else
     hook.Add 'PlayerNoClip', 'PPM2.WingsCheck', =>

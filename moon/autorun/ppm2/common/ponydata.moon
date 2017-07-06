@@ -141,9 +141,14 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     for i = 1, 6
         @NetworkVar('SocksDetailColor' .. i, rColor, wColor, Color(255, 255, 255))
 
+    -- Backward compatibility about strength
     @NetworkVar('BatPonyEars',      rBool, wBool,              false)
+    @NetworkVar('BatPonyEarsStrength', rFloat(0, 1), wFloat, 1)
     @NetworkVar('Fangs',            rBool, wBool,              false)
+    @NetworkVar('FangsStrength',    rFloat(0, 1), wFloat, 1)
+    @NetworkVar('AlternativeFangs', rBool, wBool,              false)
     @NetworkVar('ClawTeeth',        rBool, wBool,              false)
+    @NetworkVar('ClawTeethStrength',rFloat(0, 1), wFloat, 1)
 
     @NetworkVar('TeethColor',       rColor, wColor,    Color(255, 255, 255))
     @NetworkVar('MouthColor',       rColor, wColor,    Color(219, 65, 155))
@@ -230,6 +235,11 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @NetworkVar("TattooOverDetail#{i}", rBool, wBool, false)
         @NetworkVar("TattooGlow#{i}",  rBool, wBool, false)
         @NetworkVar("TattooGlowStrength#{i}", rFloat(0, 1), wFloat, 1)
+    
+    @NetworkVar('HoofFluffers', rBool, wBool, false)
+    @NetworkVar('HoofFluffersStrength', rFloat(0, 1), wFloat, 1)
+
+    @NetworkVar('EarsSize', rFloat(0.1, 2), wFloat, 1)
 
     Clone: (target = @ent) =>
         copy = @@(nil, target)
