@@ -378,6 +378,12 @@ CALC_VIEW_PANEL = {
         @realW, @realH = ScrW(), ScrH()
         @SetCursor('hand')
 
+        if IS_USING_NEW(true)
+            @emotesPanel = PPM2.CreateEmotesPanel(@, LocalPlayer(), false)
+            @emotesPanel\SetPos(10, 10)
+            @emotesPanel\SetMouseInputEnabled(true)
+            @emotesPanel\SetVisible(true)
+
     SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
     SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
 
@@ -400,11 +406,9 @@ CALC_VIEW_PANEL = {
 
     OnMousePressed: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
+        @emotesPanel\SetVisible(false) if IsValid(@emotesPanel)
         @hold = true
         @SetCursor('sizeall')
-        @holdLast = RealTime() + .1
-        @oldPlaying = @playing
-        @playing = false
         @mouseX, @mouseY = gui.MousePos()
 
     CheckCode: (code = KEY_NONE, status = false) =>
@@ -432,6 +436,7 @@ CALC_VIEW_PANEL = {
 
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
+        @emotesPanel\SetVisible(true) if IsValid(@emotesPanel)
         @hold = false
         @SetCursor('hand')
 
