@@ -1627,6 +1627,8 @@ PPM2.OpenNewEditor = ->
     @lblTitle\SetSize(300, 20)
     @SetTitle = (text = '') => @lblTitle\SetText(text)
     @GetTitle = => @lblTitle\GetText()
+    @deleteOnClose = false
+    @SetDeleteOnClose = (val = false) => @deleteOnClose = val
 
     @Close = =>
         data = PPM2.GetMainData()
@@ -1637,6 +1639,8 @@ PPM2.OpenNewEditor = ->
         net.Start('PPM2.EditorStatus')
         net.WriteBool(false)
         net.SendToServer()
+        if @deleteOnClose
+            @Remove()
 
     @OnRemove = =>
         @leftPanel\Remove()
