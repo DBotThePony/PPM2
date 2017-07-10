@@ -250,7 +250,7 @@ class DefaultBodygroupController
     UpdateTailSize: (ent = @ent) =>
         return if not CLIENT
         size = @GetData()\GetTailSize()
-        size *= @GetData()\GetPonySize() if not ent\IsRagdoll()
+        size *= @GetData()\GetPonySize() if not ent\IsRagdoll() and not ent\IsNJPony()
         vec = Vector(1, 1, 1)
         vecTail = vec * size
         vecTailPos = Vector((size - 1) * 8, 0, 0)
