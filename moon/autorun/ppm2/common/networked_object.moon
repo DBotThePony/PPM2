@@ -127,15 +127,17 @@ class NetworkedObject
 	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
-		strName = "_NW_#{getName}"
+        defFunc = defValue
+        defFunc = (-> defValue) if type(defValue) ~= 'function'
+        strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
-		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :id, :onSet}
+		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id, :onSet}
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
-		@__base[strName] = defValue
+		@__base[strName] = defFunc()
 		@__base["Get#{getName}"] = => @[strName]
-		@__base["Set#{getName}"] = (val = defValue, networkNow = networkByDefault) =>
+		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
 			oldVal = @[strName]
 			@[strName] = val
 			nevVal = onSet(@, val)
@@ -246,6 +248,8 @@ class NetworkedObject
 		@valid = true
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
+
+        @[data.strName] = data.defFunc() for data in *@@NW_Vars when data.defFunc
 
 		if SERVER
 			@netID = @@NW_NextObjectID
