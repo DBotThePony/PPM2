@@ -410,23 +410,32 @@ CALC_VIEW_PANEL = {
         @hold = true
         @SetCursor('sizeall')
         @mouseX, @mouseY = gui.MousePos()
+    
+    IsActive: => @forward or @backward or @left or @right or @hold or @down or @up
 
     CheckCode: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_RCONTROL, KEY_LCONTROL
                 @slow = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_LSHIFT, KEY_RSHIFT
                 @fast = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_W
                 @forward = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_S
                 @backward = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_A
                 @left = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_D
                 @right = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
             when KEY_SPACE
                 @up = status
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
 
     OnKeyCodePressed: (code = KEY_NONE) =>
         @CheckCode(code, true)
@@ -436,7 +445,7 @@ CALC_VIEW_PANEL = {
 
     OnMouseReleased: (code = MOUSE_LEFT) =>
         return if code ~= MOUSE_LEFT
-        @emotesPanel\SetVisible(true) if IsValid(@emotesPanel)
+        @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
         @hold = false
         @SetCursor('hand')
 
@@ -475,8 +484,9 @@ CALC_VIEW_PANEL = {
         if @up
             @drawPos += @moveAngle\Up() * speedModifier * delta * 100
 
-        if @forward or @backward or @left or @right or @hold or @down or @up
+        if @IsActive()
             if not @resizedToScreen
+                @emotesPanel\SetVisible(false) if IsValid(@emotesPanel)
                 @resizedToScreen = true
                 @SetPos(0, 0)
                 @SetSize(ScrW(), ScrH())
@@ -485,6 +495,7 @@ CALC_VIEW_PANEL = {
                 @resizedToScreen = false
                 @SetPos(@realX, @realY)
                 @SetSize(@realW, @realH)
+                @emotesPanel\SetVisible(not @IsActive()) if IsValid(@emotesPanel)
 
     OnRemove: =>
         hook.Remove('CalcView', @)
