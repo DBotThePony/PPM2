@@ -1048,3 +1048,8 @@ for key, value in pairs PPM2.PonyDataRegistry
             value.fix = COLOR_FIXER(r, g, b, a)
             value.read = rColor
             value.write = wColor
+        else
+            error("Unknown variable type - #{value.type} for #{key}")
+
+for key, value in pairs PPM2.PonyDataRegistry
+    error("Data has no fix function: #{key}") if not value.fix
