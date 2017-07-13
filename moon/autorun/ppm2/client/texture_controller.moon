@@ -238,7 +238,7 @@ class PonyTextureController
             callback(@URL_MATERIAL_CACHE[width][height][url].texture, nil, @URL_MATERIAL_CACHE[width][height][url].material)
             return
         @ALREADY_DOWNLOADING[width][height][url] = true
-        table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}})
+        table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}, timeouts: 0})
         --PPM2.Message 'Queuing to download ', url
     @BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
         url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
@@ -308,6 +308,7 @@ class PonyTextureController
             @SHOULD_WAIT_WEB = true
             timer.Simple 1, ->
                 @SHOULD_WAIT_WEB = false
+                table.remove(@HTML_MATERIAL_QUEUE, 1)
                 return unless IsValid(panel)
                 panel\UpdateHTMLTexture()
                 htmlmat = panel\GetHTMLMaterial()
@@ -334,34 +335,10 @@ class PonyTextureController
 
                 for callback in *data.callbacks
                     callback(texture, panel, newMat)
-                table.remove(@HTML_MATERIAL_QUEUE, 1)
                 timer.Simple 0, -> panel\Remove() if IsValid(panel)
             return
         data.frame = 0
         panel = vgui.Create('DHTML')
-        data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
-        timeouts = 0
-        timer.Create data.timerid, 8, 3, ->
-            timeouts += 1
-            return if timeouts < 3
-            return unless IsValid(panel)
-            panel\Remove()
-            newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
-                '$basetexture': 'models/ppm/partrender/null'
-                '$ignorez': 1
-                '$vertexcolor': 1
-                '$vertexalpha': 1
-                '$nolod': 1
-                '$translucent': 1
-            })
-
-            @FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
-                texture: newMat\GetTexture('$basetexture')
-                material: newMat
-            }
-
-            for callback in *data.callbacks
-                callback(newMat\GetTexture('$basetexture'), nil, newMat)
         panel\SetVisible(false)
         panel\SetSize(data.width, data.height)
         panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
@@ -370,6 +347,33 @@ class PonyTextureController
             if msg == 'FRAME'
                 data.frame += 1
         data.panel = panel
+        data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
+        timer.Create data.timerid, 8, 1, ->
+            return unless IsValid(panel)
+            panel\Remove()
+            if data.timeouts >= 4
+                newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
+                    '$basetexture': 'models/ppm/partrender/null'
+                    '$ignorez': 1
+                    '$vertexcolor': 1
+                    '$vertexalpha': 1
+                    '$nolod': 1
+                    '$translucent': 1
+                })
+
+                @FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
+                    texture: newMat\GetTexture('$basetexture')
+                    material: newMat
+                }
+
+                for callback in *data.callbacks
+                    callback(newMat\GetTexture('$basetexture'), nil, newMat)
+                
+                table.remove(@HTML_MATERIAL_QUEUE, 1)
+            else
+                data.timeouts += 1
+                table.remove(@HTML_MATERIAL_QUEUE, 1)
+                table.insert(@HTML_MATERIAL_QUEUE, data)
 
     new: (controller, compile = true) =>
         @isValid = true
