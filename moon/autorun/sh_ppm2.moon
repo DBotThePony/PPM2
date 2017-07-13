@@ -63,7 +63,9 @@ if CLIENT
     file.CreateDir('ppm2')
     file.CreateDir('ppm2/backups')
     include 'client/data_instance.lua'
+    include 'client/materials_registry.lua'
     include 'client/texture_controller.lua'
+    include 'client/new_texture_controller.lua'
     include 'client/hooks.lua'
     include 'client/functions.lua'
     include 'client/render_controller.lua'
@@ -104,6 +106,7 @@ else
     AddCSLuaFile 'common/ponyfly.lua'
     AddCSLuaFile 'common/size_controller.lua'
     AddCSLuaFile 'client/data_instance.lua'
+    AddCSLuaFile 'client/materials_registry.lua'
     AddCSLuaFile 'client/texture_controller.lua'
     AddCSLuaFile 'client/hooks.lua'
     AddCSLuaFile 'client/render_controller.lua'
@@ -113,6 +116,7 @@ else
     AddCSLuaFile 'client/rag_edit.lua'
     AddCSLuaFile 'client/pac3_patch.lua'
     AddCSLuaFile 'client/functions.lua'
+    AddCSLuaFile 'client/new_texture_controller.lua'
     include 'server/hooks.lua'
     include 'server/emotes.lua'
     include 'server/hitgroups.lua'
