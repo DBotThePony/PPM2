@@ -287,12 +287,7 @@ do
         }
 
         'haircolor1': {
-            name: {'ManeColor1', 'TailColor1'}
-            func: (arg = '1.0 1.0 1.0') -> PARSE_COLOR(arg)
-        }
-
-        'haircolor2': {
-            name: {'ManeColor2', 'TailColor2'}
+            name: {'ManeColor1', 'TailColor1', 'ManeColor2', 'TailColor2'}
             func: (arg = '1.0 1.0 1.0') -> PARSE_COLOR(arg)
         }
 
@@ -303,7 +298,7 @@ do
 
         'eyeirissize': {
             name: 'IrisSize'
-            func: (arg = '1') -> tonumber(arg) or 1
+            func: (arg = '1') -> (tonumber(arg) or 1) * 1.2
         }
 
         'eyeholesize': {
@@ -358,9 +353,9 @@ do
             func: (arg = '1.0 1.0 1.0') -> PARSE_COLOR(arg)
         }
 
-    for i = 3, 6
+    for i = 2, 6
         IMPORT_TABLE["haircolor#{i}"] = {
-            name: {"ManeDetailColor#{i - 2}", "TailDetailColor#{i - 2}"}
+            name: {"ManeDetailColor#{i - 1}", "TailDetailColor#{i - 1}"}
             func: (arg = '1.0 1.0 1.0') -> PARSE_COLOR(arg)
         }
 
