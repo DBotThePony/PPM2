@@ -1014,7 +1014,6 @@ for key, value in pairs PPM2.PonyDataRegistry
         value.max = #value.enum - 1
         value.type = 'INT'
 
-for key, value in pairs PPM2.PonyDataRegistry
     switch value.type
         when 'INT'
             value.fix = INT_FIXER(value.default, value.min, value.max)
@@ -1050,6 +1049,5 @@ for key, value in pairs PPM2.PonyDataRegistry
             value.write = wColor
         else
             error("Unknown variable type - #{value.type} for #{key}")
-
-for key, value in pairs PPM2.PonyDataRegistry
+    
     error("Data has no fix function: #{key}") if not value.fix
