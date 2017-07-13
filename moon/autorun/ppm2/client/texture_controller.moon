@@ -407,12 +407,12 @@ class PonyTextureController
     GrabData: (str, ...) => @GetData()['Get' .. str](@GetData(), ...)
     GetEntity: => @ent
     GetBody: =>
-        if @GetData()\GetGender() == PPM2.GENDER_FEMALE
+        if @GrabData('Gender') == PPM2.GENDER_FEMALE
             return @FemaleMaterial
         else
             return @MaleMaterial
     GetBodyName: =>
-        if @GetData()\GetGender() == PPM2.GENDER_FEMALE
+        if @GrabData('Gender') == PPM2.GENDER_FEMALE
             return @FemaleMaterialName
         else
             return @MaleMaterialName
@@ -730,7 +730,7 @@ class PonyTextureController
 
         continueCompilation = ->
             return unless @isValid
-            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GrabData('BodyColor')
             oldW, oldH = ScrW(), ScrH()
 
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
@@ -770,12 +770,12 @@ class PonyTextureController
                 if @GrabData("TattooOverDetail#{i}")
                     @DrawTattoo(i)
             
-            if suit = _M.SUITS[@GetData()\GetBodysuit()]
+            if suit = _M.SUITS[@GrabData('Bodysuit')]
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(suit)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
             
-            if @GetData()\GetSocks()
+            if @GrabData('Socks')
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(@@PONY_SOCKS)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
@@ -890,8 +890,8 @@ class PonyTextureController
             
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
-            {:r, :g, :b} = @GetData()\GetBodyColor()
-            {:r, :g, :b} = @GetData()\GetHornColor() if @GetData()\GetSeparateHorn()
+            {:r, :g, :b} = @GrabData('BodyColor')
+            {:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -900,8 +900,8 @@ class PonyTextureController
             surface.SetMaterial(@@HORN_MATERIAL_COLOR)
             surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            if @GetData()\GetUseHornDetail()
-                {:r, :g, :b} = @GetData()\GetHornDetailColor()
+            if @GrabData('UseHornDetail')
+                {:r, :g, :b} = @GrabData('HornDetailColor')
                 surface.SetDrawColor(r, g, b)
                 surface.SetMaterial(@@HORN_DETAIL_COLOR)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
@@ -930,8 +930,8 @@ class PonyTextureController
             surface.SetDrawColor(r, g, b)
             surface.DrawRect(0, 0, texSize, texSize)
 
-            if @GetData()\GetHornGlow()
-                surface.SetDrawColor(255, 255, 255, @GetData()\GetHornGlowSrength() * 255)
+            if @GrabData('HornGlow')
+                surface.SetDrawColor(255, 255, 255, @GrabData('HornGlowSrength') * 255)
                 surface.SetMaterial(@@HORN_DETAIL_COLOR)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -990,10 +990,10 @@ class PonyTextureController
         @UpdatePhongData()
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_SOCKS_HIRES or @@QUAD_SIZE_SOCKS
 
-        {:r, :g, :b} = @GetData()\GetSocksColor()
+        {:r, :g, :b} = @GrabData('SocksColor')
         @SocksMaterial\SetFloat('$alpha', 1)
 
-        url = @GetData()\GetSocksTextureURL()
+        url = @GrabData('SocksTextureURL')
         if url == '' or not url\find('^https?://')
             @SocksMaterial\SetVector('$color', Vector(1, 1, 1))
             @SocksMaterial\SetVector('$color2', Vector(1, 1, 1))
@@ -1005,7 +1005,7 @@ class PonyTextureController
             surface.SetDrawColor(r, g, b)
             surface.DrawRect(0, 0, texSize, texSize)
 
-            socksType = @GetData()\GetSocksTexture() + 1
+            socksType = @GrabData('SocksTexture') + 1
             surface.SetMaterial(_M.SOCKS_MATERIALS[socksType] or _M.SOCKS_MATERIALS[1])
             surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -1065,8 +1065,8 @@ class PonyTextureController
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
-            {:r, :g, :b} = @GetData()\GetBodyColor()
-            {:r, :g, :b} = @GetData()\GetWingsColor() if @GetData()\GetSeparateWings()
+            {:r, :g, :b} = @GrabData('BodyColor')
+            {:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -1107,9 +1107,9 @@ class PonyTextureController
 
         return @WingsMaterial
     
-    GetManeType: => @GetData()\GetManeType()
-    GetManeTypeLower: => @GetData()\GetManeTypeLower()
-    GetTailType: => @GetData()\GetTailType()
+    GetManeType: => @GrabData('ManeType')
+    GetManeTypeLower: => @GrabData('ManeTypeLower')
+    GetTailType: => @GrabData('TailType')
     CompileHair: =>
         return unless @isValid
         textureFirst = {
@@ -1162,7 +1162,7 @@ class PonyTextureController
             render.SetViewPort(0, 0, texSize, texSize)
 
             -- First mane pass
-            {:r, :g, :b} = @GetData()\GetManeColor1()
+            {:r, :g, :b} = @GrabData('ManeColor1')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -1195,7 +1195,7 @@ class PonyTextureController
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
 
-            {:r, :g, :b} = @GetData()\GetManeColor2()
+            {:r, :g, :b} = @GrabData('ManeColor2')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -1292,7 +1292,7 @@ class PonyTextureController
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
 
-            {:r, :g, :b} = @GetData()\GetTailColor1()
+            {:r, :g, :b} = @GrabData('TailColor1')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -1327,7 +1327,7 @@ class PonyTextureController
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
 
-            {:r, :g, :b} = @GetData()\GetTailColor2()
+            {:r, :g, :b} = @GrabData('TailColor2')
             render.Clear(r, g, b, 255, true, true)
             cam.Start2D()
             surface.SetDrawColor(r, g, b)
@@ -1378,33 +1378,33 @@ class PonyTextureController
         prefix = left and 'l' or 'r'
         prefixUpper = left and 'L' or 'R'
 
-        separated = @GetData()\GetSeparateEyes()
+        separated = @GrabData('SeparateEyes')
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
-        EyeType =           @GetData()["GetEyeType#{prefixData}"](@GetData())
-        EyeBackground =     @GetData()["GetEyeBackground#{prefixData}"](@GetData())
-        EyeHole =           @GetData()["GetEyeHole#{prefixData}"](@GetData())
-        HoleWidth =         @GetData()["GetHoleWidth#{prefixData}"](@GetData())
-        IrisSize =          @GetData()["GetIrisSize#{prefixData}"](@GetData()) * .75
-        EyeIris1 =          @GetData()["GetEyeIrisTop#{prefixData}"](@GetData())
-        EyeIris2 =          @GetData()["GetEyeIrisBottom#{prefixData}"](@GetData())
-        EyeIrisLine1 =      @GetData()["GetEyeIrisLine1#{prefixData}"](@GetData())
-        EyeIrisLine2 =      @GetData()["GetEyeIrisLine2#{prefixData}"](@GetData())
-        EyeLines =          @GetData()["GetEyeLines#{prefixData}"](@GetData())
-        HoleSize =          @GetData()["GetHoleSize#{prefixData}"](@GetData())
-        EyeReflection =     @GetData()["GetEyeReflection#{prefixData}"](@GetData())
-        EyeEffect =         @GetData()["GetEyeEffect#{prefixData}"](@GetData())
-        DerpEyes =          @GetData()["GetDerpEyes#{prefixData}"](@GetData())
-        DerpEyesStrength =  @GetData()["GetDerpEyesStrength#{prefixData}"](@GetData())
-        EyeURL =            @GetData()["GetEyeURL#{prefixData}"](@GetData())
-        IrisWidth =         @GetData()["GetIrisWidth#{prefixData}"](@GetData())
-        IrisHeight =        @GetData()["GetIrisHeight#{prefixData}"](@GetData())
-        HoleHeight =        @GetData()["GetHoleHeight#{prefixData}"](@GetData())
-        HoleShiftX =        @GetData()["GetHoleShiftX#{prefixData}"](@GetData())
-        HoleShiftY =        @GetData()["GetHoleShiftY#{prefixData}"](@GetData())
-        EyeRotation =       @GetData()["GetEyeRotation#{prefixData}"](@GetData())
-        PonySize =          @GetData()\GetPonySize()
+        EyeType =           @GrabData("EyeType#{prefixData}")
+        EyeBackground =     @GrabData("EyeBackground#{prefixData}")
+        EyeHole =           @GrabData("EyeHole#{prefixData}")
+        HoleWidth =         @GrabData("HoleWidth#{prefixData}")
+        IrisSize =          @GrabData("IrisSize#{prefixData}") * .75
+        EyeIris1 =          @GrabData("EyeIrisTop#{prefixData}")
+        EyeIris2 =          @GrabData("EyeIrisBottom#{prefixData}")
+        EyeIrisLine1 =      @GrabData("EyeIrisLine1#{prefixData}")
+        EyeIrisLine2 =      @GrabData("EyeIrisLine2#{prefixData}")
+        EyeLines =          @GrabData("EyeLines#{prefixData}")
+        HoleSize =          @GrabData("HoleSize#{prefixData}")
+        EyeReflection =     @GrabData("EyeReflection#{prefixData}")
+        EyeEffect =         @GrabData("EyeEffect#{prefixData}")
+        DerpEyes =          @GrabData("DerpEyes#{prefixData}")
+        DerpEyesStrength =  @GrabData("DerpEyesStrength#{prefixData}")
+        EyeURL =            @GrabData("EyeURL#{prefixData}")
+        IrisWidth =         @GrabData("IrisWidth#{prefixData}")
+        IrisHeight =        @GrabData("IrisHeight#{prefixData}")
+        HoleHeight =        @GrabData("HoleHeight#{prefixData}")
+        HoleShiftX =        @GrabData("HoleShiftX#{prefixData}")
+        HoleShiftY =        @GrabData("HoleShiftY#{prefixData}")
+        EyeRotation =       @GrabData("EyeRotation#{prefixData}")
+        PonySize =          @GrabData('PonySize')
         PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
         
         oldW, oldH = ScrW(), ScrH()
@@ -1539,13 +1539,13 @@ class PonyTextureController
         @CMarkTextureGUIName = "!#{textureDataGUI.name\lower()}"
         @CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
-        unless @GetData()\GetCMark()
+        unless @GrabData('CMark')
             @CMarkTexture\SetTexture('$basetexture', 'models/ppm/partrender/null')
             @CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm/partrender/null')
             return @CMarkTexture, @CMarkTextureGUI
         
-        URL = @GetData()\GetCMarkURL()
-        size = @GetData()\GetCMarkSize()
+        URL = @GrabData('CMarkURL')
+        size = @GrabData('CMarkSize')
         
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_CMARK_HIRES or @@QUAD_SIZE_CMARK
         sizeQuad = texSize * size
@@ -1561,8 +1561,8 @@ class PonyTextureController
             render.Clear(0, 0, 0, 0, true, true)
             cam.Start2D()
 
-            if mark = _M.CUTIEMARKS[@GetData()\GetCMarkType() + 1]
-                surface.SetDrawColor(@GetData()\GetCMarkColor())
+            if mark = _M.CUTIEMARKS[@GrabData('CMarkType') + 1]
+                surface.SetDrawColor(@GrabData('CMarkColor'))
                 surface.SetMaterial(mark)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
             
@@ -1585,7 +1585,7 @@ class PonyTextureController
                 render.Clear(0, 0, 0, 0, true, true)
                 cam.Start2D()
 
-                surface.SetDrawColor(@GetData()\GetCMarkColor())
+                surface.SetDrawColor(@GrabData('CMarkColor'))
                 surface.SetMaterial(material)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
                 
