@@ -1506,6 +1506,8 @@ STRETCHING_PANEL = {
 
 vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
+local cl_playermodel
+
 createTopButtons = (isNewEditor = false) =>
     W, H = @GetSize()
     saveAs = (callback = (->)) ->
@@ -1545,6 +1547,8 @@ createTopButtons = (isNewEditor = false) =>
                     nwdata.NETWORKED = false
                     nwdata\Create()
             @data\ApplyDataToObject(mainData, false) -- no save on apply
+            cl_playermodel = cl_playermodel or GetConVar('cl_playermodel')
+            RunConsoleCommand('cl_playermodel', 'pony') if not cl_playermodel\GetString()\find('pony')
 
     if not isNewEditor
         @selectModelBox = vgui.Create('DComboBox', @)
