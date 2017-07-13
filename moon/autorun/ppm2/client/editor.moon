@@ -1348,6 +1348,7 @@ EditorPages = {
         'internal': 'saves'
         'func': (sheet) =>
             @Label('Open file by double click')
+            @Button 'Reload file list', -> @rebuildFileList()
             list = vgui.Create('DListView', @)
             list\Dock(FILL)
             list\SetMultiSelect(false)
@@ -1406,6 +1407,7 @@ EditorPages = {
         'internal': 'oldsaves'
         'func': (sheet) =>
             @Label('!!! It may or may not work. You will be squished.')
+            @Button 'Reload file list', -> @rebuildFileList()
             list = vgui.Create('DListView', @)
             list\Dock(FILL)
             list\SetMultiSelect(false)
