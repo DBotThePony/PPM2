@@ -64,12 +64,12 @@ rURL = -> URL_FIXER(rString())
 FLOAT_FIXER = (def = 1, min = 0, max = 1) ->
     defFunc = -> def if type(def) ~= 'function'
     defFunc = def if type(def) == 'function'
-    return (arg = defFunc()) -> math.Clamp(tonumber(arg) or def, min, max)
+    return (arg = defFunc()) -> math.Clamp(tonumber(arg) or defFunc(), min, max)
 
 INT_FIXER = (def = 1, min = 0, max = 1) ->
     defFunc = -> def if type(def) ~= 'function'
     defFunc = def if type(def) == 'function'
-    return (arg = defFunc()) -> math.floor(math.Clamp(tonumber(arg) or def, min, max))
+    return (arg = defFunc()) -> math.floor(math.Clamp(tonumber(arg) or defFunc(), min, max))
 
 PPM2.PonyDataRegistry = {
     'age': {
