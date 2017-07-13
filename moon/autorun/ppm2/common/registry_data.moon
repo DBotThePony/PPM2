@@ -1016,6 +1016,8 @@ for key, value in pairs PPM2.PonyDataRegistry
 
     switch value.type
         when 'INT'
+            error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
+            error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
             value.fix = INT_FIXER(value.default, value.min, value.max)
             if value.min >= 0
                 selectBits = 16
@@ -1031,6 +1033,8 @@ for key, value in pairs PPM2.PonyDataRegistry
                 value.read = rInt(selectBits, value.min, value.max)
                 value.write = wInt(value.default(), selectBits)
         when 'FLOAT'
+            error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
+            error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
             value.fix = FLOAT_FIXER(value.default, value.min, value.max)
             value.read = rFloat(value.min, value.max)
             value.write = (arg = value.default()) -> wFloat(arg)
