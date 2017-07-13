@@ -331,7 +331,6 @@ class PonyTextureController
                 }
 
                 @ALREADY_DOWNLOADING[data.width][data.height][data.url] = false
-                --PPM2.Message 'Finished downloading ', data.url
 
                 for callback in *data.callbacks
                     callback(texture, panel, newMat)
@@ -341,10 +340,12 @@ class PonyTextureController
         data.frame = 0
         panel = vgui.Create('DHTML')
         data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
-        timer.Create data.timerid, 8, 1, ->
+        timeouts = 0
+        timer.Create data.timerid, 8, 3, ->
+            timeouts += 1
+            return if timeouts < 3
             return unless IsValid(panel)
             panel\Remove()
-            --PPM2.Message 'Failed to download', data.url, '!'
             newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
                 '$basetexture': 'models/ppm/partrender/null'
                 '$ignorez': 1
@@ -369,7 +370,6 @@ class PonyTextureController
             if msg == 'FRAME'
                 data.frame += 1
         data.panel = panel
-        --PPM2.Message 'Downloading ', data.url
 
     new: (controller, compile = true) =>
         @isValid = true
