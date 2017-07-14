@@ -47,8 +47,10 @@ REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
 reflectTasks = {}
 
 hook.Add 'Think', 'PPM2.ReflectionsUpdate', ->
+    PPM2.__RENDERING_REFLECTIONS = true
     for task in *reflectTasks
         task.ctrl\UpdateEyeReflections(task.ent)
+    PPM2.__RENDERING_REFLECTIONS = false
     reflectTasks = {}
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)

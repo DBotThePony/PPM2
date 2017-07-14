@@ -22,6 +22,7 @@ ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, 
 SHOULD_DRAW_VIEWMODEL = CreateConVar('cl_ppm2_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 
 hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
+    return if PPM2.__RENDERING_REFLECTIONS
     return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
     return unless IsValid(arms)
     return unless ply.__cachedIsPony
@@ -38,6 +39,7 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
     arms.__ppm2_draw = true
 
 hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
+    return if PPM2.__RENDERING_REFLECTIONS
     return unless IsValid(arms)
     return unless arms.__ppm2_draw
     data = ply\GetPonyData()
@@ -49,6 +51,7 @@ IN_DRAW = false
 
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
     return if IN_DRAW
+    return if PPM2.__RENDERING_REFLECTIONS
     if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
@@ -69,6 +72,7 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
     return if IN_DRAW
+    return if PPM2.__RENDERING_REFLECTIONS
     if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
@@ -132,6 +136,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                     IN_DRAW = false
 
 PPM2.PrePlayerDraw = =>
+    return if PPM2.__RENDERING_REFLECTIONS
     return unless @GetPonyData()
     @__cachedIsPony = @IsPony()
     return if not @__cachedIsPony
@@ -145,6 +150,7 @@ PPM2.PrePlayerDraw = =>
     status = renderController\PreDraw() if renderController
 
 PPM2.PostPlayerDraw = =>
+    return if PPM2.__RENDERING_REFLECTIONS
     return unless @GetPonyData()
     return unless @__cachedIsPony
     data = @GetPonyData()
