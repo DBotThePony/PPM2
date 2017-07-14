@@ -1147,6 +1147,8 @@ EditorPages = {
                     @ComboBox('Lightwarp', ttype .. 'Lightwarp')
                     @Label('Lightwarp texture URL input\nIt must be 256x16!')
                     @URLInput(ttype .. 'LightwarpURL')
+                    @Label('Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror')
+                    @NumSlider('Glossiness' .. publicName, 'EyeGlossyStrength' .. publicName, 2)
 
                 @Label('When uring eye URL texture; options below have no effect')
 

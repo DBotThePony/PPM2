@@ -656,6 +656,14 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         type: 'FLOAT'
     }
 
+    PPM2.PonyDataRegistry["eye_glossy_reflection#{internal}"] = {
+        default: -> 0.16
+        getFunc: "EyeGlossyStrength#{publicName}"
+        min: 0
+        max: 1
+        type: 'FLOAT'
+    }
+
     PPM2.PonyDataRegistry["hole_shiftx#{internal}"] = {
         default: -> 0
         getFunc: "HoleShiftX#{publicName}"

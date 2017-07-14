@@ -1504,6 +1504,10 @@ class PonyTextureController
 
         texSize *= 1.9
 
+        separated = @GrabData('SeparateEyes')
+        prefixData = ''
+        prefixData = 'Left' if separated
+
         cam.Start2D()
         render.PushRenderTarget(rtleft)
         render.SetViewPort(0, 0, texSize, texSize)
@@ -1513,7 +1517,7 @@ class PonyTextureController
         surface.SetMaterial(@EyeMaterialDrawL)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
         
-        surface.SetDrawColor(255, 255, 255, 40)
+        surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
         
@@ -1521,7 +1525,9 @@ class PonyTextureController
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @EyeMaterialL\SetTexture('$iris', rtleft)
-        
+
+        prefixData = 'Right' if separated
+
         cam.Start2D()
         render.PushRenderTarget(rtright)
         render.SetViewPort(0, 0, texSize, texSize)
@@ -1531,7 +1537,7 @@ class PonyTextureController
         surface.SetMaterial(@EyeMaterialDrawR)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
         
-        surface.SetDrawColor(255, 255, 255, 40)
+        surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
         
