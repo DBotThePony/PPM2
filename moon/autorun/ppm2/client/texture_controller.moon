@@ -1428,7 +1428,7 @@ class PonyTextureController
                 
                 '$ambientoccltexture': 'models/ppm/eyes/eye_extra'
                 '$envmap': 'models/ppm/eyes/eye_reflection'
-                '$corneatexture': 'models/ppm/eyes/eye_cornea'
+                '$corneatexture': 'models/ppm/eyes/eye_cornea_oval'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
                 
                 '$eyeballradius': '3.7'
@@ -1454,6 +1454,34 @@ class PonyTextureController
         createdMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
         @["EyeMaterial#{prefixUpper}"] = createdMaterial
 
+        IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
+        IrisQuadSize = texSize * IrisSize * PonySize
+
+        HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
+        HolePos = texSize / 2
+        holeX = HoleQuadSize * HoleWidth / 2
+        holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
+        calcHoleX = HolePos - holeX + holeX * HoleShiftX + shiftX
+        calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
+
+        rtCornerA = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyeCorner_#{prefix}", texSize, texSize, false)
+        rtCornerA\Download()
+
+        render.PushRenderTarget(rtCornerA)
+        render.SetViewPort(0, 0, texSize, texSize)
+        render.Clear(0, 0, 0, 255, true, true)
+        cam.Start2D()
+
+        surface.SetMaterial(_M.EYE_CORNERA_OVAL)
+        surface.SetDrawColor(255, 255, 255)
+        DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
+
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+
+        createdMaterial\SetTexture('$corneatexture', rtCornerA)
+
         if EyeURL == '' or not EyeURL\find('^https?://')
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
             rt\Download()
@@ -1468,8 +1496,6 @@ class PonyTextureController
 
             surface.SetDrawColor(EyeIris1)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
-            IrisQuadSize = texSize * IrisSize * PonySize
             DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeIris2)
@@ -1487,14 +1513,7 @@ class PonyTextureController
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
-            HolePos = texSize / 2
-            do
-                holeX = HoleQuadSize * HoleWidth / 2
-                holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
-                cx = HolePos - holeX + holeX * HoleShiftX + shiftX
-                cy = HolePos - holeY + holeY * HoleShiftY + shiftY
-                DrawTexturedRectRotated(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
+            DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeEffect)
             surface.SetMaterial(@@EYE_EFFECT)

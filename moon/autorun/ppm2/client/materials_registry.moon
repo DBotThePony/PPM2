@@ -239,5 +239,12 @@ module.EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2')
 module.EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2')
 module.PONY_SOCKS = Material('models/ppm/texclothes/pony_socks')
 
+module.EYE_CORNERA = Material('models/ppm/eyes/eye_cornea')
+module.EYE_CORNERA_OVAL = Material('models/ppm/eyes/eye_cornea_oval')
+module.EYE_EXTRA = Material('models/ppm/eyes/eye_extra')
+module.EYE_EXTRA2 = Material('models/ppm/eyes/eye_extra2')
+module.EYE_LIGHTWARP = Material('models/ppm/eyes/eye_lightwarp')
+module.EYE_REFLECTION2 = Material('models/ppm/eyes/eye_reflection')
+
 PPM2.MaterialsRegistry = module
 return module
