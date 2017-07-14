@@ -123,7 +123,9 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeRotation#{publicName}"] = true
-        @EYE_UPDATE_TRIGGER["PonySize#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["PonySize"] = true
+        @EYE_UPDATE_TRIGGER["EyeRefract#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeCornerA#{publicName}"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -1386,11 +1388,13 @@ class PonyTextureController
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
+        EyeRefract =        @GrabData("EyeRefract#{prefixData}")
+        EyeCornerA =        @GrabData("EyeCornerA#{prefixData}")
         EyeType =           @GrabData("EyeType#{prefixData}")
         EyeBackground =     @GrabData("EyeBackground#{prefixData}")
         EyeHole =           @GrabData("EyeHole#{prefixData}")
         HoleWidth =         @GrabData("HoleWidth#{prefixData}")
-        IrisSize =          @GrabData("IrisSize#{prefixData}") * .4
+        IrisSize =          @GrabData("IrisSize#{prefixData}") * (EyeRefract and .38 or .75)
         EyeIris1 =          @GrabData("EyeIrisTop#{prefixData}")
         EyeIris2 =          @GrabData("EyeIrisBottom#{prefixData}")
         EyeIrisLine1 =      @GrabData("EyeIrisLine1#{prefixData}")
@@ -1420,8 +1424,8 @@ class PonyTextureController
         shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eye_#{prefix}"
-            'shader': 'EyeRefract'
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
+            'shader': EyeRefract and 'EyeRefract' or 'Eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
                 '$irisframe': '0'
@@ -1464,26 +1468,28 @@ class PonyTextureController
         calcHoleX = HolePos - holeX + holeX * HoleShiftX + shiftX
         calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
 
-        rtCornerA = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyeCorner_#{prefix}", texSize, texSize, false)
-        rtCornerA\Download()
+        if EyeRefract
+            rtCornerA = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyeCorner_#{prefix}", texSize, texSize, false)
+            rtCornerA\Download()
 
-        render.PushRenderTarget(rtCornerA)
-        render.SetViewPort(0, 0, texSize, texSize)
-        render.Clear(0, 0, 0, 255, true, true)
-        cam.Start2D()
+            render.PushRenderTarget(rtCornerA)
+            render.SetViewPort(0, 0, texSize, texSize)
+            render.Clear(0, 0, 0, 255, true, true)
+            cam.Start2D()
 
-        surface.SetMaterial(_M.EYE_CORNERA_OVAL)
-        surface.SetDrawColor(255, 255, 255)
-        DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
+            if EyeCornerA
+                surface.SetMaterial(_M.EYE_CORNERA_OVAL)
+                surface.SetDrawColor(255, 255, 255)
+                DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
 
-        cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
-        render.PopRenderTarget()
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
 
-        createdMaterial\SetTexture('$corneatexture', rtCornerA)
+            createdMaterial\SetTexture('$corneatexture', rtCornerA)
 
         if EyeURL == '' or not EyeURL\find('^https?://')
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, texSize, false)
             rt\Download()
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)

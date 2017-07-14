@@ -598,6 +598,18 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         type: 'BOOLEAN'
     }
 
+    PPM2.PonyDataRegistry["eye_use_refract#{internal}"] = {
+        default: -> true
+        getFunc: "EyeRefract#{publicName}"
+        type: 'BOOLEAN'
+    }
+
+    PPM2.PonyDataRegistry["eye_cornera#{internal}"] = {
+        default: -> false
+        getFunc: "EyeCornerA#{publicName}"
+        type: 'BOOLEAN'
+    }
+
     PPM2.PonyDataRegistry["eye_derp_strength#{internal}"] = {
         default: -> 1
         getFunc: "DerpEyesStrength#{publicName}"

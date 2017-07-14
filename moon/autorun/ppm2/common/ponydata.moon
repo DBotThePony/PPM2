@@ -57,7 +57,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('Fly',                  rBool,   wBool,                 false)
     @NetworkVar('DisableTask',          rBool,   wBool,                 false)
     @NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
-    @NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,                    1)
+    @NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
 
     for key, value in pairs PPM2.PonyDataRegistry
         @NetworkVar(value.getFunc, value.read, value.write, value.default)
