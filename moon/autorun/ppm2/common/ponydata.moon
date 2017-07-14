@@ -53,7 +53,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('LowerManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
     @NetworkVar('TailModel',        rSEnt, wSEnt, StrongEntity(-1), nil, false)
     @NetworkVar('SocksModel',       rSEnt, wSEnt, StrongEntity(-1), nil, false)
-    
+
     @NetworkVar('Fly',                  rBool,   wBool,                 false)
     @NetworkVar('DisableTask',          rBool,   wBool,                 false)
     @NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
@@ -105,13 +105,13 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     GenericDataChange: (state) =>
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
-        
+
         if state\GetKey() == 'Fly' and @flightController
             @flightController\Switch(state\GetValue())
-        
+
         if state\GetKey() == 'DisableTask'
             @@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
-        
+
         @GetSizeController()\DataChanges(state) if @ent and @GetBodygroupController()
         @GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
@@ -155,7 +155,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             @GetWeightController()\UpdateWeight() if @GetWeightController()
             @GetRenderController()\PlayerRespawn() if @GetRenderController()
             @GetBodygroupController()\MergeModels(@ent) if IsValid(@ent) and @GetBodygroupController().MergeModels
-    
+
     PlayerDeath: =>
         return if not IsValid(@ent)
         @ent.__cachedIsPony = @ent\IsPony()
@@ -172,7 +172,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         if CLIENT
             @DoRagdollMerge()
             @GetRenderController()\PlayerDeath() if @GetRenderController()
-    
+
     DoRagdollMerge: =>
         return if @deathRagdollMerged
         bgController = @GetBodygroupController()
@@ -182,7 +182,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         elseif IsValid(rag)
             @deathRagdollMerged = true
             bgController\MergeModels(rag)
-    
+
     ApplyBodygroups: (updateModels = CLIENT) => @GetBodygroupController()\ApplyBodygroups(updateModels) if @ent
     SetLocalChange: (state) => @GenericDataChange(state)
     NetworkDataChanges: (state) => @GenericDataChange(state)
@@ -191,7 +191,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @GetWeightController()\SlowUpdate() if @GetWeightController()
         if scale = @GetSizeController()
             scale\SlowUpdate()
-    
+
     GetFlightController: => @flightController
     GetRenderController: =>
         return if SERVER
@@ -276,7 +276,7 @@ if CLIENT
         data = NetworkedPonyData.NW_Objects[netID]
         return if not data
         data\Remove()
-    
+
     net.Receive 'PPM2.PonyDataRemove', ->
         netID = net.ReadUInt(16)
         data = NetworkedPonyData.NW_Objects[netID]

@@ -410,7 +410,7 @@ CALC_VIEW_PANEL = {
         @hold = true
         @SetCursor('sizeall')
         @mouseX, @mouseY = gui.MousePos()
-    
+
     IsActive: => @forward or @backward or @left or @right or @hold or @down or @up
 
     CheckCode: (code = KEY_NONE, status = false) =>
@@ -527,7 +527,7 @@ TATTOO_INPUT_GRABBER = {
     DataAdd: (key = '', val = 0) => @DataSet(key, @DataGet(key) + val)
 
     TriggerUpdate: => pnl\DoUpdate() for pnl in *@panelsToUpdate when IsValid(pnl)
-    
+
     Init: =>
         @targetID = 1
         @MakePopup()
@@ -567,7 +567,7 @@ To move tatto use WASD
 To Scale higher/lower use Up/Down arrows
 To Scale wider/smaller use Right/Left arrows
 To rotate left/right use Q/E")
-    
+
     HandleKey: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_W
@@ -659,7 +659,7 @@ To rotate left/right use Q/E")
         if @rotateRight and @rotateRightTime < RealTime()
             @DataAdd('TattooRotate', @CONTINIOUS_ROTATE_STEP * ftime)
             @TriggerUpdate()
-    
+
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0, 150)
         surface.DrawRect(0, 0, w, h)
@@ -1138,7 +1138,7 @@ EditorPages = {
 
                 @Label('Eye URL texture')
                 @URLInput("EyeURL#{publicName}")
-                
+
                 if ADVANCED_MODE\GetBool()
                     @Label('Lightwarp has effect only on EyeRefract eyes')
                     ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'

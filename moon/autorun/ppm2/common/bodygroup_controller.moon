@@ -163,7 +163,7 @@ class DefaultBodygroupController
             \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         PPM2.DebugPrint('Creating new socks model for ', @ent, ' as ', @socksModel)
 
         if SERVER
@@ -246,7 +246,7 @@ class DefaultBodygroupController
     Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
-    
+
     UpdateTailSize: (ent = @ent) =>
         return if not CLIENT
         size = @GetData()\GetTailSize()
@@ -266,7 +266,7 @@ class DefaultBodygroupController
             --\ManipulateBonePosition(@@BONE_TAIL_1, vecTail + (boneAnimTable[@@BONE_TAIL_1] or emptyVector))
             \ManipulateBonePosition(@@BONE_TAIL_2, vecTailPos + (boneAnimTable[@@BONE_TAIL_2] or emptyVector))
             \ManipulateBonePosition(@@BONE_TAIL_3, vecTailPos + (boneAnimTable[@@BONE_TAIL_3] or emptyVector))
-    
+
     UpdateManeSize: (ent = @ent) =>
         return if not CLIENT
         return if ent\IsRagdoll()
@@ -294,7 +294,7 @@ class DefaultBodygroupController
             \ManipulateBonePosition(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@@BONE_MANE_5] or emptyVector))
             \ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_6] or emptyVector))
             \ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_7] or emptyVector))
-    
+
     SlowUpdate: (createModels = CLIENT, ent = @ent) =>
         return if not IsValid(ent)
         return if not ent\IsPony()
@@ -524,7 +524,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         PPM2.DebugPrint('Creating new upper mane model for ', @ent, ' as ', @maneModelUP)
 
         if SERVER
@@ -573,7 +573,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         PPM2.DebugPrint('Creating new lower mane model for ', @ent, ' as ', @maneModelLower)
 
         if SERVER
@@ -622,7 +622,7 @@ class NewBodygroupController extends DefaultBodygroupController
             \SetParent(@ent\GetEntity())
             \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
-        
+
         PPM2.DebugPrint('Creating new tail model for ', @ent, ' as ', @tailModel)
 
         if SERVER
@@ -811,7 +811,7 @@ class NewBodygroupController extends DefaultBodygroupController
             @ent\SetFlexWeight(@@FLEX_ID_MALE, maleModifier)
 
         @ent\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GetData()\GetMaleBuff())
-        
+
         @ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
         @ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GrabData('ClawTeeth') and @GrabData('ClawTeethStrength') or 0)
         @ent\SetFlexWeight(@@FLEX_ID_HOOF_FLUFF,    @GrabData('HoofFluffers') and @GrabData('HoofFluffersStrength') or 0)
@@ -850,7 +850,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ResetBodygroups()
         return @RemoveModels() if not @ent\IsPony()
         @SlowUpdate(createModels)
-    
+
     @NOCLIP_ANIMATIONS = {9, 10, 11}
 
     SelectWingsType: =>
@@ -858,7 +858,7 @@ class NewBodygroupController extends DefaultBodygroupController
         if (@GetData()\GetFly() or @ent.GetMoveType and @ent\GetMoveType() == MOVETYPE_NOCLIP) and (not @ent.InVehicle or not @ent\InVehicle())
             wtype += PPM2.MAX_WINGS + 1
         return wtype
-    
+
     ApplyRace: =>
         return unless @isValid
         return if not IsValid(@ent)

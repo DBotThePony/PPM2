@@ -162,7 +162,7 @@ class PonyTextureController
 
         @TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
         @TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
-    
+
     @BODY_UPDATE_TRIGGER = {}
     for i = 1, PPM2.MAX_BODY_DETAILS
         @BODY_UPDATE_TRIGGER["BodyDetail#{i}"] = true
@@ -171,7 +171,7 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailGlow#{i}"] = true
         @BODY_UPDATE_TRIGGER["BodyDetailGlowStrength#{i}"] = true
-    
+
     for i = 1, PPM2.MAX_TATTOOS
         @BODY_UPDATE_TRIGGER["TattooType#{i}"] = true
         @BODY_UPDATE_TRIGGER["TattooPosX#{i}"] = true
@@ -183,7 +183,7 @@ class PonyTextureController
         @BODY_UPDATE_TRIGGER["TattooGlow#{i}"] = true
         @BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
         @BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
-    
+
     DelayCompile: (func = '', ...) =>
         return if not @[func]
         args = {...}
@@ -199,7 +199,7 @@ class PonyTextureController
                         hit = true
                         break
                 return if not hit
-        
+
         table.insert(@delayCompilation, {:func, :args})
         timer.Create "#{@}_DelayCompile", 0, 1, ->
             return if not @IsValid()
@@ -207,7 +207,7 @@ class PonyTextureController
             for data in *@delayCompilation
                 @[data.func](@, unpack(data.args))
             @delayCompilation = {}
-    
+
     DataChanges: (state) =>
         return unless @isValid
         return if not @ent
@@ -239,7 +239,7 @@ class PonyTextureController
                     @DelayCompile('CompileBody')
                 elseif @@PHONG_UPDATE_TRIGGER[key]
                     @UpdatePhongData()
-        
+
     @HTML_MATERIAL_QUEUE = {}
     @URL_MATERIAL_CACHE = {}
     @ALREADY_DOWNLOADING = {}
@@ -306,7 +306,7 @@ class PonyTextureController
                                 }
 
                                 img.style.setProperty('margin-top', (#{height} - img.height) / 2);
-                                
+
                                 setInterval(function() {
                                     console.log('FRAME');
                                 }, 50);
@@ -319,7 +319,7 @@ class PonyTextureController
                         </div>
                     </body>
                 </html>"
-    
+
     @SHOULD_WAIT_WEB = false
     hook.Add 'Think', 'PPM2.WebMaterialThink', ->
         return if @SHOULD_WAIT_WEB
@@ -395,7 +395,7 @@ class PonyTextureController
 
                 for callback in *data.callbacks
                     callback(newMat\GetTexture('$basetexture'), nil, newMat)
-                
+
                 table.remove(@HTML_MATERIAL_QUEUE, 1)
             else
                 data.timeouts += 1
@@ -510,7 +510,7 @@ class PonyTextureController
         @CompileEye(false)
         @CompileEye(true)
         @compiled = true
-    
+
     CheckReflections: (ent = @ent) =>
         if REAL_TIME_EYE_REFLECTIONS\GetBool()
             @isInRealTimeReflections = true
@@ -549,7 +549,7 @@ class PonyTextureController
             render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
             render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
-    
+
     PostDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
@@ -564,7 +564,7 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2)
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
-    
+
     ResetTextures: (ent = @ent) =>
         return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL
@@ -580,7 +580,7 @@ class PonyTextureController
         ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2)
         ent\SetSubMaterial(@@MAT_INDEX_CMARK)
         ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
-    
+
     PreDrawLegs: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
@@ -596,7 +596,7 @@ class PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
         render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
-    
+
     @MAT_INDEX_SOCKS = 0
 
     UpdateSocks: (ent = @ent, socksEnt) =>
@@ -676,7 +676,7 @@ class PonyTextureController
         PhongTint = Vector(r, g, b)
         PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
         return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
-    
+
     ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false) =>
         return if not matTarget
         PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
@@ -687,7 +687,7 @@ class PonyTextureController
                 \SetFloat('$phongboost', PhongBoost)
                 \SetVector('$phongtint', PhongTint)
                 \SetVector('$phongfresnelranges', PhongFresnel)
-        
+
         if LightwarpURL == '' or not LightwarpURL\find('^https?://')
             myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
             matTarget\SetTexture('$lightwarptexture', myTex)
@@ -712,31 +712,31 @@ class PonyTextureController
         @GetBodyPhongMaterials(proceed)
         for mat in *proceed
             @ApplyPhongData(mat, 'Body')
-        
+
         if @GrabData('SeparateHornPhong') and @HornMaterial
             @ApplyPhongData(@HornMaterial, 'Horn')
-        
+
         if @GrabData('SeparateWingsPhong') and @WingsMaterial
             @ApplyPhongData(@WingsMaterial, 'Wings')
-        
+
         if @SocksMaterial
             @ApplyPhongData(@SocksMaterial, 'Socks')
-        
+
         if @GrabData('SeparateManePhong')
             @ApplyPhongData(@HairColor1Material, 'Mane')
             @ApplyPhongData(@HairColor2Material, 'Mane')
-        
+
         if @GrabData('SeparateTailPhong')
             @ApplyPhongData(@TailColor1Material, 'Tail')
             @ApplyPhongData(@TailColor2Material, 'Tail')
-        
+
         if @GrabData('SeparateEyes')
             @ApplyPhongData(@EyeMaterialL, 'LEye', true)
             @ApplyPhongData(@EyeMaterialR, 'REye', true)
         else
             @ApplyPhongData(@EyeMaterialL, 'BEyes', true)
             @ApplyPhongData(@EyeMaterialR, 'BEyes', true)
-    
+
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
         prefix = bType and 'Female' or 'Male'
@@ -765,7 +765,7 @@ class PonyTextureController
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
-                
+
                 '$rimlight': '1'
                 '$rimlightexponent': '2'
                 '$rimlightboost': '1'
@@ -806,7 +806,7 @@ class PonyTextureController
                     surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, bodysize, bodysize)
-            
+
             surface.SetDrawColor(255, 255, 255)
 
             for i, mat in pairs urlTextures
@@ -814,16 +814,16 @@ class PonyTextureController
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
-            
+
             for i = 1, PPM2.MAX_TATTOOS
                 if @GrabData("TattooOverDetail#{i}")
                     @DrawTattoo(i)
-            
+
             if suit = _M.SUITS[@GrabData('Bodysuit')]
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(suit)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
-            
+
             if @GrabData('Socks')
                 surface.SetDrawColor(255, 255, 255)
                 surface.SetMaterial(@@PONY_SOCKS)
@@ -856,7 +856,7 @@ class PonyTextureController
             for i = 1, PPM2.MAX_BODY_DETAILS
                 if mat = _M.BODY_DETAILS[@GetData()["GetBodyDetail#{i}"](@GetData())]
                     alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
-                    
+
                     if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
                         surface.SetDrawColor(255, 255, 255, alpha * 255)
                         surface.SetMaterial(mat)
@@ -869,7 +869,7 @@ class PonyTextureController
             for i = 1, PPM2.MAX_TATTOOS
                 if @GrabData("TattooOverDetail#{i}")
                     @DrawTattoo(i, true)
-            
+
             surface.DisableClipping(false)
             cam.End2D()
             render.PopRenderTarget()
@@ -877,21 +877,21 @@ class PonyTextureController
             @["#{prefix}Material"]\SetTexture('$selfillummask', rtIllum)
 
             PPM2.DebugPrint('Compiled body texture for ', @ent, ' as part of ', @)
-        
+
         data = @GetData()
         validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
             detailURL = data["GetBodyDetailURL#{i}"](data)
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, bodysize, bodysize, (texture, panel, mat) ->
                 left -= 1
                 urlTextures[i] = mat
                 if left == 0
                     continueCompilation()
-        
+
         if left == 0
             continueCompilation()
         return @["#{prefix}Material"]
@@ -936,7 +936,7 @@ class PonyTextureController
 
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rt", texSize, texSize, false)
             rt\Download()
-            
+
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
             {:r, :g, :b} = @GrabData('BodyColor')
@@ -998,7 +998,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -1144,7 +1144,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -1155,7 +1155,7 @@ class PonyTextureController
             continueCompilation()
 
         return @WingsMaterial
-    
+
     GetManeType: => @GrabData('ManeType')
     GetManeTypeLower: => @GrabData('ManeTypeLower')
     GetTailType: => @GrabData('TailType')
@@ -1176,7 +1176,7 @@ class PonyTextureController
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
-                
+
                 '$rimlight': 1
                 '$rimlightexponent': 2
                 '$rimlightboost': 1
@@ -1260,7 +1260,7 @@ class PonyTextureController
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, texSize, texSize)
                     i += 1
-            
+
             for i, mat in pairs urlTextures
                 surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
                 surface.SetMaterial(mat)
@@ -1279,7 +1279,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -1306,7 +1306,7 @@ class PonyTextureController
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
-                
+
                 '$rimlight': 1
                 '$rimlightexponent': 2
                 '$rimlightboost': 1
@@ -1412,7 +1412,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -1422,7 +1422,7 @@ class PonyTextureController
         if left == 0
             continueCompilation()
         return @TailColor1Material, @TailColor2Material
-    
+
     @REFLECT_RENDER_SIZE = 64
     @GetReflectionsScale: =>
         val = REAL_TIME_EYE_REFLECTIONS_SIZE\GetInt()
@@ -1515,15 +1515,15 @@ class PonyTextureController
         render.PushRenderTarget(rtleft)
         render.SetViewPort(0, 0, texSize, texSize)
         render.Clear(0, 0, 0, 255, true, true)
-        
+
         surface.SetDrawColor(255, 255, 255, 255)
         surface.SetMaterial(@EyeMaterialDrawL)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
-        
+
         surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
-        
+
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
@@ -1535,15 +1535,15 @@ class PonyTextureController
         render.PushRenderTarget(rtright)
         render.SetViewPort(0, 0, texSize, texSize)
         render.Clear(0, 0, 0, 255, true, true)
-        
+
         surface.SetDrawColor(255, 255, 255, 255)
         surface.SetMaterial(@EyeMaterialDrawR)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
-        
+
         surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
         surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
-        
+
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
@@ -1583,7 +1583,7 @@ class PonyTextureController
         EyeRotation =       @GrabData("EyeRotation#{prefixData}")
         PonySize =          @GrabData('PonySize')
         PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
-        
+
         oldW, oldH = ScrW(), ScrH()
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
@@ -1598,12 +1598,12 @@ class PonyTextureController
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
                 '$irisframe': '0'
-                
+
                 '$ambientoccltexture': 'models/ppm/eyes/eye_extra'
                 '$envmap': 'models/ppm/eyes/eye_reflection'
                 '$corneatexture': 'models/ppm/eyes/eye_cornea_oval'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
-                
+
                 '$eyeballradius': '3.7'
                 '$ambientocclcolor': '[0.3 0.3 0.3]'
                 '$dilation': '0.5'
@@ -1662,7 +1662,7 @@ class PonyTextureController
             rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, texSize, false)
             rt\Download()
             @["EyeTexture#{prefixUpper}"] = rt
-            
+
             drawMat = CreateMaterial("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_RenderMat_#{prefix}", 'UnlitGeneric', {
                 '$basetexture': 'models/debug/debugwhite'
                 '$ignorez': 1
@@ -1699,7 +1699,7 @@ class PonyTextureController
                 surface.SetDrawColor(EyeIrisLine2)
                 surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
                 DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
-            
+
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
             DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
@@ -1755,10 +1755,10 @@ class PonyTextureController
             @CMarkTexture\SetTexture('$basetexture', 'models/ppm/partrender/null')
             @CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm/partrender/null')
             return @CMarkTexture, @CMarkTextureGUI
-        
+
         URL = @GrabData('CMarkURL')
         size = @GrabData('CMarkSize')
-        
+
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_CMARK_HIRES or @@QUAD_SIZE_CMARK
         sizeQuad = texSize * size
         shift = (texSize - sizeQuad) / 2
@@ -1777,7 +1777,7 @@ class PonyTextureController
                 surface.SetDrawColor(@GrabData('CMarkColor'))
                 surface.SetMaterial(mark)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
-            
+
             cam.End2D()
             render.PopRenderTarget()
             render.SetViewPort(0, 0, oldW, oldH)
@@ -1800,7 +1800,7 @@ class PonyTextureController
                 surface.SetDrawColor(@GrabData('CMarkColor'))
                 surface.SetMaterial(material)
                 surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
-                
+
                 cam.End2D()
                 render.PopRenderTarget()
                 render.SetViewPort(0, 0, oldW, oldH)
@@ -1809,7 +1809,7 @@ class PonyTextureController
                 @CMarkTextureGUI\SetTexture('$basetexture', rt)
 
                 PPM2.DebugPrint('Compiled cutiemark texture for ', @ent, ' as part of ', @)
-        
+
         return @CMarkTexture, @CMarkTextureGUI
 
 PPM2.PonyTextureController = PonyTextureController
