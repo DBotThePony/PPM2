@@ -45,12 +45,17 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
     data\GetRenderController()\PostDrawArms(arms)
     arms.__ppm2_draw = false
 
+IN_DRAW = false
+
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
+    return if IN_DRAW
     if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
                 if data = \GetPonyData()
+                    IN_DRAW = true
                     data\GetRenderController()\DrawLegsDepth()
+                    IN_DRAW = false
 
     return if bDrawingDepth or bDrawingSkybox
 
@@ -58,14 +63,19 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
                 if data = \GetPonyData()
+                    IN_DRAW = true
                     data\GetRenderController()\DrawLegs()
+                    IN_DRAW = false
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
+    return if IN_DRAW
     if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
                 if data = \GetPonyData()
+                    IN_DRAW = true
                     data\GetRenderController()\DrawLegsDepth()
+                    IN_DRAW = false
 
     return if bDrawingDepth or bDrawingSkybox
 
@@ -78,7 +88,9 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                     ent.__ppm2_task_hit = true
                     renderController = task\GetRenderController()
                     renderController\PreDraw(ent)
+                    IN_DRAW = true
                     ent\DrawModel()
+                    IN_DRAW = false
                     renderController\PostDraw(ent)
                 else
                     if ent.__ppm2_task_hit
@@ -106,14 +118,18 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                         data\DoRagdollMerge()
                         if renderController
                             renderController\PreDraw(rag)
+                            IN_DRAW = true
                             rag\DrawModel()
+                            IN_DRAW = false
                             renderController\PostDraw(rag)
 
     if LEGS_RENDER_TYPE\GetBool()
         with LocalPlayer()
             if .__cachedIsPony and \Alive()
                 if data = \GetPonyData()
+                    IN_DRAW = true
                     data\GetRenderController()\DrawLegs()
+                    IN_DRAW = false
 
 PPM2.PrePlayerDraw = =>
     return unless @GetPonyData()
@@ -127,6 +143,7 @@ PPM2.PrePlayerDraw = =>
     data = @GetPonyData()
     renderController = data\GetRenderController()
     status = renderController\PreDraw() if renderController
+
 PPM2.PostPlayerDraw = =>
     return unless @GetPonyData()
     return unless @__cachedIsPony
