@@ -41,6 +41,9 @@ REAL_TIME_EYE_REFLECTIONS_SIZE = PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE
 PPM2.REAL_TIME_EYE_REFLECTIONS_DIST = CreateConVar('ppm2_cl_reflections_drawdist', '512', {FCVAR_ACRHIVE}, 'Reflections maximal draw distance')
 REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
 
+PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
+REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
+
 reflectTasks = {}
 
 hook.Add 'Think', 'PPM2.ReflectionsUpdate', ->
@@ -1487,8 +1490,8 @@ class PonyTextureController
         viewData.w = scale
         viewData.h = scale
         viewData.aspectratio = 1
-        viewData.znear = 4
-        viewData.zfar = 1000
+        viewData.znear = 1
+        viewData.zfar = REAL_TIME_EYE_REFLECTIONS_RDIST\GetInt()
 
         render.RenderView(viewData)
         render.PopRenderTarget()
