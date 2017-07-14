@@ -1886,4 +1886,6 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
     @CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
     @CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
     @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
-    @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
+    @CheckBox 'Enable real time eyes reflections', 'ppm2_cl_reflections'
+    @CheckBox 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
+    @CheckBox 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
