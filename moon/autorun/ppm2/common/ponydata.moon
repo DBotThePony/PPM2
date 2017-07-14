@@ -15,8 +15,9 @@
 -- limitations under the License.
 --
 
-for ply in *player.GetAll()
-    ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
+pcall ->
+    for ply in *player.GetAll()
+        ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
 
 wUInt = (def = 0, size = 8) ->
     return (arg = def) -> net.WriteUInt(arg, size)
@@ -256,6 +257,9 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         @isValid = false
         @ent = @GetEntity() if not IsValid(@ent)
         @ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
+        @ent.RenderOverride = @ent.__ppm2_oldRenderOverride
+        @ent.__ppm2_oldRenderOverride = nil
+        @ent.__ppm2RenderOverride = nil
         if CLIENT
             @GetWeightController()\Remove() if @GetWeightController()
             @GetRenderController()\Remove() if @GetRenderController()
