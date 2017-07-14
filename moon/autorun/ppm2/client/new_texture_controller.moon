@@ -529,6 +529,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
+        @CheckReflections(ent)
         if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1

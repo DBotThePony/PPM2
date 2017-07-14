@@ -1138,7 +1138,20 @@ EditorPages = {
 
                 @Label('Eye URL texture')
                 @URLInput("EyeURL#{publicName}")
+                
+                if ADVANCED_MODE\GetBool()
+                    @Label('Lightwarp has effect only on EyeRefract eyes')
+                    ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'
+                    @CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
+                    @CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
+                    @ComboBox('Lightwarp', ttype .. 'Lightwarp')
+                    @Label('Lightwarp texture URL input\nIt must be 256x16!')
+                    @URLInput(ttype .. 'LightwarpURL')
+                    @Label('Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror')
+                    @NumSlider('Glossiness' .. publicName, 'EyeGlossyStrength' .. publicName, 2)
+
                 @Label('When uring eye URL texture; options below have no effect')
+
                 @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
                 @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
@@ -1873,4 +1886,6 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
     @CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
     @CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
     @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
-    @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
+    @CheckBox 'Enable real time eyes reflections', 'ppm2_cl_reflections'
+    @CheckBox 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
+    @CheckBox 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0

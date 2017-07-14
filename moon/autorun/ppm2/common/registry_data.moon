@@ -598,6 +598,18 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         type: 'BOOLEAN'
     }
 
+    PPM2.PonyDataRegistry["eye_use_refract#{internal}"] = {
+        default: -> false
+        getFunc: "EyeRefract#{publicName}"
+        type: 'BOOLEAN'
+    }
+
+    PPM2.PonyDataRegistry["eye_cornera#{internal}"] = {
+        default: -> false
+        getFunc: "EyeCornerA#{publicName}"
+        type: 'BOOLEAN'
+    }
+
     PPM2.PonyDataRegistry["eye_derp_strength#{internal}"] = {
         default: -> 1
         getFunc: "DerpEyesStrength#{publicName}"
@@ -641,6 +653,14 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         getFunc: "IrisHeight#{publicName}"
         min: PPM2.MIN_PUPIL_SIZE
         max: PPM2.MAX_PUPIL_SIZE
+        type: 'FLOAT'
+    }
+
+    PPM2.PonyDataRegistry["eye_glossy_reflection#{internal}"] = {
+        default: -> 0.16
+        getFunc: "EyeGlossyStrength#{publicName}"
+        min: 0
+        max: 1
         type: 'FLOAT'
     }
 
@@ -941,7 +961,7 @@ for i = 1, PPM2.MAX_TATTOOS
         type: 'COLOR'
     }
 
-for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes'}
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
         default: -> 3
         getFunc: ttype .. 'PhongExponent'

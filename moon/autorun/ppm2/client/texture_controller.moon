@@ -32,6 +32,25 @@ _M = PPM2.MaterialsRegistry
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
+PPM2.REAL_TIME_EYE_REFLECTIONS = CreateConVar('ppm2_cl_reflections', '0', {FCVAR_ACRHIVE}, 'Calculate eye reflections in real time. Needs beefy computer.')
+REAL_TIME_EYE_REFLECTIONS = PPM2.REAL_TIME_EYE_REFLECTIONS
+
+PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE = CreateConVar('ppm2_cl_reflections_size', '512', {FCVAR_ACRHIVE}, 'Reflections size. Must be multiple to 2! (16, 32, 64, 128, 256)')
+REAL_TIME_EYE_REFLECTIONS_SIZE = PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE
+
+PPM2.REAL_TIME_EYE_REFLECTIONS_DIST = CreateConVar('ppm2_cl_reflections_drawdist', '192', {FCVAR_ACRHIVE}, 'Reflections maximal draw distance')
+REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
+
+PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
+REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
+
+reflectTasks = {}
+
+hook.Add 'Think', 'PPM2.ReflectionsUpdate', ->
+    for task in *reflectTasks
+        task.ctrl\UpdateEyeReflections(task.ent)
+    reflectTasks = {}
+
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
 class PonyTextureController
@@ -123,7 +142,15 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["HoleShiftX#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["HoleShiftY#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeRotation#{publicName}"] = true
-        @EYE_UPDATE_TRIGGER["PonySize#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["PonySize"] = true
+        @EYE_UPDATE_TRIGGER["EyeRefract#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeCornerA#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["LEyeLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["REyeLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["LEyeLightwarpURL"] = true
+        @EYE_UPDATE_TRIGGER["REyeLightwarpURL"] = true
+        @EYE_UPDATE_TRIGGER["BEyesLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["BEyesLightwarpURL"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -484,9 +511,18 @@ class PonyTextureController
         @CompileEye(true)
         @compiled = true
     
+    CheckReflections: (ent = @ent) =>
+        if REAL_TIME_EYE_REFLECTIONS\GetBool()
+            @isInRealTimeReflections = true
+            table.insert(reflectTasks, {ctrl: @, ent: ent})
+        elseif @isInRealTimeReflections
+            @isInRealTimeReflections = false
+            @ResetEyeReflections()
+
     PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
+        @CheckReflections(ent)
         if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1
@@ -641,14 +677,16 @@ class PonyTextureController
         PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
         return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
     
-    ApplyPhongData: (matTarget, prefix = 'Body') =>
+    ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false) =>
         return if not matTarget
         PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
-        with matTarget
-            \SetFloat('$phongexponent', PhongExponent)
-            \SetFloat('$phongboost', PhongBoost)
-            \SetVector('$phongtint', PhongTint)
-            \SetVector('$phongfresnelranges', PhongFresnel)
+
+        if not lightwarpsOnly
+            with matTarget
+                \SetFloat('$phongexponent', PhongExponent)
+                \SetFloat('$phongboost', PhongBoost)
+                \SetVector('$phongtint', PhongTint)
+                \SetVector('$phongfresnelranges', PhongFresnel)
         
         if LightwarpURL == '' or not LightwarpURL\find('^https?://')
             myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
@@ -691,6 +729,13 @@ class PonyTextureController
         if @GrabData('SeparateTailPhong')
             @ApplyPhongData(@TailColor1Material, 'Tail')
             @ApplyPhongData(@TailColor2Material, 'Tail')
+        
+        if @GrabData('SeparateEyes')
+            @ApplyPhongData(@EyeMaterialL, 'LEye', true)
+            @ApplyPhongData(@EyeMaterialR, 'REye', true)
+        else
+            @ApplyPhongData(@EyeMaterialL, 'BEyes', true)
+            @ApplyPhongData(@EyeMaterialR, 'BEyes', true)
     
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
@@ -1377,6 +1422,132 @@ class PonyTextureController
         if left == 0
             continueCompilation()
         return @TailColor1Material, @TailColor2Material
+    
+    @REFLECT_RENDER_SIZE = 64
+    @GetReflectionsScale: =>
+        val = REAL_TIME_EYE_REFLECTIONS_SIZE\GetInt()
+        return @REFLECT_RENDER_SIZE if val % 2 ~= 0
+        return val
+
+    ResetEyeReflections: =>
+        @EyeMaterialL\SetTexture('$iris', @EyeTextureL)
+        @EyeMaterialR\SetTexture('$iris', @EyeTextureR)
+
+    UpdateEyeReflections: (ent = @ent) =>
+        @AttachID = @AttachID or @ent\LookupAttachment('eyes')
+        local Pos
+        local Ang
+        {:Pos, :Ang} = @ent\GetAttachment(@AttachID) if ent == @ent
+        {:Pos, :Ang} = ent\GetAttachment(ent\LookupAttachment('eyes')) if ent ~= @ent
+
+        return @ResetEyeReflections() if Pos\Distance(EyePos()) > REAL_TIME_EYE_REFLECTIONS_DIST\GetInt()
+
+        scale = @@GetReflectionsScale()
+        @lastScale = @lastScale or scale
+        if @lastScale ~= scale
+            @lastScale = scale
+            @reflectRT = nil
+            @reflectRTMat = nil
+
+        texName = "PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyesReflect_#{scale}"
+        reflectrt = @reflectRT or GetRenderTargetEx(
+            texName,
+            scale,
+            scale,
+            RT_SIZE_DEFAULT,
+            MATERIAL_RT_DEPTH_NONE,
+            1 + 32768 + 2048 + 8388608 + 512 + 256,
+            CREATERENDERTARGETFLAGS_UNFILTERABLE_OK,
+            IMAGE_FORMAT_RGB888
+        )
+
+        reflectrt\Download()
+        @reflectRT = reflectrt
+        @reflectRTMat = @reflectRTMat or CreateMaterial(texName .. '_Mat', 'UnlitGeneric', {
+            '$basetexture': 'models/debug/debugwhite'
+            '$ignorez': 1
+            '$vertexcolor': 1
+            '$translucent': 1
+            '$alpha': 1
+            '$vertexalpha': 1
+            '$nolod': 1
+        })
+
+        @reflectRTMat\SetTexture('$basetexture', reflectrt)
+
+        render.PushRenderTarget(reflectrt)
+        render.Clear(0, 0, 0, 255, true, true)
+
+        viewData = {}
+        viewData.drawhud = false
+        viewData.drawmonitors = false
+        viewData.drawviewmodel = false
+        viewData.origin = Pos
+        viewData.angles = Ang
+        viewData.x = 0
+        viewData.y = 0
+        viewData.fov = 150
+        viewData.w = scale
+        viewData.h = scale
+        viewData.aspectratio = 1
+        viewData.znear = 1
+        viewData.zfar = REAL_TIME_EYE_REFLECTIONS_RDIST\GetInt()
+
+        render.RenderView(viewData)
+        render.PopRenderTarget()
+
+        oldW, oldH = ScrW(), ScrH()
+
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
+
+        rtleft = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_LeftReflect_#{scale}", texSize, texSize, false)
+        rtleft\Download()
+        rtright = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_RightReflect_#{scale}", texSize, texSize, false)
+        rtright\Download()
+
+        texSize *= 1.9
+
+        separated = @GrabData('SeparateEyes')
+        prefixData = ''
+        prefixData = 'Left' if separated
+
+        cam.Start2D()
+        render.PushRenderTarget(rtleft)
+        render.SetViewPort(0, 0, texSize, texSize)
+        render.Clear(0, 0, 0, 255, true, true)
+        
+        surface.SetDrawColor(255, 255, 255, 255)
+        surface.SetMaterial(@EyeMaterialDrawL)
+        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        
+        surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
+        surface.SetMaterial(@reflectRTMat)
+        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+        @EyeMaterialL\SetTexture('$iris', rtleft)
+
+        prefixData = 'Right' if separated
+
+        cam.Start2D()
+        render.PushRenderTarget(rtright)
+        render.SetViewPort(0, 0, texSize, texSize)
+        render.Clear(0, 0, 0, 255, true, true)
+        
+        surface.SetDrawColor(255, 255, 255, 255)
+        surface.SetMaterial(@EyeMaterialDrawR)
+        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        
+        surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
+        surface.SetMaterial(@reflectRTMat)
+        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        
+        cam.End2D()
+        render.SetViewPort(0, 0, oldW, oldH)
+        render.PopRenderTarget()
+        @EyeMaterialR\SetTexture('$iris', rtright)
     CompileEye: (left = false) =>
         return unless @isValid
         prefix = left and 'l' or 'r'
@@ -1386,11 +1557,13 @@ class PonyTextureController
         prefixData = ''
         prefixData = left and 'Left' or 'Right' if separated
 
+        EyeRefract =        @GrabData("EyeRefract#{prefixData}")
+        EyeCornerA =        @GrabData("EyeCornerA#{prefixData}")
         EyeType =           @GrabData("EyeType#{prefixData}")
         EyeBackground =     @GrabData("EyeBackground#{prefixData}")
         EyeHole =           @GrabData("EyeHole#{prefixData}")
         HoleWidth =         @GrabData("HoleWidth#{prefixData}")
-        IrisSize =          @GrabData("IrisSize#{prefixData}") * .75
+        IrisSize =          @GrabData("IrisSize#{prefixData}") * (EyeRefract and .38 or .75)
         EyeIris1 =          @GrabData("EyeIrisTop#{prefixData}")
         EyeIris2 =          @GrabData("EyeIrisBottom#{prefixData}")
         EyeIrisLine1 =      @GrabData("EyeIrisLine1#{prefixData}")
@@ -1420,15 +1593,15 @@ class PonyTextureController
         shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
         textureData = {
-            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eye_#{prefix}"
-            'shader': 'eyes'
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
+            'shader': EyeRefract and 'EyeRefract' or 'Eyes'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
                 '$irisframe': '0'
                 
-                '$ambientoccltexture': 'models/ppm/partrender/null'
-                --'$envmap': 'models/ppm/partrender/null'
-                '$corneatexture': 'models/ppm/partrender/null'
+                '$ambientoccltexture': 'models/ppm/eyes/eye_extra'
+                '$envmap': 'models/ppm/eyes/eye_reflection'
+                '$corneatexture': 'models/ppm/eyes/eye_cornea_oval'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
                 
                 '$eyeballradius': '3.7'
@@ -1453,10 +1626,54 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}Name"] = "!#{textureData.name\lower()}"
         createdMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
         @["EyeMaterial#{prefixUpper}"] = createdMaterial
+        @UpdatePhongData()
+
+        IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
+        IrisQuadSize = texSize * IrisSize * PonySize
+
+        HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
+        HolePos = texSize / 2
+        holeX = HoleQuadSize * HoleWidth / 2
+        holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
+        calcHoleX = HolePos - holeX + holeX * HoleShiftX + shiftX
+        calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
+
+        if EyeRefract
+            rtCornerA = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyeCorner_#{prefix}", texSize, texSize, false)
+            rtCornerA\Download()
+
+            render.PushRenderTarget(rtCornerA)
+            render.SetViewPort(0, 0, texSize, texSize)
+            render.Clear(0, 0, 0, 255, true, true)
+            cam.Start2D()
+
+            if EyeCornerA
+                surface.SetMaterial(_M.EYE_CORNERA_OVAL)
+                surface.SetDrawColor(255, 255, 255)
+                DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            createdMaterial\SetTexture('$corneatexture', rtCornerA)
 
         if EyeURL == '' or not EyeURL\find('^https?://')
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Eye_#{prefix}", texSize, texSize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, texSize, false)
             rt\Download()
+            @["EyeTexture#{prefixUpper}"] = rt
+            
+            drawMat = CreateMaterial("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_RenderMat_#{prefix}", 'UnlitGeneric', {
+                '$basetexture': 'models/debug/debugwhite'
+                '$ignorez': 1
+                '$vertexcolor': 1
+                '$vertexalpha': 1
+                '$nolod': 1
+            })
+
+            @["EyeMaterialDraw#{prefixUpper}"] = drawMat
+            drawMat\SetTexture('$basetexture', rt)
+
             render.PushRenderTarget(rt)
             render.SetViewPort(0, 0, texSize, texSize)
 
@@ -1468,8 +1685,6 @@ class PonyTextureController
 
             surface.SetDrawColor(EyeIris1)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
-            IrisQuadSize = texSize * IrisSize * PonySize
             DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeIris2)
@@ -1487,14 +1702,7 @@ class PonyTextureController
             
             surface.SetDrawColor(EyeHole)
             surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
-            HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
-            HolePos = texSize / 2
-            do
-                holeX = HoleQuadSize * HoleWidth / 2
-                holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
-                cx = HolePos - holeX + holeX * HoleShiftX + shiftX
-                cy = HolePos - holeY + holeY * HoleShiftY + shiftY
-                DrawTexturedRectRotated(cx, cy, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
+            DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeEffect)
             surface.SetMaterial(@@EYE_EFFECT)
