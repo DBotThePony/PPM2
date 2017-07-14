@@ -38,7 +38,7 @@ REAL_TIME_EYE_REFLECTIONS = PPM2.REAL_TIME_EYE_REFLECTIONS
 PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE = CreateConVar('ppm2_cl_reflections_size', '512', {FCVAR_ACRHIVE}, 'Reflections size. Must be multiple to 2! (16, 32, 64, 128, 256)')
 REAL_TIME_EYE_REFLECTIONS_SIZE = PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE
 
-PPM2.REAL_TIME_EYE_REFLECTIONS_DIST = CreateConVar('ppm2_cl_reflections_drawdist', '512', {FCVAR_ACRHIVE}, 'Reflections maximal draw distance')
+PPM2.REAL_TIME_EYE_REFLECTIONS_DIST = CreateConVar('ppm2_cl_reflections_drawdist', '192', {FCVAR_ACRHIVE}, 'Reflections maximal draw distance')
 REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
 
 PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
