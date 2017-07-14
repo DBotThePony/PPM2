@@ -1546,9 +1546,10 @@ class PonyTextureController
         surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         surface.DisableClipping(false)
+
+        render.SetViewPort(0, 0, oldW, oldH)
         @EyeMaterialR\SetTexture('$iris', rtright)
     CompileEye: (left = false) =>
         return unless @isValid
