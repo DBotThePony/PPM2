@@ -84,15 +84,9 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                     if ent.__ppm2_task_hit
                         ent.__ppm2_task_hit = false
                         ent\SetNoDraw(false)
-
-                    if not ent.__ppm2RenderOverride
-                        ent.__ppm2_oldRenderOverride = ent.RenderOverride
-                        ent.__ppm2RenderOverride = ->
-                            renderController = task\GetRenderController()
-                            renderController\PreDraw(ent, true)
-                            ent\DrawModel()
-                            renderController\PostDraw(ent, true)
-                        ent.RenderOverride = ent.__ppm2RenderOverride
+                    renderController = task\GetRenderController()
+                    renderController\PreDraw(ent)
+                    renderController\PostDraw(ent)
             else
                 if ent.__ppm2_task_hit
                     ent.__ppm2_task_hit = false

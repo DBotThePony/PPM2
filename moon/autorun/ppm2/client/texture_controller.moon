@@ -519,12 +519,11 @@ class PonyTextureController
             @isInRealTimeReflections = false
             @ResetEyeReflections()
 
-    PreDraw: (ent = @ent, forceUpdate = false) =>
+    PreDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
         @CheckReflections(ent)
-
-        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool() or forceUpdate
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1
             ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
@@ -538,8 +537,7 @@ class PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2, @GetTailName(2))
             ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
-
-        if PPM2.ALTERNATIVE_RENDER\GetBool() or forceUpdate
+        if PPM2.ALTERNATIVE_RENDER\GetBool()
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
             render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
@@ -552,10 +550,10 @@ class PonyTextureController
             render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
 
-    PostDraw: (ent = @ent, forceUpdate = false) =>
+    PostDraw: (ent = @ent) =>
         return unless @compiled
         return unless @isValid
-        return unless PPM2.ALTERNATIVE_RENDER\GetBool() or forceUpdate
+        return if not PPM2.ALTERNATIVE_RENDER\GetBool()
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)

@@ -302,15 +302,14 @@ class PonyRenderController
         @socksModel\SetNoDraw(status) if IsValid(@socksModel)
         @hideModels = status
 
-    PreDraw: (ent = @ent, forceUpdate = false) =>
+    PreDraw: (ent = @ent) =>
         return if not @isValid
-        with @GetTextureController()
-            \PreDraw(ent, forceUpdate)
-            \UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and (forceUpdate or PPM2.ALTERNATIVE_RENDER\GetBool())
+        @GetTextureController()\PreDraw(ent)
+        @GetTextureController()\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and PPM2.ALTERNATIVE_RENDER\GetBool()
         @flexes\Think(ent) if @flexes
-    PostDraw: (ent = @ent, forceUpdate = false) =>
+    PostDraw: (ent = @ent) =>
         return if not @isValid
-        @GetTextureController()\PostDraw(ent, forceUpdate)
+        @GetTextureController()\PostDraw(ent)
 
     @ARMS_MATERIAL_INDEX = 0
     PreDrawArms: (ent) =>
