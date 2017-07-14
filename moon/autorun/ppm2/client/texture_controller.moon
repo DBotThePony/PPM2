@@ -1501,14 +1501,15 @@ class PonyTextureController
         oldW, oldH = ScrW(), ScrH()
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
+        render.SetViewPort(0, 0, texSize, texSize)
 
+        surface.DisableClipping(true)
         rtleft = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_LeftReflect_#{scale}", texSize, texSize, false)
         rtleft\Download()
         rtright = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_RightReflect_#{scale}", texSize, texSize, false)
         rtright\Download()
 
-        texSize *= 1.92
-        W, H = 1.9, 1.08
+        W, H = 1, 1
 
         separated = @GrabData('SeparateEyes')
         prefixData = ''
@@ -1516,7 +1517,6 @@ class PonyTextureController
 
         cam.Start2D()
         render.PushRenderTarget(rtleft)
-        render.SetViewPort(0, 0, texSize, texSize)
         render.Clear(0, 0, 0, 255, true, true)
 
         surface.SetDrawColor(255, 255, 255, 255)
@@ -1528,7 +1528,6 @@ class PonyTextureController
         surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         cam.End2D()
-        render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
         @EyeMaterialL\SetTexture('$iris', rtleft)
 
@@ -1536,7 +1535,6 @@ class PonyTextureController
 
         cam.Start2D()
         render.PushRenderTarget(rtright)
-        render.SetViewPort(0, 0, texSize, texSize)
         render.Clear(0, 0, 0, 255, true, true)
 
         surface.SetDrawColor(255, 255, 255, 255)
@@ -1550,6 +1548,7 @@ class PonyTextureController
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
         render.PopRenderTarget()
+        surface.DisableClipping(false)
         @EyeMaterialR\SetTexture('$iris', rtright)
     CompileEye: (left = false) =>
         return unless @isValid
