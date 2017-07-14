@@ -141,7 +141,7 @@ PPM2.ReadFromOldData = (filename = '_current') ->
     return false if read == ''
     split = [str\Trim() for str in *string.Explode('\n', read\Replace('\r', ''))]
     outputData = {}
-    
+
     for line in *split
         varID = line\match('([a-zA-Z0-9_]+)')
         continue if not varID or varID == ''
@@ -153,8 +153,8 @@ PPM2.ReadFromOldData = (filename = '_current') ->
         else
             get = dt.func(value)
             outputData[name] = get for name in *dt.name
-    
-    data = PonyDataInstance("#{filename}_imported", nil, false)
+
+    data = PPM2.PonyDataInstance("#{filename}_imported", nil, false)
     for key, value in pairs outputData
         data["Set#{key}"](data, value, false)
     return data, outputData
