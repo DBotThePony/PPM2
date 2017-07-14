@@ -1421,14 +1421,14 @@ class PonyTextureController
 
         textureData = {
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eye_#{prefix}"
-            'shader': 'eyes'
+            'shader': 'EyeRefract'
             'data': {
                 '$iris': 'models/ppm/base/face/p_base'
                 '$irisframe': '0'
                 
-                '$ambientoccltexture': 'models/ppm/partrender/null'
-                --'$envmap': 'models/ppm/partrender/null'
-                '$corneatexture': 'models/ppm/partrender/null'
+                '$ambientoccltexture': 'models/ppm/eyes/eye_extra'
+                '$envmap': 'models/ppm/eyes/eye_reflection'
+                '$corneatexture': 'models/ppm/eyes/eye_cornea'
                 '$lightwarptexture': 'models/ppm/clothes/lightwarp'
                 
                 '$eyeballradius': '3.7'
@@ -1507,7 +1507,7 @@ class PonyTextureController
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
-            @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+            --@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
 
             PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
         else
