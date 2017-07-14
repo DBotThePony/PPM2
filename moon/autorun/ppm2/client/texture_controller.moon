@@ -1390,7 +1390,7 @@ class PonyTextureController
         EyeBackground =     @GrabData("EyeBackground#{prefixData}")
         EyeHole =           @GrabData("EyeHole#{prefixData}")
         HoleWidth =         @GrabData("HoleWidth#{prefixData}")
-        IrisSize =          @GrabData("IrisSize#{prefixData}") * .75
+        IrisSize =          @GrabData("IrisSize#{prefixData}") * .4
         EyeIris1 =          @GrabData("EyeIrisTop#{prefixData}")
         EyeIris2 =          @GrabData("EyeIrisBottom#{prefixData}")
         EyeIrisLine1 =      @GrabData("EyeIrisLine1#{prefixData}")
@@ -1507,7 +1507,7 @@ class PonyTextureController
             cam.End2D()
             render.SetViewPort(0, 0, oldW, oldH)
             render.PopRenderTarget()
-            --@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
+            @["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', rt)
 
             PPM2.DebugPrint('Compiled eyes texture for ', @ent, ' as part of ', @)
         else
