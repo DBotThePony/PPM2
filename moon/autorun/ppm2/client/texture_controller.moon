@@ -1505,7 +1505,8 @@ class PonyTextureController
         rtright = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_RightReflect_#{scale}", texSize, texSize, false)
         rtright\Download()
 
-        texSize *= 1.9
+        texSize *= 1.92
+        W, H = 1.9, 1.08
 
         separated = @GrabData('SeparateEyes')
         prefixData = ''
@@ -1518,11 +1519,11 @@ class PonyTextureController
 
         surface.SetDrawColor(255, 255, 255, 255)
         surface.SetMaterial(@EyeMaterialDrawL)
-        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
-        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
@@ -1538,11 +1539,11 @@ class PonyTextureController
 
         surface.SetDrawColor(255, 255, 255, 255)
         surface.SetMaterial(@EyeMaterialDrawR)
-        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
         surface.SetMaterial(@reflectRTMat)
-        surface.DrawTexturedRect(0, 0, texSize * 2, texSize)
+        surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
 
         cam.End2D()
         render.SetViewPort(0, 0, oldW, oldH)
