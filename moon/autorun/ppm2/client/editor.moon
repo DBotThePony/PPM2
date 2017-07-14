@@ -1140,7 +1140,7 @@ EditorPages = {
                 @URLInput("EyeURL#{publicName}")
                 @Label('When uring eye URL texture; options below have no effect')
                 if ADVANCED_MODE\GetBool()
-                    @CheckBox("#{prefix}Use Eye Refract", "EyeRefract#{publicName}")
+                    @CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
                     @CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
                 @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
                 @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
