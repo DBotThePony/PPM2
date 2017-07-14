@@ -45,13 +45,22 @@ PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderd
 REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
 
 reflectTasks = {}
+lastReflectionFrame = 0
 
-hook.Add 'Think', 'PPM2.ReflectionsUpdate', ->
+hook.Add 'DrawOverlay', 'PPM2.ReflectionsUpdate', (a, b) ->
+    return if PPM2.__RENDERING_REFLECTIONS
+    return if lastReflectionFrame == FrameNumber()
+    lastReflectionFrame = FrameNumber()
     PPM2.__RENDERING_REFLECTIONS = true
     for task in *reflectTasks
-        task.ctrl\UpdateEyeReflections(task.ent)
+        pcall task.ctrl.UpdateEyeReflections, task.ctrl, task.ent
     PPM2.__RENDERING_REFLECTIONS = false
     reflectTasks = {}
+
+hook.Add 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
+hook.Add 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
+hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
+hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
