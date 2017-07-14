@@ -28,7 +28,7 @@ concommand.Add 'ppm2_reload_materials', ->
         if texture = mat\GetTexture('$basetexture')
             texture\Download()
         mat\Recompute()
-    PonyTextureController.URL_MATERIAL_CACHE = {}
+    PPM2.PonyTextureController.URL_MATERIAL_CACHE = {}
     PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds. Do not forget to ppm2_reload and ppm2_require now!')
 
 _Material = Material
@@ -48,7 +48,7 @@ module = {
         Material('models/ppm/partrender/body_leggrad1')
         Material('models/ppm/partrender/body_lines1')
         Material('models/ppm/partrender/body_stripes1')
-        Material('models/ppm/partrender/body_headstripes1') 
+        Material('models/ppm/partrender/body_headstripes1')
         Material('models/ppm/partrender/body_freckles')
         Material('models/ppm/partrender/body_hooves1')
         Material('models/ppm/partrender/body_hooves2')
