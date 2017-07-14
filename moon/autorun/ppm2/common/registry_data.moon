@@ -599,7 +599,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
     }
 
     PPM2.PonyDataRegistry["eye_use_refract#{internal}"] = {
-        default: -> true
+        default: -> false
         getFunc: "EyeRefract#{publicName}"
         type: 'BOOLEAN'
     }
