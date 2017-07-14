@@ -1138,10 +1138,18 @@ EditorPages = {
 
                 @Label('Eye URL texture')
                 @URLInput("EyeURL#{publicName}")
-                @Label('When uring eye URL texture; options below have no effect')
+                
                 if ADVANCED_MODE\GetBool()
+                    @Label('Lightwarp has effect only on EyeRefract eyes')
+                    ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'
                     @CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
                     @CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
+                    @ComboBox('Lightwarp', ttype .. 'Lightwarp')
+                    @Label('Lightwarp texture URL input\nIt must be 256x16!')
+                    @URLInput(ttype .. 'LightwarpURL')
+
+                @Label('When uring eye URL texture; options below have no effect')
+
                 @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
                 @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")

@@ -126,6 +126,12 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["PonySize"] = true
         @EYE_UPDATE_TRIGGER["EyeRefract#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeCornerA#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["LEyeLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["REyeLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["LEyeLightwarpURL"] = true
+        @EYE_UPDATE_TRIGGER["REyeLightwarpURL"] = true
+        @EYE_UPDATE_TRIGGER["BEyesLightwarp"] = true
+        @EYE_UPDATE_TRIGGER["BEyesLightwarpURL"] = true
 
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["ManeColor#{i}"] = true
@@ -643,14 +649,16 @@ class PonyTextureController
         PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
         return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
     
-    ApplyPhongData: (matTarget, prefix = 'Body') =>
+    ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false) =>
         return if not matTarget
         PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
-        with matTarget
-            \SetFloat('$phongexponent', PhongExponent)
-            \SetFloat('$phongboost', PhongBoost)
-            \SetVector('$phongtint', PhongTint)
-            \SetVector('$phongfresnelranges', PhongFresnel)
+
+        if not lightwarpsOnly
+            with matTarget
+                \SetFloat('$phongexponent', PhongExponent)
+                \SetFloat('$phongboost', PhongBoost)
+                \SetVector('$phongtint', PhongTint)
+                \SetVector('$phongfresnelranges', PhongFresnel)
         
         if LightwarpURL == '' or not LightwarpURL\find('^https?://')
             myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
@@ -693,6 +701,13 @@ class PonyTextureController
         if @GrabData('SeparateTailPhong')
             @ApplyPhongData(@TailColor1Material, 'Tail')
             @ApplyPhongData(@TailColor2Material, 'Tail')
+        
+        if @GrabData('SeparateEyes')
+            @ApplyPhongData(@EyeMaterialL, 'LEye', true)
+            @ApplyPhongData(@EyeMaterialR, 'REye', true)
+        else
+            @ApplyPhongData(@EyeMaterialL, 'BEyes', true)
+            @ApplyPhongData(@EyeMaterialR, 'BEyes', true)
     
     __compileBodyInternal: (bType = false) =>
         return unless @isValid
@@ -1457,6 +1472,7 @@ class PonyTextureController
         @["EyeMaterial#{prefixUpper}Name"] = "!#{textureData.name\lower()}"
         createdMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
         @["EyeMaterial#{prefixUpper}"] = createdMaterial
+        @UpdatePhongData()
 
         IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
         IrisQuadSize = texSize * IrisSize * PonySize
