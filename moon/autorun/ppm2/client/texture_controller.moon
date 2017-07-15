@@ -84,8 +84,7 @@ class PonyTextureController
     @TAIL_MATERIAL_COLOR = _M.TAIL_MATERIAL_COLOR
     @WINGS_MATERIAL_COLOR = _M.WINGS_MATERIAL_COLOR
     @HORN_MATERIAL_COLOR = _M.HORN_MATERIAL_COLOR
-    @BODY_MATERIAL_MALE = _M.BODY_MATERIAL_MALE
-    @BODY_MATERIAL_FEMALE = _M.BODY_MATERIAL_FEMALE
+    @BODY_MATERIAL = _M.BODY_MATERIAL
     @HORN_DETAIL_COLOR = _M.HORN_DETAIL_COLOR
     @EYE_OVAL = _M.EYE_OVAL
     @EYE_OVALS = _M.EYE_OVALS
@@ -232,7 +231,7 @@ class PonyTextureController
                 @DelayCompile('CompileBody')
                 @DelayCompile('CompileWings')
                 @DelayCompile('CompileHorn')
-            when 'Socks', 'Bodysuit'
+            when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor'
                 @DelayCompile('CompileBody')
             when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @DelayCompile('CompileCMark')
@@ -452,16 +451,8 @@ class PonyTextureController
         return @networkedData
     GrabData: (str, ...) => @GetData()['Get' .. str](@GetData(), ...)
     GetEntity: => @ent
-    GetBody: =>
-        if @GrabData('Gender') == PPM2.GENDER_FEMALE
-            return @FemaleMaterial
-        else
-            return @MaleMaterial
-    GetBodyName: =>
-        if @GrabData('Gender') == PPM2.GENDER_FEMALE
-            return @FemaleMaterialName
-        else
-            return @MaleMaterialName
+    GetBody: => @BodyMaterial
+    GetBodyName: => @BodyMaterialName
     GetSocks: => @SocksMaterial
     GetSocksName: => @SocksMaterialName
     GetCMark: => @CMarkTexture
@@ -711,8 +702,7 @@ class PonyTextureController
                 matTarget\SetTexture('$lightwarptexture', tex)
 
     GetBodyPhongMaterials: (output = {}) =>
-        table.insert(output, @MaleMaterial) if @MaleMaterial
-        table.insert(output, @FemaleMaterial) if @FemaleMaterial
+        table.insert(output, @BodyMaterial) if @BodyMaterial
         table.insert(output, @HornMaterial) if @HornMaterial and not @GrabData('SeparateHornPhong')
         table.insert(output, @WingsMaterial) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
         if not @GrabData('SeparateManePhong')
@@ -752,19 +742,18 @@ class PonyTextureController
             @ApplyPhongData(@EyeMaterialL, 'BEyes', true)
             @ApplyPhongData(@EyeMaterialR, 'BEyes', true)
 
-    __compileBodyInternal: (bType = false) =>
+    CompileBody: =>
         return unless @isValid
-        prefix = bType and 'Female' or 'Male'
-        prefixUP = bType and 'FEMALE' or 'MALE'
+        return unless @isValid
         urlTextures = {}
         left = 0
         bodysize = @@GetBodySize()
 
         textureData = {
-            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}"
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/ppm/base/bodym'
+                '$basetexture': 'models/ppm/base/body'
                 '$lightwarptexture': 'models/ppm/base/lightwrap'
                 '$halflambert': '1'
                 '$selfillum': '1'
@@ -787,17 +776,16 @@ class PonyTextureController
             }
         }
 
-        textureData.data['$basetexture'] = 'models/ppm/base/body' if not bType
-
-        @["#{prefix}MaterialName"] = "!#{textureData.name\lower()}"
-        @["#{prefix}Material"] = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @BodyMaterialName = "!#{textureData.name\lower()}"
+        @BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        @UpdatePhongData()
 
         continueCompilation = ->
             return unless @isValid
             {:r, :g, :b} = @GrabData('BodyColor')
             oldW, oldH = ScrW(), ScrH()
 
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
             rt\Download()
 
             render.PushRenderTarget(rt)
@@ -808,31 +796,33 @@ class PonyTextureController
             surface.SetDrawColor(r, g, b)
             surface.DrawRect(0, 0, bodysize, bodysize)
 
-            surface.SetMaterial(@@["BODY_MATERIAL_#{prefixUP}"])
+            surface.SetMaterial(@@BODY_MATERIAL)
             surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
-            for i = 1, PPM2.MAX_TATTOOS
-                if not @GrabData("TattooOverDetail#{i}")
-                    @DrawTattoo(i)
+            surface.SetMaterial(_M.LIPS)
+            surface.SetDrawColor(@GrabData('LipsColor'))
+            surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
+            surface.SetMaterial(_M.NOSE)
+            surface.SetDrawColor(@GrabData('NoseColor'))
+            surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
+            @DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 
             for i = 1, PPM2.MAX_BODY_DETAILS
-                detailID = @GetData()["GetBodyDetail#{i}"](@GetData())
-                if mat = _M.BODY_DETAILS[detailID]
-                    surface.SetDrawColor(@GetData()["GetBodyDetailColor#{i}"](@GetData()))
+                if mat = _M.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
+                    surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
                     surface.SetMaterial(mat)
                     surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             surface.SetDrawColor(255, 255, 255)
 
             for i, mat in pairs urlTextures
-                {:r, :g, :b, :a} = @GetData()["GetBodyDetailURLColor#{i}"](@GetData())
-                surface.SetDrawColor(r, g, b, a)
+                surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
-            for i = 1, PPM2.MAX_TATTOOS
-                if @GrabData("TattooOverDetail#{i}")
-                    @DrawTattoo(i)
+            @DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 
             if suit = _M.SUITS[@GrabData('Bodysuit')]
                 surface.SetDrawColor(255, 255, 255)
@@ -848,9 +838,9 @@ class PonyTextureController
             cam.End2D()
             render.PopRenderTarget()
 
-            @["#{prefix}Material"]\SetTexture('$basetexture', rt)
+            @BodyMaterial\SetTexture('$basetexture', rt)
 
-            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_#{prefix}_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
+            rtIllum = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_Body_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, bodysize, false)
             rtIllum\Download()
 
             render.PushRenderTarget(rtIllum)
@@ -889,7 +879,7 @@ class PonyTextureController
             cam.End2D()
             render.PopRenderTarget()
 
-            @["#{prefix}Material"]\SetTexture('$selfillummask', rtIllum)
+            @BodyMaterial\SetTexture('$selfillummask', rtIllum)
 
             PPM2.DebugPrint('Compiled body texture for ', @ent, ' as part of ', @)
 
@@ -907,14 +897,8 @@ class PonyTextureController
                 if left == 0
                     continueCompilation()
 
-        if left == 0
-            continueCompilation()
-        return @["#{prefix}Material"]
-    CompileBody: =>
-        return unless @isValid
-        @__compileBodyInternal(true)
-        @__compileBodyInternal(false)
-        @UpdatePhongData()
+        continueCompilation() if left == 0
+        return @BodyMaterial
     CompileHorn: =>
         return unless @isValid
         textureData = {

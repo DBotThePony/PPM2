@@ -521,6 +521,18 @@ PPM2.PonyDataRegistry = {
         max: 1
         type: 'FLOAT'
     }
+
+    'lips_color': {
+        default: -> Color(172, 92, 92)
+        getFunc: 'LipsColor'
+        type: 'COLOR'
+    }
+
+    'nose_color': {
+        default: -> Color(77, 84, 83)
+        getFunc: 'NoseColor'
+        type: 'COLOR'
+    }
 }
 
 for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
