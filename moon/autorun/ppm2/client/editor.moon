@@ -1632,6 +1632,11 @@ PPM2.OpenNewEditor = ->
             net.SendToServer()
         return
 
+    controller = ply\GetPonyData()
+    if not controller
+        Derma_Message('For some reason, your player has no NetworkedPonyData - Nothing to edit!\nTry ppm2_reload in your console and try to open editor again', 'Oops!', 'Okai')
+        return
+
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
     self = PPM2.EditorTopFrame
     topframe = PPM2.EditorTopFrame
@@ -1701,7 +1706,7 @@ PPM2.OpenNewEditor = ->
 
     copy = PPM2.GetMainData()\Copy()
     ply = LocalPlayer()
-    @controller = ply\GetPonyData()
+    @controller = controller
     copy\SetNetworkData(@controller)
     copy\SetNetworkOnChange(false)
     @data = copy
