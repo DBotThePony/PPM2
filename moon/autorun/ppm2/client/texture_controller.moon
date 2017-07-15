@@ -945,17 +945,15 @@ class PonyTextureController
             surface.SetDrawColor(r, g, b)
             surface.DrawRect(0, 0, texSize, texSize)
 
-            surface.SetMaterial(@@HORN_MATERIAL_COLOR)
+            surface.SetMaterial(_M.DEBUGWHITE)
             surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            if @GrabData('UseHornDetail')
-                {:r, :g, :b} = @GrabData('HornDetailColor')
-                surface.SetDrawColor(r, g, b)
-                surface.SetMaterial(@@HORN_DETAIL_COLOR)
-                surface.DrawTexturedRect(0, 0, texSize, texSize)
+            surface.SetDrawColor(@GrabData('HornDetailColor'))
+            surface.SetMaterial(@@HORN_DETAIL_COLOR)
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
 
             for i, mat in pairs urlTextures
-                {:r, :g, :b, :a} = @GetData()["GetHornURLColor#{i}"](@GetData())
+                {:r, :g, :b, :a} = @GrabData("HornURLColor#{i}")
                 surface.SetDrawColor(r, g, b, a)
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)

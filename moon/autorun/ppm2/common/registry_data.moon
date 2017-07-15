@@ -278,12 +278,6 @@ PPM2.PonyDataRegistry = {
         type: 'BOOLEAN'
     }
 
-    'use_horn_detail': {
-        default: -> false
-        getFunc: 'UseHornDetail'
-        type: 'BOOLEAN'
-    }
-
     'horn_glow': {
         default: -> false
         getFunc: 'HornGlow'
@@ -299,7 +293,7 @@ PPM2.PonyDataRegistry = {
     }
 
     'horn_detail_color': {
-        default: -> Color(255, 255, 255)
+        default: -> Color(90, 90, 90)
         getFunc: 'HornDetailColor'
         type: 'COLOR'
     }

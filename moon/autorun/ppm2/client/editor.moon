@@ -1031,10 +1031,8 @@ EditorPages = {
             @NumSlider('Right Wing Inside', 'RWingZ', 2, right)
             return if not ADVANCED_MODE\GetBool()
             @Hr()
-            @Label('You might want to use "Glowing Horn"\nwith "Use Horn Detail"')
-            @CheckBox('Use Horn Detail', 'UseHornDetail')
             @ColorBox('Horn Detail Color', 'HornDetailColor')
-            @CheckBox('Glowing Horn', 'HornGlow')
+            @CheckBox('Glowing Horn Detail', 'HornGlow')
             @NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
     }
 
