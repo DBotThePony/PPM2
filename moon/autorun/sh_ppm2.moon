@@ -80,6 +80,7 @@ if CLIENT
         if ent.isPonyLegsModel
             ent\Remove()
 else
+    CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
     resource.AddWorkshop('933203381')
 
     util.AddNetworkString('PPM2.RequestPonyData')
