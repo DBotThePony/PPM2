@@ -746,7 +746,6 @@ class PonyTextureController
 
     CompileBody: =>
         return unless @isValid
-        return unless @isValid
         urlTextures = {}
         left = 0
         bodysize = @@GetBodySize()
