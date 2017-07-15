@@ -15,12 +15,12 @@
 -- limitations under the License.
 --
 
-local VERSION = 201706231257
+local VERSION = 201707151354
 
 if _G.StrongEntityLinkVersion and _G.StrongEntityLinkVersion >= VERSION then return end
 _G.StrongEntityLinkVersion = VERSION
 
-local ENTITIES_REGISTRY = {}
+local STRONG_ENTITIES_REGISTRY = {}
 local WRAPPED_FUNCTIONS = {}
 
 local entMeta = FindMetaTable('Entity')
@@ -55,7 +55,7 @@ local StrongLinkMetadata = {
 
         return self.__strong_entity_link
     end,
-    
+
 	GetStrongEntity = function(self)
         if not isValid(self.__strong_entity_link) then
             self.__strong_entity_link = Entity(self.__strong_entity_link_id)
@@ -127,7 +127,7 @@ local metaData = {
         if value ~= nil then
             return value
         end
-		
+
 		local self2 = self.__strong_entity_meta
 
         if not isValid(self2.__strong_entity_link) then
@@ -215,9 +215,9 @@ local function InitStrongEntity(entIndex)
             entIndex = -1
         end
     end
-    
-    if ENTITIES_REGISTRY[entIndex] then
-        return ENTITIES_REGISTRY[entIndex]
+
+    if STRONG_ENTITIES_REGISTRY[entIndex] then
+        return STRONG_ENTITIES_REGISTRY[entIndex]
     end
 
     local newMeta = {
@@ -234,7 +234,7 @@ local function InitStrongEntity(entIndex)
 
     local newObject = setmetatable({}, newMeta)
 
-    ENTITIES_REGISTRY[entIndex] = newObject
+    STRONG_ENTITIES_REGISTRY[entIndex] = newObject
     return newObject
 end
 
@@ -244,13 +244,13 @@ if CLIENT then
     hook.Add('NetworkEntityCreated', 'StrongEntity', function(self)
         local id = self:EntIndex()
 
-        if not ENTITIES_REGISTRY[id] then return end
+        if not STRONG_ENTITIES_REGISTRY[id] then return end
         local tab = self:GetTable()
-		
-        local strongEnt = ENTITIES_REGISTRY[id]
+
+        local strongEnt = STRONG_ENTITIES_REGISTRY[id]
         local strongTableMeta = debug.getmetatable(strongEnt)
 		local strongTable = strongTableMeta.__strong_entity_table
-		
+
         for key, value in pairs(strongTable) do
             if value ~= UniqueNoValue then
                 tab[key] = value
@@ -259,21 +259,61 @@ if CLIENT then
                 strongTable[key] = nil
             end
         end
-		
+
 		strongTableMeta.__strong_entity_link = self
         hook.Call('StrongEntityLinkUpdates', nil, strongEnt, self)
     end)
 
     net.Receive('StrongEntity.Removed', function()
-        ENTITIES_REGISTRY[net.ReadUInt(16)] = nil
+        local entIndex = net.ReadUInt(16)
+        STRONG_ENTITIES_REGISTRY[entIndex] = nil
     end)
 else
     util.AddNetworkString('StrongEntity.Removed')
+    local avaliableEntities = {}
 
+    local function checkEntities()
+        local hash = {}
+
+        for i, ent in pairs(ents.GetAll()) do
+            hash[ent] = {ent, ent:EntIndex()}
+        end
+
+        for ent, data in pairs(avaliableEntities) do
+            if not hash[ent] then
+                local entIndex = data[2]
+                net.Start('StrongEntity.Removed')
+                net.WriteUInt(entIndex, 16)
+                net.Broadcast()
+                STRONG_ENTITIES_REGISTRY[entIndex] = nil
+            end
+        end
+
+        avaliableEntities = hash
+    end
+
+    local function updateList()
+        for i, ent in pairs(ents.GetAll()) do
+            avaliableEntities[ent] = {ent, ent:EntIndex()}
+        end
+    end
+
+    updateList()
+
+    -- For some reason, some of entities are not being passed to this function
+    -- Example - ragdolls with posed flexes
     hook.Add('EntityRemoved', 'StrongEntity', function(self)
+        local entIndex = self:EntIndex()
         net.Start('StrongEntity.Removed')
-        net.WriteUInt(self:EntIndex(), 16)
+        net.WriteUInt(entIndex, 16)
         net.Broadcast()
+        STRONG_ENTITIES_REGISTRY[entIndex] = nil
+        avaliableEntities[self] = nil
+        timer.Create('StrongEntityDeletedCheck', 0, 1, checkEntities)
+    end)
+
+    hook.Add('OnEntityCreated', 'StrongEntity', function(self)
+        timer.Create('StrongEntityCreatedCheck', 0, 1, updateList)
     end)
 end
 
