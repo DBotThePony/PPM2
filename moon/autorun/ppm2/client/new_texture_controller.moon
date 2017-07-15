@@ -59,7 +59,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
     @MANE_UPDATE_TRIGGER['ManeTypeNew'] = true
     @MANE_UPDATE_TRIGGER['SeparateMane'] = true
     @MANE_UPDATE_TRIGGER['ManeTypeLowerNew'] = true
-    
+
     for i = 1, 6
         @MANE_UPDATE_TRIGGER["LowerManeColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeColor#{i}"] = true
@@ -70,7 +70,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         @MANE_UPDATE_TRIGGER["LowerManeURLColor#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeURL#{i}"] = true
         @MANE_UPDATE_TRIGGER["UpperManeURLColor#{i}"] = true
-    
+
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
     DataChanges: (state) =>
@@ -86,10 +86,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             when 'SeparateWings'
                 @DelayCompile('CompileBatWings')
                 @DelayCompile('CompileBatWingsSkin')
-            
+
             when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
                 @DelayCompile('CompileBatWings')
-            
+
             when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
                 @DelayCompile('CompileBatWingsSkin')
 
@@ -114,7 +114,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
-                
+
                 '$rimlight': 1
                 '$rimlightexponent': 2
                 '$rimlightboost': 1
@@ -135,7 +135,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
-        
+
         urlTextures = {}
         left = 0
 
@@ -217,7 +217,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -227,7 +227,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         if left == 0
             continueCompilation()
         return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
-    
+
     GetBodyPhongMaterials: (output = {}) =>
         super(output)
         if not @GrabData('SeparateWingsPhong')
@@ -239,7 +239,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         if @GrabData('SeparateWingsPhong')
             @ApplyPhongData(@BatWingsMaterial, 'Wings')
             @ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
-        
+
         if @GrabData('SeparateManePhong')
             @ApplyPhongData(@UpperManeColor1, 'UpperMane')
             @ApplyPhongData(@UpperManeColor2, 'UpperMane')
@@ -313,7 +313,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -392,7 +392,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -403,7 +403,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             continueCompilation()
 
         return @BatWingsSkinMaterial
-        
+
     CompileHair: =>
         return unless @isValid
         return super() if not @GetData()\GetSeparateMane()
@@ -414,7 +414,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         @UpperManeColor1Name, @UpperManeColor2Name = name1, name2
         @LowerManeColor1Name, @LowerManeColor2Name = name3, name4
         return mat1, mat2, mat3, mat4
-    
+
     CompileMouth: =>
         textureData = {
             '$basetexture': 'models/debug/debugwhite'
@@ -422,13 +422,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             '$halflambert': '1'
             '$phong': '1'
             '$phongexponent': '20'
-            '$phongboost': '.1'	
+            '$phongboost': '.1'
             '$phongfresnelranges': '[.3 1 8]'
             '$halflambert': '0'
             '$basemapalphaphongmask': '1'
 
             '$rimlight': '1'
-            '$rimlightexponent': '4'	
+            '$rimlightexponent': '4'
             '$rimlightboost': '2'
             '$color': '[1 1 1]'
             '$color2': '[1 1 1]'
@@ -457,13 +457,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
 
         return @TeethMaterial, @MouthMaterial, @TongueMaterial
-    
+
     CompileTextures: =>
         super()
         @CompileMouth()
         @CompileBatWingsSkin()
         @CompileBatWings()
-    
+
     GetTeeth: => @TeethMaterial
     GetMouth: => @MouthMaterial
     GetTongue: => @TongueMaterial
@@ -475,7 +475,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
     GetTeethName: => @TeethMaterialName
     GetMouthName: => @MouthMaterialName
     GetTongueName: => @TongueMaterialName
-    
+
     GetUpperHair: (index = 1) =>
         if index == 2
             return @UpperManeColor2
@@ -486,7 +486,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             return @LowerManeColor2
         else
             return @LowerManeColor1
-    
+
     GetUpperHairName: (index = 1) =>
         if index == 2
             return @UpperManeColor2Name
@@ -508,7 +508,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         else
             entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
             entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
-    
+
     UpdateLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
         return unless @isValid
@@ -526,10 +526,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
         entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
 
-    PreDraw: (ent = @ent) =>
+    PreDraw: (ent = @ent, drawingNewTask = false) =>
         return unless @compiled
         return unless @isValid
         @CheckReflections(ent)
+
         if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
             @lastMaterialUpdateEnt = ent
             @lastMaterialUpdate = RealTime() + 1
@@ -545,7 +546,8 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
             ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
             ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
-        if PPM2.ALTERNATIVE_RENDER\GetBool()
+
+        if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
             render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
@@ -558,10 +560,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
             render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
             render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT, @GetBatWings())
             render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
-    PostDraw: (ent = @ent) =>
+
+    PostDraw: (ent = @ent, drawingNewTask = false) =>
         return unless @compiled
         return unless @isValid
-        return if not PPM2.ALTERNATIVE_RENDER\GetBool()
+        return unless PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
@@ -574,6 +577,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT)
         render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN)
+
     ResetTextures: (ent = @ent) =>
         return if not IsValid(ent)
         @lastMaterialUpdateEnt = NULL

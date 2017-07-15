@@ -72,6 +72,26 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                     data\GetRenderController()\DrawLegs()
                     IN_DRAW = false
 
+Think = ->
+    if TASK_RENDER_TYPE\GetBool()
+        for task in *PPM2.NetworkedPonyData.RenderTasks
+            ent = task.ent
+            if IsValid(ent) and ent.__cachedIsPony
+                ent = ent\GetEntity()
+                if ent.__ppm2_task_hit
+                    ent.__ppm2_task_hit = false
+                    ent\SetNoDraw(false)
+
+                if not ent.__ppm2RenderOverride
+                    ent.__ppm2_oldRenderOverride = ent.RenderOverride
+                    ent.__ppm2RenderOverride = ->
+                        renderController = task\GetRenderController()
+                        renderController\PreDraw(ent, true)
+                        ent\DrawModel()
+                        renderController\PostDraw(ent, true)
+                        ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
+                    ent.RenderOverride = ent.__ppm2RenderOverride
+
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
     return if IN_DRAW
     return if PPM2.__RENDERING_REFLECTIONS
@@ -85,11 +105,11 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
     return if bDrawingDepth or bDrawingSkybox
 
-    for task in *PPM2.NetworkedPonyData.RenderTasks
-        ent = task.ent
-        if IsValid(ent)
-            if ent.__cachedIsPony
-                if not TASK_RENDER_TYPE\GetBool()
+    if not TASK_RENDER_TYPE\GetBool()
+        for task in *PPM2.NetworkedPonyData.RenderTasks
+            ent = task.ent
+            if IsValid(ent)
+                if ent.__cachedIsPony
                     ent\SetNoDraw(true)
                     ent.__ppm2_task_hit = true
                     renderController = task\GetRenderController()
@@ -102,14 +122,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
                     if ent.__ppm2_task_hit
                         ent.__ppm2_task_hit = false
                         ent\SetNoDraw(false)
-                    renderController = task\GetRenderController()
-                    renderController\PreDraw(ent)
-                    renderController\PostDraw(ent)
-            else
-                if ent.__ppm2_task_hit
-                    ent.__ppm2_task_hit = false
-                    ent\SetNoDraw(false)
-                    task\Reset()
+                        task\Reset()
 
     if not ENABLE_NEW_RAGDOLLS\GetBool()
         for ply in *player.GetAll()
@@ -162,4 +175,5 @@ PPM2.PostPlayerDraw = =>
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
+hook.Add 'Think', 'PPM2.UpdateRenderTasks', Think, 2
 hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, 2

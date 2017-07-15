@@ -302,12 +302,13 @@ class PonyRenderController
         @socksModel\SetNoDraw(status) if IsValid(@socksModel)
         @hideModels = status
 
-    PreDraw: (ent = @ent) =>
+    PreDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
-        @GetTextureController()\PreDraw(ent)
-        @GetTextureController()\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and PPM2.ALTERNATIVE_RENDER\GetBool()
+        with @GetTextureController()
+            \PreDraw(ent, drawingNewTask)
+            \UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and (PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask)
         @flexes\Think(ent) if @flexes
-    PostDraw: (ent = @ent) =>
+    PostDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
         @GetTextureController()\PostDraw(ent)
 
@@ -405,9 +406,9 @@ class NewPonyRenderController extends PonyRenderController
         @tailModel\SetNoDraw(status) if IsValid(@tailModel)
         super(status)
 
-    PreDraw: (ent = @ent) =>
-        super(ent)
-        if PPM2.ALTERNATIVE_RENDER\GetBool()
+    PreDraw: (ent = @ent, drawingNewTask = false) =>
+        super(ent, drawingNewTask)
+        if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
             textures = @GetTextureController()
             return if not textures
             textures\UpdateUpperMane(@ent, @upperManeModel) if IsValid(@upperManeModel)
