@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
-	"$basetexture" "models/ppm/base/horn_detail"
+	"$basetexture" "models/ppm/partrender/horn_detail"
 	"$ignorez"  1
 	"$vertexcolor"  1
 	"$vertexalpha"  1

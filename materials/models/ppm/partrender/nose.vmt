@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
-	"$basetexture" "models/ppm/base/nose"
+	"$basetexture" "models/ppm/partrender/nose"
 	"$ignorez"  1
 	"$vertexcolor"  1
 	"$vertexalpha"  1
