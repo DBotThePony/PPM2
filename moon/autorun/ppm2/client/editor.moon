@@ -973,6 +973,8 @@ EditorPages = {
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
             if ADVANCED_MODE\GetBool()
+                @CheckBox('Inherit Lips Color from body', 'LipsColorInherit')
+                @CheckBox('Inherit Nose Color from body', 'NoseColorInherit')
                 @ColorBox('Lips Color', 'LipsColor')
                 @ColorBox('Nose Color', 'NoseColor')
                 doAddPhongData(@, 'Body')

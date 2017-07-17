@@ -231,7 +231,7 @@ class PonyTextureController
                 @DelayCompile('CompileBody')
                 @DelayCompile('CompileWings')
                 @DelayCompile('CompileHorn')
-            when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor'
+            when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit'
                 @DelayCompile('CompileBody')
             when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
                 @DelayCompile('CompileCMark')
@@ -800,12 +800,24 @@ class PonyTextureController
             surface.SetMaterial(@@BODY_MATERIAL)
             surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
+            if not @GrabData('LipsColorInherit')
+                surface.SetDrawColor(@GrabData('LipsColor'))
+            else
+                {:r, :g, :b} = @GrabData('BodyColor')
+                r, g, b = math.max(r - 50, 0), math.max(g - 50, 0), math.max(b - 50, 0)
+                surface.SetDrawColor(r, g, b)
+
             surface.SetMaterial(_M.LIPS)
-            surface.SetDrawColor(@GrabData('LipsColor'))
             surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
+            if not @GrabData('NoseColorInherit')
+                surface.SetDrawColor(@GrabData('NoseColor'))
+            else
+                {:r, :g, :b} = @GrabData('BodyColor')
+                r, g, b = math.max(r - 50, 0), math.max(g - 50, 0), math.max(b - 50, 0)
+                surface.SetDrawColor(r, g, b)
+
             surface.SetMaterial(_M.NOSE)
-            surface.SetDrawColor(@GrabData('NoseColor'))
             surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
             @DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")

@@ -516,6 +516,18 @@ PPM2.PonyDataRegistry = {
         type: 'FLOAT'
     }
 
+    'lips_color_inherit': {
+        default: -> true
+        getFunc: 'LipsColorInherit'
+        type: 'BOOLEAN'
+    }
+
+    'nose_color_inherit': {
+        default: -> true
+        getFunc: 'NoseColorInherit'
+        type: 'BOOLEAN'
+    }
+
     'lips_color': {
         default: -> Color(172, 92, 92)
         getFunc: 'LipsColor'
