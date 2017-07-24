@@ -90,10 +90,10 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
                 dist = pos\Distance(lpos)
                 if dist < 250
                     pos.z += 10
-                    alpha = math.Clamp(1 - dist / 250, 0.1, 1)
+                    alpha = math.Clamp(1.3 - dist / 250, 0.1, 1) * 255
                     {:x, :y} = pos\ToScreen()
-                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x + 1, y + 1, PPM_HINT_COLOR_SECOND, TEXT_ALIGN_CENTER)
-                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x, y, PPM_HINT_COLOR_FIRST, TEXT_ALIGN_CENTER)
+                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x + 1, y + 1, Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER)
+                    draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x, y, Color(0, 0, 0, alpha), TEXT_ALIGN_CENTER)
 
 concommand.Add 'ppm2_cleanup', ->
     for ent in *ents.GetAll()
