@@ -393,7 +393,6 @@ CALC_VIEW_PANEL = {
         origin = LocalPlayer()\GetPos() + @drawPos
         angles = @drawAngle
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
-        @moveAngle = angles
         return newData
 
     PrePlayerDraw: (ply = LocalPlayer()) =>
@@ -470,19 +469,19 @@ CALC_VIEW_PANEL = {
         speedModifier *= 0.5 if @slow
 
         if @forward
-            @drawPos += @moveAngle\Forward() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Forward() * speedModifier * delta * 100
 
         if @backward
-            @drawPos -= @moveAngle\Forward() * speedModifier * delta * 100
+            @drawPos -= @drawAngle\Forward() * speedModifier * delta * 100
 
         if @right
-            @drawPos += @moveAngle\Right() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Right() * speedModifier * delta * 100
 
         if @left
-            @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
+            @drawPos -= @drawAngle\Right() * speedModifier * delta * 100
 
         if @up
-            @drawPos += @moveAngle\Up() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Up() * speedModifier * delta * 100
 
         if @IsActive()
             if not @resizedToScreen
