@@ -804,7 +804,7 @@ class PonyTextureController
                 surface.SetDrawColor(@GrabData('LipsColor'))
             else
                 {:r, :g, :b} = @GrabData('BodyColor')
-                r, g, b = math.max(r - 50, 0), math.max(g - 50, 0), math.max(b - 50, 0)
+                r, g, b = math.max(r - 30, 0), math.max(g - 30, 0), math.max(b - 30, 0)
                 surface.SetDrawColor(r, g, b)
 
             surface.SetMaterial(_M.LIPS)
@@ -814,7 +814,7 @@ class PonyTextureController
                 surface.SetDrawColor(@GrabData('NoseColor'))
             else
                 {:r, :g, :b} = @GrabData('BodyColor')
-                r, g, b = math.max(r - 50, 0), math.max(g - 50, 0), math.max(b - 50, 0)
+                r, g, b = math.max(r - 30, 0), math.max(g - 30, 0), math.max(b - 30, 0)
                 surface.SetDrawColor(r, g, b)
 
             surface.SetMaterial(_M.NOSE)
