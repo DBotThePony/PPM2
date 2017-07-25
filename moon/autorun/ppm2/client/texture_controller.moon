@@ -624,8 +624,8 @@ class PonyTextureController
     @QUAD_SIZE_WING = 128
     @QUAD_SIZE_WING_HIRES = 256
 
-    @QUAD_SIZE_HORN = 128
-    @QUAD_SIZE_HORN_HIRES = 256
+    @QUAD_SIZE_HORN = 256
+    @QUAD_SIZE_HORN_HIRES = 512
 
     @QUAD_SIZE_HAIR = 256
     @QUAD_SIZE_HAIR_HIRES = 512
@@ -912,6 +912,8 @@ class PonyTextureController
 
         continueCompilation() if left == 0
         return @BodyMaterial
+
+    @BUMP_COLOR = Color(127, 127, 255)
     CompileHorn: =>
         return unless @isValid
         textureData = {
@@ -919,6 +921,7 @@ class PonyTextureController
             'shader': 'VertexLitGeneric'
             'data': {
                 '$basetexture': 'models/ppm/base/horn'
+                '$bumpmap': 'models/ppm/base/horn_normal'
                 '$selfillum': '1'
                 '$selfillummask': 'models/ppm/partrender/null'
 
@@ -999,6 +1002,30 @@ class PonyTextureController
             render.PopRenderTarget()
 
             @HornMaterial\SetTexture('$selfillummask', rtIllum)
+
+            rtBump = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rtIllum", texSize, texSize, false)
+            rtBump\Download()
+
+            render.PushRenderTarget(rtBump)
+
+            {:r, :g, :b} = @@BUMP_COLOR
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.DisableClipping(true)
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            alpha = 255
+            alpha = @GrabData('HornDetailColor').a
+            surface.SetDrawColor(255, 255, 255, alpha)
+            surface.SetMaterial(_M.HORN_DETAIL_BUMP)
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            surface.DisableClipping(false)
+            cam.End2D()
+            render.PopRenderTarget()
+
+            @HornMaterial\SetTexture('$bumpmap', rtBump)
 
             PPM2.DebugPrint('Compiled Horn texture for ', @ent, ' as part of ', @)
 

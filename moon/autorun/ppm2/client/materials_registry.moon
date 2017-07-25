@@ -228,6 +228,7 @@ module.TAIL_MATERIAL_COLOR = CreateMaterial('PPM2.TailTextureBase', 'UnlitGeneri
 module.WINGS_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGeneric', debugwhite)
 module.HORN_MATERIAL_COLOR = CreateMaterial('PPM2.HornMaterialBase', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/horn'))
 module.BODY_MATERIAL = CreateMaterial('PPM2.BodyTexture', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/body'))
+module.HORN_DETAIL_BUMP = CreateMaterial('PPM2.HornBumpMapRenderer', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/horn_normal'))
 module.HORN_DETAIL_COLOR = Material('models/ppm/partrender/horn_detail')
 module.EYE_OVAL = Material('models/ppm/partrender/eye_oval')
 module.EYE_GRAD = Material('models/ppm/partrender/eye_grad')
