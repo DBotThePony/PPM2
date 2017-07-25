@@ -1,8 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "models/props_pony/ppm/ppm_socks/custom_textured/flowers11"
-	"$ignorez"  1
-	"$vertexcolor"  1
-	"$vertexalpha"  1
-	"$nolod"  1
-}
