@@ -28,7 +28,6 @@
 -- 10   =   models/ppm/base/cmark
 -- 11   =   models/ppm/base/eyelashes
 
-<<<<<<< HEAD
 _M = PPM2.MaterialsRegistry
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
@@ -68,162 +67,6 @@ hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return f
 hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
-=======
-DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
-
-USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
-USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
-
-PPM2.BodyDetailsMaterials = {
-    Material('models/ppm/partrender/body_leggrad1.png')
-    Material('models/ppm/partrender/body_lines1.png')
-    Material('models/ppm/partrender/body_stripes1.png')
-    Material('models/ppm/partrender/body_headstripes1.png') 
-    Material('models/ppm/partrender/body_freckles.png')
-    Material('models/ppm/partrender/body_hooves1.png')
-    Material('models/ppm/partrender/body_hooves2.png')
-    Material('models/ppm/partrender/body_headmask1.png')
-    Material('models/ppm/partrender/body_hooves1_crit.png')
-    Material('models/ppm/partrender/body_hooves2_crit.png')
-    Material('models/ppm/partrender/body_spots1.png')
-}
-
-PPM2.UpperManeDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/upmane_5_mask0.png')}
-    [5]: {Material('models/ppm/partrender/upmane_6_mask0.png')}
-    [7]: {Material('models/ppm/partrender/upmane_8_mask0.png'), Material('models/ppm/partrender/upmane_8_mask1.png')}
-    [8]: {Material('models/ppm/partrender/upmane_9_mask0.png'), Material('models/ppm/partrender/upmane_9_mask1.png'), Material('models/ppm/partrender/upmane_9_mask2.png')}
-    [9]: {Material('models/ppm/partrender/upmane_10_mask0.png')}
-    [10]: {Material('models/ppm/partrender/upmane_11_mask0.png'), Material('models/ppm/partrender/upmane_11_mask1.png'), Material('models/ppm/partrender/upmane_11_mask2.png')}
-    [11]: {Material('models/ppm/partrender/upmane_12_mask0.png')}
-    [12]: {Material('models/ppm/partrender/upmane_13_mask0.png')}
-    [13]: {Material('models/ppm/partrender/upmane_14_mask0.png')}
-    [14]: {Material('models/ppm/partrender/upmane_15_mask0.png')}
-}
-
-PPM2.DownManeDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/dnmane_5_mask0.png')}
-    [7]: {Material('models/ppm/partrender/dnmane_8_mask0.png'), Material('models/ppm/partrender/dnmane_8_mask1.png')}
-    [8]: {Material('models/ppm/partrender/dnmane_9_mask0.png'), Material('models/ppm/partrender/dnmane_9_mask1.png')}
-    [9]: {Material('models/ppm/partrender/dnmane_10_mask0.png'), Material('models/ppm/partrender/dnmane_10_mask1.png'), Material('models/ppm/partrender/dnmane_10_mask2.png')}
-    [10]: {Material('models/ppm/partrender/dnmane_11_mask0.png'), Material('models/ppm/partrender/dnmane_11_mask1.png')}
-    [11]: {Material('models/ppm/partrender/dnmane_12_mask0.png')}
-}
-
-PPM2.TailDetailsMaterials = {
-    [4]: {Material('models/ppm/partrender/tail_5_mask0.png')}
-    [7]: {Material('models/ppm/partrender/tail_8_mask0.png'), Material('models/ppm/partrender/tail_8_mask1.png'), Material('models/ppm/partrender/tail_8_mask2.png'), Material('models/ppm/partrender/tail_8_mask3.png'), Material('models/ppm/partrender/tail_8_mask4.png')}
-    [9]: {Material('models/ppm/partrender/tail_10_mask0.png')}
-    [10]: {Material('models/ppm/partrender/tail_11_mask0.png'), Material('models/ppm/partrender/tail_11_mask1.png'), Material('models/ppm/partrender/tail_11_mask2.png')}
-    [11]: {Material('models/ppm/partrender/tail_12_mask0.png'), Material('models/ppm/partrender/tail_12_mask1.png')}
-    [12]: {Material('models/ppm/partrender/tail_13_mask0.png')}
-    [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
-}
-
-PPM2.SocksMaterials = {
-    'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
-    'models/props_pony/ppm/ppm_socks/custom/geometric1_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric2_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric3_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric4_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric5_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
-    'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
-    'models/props_pony/ppm/ppm_socks/custom_textured/dark1'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers10'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers11'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers12'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers13'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers14'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers15'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers16'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers17'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers18'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers19'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers2'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers20'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers3'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers4'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers5'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers6'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers7'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers8'
-    'models/props_pony/ppm/ppm_socks/custom_textured/flowers9'
-    'models/props_pony/ppm/ppm_socks/custom_textured/grey1'
-    'models/props_pony/ppm/ppm_socks/custom_textured/grey2'
-    'models/props_pony/ppm/ppm_socks/custom_textured/grey3'
-    'models/props_pony/ppm/ppm_socks/custom_textured/hearts1'
-    'models/props_pony/ppm/ppm_socks/custom_textured/hearts2'
-    'models/props_pony/ppm/ppm_socks/custom_textured/snow1'
-    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper1'
-    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper2'
-    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper3'
-}
-
-PPM2.SocksMaterialsComp = [Material(id) for id in *PPM2.SocksMaterials]
-
-PPM2.SocksDetails = {
-    [2]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_4.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_5.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_6.png'
-    }
-
-    [3]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric2_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric2_4.png'
-    }
-
-    [4]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_5.png'
-    }
-
-    [5]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_4.png'
-    }
-
-    [6]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_4.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_5.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_6.png'
-    }
-
-    [7]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_4.png'
-    }
-
-    [8]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric7_3.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric7_4.png'
-    }
-
-    [9]: {
-        'models/props_pony/ppm/ppm_socks/custom/geometric8_2.png'
-        'models/props_pony/ppm/ppm_socks/custom/geometric8_3.png'
-    }
-}
-
-PPM2.SocksDetailsComp = {i, [Material(mat) for mat in *data] for i, data in pairs PPM2.SocksDetails}
-
-PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
-
-PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
-PPM2.ApplyMaterialData = (mat, matData) ->
-    for k, v in pairs matData
-        switch type(v)
-            when 'string'
-                mat\SetString(k, v)
-            when 'number'
-                mat\SetInt(k, v) if math.floor(v) == v
-                mat\SetFloat(k, v) if math.floor(v) ~= v
->>>>>>> parent of 5c74db4... Converted partrender to vtf from pngs
 
 class PonyTextureController
     @AVALIABLE_CONTROLLERS = {}
@@ -2020,10 +1863,10 @@ class PonyTextureController
             when 'SeparateWings'
                 @CompileBatWings()
                 @CompileBatWingsSkin()
-            
+
             when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
                 @CompileBatWings()
-            
+
             when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
                 @CompileBatWingsSkin()
 
@@ -2037,7 +1880,7 @@ class PonyTextureController
             'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
             'shader': 'VertexLitGeneric'
             'data': {
-                '$basetexture': 'models/debug/debugwhite' 
+                '$basetexture': 'models/debug/debugwhite'
                 '$model': '1'
                 '$phong': '1'
                 '$basemapalphaphongmask': '1'
@@ -2046,7 +1889,7 @@ class PonyTextureController
                 '$phongalbedotint': '1'
                 '$phongtint': '[1 .95 .95]'
                 '$phongfresnelranges': '[0.5 6 10]'
-                
+
                 '$rimlight': 1
                 '$rimlightexponent': 2
                 '$rimlightboost': 1
@@ -2067,7 +1910,7 @@ class PonyTextureController
         HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
-        
+
         urlTextures = {}
         left = 0
 
@@ -2149,7 +1992,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -2224,7 +2067,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -2300,7 +2143,7 @@ class PonyTextureController
             continue if detailURL == '' or not detailURL\find('^https?://')
             left += 1
             {detailURL, i}
-        
+
         for {url, i} in *validURLS
             @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
                 left -= 1
@@ -2311,7 +2154,7 @@ class PonyTextureController
             continueCompilation()
 
         return @BatWingsSkinMaterial
-        
+
     CompileHair: =>
         return unless @isValid
         return super() if not @GetData()\GetSeparateMane()
@@ -2322,19 +2165,19 @@ class PonyTextureController
         @UpperManeColor1Name, @UpperManeColor2Name = name1, name2
         @LowerManeColor1Name, @LowerManeColor2Name = name3, name4
         return mat1, mat2, mat3, mat4
-    
+
     CompileMouth: =>
         textureData = {
-            '$basetexture': 'models/debug/debugwhite' 
+            '$basetexture': 'models/debug/debugwhite'
             '$phong': '1'
             '$phongexponent': '20'
-            '$phongboost': '.1'	
+            '$phongboost': '.1'
             '$phongfresnelranges': '[.3 1 8]'
             '$halflambert': '0'
             '$basemapalphaphongmask': '1'
 
             '$rimlight': '1'
-            '$rimlightexponent': '4'	
+            '$rimlightexponent': '4'
             '$rimlightboost': '2'
             '$color': '[1 1 1]'
             '$color2': '[1 1 1]'
@@ -2363,13 +2206,13 @@ class PonyTextureController
         PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
 
         return @TeethMaterial, @MouthMaterial, @TongueMaterial
-    
+
     CompileTextures: =>
         super()
         @CompileMouth()
         @CompileBatWingsSkin()
         @CompileBatWings()
-    
+
     GetTeeth: => @TeethMaterial
     GetMouth: => @MouthMaterial
     GetTongue: => @TongueMaterial
@@ -2381,7 +2224,7 @@ class PonyTextureController
     GetTeethName: => @TeethMaterialName
     GetMouthName: => @MouthMaterialName
     GetTongueName: => @TongueMaterialName
-    
+
     GetUpperHair: (index = 1) =>
         if index == 2
             return @UpperManeColor2
@@ -2392,7 +2235,7 @@ class PonyTextureController
             return @LowerManeColor2
         else
             return @LowerManeColor1
-    
+
     GetUpperHairName: (index = 1) =>
         if index == 2
             return @UpperManeColor2Name
@@ -2414,7 +2257,7 @@ class PonyTextureController
         else
             entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
             entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
-    
+
     UpdateLowerMane: (ent = @ent, entMane) =>
         return unless @compiled
         return unless @isValid
