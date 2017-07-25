@@ -45,147 +45,147 @@ CreateMaterial = (name, shader, data) ->
 
 module = {
     BODY_DETAILS: {
-        Material('models/ppm/partrender/body_leggrad1')
-        Material('models/ppm/partrender/body_lines1')
-        Material('models/ppm/partrender/body_stripes1')
-        Material('models/ppm/partrender/body_headstripes1')
-        Material('models/ppm/partrender/body_freckles')
-        Material('models/ppm/partrender/body_hooves1')
-        Material('models/ppm/partrender/body_hooves2')
-        Material('models/ppm/partrender/body_headmask1')
-        Material('models/ppm/partrender/body_hooves1_crit')
-        Material('models/ppm/partrender/body_hooves2_crit')
-        Material('models/ppm/partrender/body_spots1')
-        Material('models/ppm/partrender/body_robotic')
-        Material('models/ppm/partrender/dash-e')
-        Material('models/ppm/partrender/eye_scar')
-        Material('models/ppm/partrender/eye_wound')
-        Material('models/ppm/partrender/body_scar')
-        Material('models/ppm/partrender/gear_socks')
-        Material('models/ppm/partrender/sharp_hooves')
-        Material('models/ppm/partrender/sharp_hooves2')
-        Material('models/ppm/partrender/separated_muzzle')
-        Material('models/ppm/partrender/eye_scar_left')
-        Material('models/ppm/partrender/eye_scar_right')
+        Material('models/ppm/partrender/body_leggrad1.png')
+        Material('models/ppm/partrender/body_lines1.png')
+        Material('models/ppm/partrender/body_stripes1.png')
+        Material('models/ppm/partrender/body_headstripes1.png')
+        Material('models/ppm/partrender/body_freckles.png')
+        Material('models/ppm/partrender/body_hooves1.png')
+        Material('models/ppm/partrender/body_hooves2.png')
+        Material('models/ppm/partrender/body_headmask1.png')
+        Material('models/ppm/partrender/body_hooves1_crit.png')
+        Material('models/ppm/partrender/body_hooves2_crit.png')
+        Material('models/ppm/partrender/body_spots1.png')
+        Material('models/ppm/partrender/body_robotic.png')
+        Material('models/ppm/partrender/dash-e.png')
+        Material('models/ppm/partrender/eye_scar.png')
+        Material('models/ppm/partrender/eye_wound.png')
+        Material('models/ppm/partrender/body_scar.png')
+        Material('models/ppm/partrender/gear_socks.png')
+        Material('models/ppm/partrender/sharp_hooves.png')
+        Material('models/ppm/partrender/sharp_hooves2.png')
+        Material('models/ppm/partrender/separated_muzzle.png')
+        Material('models/ppm/partrender/eye_scar_left.png')
+        Material('models/ppm/partrender/eye_scar_right.png')
     }
 
     UPPER_MANE_DETAILS: {
-        [4]: {Material('models/ppm/partrender/upmane_5_mask0')}
-        [5]: {Material('models/ppm/partrender/upmane_6_mask0')}
-        [7]: {Material('models/ppm/partrender/upmane_8_mask0'), Material('models/ppm/partrender/upmane_8_mask1')}
-        [8]: {Material('models/ppm/partrender/upmane_9_mask0'), Material('models/ppm/partrender/upmane_9_mask1'), Material('models/ppm/partrender/upmane_9_mask2')}
-        [9]: {Material('models/ppm/partrender/upmane_10_mask0')}
-        [10]: {Material('models/ppm/partrender/upmane_11_mask0'), Material('models/ppm/partrender/upmane_11_mask1'), Material('models/ppm/partrender/upmane_11_mask2')}
-        [11]: {Material('models/ppm/partrender/upmane_12_mask0')}
-        [12]: {Material('models/ppm/partrender/upmane_13_mask0')}
-        [13]: {Material('models/ppm/partrender/upmane_14_mask0')}
-        [14]: {Material('models/ppm/partrender/upmane_15_mask0')}
+        [4]: {Material('models/ppm/partrender/upmane_5_mask0.png')}
+        [5]: {Material('models/ppm/partrender/upmane_6_mask0.png')}
+        [7]: {Material('models/ppm/partrender/upmane_8_mask0.png'), Material('models/ppm/partrender/upmane_8_mask1.png')}
+        [8]: {Material('models/ppm/partrender/upmane_9_mask0.png'), Material('models/ppm/partrender/upmane_9_mask1.png'), Material('models/ppm/partrender/upmane_9_mask2.png')}
+        [9]: {Material('models/ppm/partrender/upmane_10_mask0.png')}
+        [10]: {Material('models/ppm/partrender/upmane_11_mask0.png'), Material('models/ppm/partrender/upmane_11_mask1.png'), Material('models/ppm/partrender/upmane_11_mask2.png')}
+        [11]: {Material('models/ppm/partrender/upmane_12_mask0.png')}
+        [12]: {Material('models/ppm/partrender/upmane_13_mask0.png')}
+        [13]: {Material('models/ppm/partrender/upmane_14_mask0.png')}
+        [14]: {Material('models/ppm/partrender/upmane_15_mask0.png')}
     }
 
     LOWER_MANE_DETAILS: {
-        [4]: {Material('models/ppm/partrender/dnmane_5_mask0')}
-        [7]: {Material('models/ppm/partrender/dnmane_8_mask0'), Material('models/ppm/partrender/dnmane_8_mask1')}
-        [8]: {Material('models/ppm/partrender/dnmane_9_mask0'), Material('models/ppm/partrender/dnmane_9_mask1')}
-        [9]: {Material('models/ppm/partrender/dnmane_10_mask0'), Material('models/ppm/partrender/dnmane_10_mask1'), Material('models/ppm/partrender/dnmane_10_mask2')}
-        [10]: {Material('models/ppm/partrender/dnmane_11_mask0'), Material('models/ppm/partrender/dnmane_11_mask1')}
-        [11]: {Material('models/ppm/partrender/dnmane_12_mask0')}
+        [4]: {Material('models/ppm/partrender/dnmane_5_mask0.png')}
+        [7]: {Material('models/ppm/partrender/dnmane_8_mask0.png'), Material('models/ppm/partrender/dnmane_8_mask1.png')}
+        [8]: {Material('models/ppm/partrender/dnmane_9_mask0.png'), Material('models/ppm/partrender/dnmane_9_mask1.png')}
+        [9]: {Material('models/ppm/partrender/dnmane_10_mask0.png'), Material('models/ppm/partrender/dnmane_10_mask1.png'), Material('models/ppm/partrender/dnmane_10_mask2.png')}
+        [10]: {Material('models/ppm/partrender/dnmane_11_mask0.png'), Material('models/ppm/partrender/dnmane_11_mask1.png')}
+        [11]: {Material('models/ppm/partrender/dnmane_12_mask0.png')}
     }
 
     TAIL_DETAILS: {
-        [4]: {Material('models/ppm/partrender/tail_5_mask0')}
-        [7]: {Material('models/ppm/partrender/tail_8_mask0'), Material('models/ppm/partrender/tail_8_mask1'), Material('models/ppm/partrender/tail_8_mask2'), Material('models/ppm/partrender/tail_8_mask3'), Material('models/ppm/partrender/tail_8_mask4')}
-        [9]: {Material('models/ppm/partrender/tail_10_mask0')}
-        [10]: {Material('models/ppm/partrender/tail_11_mask0'), Material('models/ppm/partrender/tail_11_mask1'), Material('models/ppm/partrender/tail_11_mask2')}
-        [11]: {Material('models/ppm/partrender/tail_12_mask0'), Material('models/ppm/partrender/tail_12_mask1')}
-        [12]: {Material('models/ppm/partrender/tail_13_mask0')}
-        [13]: {Material('models/ppm/partrender/tail_14_mask0')}
+        [4]: {Material('models/ppm/partrender/tail_5_mask0.png')}
+        [7]: {Material('models/ppm/partrender/tail_8_mask0.png'), Material('models/ppm/partrender/tail_8_mask1.png'), Material('models/ppm/partrender/tail_8_mask2.png'), Material('models/ppm/partrender/tail_8_mask3.png'), Material('models/ppm/partrender/tail_8_mask4.png')}
+        [9]: {Material('models/ppm/partrender/tail_10_mask0.png')}
+        [10]: {Material('models/ppm/partrender/tail_11_mask0.png'), Material('models/ppm/partrender/tail_11_mask1.png'), Material('models/ppm/partrender/tail_11_mask2.png')}
+        [11]: {Material('models/ppm/partrender/tail_12_mask0.png'), Material('models/ppm/partrender/tail_12_mask1.png')}
+        [12]: {Material('models/ppm/partrender/tail_13_mask0.png')}
+        [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
     }
 
     SOCKS_PATCHS: {
-        'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
-        'models/props_pony/ppm/ppm_socks/custom/geometric1_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric2_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric3_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric4_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric5_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric6_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric7_1'
-        'models/props_pony/ppm/ppm_socks/custom/geometric8_1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/dark1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers10'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers11'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers12'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers13'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers14'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers15'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers16'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers17'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers18'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers19'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers2'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers20'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers3'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers4'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers5'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers6'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers7'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers8'
-        'models/props_pony/ppm/ppm_socks/custom_textured/flowers9'
-        'models/props_pony/ppm/ppm_socks/custom_textured/grey1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/grey2'
-        'models/props_pony/ppm/ppm_socks/custom_textured/grey3'
-        'models/props_pony/ppm/ppm_socks/custom_textured/hearts1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/hearts2'
-        'models/props_pony/ppm/ppm_socks/custom_textured/snow1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper1'
-        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper2'
-        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper3'
+        'models/props_pony/ppm/ppm_socks/socks_striped_unlit.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/dark1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers10.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers11.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers12.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers13.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers14.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers15.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers16.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers17.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers18.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers19.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers2.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers20.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers3.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers4.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers5.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers6.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers7.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers8.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/flowers9.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/grey1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/grey2.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/grey3.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/hearts1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/hearts2.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/snow1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper1.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper2.png'
+        'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper3.png'
     }
 
     SOCKS_DETAILS_PATCHS: {
         [2]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric1_4'
-            'models/props_pony/ppm/ppm_socks/custom/geometric1_5'
-            'models/props_pony/ppm/ppm_socks/custom/geometric1_6'
+            'models/props_pony/ppm/ppm_socks/custom/geometric1_4.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric1_5.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric1_6.png'
         }
 
         [3]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric2_3'
-            'models/props_pony/ppm/ppm_socks/custom/geometric2_4'
+            'models/props_pony/ppm/ppm_socks/custom/geometric2_3.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric2_4.png'
         }
 
         [4]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric3_2'
-            'models/props_pony/ppm/ppm_socks/custom/geometric3_3'
-            'models/props_pony/ppm/ppm_socks/custom/geometric3_5'
+            'models/props_pony/ppm/ppm_socks/custom/geometric3_2.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric3_3.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric3_5.png'
         }
 
         [5]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric4_2'
-            'models/props_pony/ppm/ppm_socks/custom/geometric4_3'
-            'models/props_pony/ppm/ppm_socks/custom/geometric4_4'
+            'models/props_pony/ppm/ppm_socks/custom/geometric4_2.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric4_3.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric4_4.png'
         }
 
         [6]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric5_4'
-            'models/props_pony/ppm/ppm_socks/custom/geometric5_5'
-            'models/props_pony/ppm/ppm_socks/custom/geometric5_6'
+            'models/props_pony/ppm/ppm_socks/custom/geometric5_4.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric5_5.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric5_6.png'
         }
 
         [7]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric6_2'
-            'models/props_pony/ppm/ppm_socks/custom/geometric6_3'
-            'models/props_pony/ppm/ppm_socks/custom/geometric6_4'
+            'models/props_pony/ppm/ppm_socks/custom/geometric6_2.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric6_3.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric6_4.png'
         }
 
         [8]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric7_3'
-            'models/props_pony/ppm/ppm_socks/custom/geometric7_4'
+            'models/props_pony/ppm/ppm_socks/custom/geometric7_3.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric7_4.png'
         }
 
         [9]: {
-            'models/props_pony/ppm/ppm_socks/custom/geometric8_2'
-            'models/props_pony/ppm/ppm_socks/custom/geometric8_3'
+            'models/props_pony/ppm/ppm_socks/custom/geometric8_2.png'
+            'models/props_pony/ppm/ppm_socks/custom/geometric8_3.png'
         }
     }
 }
@@ -193,7 +193,7 @@ module = {
 module.SOCKS_MATERIALS = [Material(id) for id in *module.SOCKS_PATCHS]
 module.SOCKS_DETAILS = [Material(id) for id in *module.SOCKS_DETAILS_PATCHS]
 module.CUTIEMARKS = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
-module.SUITS = [Material("models/ppm/texclothes/#{mat}") for mat in *{
+module.SUITS = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{
     'clothes_royalguard', 'clothes_sbs_full'
     'clothes_sbs_light', 'clothes_wbs_full'
     'clothes_wbs_light', 'spidermane_light'
@@ -208,7 +208,7 @@ additionTable = (...) ->
         tab[key] = val
     return tab
 
-module.TATTOOS = [Material("models/ppm/partrender/tattoo/#{fil\lower()}") for fil in *PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
+module.TATTOOS = [Material("models/ppm/partrender/tattoo/#{fil\lower()}.png") for fil in *PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
 debugwhite = {
     '$basetexture': 'models/debug/debugwhite'
     '$ignorez': 1
@@ -218,8 +218,8 @@ debugwhite = {
 }
 
 module.EYE_OVALS = {
-    Material('models/ppm/partrender/eye_oval')
-    Material('models/ppm/partrender/eye_oval_aperture')
+    Material('models/ppm/partrender/eye_oval.png')
+    Material('models/ppm/partrender/eye_oval_aperture.png')
 }
 
 module.DEBUGWHITE = CreateMaterial('PPM2.Debugwhite', 'UnlitGeneric', debugwhite)
@@ -229,19 +229,19 @@ module.WINGS_MATERIAL_COLOR = CreateMaterial('PPM2.WingsMaterialBase', 'UnlitGen
 module.HORN_MATERIAL_COLOR = CreateMaterial('PPM2.HornMaterialBase', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/horn'))
 module.BODY_MATERIAL = CreateMaterial('PPM2.BodyTexture', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/body'))
 module.HORN_DETAIL_BUMP = CreateMaterial('PPM2.HornBumpMapRenderer', 'UnlitGeneric', additionTable('$basetexture', 'models/ppm/base/horn_normal'))
-module.HORN_DETAIL_COLOR = Material('models/ppm/partrender/horn_detail')
-module.EYE_OVAL = Material('models/ppm/partrender/eye_oval')
-module.EYE_GRAD = Material('models/ppm/partrender/eye_grad')
-module.EYE_EFFECT = Material('models/ppm/partrender/eye_effect')
-module.EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection')
-module.EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1')
-module.EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1')
-module.EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2')
-module.EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2')
-module.PONY_SOCKS = Material('models/ppm/texclothes/pony_socks')
+module.HORN_DETAIL_COLOR = Material('models/ppm/partrender/horn_detail.png')
+module.EYE_OVAL = Material('models/ppm/partrender/eye_oval.png')
+module.EYE_GRAD = Material('models/ppm/partrender/eye_grad.png')
+module.EYE_EFFECT = Material('models/ppm/partrender/eye_effect.png')
+module.EYE_REFLECTION = Material('models/ppm/partrender/eye_reflection.png')
+module.EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1.png')
+module.EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1.png')
+module.EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2.png')
+module.EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2.png')
+module.PONY_SOCKS = Material('models/ppm/texclothes/pony_socks.png')
 
-module.LIPS = Material('models/ppm/partrender/lips')
-module.NOSE = Material('models/ppm/partrender/nose')
+module.LIPS = Material('models/ppm/partrender/lips.png')
+module.NOSE = Material('models/ppm/partrender/nose.png')
 
 module.EYE_CORNERA = Material('models/ppm/eyes/eye_cornea')
 module.EYE_CORNERA_OVAL = Material('models/ppm/eyes/eye_cornea_oval')
