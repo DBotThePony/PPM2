@@ -1003,7 +1003,7 @@ class PonyTextureController
 
             @HornMaterial\SetTexture('$selfillummask', rtIllum)
 
-            rtBump = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rtIllum", texSize, texSize, false)
+            rtBump = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Horn_rtBump", texSize, texSize, false)
             rtBump\Download()
 
             render.PushRenderTarget(rtBump)
