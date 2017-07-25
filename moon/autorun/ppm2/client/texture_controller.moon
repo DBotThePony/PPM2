@@ -28,6 +28,7 @@
 -- 10   =   models/ppm/base/cmark
 -- 11   =   models/ppm/base/eyelashes
 
+<<<<<<< HEAD
 _M = PPM2.MaterialsRegistry
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
@@ -67,6 +68,162 @@ hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return f
 hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
+=======
+DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
+
+USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ACRHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
+USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ACRHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
+
+PPM2.BodyDetailsMaterials = {
+    Material('models/ppm/partrender/body_leggrad1.png')
+    Material('models/ppm/partrender/body_lines1.png')
+    Material('models/ppm/partrender/body_stripes1.png')
+    Material('models/ppm/partrender/body_headstripes1.png') 
+    Material('models/ppm/partrender/body_freckles.png')
+    Material('models/ppm/partrender/body_hooves1.png')
+    Material('models/ppm/partrender/body_hooves2.png')
+    Material('models/ppm/partrender/body_headmask1.png')
+    Material('models/ppm/partrender/body_hooves1_crit.png')
+    Material('models/ppm/partrender/body_hooves2_crit.png')
+    Material('models/ppm/partrender/body_spots1.png')
+}
+
+PPM2.UpperManeDetailsMaterials = {
+    [4]: {Material('models/ppm/partrender/upmane_5_mask0.png')}
+    [5]: {Material('models/ppm/partrender/upmane_6_mask0.png')}
+    [7]: {Material('models/ppm/partrender/upmane_8_mask0.png'), Material('models/ppm/partrender/upmane_8_mask1.png')}
+    [8]: {Material('models/ppm/partrender/upmane_9_mask0.png'), Material('models/ppm/partrender/upmane_9_mask1.png'), Material('models/ppm/partrender/upmane_9_mask2.png')}
+    [9]: {Material('models/ppm/partrender/upmane_10_mask0.png')}
+    [10]: {Material('models/ppm/partrender/upmane_11_mask0.png'), Material('models/ppm/partrender/upmane_11_mask1.png'), Material('models/ppm/partrender/upmane_11_mask2.png')}
+    [11]: {Material('models/ppm/partrender/upmane_12_mask0.png')}
+    [12]: {Material('models/ppm/partrender/upmane_13_mask0.png')}
+    [13]: {Material('models/ppm/partrender/upmane_14_mask0.png')}
+    [14]: {Material('models/ppm/partrender/upmane_15_mask0.png')}
+}
+
+PPM2.DownManeDetailsMaterials = {
+    [4]: {Material('models/ppm/partrender/dnmane_5_mask0.png')}
+    [7]: {Material('models/ppm/partrender/dnmane_8_mask0.png'), Material('models/ppm/partrender/dnmane_8_mask1.png')}
+    [8]: {Material('models/ppm/partrender/dnmane_9_mask0.png'), Material('models/ppm/partrender/dnmane_9_mask1.png')}
+    [9]: {Material('models/ppm/partrender/dnmane_10_mask0.png'), Material('models/ppm/partrender/dnmane_10_mask1.png'), Material('models/ppm/partrender/dnmane_10_mask2.png')}
+    [10]: {Material('models/ppm/partrender/dnmane_11_mask0.png'), Material('models/ppm/partrender/dnmane_11_mask1.png')}
+    [11]: {Material('models/ppm/partrender/dnmane_12_mask0.png')}
+}
+
+PPM2.TailDetailsMaterials = {
+    [4]: {Material('models/ppm/partrender/tail_5_mask0.png')}
+    [7]: {Material('models/ppm/partrender/tail_8_mask0.png'), Material('models/ppm/partrender/tail_8_mask1.png'), Material('models/ppm/partrender/tail_8_mask2.png'), Material('models/ppm/partrender/tail_8_mask3.png'), Material('models/ppm/partrender/tail_8_mask4.png')}
+    [9]: {Material('models/ppm/partrender/tail_10_mask0.png')}
+    [10]: {Material('models/ppm/partrender/tail_11_mask0.png'), Material('models/ppm/partrender/tail_11_mask1.png'), Material('models/ppm/partrender/tail_11_mask2.png')}
+    [11]: {Material('models/ppm/partrender/tail_12_mask0.png'), Material('models/ppm/partrender/tail_12_mask1.png')}
+    [12]: {Material('models/ppm/partrender/tail_13_mask0.png')}
+    [13]: {Material('models/ppm/partrender/tail_14_mask0.png')}
+}
+
+PPM2.SocksMaterials = {
+    'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
+    'models/props_pony/ppm/ppm_socks/custom/geometric1_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric2_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric3_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric4_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric5_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric6_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric7_1.png'
+    'models/props_pony/ppm/ppm_socks/custom/geometric8_1.png'
+    'models/props_pony/ppm/ppm_socks/custom_textured/dark1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers10'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers11'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers12'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers13'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers14'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers15'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers16'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers17'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers18'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers19'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers20'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers3'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers4'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers5'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers6'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers7'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers8'
+    'models/props_pony/ppm/ppm_socks/custom_textured/flowers9'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/grey3'
+    'models/props_pony/ppm/ppm_socks/custom_textured/hearts1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/hearts2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/snow1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper1'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper2'
+    'models/props_pony/ppm/ppm_socks/custom_textured/wallpaper3'
+}
+
+PPM2.SocksMaterialsComp = [Material(id) for id in *PPM2.SocksMaterials]
+
+PPM2.SocksDetails = {
+    [2]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_5.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric1_6.png'
+    }
+
+    [3]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric2_4.png'
+    }
+
+    [4]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric3_5.png'
+    }
+
+    [5]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric4_4.png'
+    }
+
+    [6]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_4.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_5.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric5_6.png'
+    }
+
+    [7]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric6_4.png'
+    }
+
+    [8]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_3.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric7_4.png'
+    }
+
+    [9]: {
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_2.png'
+        'models/props_pony/ppm/ppm_socks/custom/geometric8_3.png'
+    }
+}
+
+PPM2.SocksDetailsComp = {i, [Material(mat) for mat in *data] for i, data in pairs PPM2.SocksDetails}
+
+PPM2.DefaultCutiemarksMaterials = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
+
+PPM2.AvaliablePonySuitsMaterials = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{'clothes_royalguard', 'clothes_sbs_full', 'clothes_sbs_light', 'clothes_wbs_full', 'clothes_wbs_light'}]
+PPM2.ApplyMaterialData = (mat, matData) ->
+    for k, v in pairs matData
+        switch type(v)
+            when 'string'
+                mat\SetString(k, v)
+            when 'number'
+                mat\SetInt(k, v) if math.floor(v) == v
+                mat\SetFloat(k, v) if math.floor(v) ~= v
+>>>>>>> parent of 5c74db4... Converted partrender to vtf from pngs
 
 class PonyTextureController
     @AVALIABLE_CONTROLLERS = {}
@@ -365,8 +522,6 @@ class PonyTextureController
                 })
 
                 newMat\SetTexture('$basetexture', texture)
-                @URL_MATERIAL_CACHE[data.width] = @URL_MATERIAL_CACHE[data.width] or {}
-                @URL_MATERIAL_CACHE[data.width][data.height] = @URL_MATERIAL_CACHE[data.width][data.height] or {}
                 @URL_MATERIAL_CACHE[data.width][data.height][data.url] = {
                     texture: texture
                     material: newMat
@@ -1848,7 +2003,500 @@ class PonyTextureController
 
                 PPM2.DebugPrint('Compiled cutiemark texture for ', @ent, ' as part of ', @)
 
+<<<<<<< HEAD
         return @CMarkTexture, @CMarkTextureGUI
 
+=======
+    DataChanges: (state) =>
+        return unless @isValid
+        super(state)
+        switch state\GetKey()
+            when 'ManeTypeNew', 'ManeTypeLowerNew', 'TailTypeNew'
+                @CompileHair()
+
+            when 'TeethColor', 'MouthColor', 'TongueColor'
+                @CompileMouth()
+
+            when 'SeparateWings'
+                @CompileBatWings()
+                @CompileBatWingsSkin()
+            
+            when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
+                @CompileBatWings()
+            
+            when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
+                @CompileBatWingsSkin()
+
+    GetManeType: => @GetData()\GetManeTypeNew()
+    GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
+    GetTailType: => @GetData()\GetTailTypeNew()
+
+    CompileHairInternal: (prefix = 'Upper') =>
+        return unless @isValid
+        textureFirst = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite' 
+                '$model': '1'
+                '$phong': '1'
+                '$basemapalphaphongmask': '1'
+                '$phongexponent': '6'
+                '$phongboost': '0.05'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                
+                '$rimlight': 1
+                '$rimlightexponent': 2
+                '$rimlightboost': 1
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
+
+        textureSecond = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2_#{prefix}"
+            'shader': 'VertexLitGeneric'
+            'data': {k, v for k, v in pairs textureFirst.data}
+        }
+
+        HairColor1MaterialName = "!#{textureFirst.name\lower()}"
+        HairColor2MaterialName = "!#{textureSecond.name\lower()}"
+        HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
+        HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
+
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
+        
+        urlTextures = {}
+        left = 0
+
+        continueCompilation = ->
+            return unless @isValid
+            oldW, oldH = ScrW(), ScrH()
+
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", texSize, texSize, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, texSize, texSize)
+
+            -- First mane pass
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            maneTypeUpper = @GetManeType()
+            if @@UPPER_MANE_MATERIALS[maneTypeUpper]
+                i = 1
+                for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+                    continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
+                    i += 1
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            HairColor1Material\SetTexture('$basetexture', rt)
+
+            -- Second mane pass
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", texSize, texSize, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, texSize, texSize)
+
+            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            maneTypeLower = @GetManeTypeLower()
+            if @@LOWER_MANE_MATERIALS[maneTypeLower]
+                i = 1
+                for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+                    continue if type(mat) == 'number'
+                    {:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+                    surface.SetDrawColor(r, g, b, a)
+                    surface.SetMaterial(mat)
+                    surface.DrawTexturedRect(0, 0, texSize, texSize)
+                    i += 1
+
+            for i, mat in pairs urlTextures
+                surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+            HairColor2Material\SetTexture('$basetexture', rt)
+
+            PPM2.DebugPrint('Compiled mane textures for ', @ent, ' as part of ', @)
+
+        data = @GetData()
+        validURLS = for i = 1, 6
+            detailURL = data["Get#{prefix}ManeURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+        return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
+
+    CompileBatWings: =>
+        return unless @isValid
+        textureData = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWings"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite'
+
+                '$model': '1'
+                '$phong': '1'
+                '$phongexponent': '0.1'
+                '$phongboost': '0.1'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                '$alpha': '1'
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
+
+        urlTextures = {}
+        left = 0
+        @BatWingsMaterialName = "!#{textureData.name\lower()}"
+        @BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
+
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
+
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", texSize, texSize, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetBatWingColor() if @GetData()\GetSeparateWings()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            @BatWingsMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            PPM2.DebugPrint('Compiled Bat Wings texture for ', @ent, ' as part of ', @)
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetBatWingURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+
+        return @BatWingsMaterial
+
+    CompileBatWingsSkin: =>
+        return unless @isValid
+        textureData = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWingsSkin"
+            'shader': 'VertexLitGeneric'
+            'data': {
+                '$basetexture': 'models/debug/debugwhite'
+
+                '$model': '1'
+                '$phong': '1'
+                '$phongexponent': '0.1'
+                '$phongboost': '0.1'
+                '$phongalbedotint': '1'
+                '$phongtint': '[1 .95 .95]'
+                '$phongfresnelranges': '[0.5 6 10]'
+                '$alpha': '1'
+                '$color': '[1 1 1]'
+                '$color2': '[1 1 1]'
+            }
+        }
+
+        urlTextures = {}
+        left = 0
+        @BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
+        @BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+        texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
+
+        continueCompilation = ->
+            oldW, oldH = ScrW(), ScrH()
+
+            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", texSize, texSize, false)
+            rt\Download()
+            render.PushRenderTarget(rt)
+            render.SetViewPort(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GetData()\GetBodyColor()
+            {:r, :g, :b} = @GetData()\GetBatWingSkinColor() if @GetData()\GetSeparateWings()
+            render.Clear(r, g, b, 255, true, true)
+            cam.Start2D()
+            surface.SetDrawColor(r, g, b)
+            surface.DrawRect(0, 0, texSize, texSize)
+
+            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
+            surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            for i, mat in pairs urlTextures
+                {:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
+                surface.SetDrawColor(r, g, b, a)
+                surface.SetMaterial(mat)
+                surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+            @BatWingsSkinMaterial\SetTexture('$basetexture', rt)
+
+            cam.End2D()
+            render.SetViewPort(0, 0, oldW, oldH)
+            render.PopRenderTarget()
+
+            PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @ent, ' as part of ', @)
+
+        data = @GetData()
+        validURLS = for i = 1, 3
+            detailURL = data["GetBatWingSkinURL#{i}"](data)
+            continue if detailURL == '' or not detailURL\find('^https?://')
+            left += 1
+            {detailURL, i}
+        
+        for {url, i} in *validURLS
+            @@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+                left -= 1
+                urlTextures[i] = mat
+                if left == 0
+                    continueCompilation()
+        if left == 0
+            continueCompilation()
+
+        return @BatWingsSkinMaterial
+        
+    CompileHair: =>
+        return unless @isValid
+        return super() if not @GetData()\GetSeparateMane()
+        mat1, mat2, name1, name2 = @CompileHairInternal('Upper')
+        mat3, mat4, name3, name4 = @CompileHairInternal('Lower')
+        @UpperManeColor1, @UpperManeColor2 = mat1, mat2
+        @LowerManeColor1, @LowerManeColor2 = mat3, mat4
+        @UpperManeColor1Name, @UpperManeColor2Name = name1, name2
+        @LowerManeColor1Name, @LowerManeColor2Name = name3, name4
+        return mat1, mat2, mat3, mat4
+    
+    CompileMouth: =>
+        textureData = {
+            '$basetexture': 'models/debug/debugwhite' 
+            '$phong': '1'
+            '$phongexponent': '20'
+            '$phongboost': '.1'	
+            '$phongfresnelranges': '[.3 1 8]'
+            '$halflambert': '0'
+            '$basemapalphaphongmask': '1'
+
+            '$rimlight': '1'
+            '$rimlightexponent': '4'	
+            '$rimlightboost': '2'
+            '$color': '[1 1 1]'
+            '$color2': '[1 1 1]'
+
+            '$ambientocclusion': '1'
+        }
+
+        {:r, :g, :b} = @GetData()\GetTeethColor()
+        @TeethMaterialName = "!ppm2_#{@GetID()}_teeth"
+        @TeethMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Teeth", 'VertexLitGeneric', textureData)
+        @TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+        @TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+        {:r, :g, :b} = @GetData()\GetMouthColor()
+        @MouthMaterialName = "!ppm2_#{@GetID()}_mouth"
+        @MouthMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Mouth", 'VertexLitGeneric', textureData)
+        @MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+        @MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+        {:r, :g, :b} = @GetData()\GetTongueColor()
+        @TongueMaterialName = "!ppm2_#{@GetID()}_tongue"
+        @TongueMaterial = CreateMaterial("PPM2_#{@@SessionID}_#{@GetID()}_Tongue", 'VertexLitGeneric', textureData)
+        @TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+        @TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+        PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
+
+        return @TeethMaterial, @MouthMaterial, @TongueMaterial
+    
+    CompileTextures: =>
+        super()
+        @CompileMouth()
+        @CompileBatWingsSkin()
+        @CompileBatWings()
+    
+    GetTeeth: => @TeethMaterial
+    GetMouth: => @MouthMaterial
+    GetTongue: => @TongueMaterial
+    GetBatWings: => @BatWingsMaterial
+    GetBatWingsSkin: => @BatWingsSkinMaterial
+
+    GetBatWingsName: => @BatWingsMaterialName
+    GetBatWingsSkinName: => @BatWingsSkinMaterialName
+    GetTeethName: => @TeethMaterialName
+    GetMouthName: => @MouthMaterialName
+    GetTongueName: => @TongueMaterialName
+    
+    GetUpperHair: (index = 1) =>
+        if index == 2
+            return @UpperManeColor2
+        else
+            return @UpperManeColor1
+    GetLowerHair: (index = 1) =>
+        if index == 2
+            return @LowerManeColor2
+        else
+            return @LowerManeColor1
+    
+    GetUpperHairName: (index = 1) =>
+        if index == 2
+            return @UpperManeColor2Name
+        else
+            return @UpperManeColor1Name
+    GetLowerHairName: (index = 1) =>
+        if index == 2
+            return @LowerManeColor2Name
+        else
+            return @LowerManeColor1Name
+
+    UpdateUpperMane: (ent = @ent, entMane) =>
+        return unless @isValid
+        return unless @compiled
+
+        if not @GetData()\GetSeparateMane()
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
+        else
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
+    
+    UpdateLowerMane: (ent = @ent, entMane) =>
+        return unless @compiled
+        return unless @isValid
+
+        if not @GetData()\GetSeparateMane()
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
+        else
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHairName(1))
+            entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
+
+    UpdateTail: (ent = @ent, entTail) =>
+        return unless @compiled
+        return unless @isValid
+        entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
+        entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
+
+    PreDraw: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
+            @lastMaterialUpdateEnt = ent
+            @lastMaterialUpdate = RealTime() + 1
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
+            ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT, @GetEyeName(false))
+            ent\SetSubMaterial(@@MAT_INDEX_TONGUE, @GetTongueName())
+            ent\SetSubMaterial(@@MAT_INDEX_TEETH, @GetTeethName())
+            ent\SetSubMaterial(@@MAT_INDEX_MOUTH, @GetMouthName())
+            ent\SetSubMaterial(@@MAT_INDEX_BODY, @GetBodyName())
+            ent\SetSubMaterial(@@MAT_INDEX_HORN, @GetHornName())
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
+            ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
+            ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
+            ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
+        if PPM2.ALTERNATIVE_RENDER\GetBool()
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH, @GetTeeth())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH, @GetMouth())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT, @GetBatWings())
+            render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
+    PostDraw: (ent = @ent) =>
+        return unless @compiled
+        return unless @isValid
+        return if not PPM2.ALTERNATIVE_RENDER\GetBool()
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_TEETH)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_MOUTH)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT)
+        render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN)
+    ResetTextures: (ent = @ent) =>
+        return if not IsValid(ent)
+        @lastMaterialUpdateEnt = NULL
+        @lastMaterialUpdate = 0
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT)
+        ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT)
+        ent\SetSubMaterial(@@MAT_INDEX_TONGUE)
+        ent\SetSubMaterial(@@MAT_INDEX_TEETH)
+        ent\SetSubMaterial(@@MAT_INDEX_MOUTH)
+        ent\SetSubMaterial(@@MAT_INDEX_BODY)
+        ent\SetSubMaterial(@@MAT_INDEX_HORN)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS)
+        ent\SetSubMaterial(@@MAT_INDEX_CMARK)
+        ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT)
+        ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN)
+
+PPM2.NewPonyTextureController = NewPonyTextureController
+>>>>>>> parent of 5c74db4... Converted partrender to vtf from pngs
 PPM2.PonyTextureController = PonyTextureController
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController
