@@ -190,16 +190,6 @@ module = {
     }
 }
 
-module.SOCKS_MATERIALS = [Material(id) for id in *module.SOCKS_PATCHS]
-module.SOCKS_DETAILS = [Material(id) for id in *module.SOCKS_DETAILS_PATCHS]
-module.CUTIEMARKS = [CreateMaterial("PPM2_CMarkDraw_#{mark}", 'UnlitGeneric', {'$basetexture': "models/ppm/cmarks/#{mark}", '$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}) for mark in *PPM2.DefaultCutiemarks]
-module.SUITS = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{
-    'clothes_royalguard', 'clothes_sbs_full'
-    'clothes_sbs_light', 'clothes_wbs_full'
-    'clothes_wbs_light', 'spidermane_light'
-    'spidermane_full'
-}]
-
 additionTable = (...) ->
     tab = {'$ignorez': 1, '$vertexcolor': 1, '$vertexalpha': 1, '$nolod': 1}
     args = {...}
@@ -207,6 +197,16 @@ additionTable = (...) ->
         key, val = args[i], args[i + 1]
         tab[key] = val
     return tab
+
+module.SOCKS_MATERIALS = [Material(id) for id in *module.SOCKS_PATCHS]
+module.SOCKS_DETAILS = [Material(id) for id in *module.SOCKS_DETAILS_PATCHS]
+module.CUTIEMARKS = [Material("models/ppm/cmarks/#{mark}.png") for mark in *PPM2.DefaultCutiemarks]
+module.SUITS = [Material("models/ppm/texclothes/#{mat}.png") for mat in *{
+    'clothes_royalguard', 'clothes_sbs_full'
+    'clothes_sbs_light', 'clothes_wbs_full'
+    'clothes_wbs_light', 'spidermane_light'
+    'spidermane_full'
+}]
 
 module.TATTOOS = [Material("models/ppm/partrender/tattoo/#{fil\lower()}.png") for fil in *PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
 debugwhite = {
