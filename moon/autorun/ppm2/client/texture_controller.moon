@@ -220,6 +220,7 @@ class PonyTextureController
             return if not IsValid(@ent)
             for data in *@delayCompilation
                 @[data.func](@, unpack(data.args))
+            @lastMaterialUpdate = 0
             @delayCompilation = {}
 
     DataChanges: (state) =>
