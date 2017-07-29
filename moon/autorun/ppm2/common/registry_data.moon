@@ -578,6 +578,12 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         type: 'COLOR'
     }
 
+    PPM2.PonyDataRegistry["eye_irisline_direction#{internal}"] = {
+        default: -> false
+        getFunc: "EyeLineDirection#{publicName}"
+        type: 'BOOLEAN'
+    }
+
     PPM2.PonyDataRegistry["eye_irisline2#{internal}"] = {
         default: -> Color(255, 255, 255)
         getFunc: "EyeIrisLine2#{publicName}"

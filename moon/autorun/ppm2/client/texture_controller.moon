@@ -159,6 +159,7 @@ class PonyTextureController
         @EYE_UPDATE_TRIGGER["PonySize"] = true
         @EYE_UPDATE_TRIGGER["EyeRefract#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["EyeCornerA#{publicName}"] = true
+        @EYE_UPDATE_TRIGGER["EyeLineDirection#{publicName}"] = true
         @EYE_UPDATE_TRIGGER["LEyeLightwarp"] = true
         @EYE_UPDATE_TRIGGER["REyeLightwarp"] = true
         @EYE_UPDATE_TRIGGER["LEyeLightwarpURL"] = true
@@ -1589,6 +1590,7 @@ class PonyTextureController
         return unless @isValid
         prefix = left and 'l' or 'r'
         prefixUpper = left and 'L' or 'R'
+        prefixUpperR = left and 'R' or 'L'
 
         separated = @GrabData('SeparateEyes')
         prefixData = ''
@@ -1618,6 +1620,7 @@ class PonyTextureController
         HoleShiftX =        @GrabData("HoleShiftX#{prefixData}")
         HoleShiftY =        @GrabData("HoleShiftY#{prefixData}")
         EyeRotation =       @GrabData("EyeRotation#{prefixData}")
+        EyeLineDirection =  @GrabData("EyeLineDirection#{prefixData}")
         PonySize =          @GrabData('PonySize')
         PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
 
@@ -1729,12 +1732,14 @@ class PonyTextureController
             DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             if EyeLines
+                lprefix = prefixUpper
+                lprefix = prefixUpperR if not EyeLineDirection
                 surface.SetDrawColor(EyeIrisLine1)
-                surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_1"])
+                surface.SetMaterial(@@["EYE_LINE_#{lprefix}_1"])
                 DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
                 surface.SetDrawColor(EyeIrisLine2)
-                surface.SetMaterial(@@["EYE_LINE_#{prefixUpper}_2"])
+                surface.SetMaterial(@@["EYE_LINE_#{lprefix}_2"])
                 DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
             surface.SetDrawColor(EyeHole)

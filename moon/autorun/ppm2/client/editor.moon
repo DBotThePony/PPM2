@@ -1161,6 +1161,7 @@ EditorPages = {
                 @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
 
                 if ADVANCED_MODE\GetBool()
+                    @CheckBox("#{prefix}Eye lines points inside", "EyeLineDirection#{publicName}")
                     @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
                     @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
 
