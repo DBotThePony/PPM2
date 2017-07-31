@@ -141,19 +141,8 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
         continueCompilation = ->
             return unless @isValid
-            oldW, oldH = ScrW(), ScrH()
-
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_1_#{prefix}", texSize, texSize, false)
-            rt\Download()
-            render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, texSize, texSize)
-
-            -- First mane pass
-            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor1"](@GetData())
-            render.Clear(r, g, b, 255, true, true)
-            cam.Start2D()
-            surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
+            @StartRT("Mane_rt_1_#{prefix}", texSize, r, g, b)
 
             maneTypeUpper = @GetManeType()
             if @@UPPER_MANE_MATERIALS[maneTypeUpper]
@@ -171,22 +160,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            cam.End2D()
-            render.SetViewPort(0, 0, oldW, oldH)
-            render.PopRenderTarget()
-            HairColor1Material\SetTexture('$basetexture', rt)
+            HairColor1Material\SetTexture('$basetexture', @EndRT())
 
             -- Second mane pass
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_Mane_rt_2_#{prefix}", texSize, texSize, false)
-            rt\Download()
-            render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, texSize, texSize)
-
-            {:r, :g, :b} = @GetData()["Get#{prefix}ManeColor2"](@GetData())
-            render.Clear(r, g, b, 255, true, true)
-            cam.Start2D()
-            surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
+            @StartRT("Mane_rt_2_#{prefix}", texSize, r, g, b)
 
             maneTypeLower = @GetManeTypeLower()
             if @@LOWER_MANE_MATERIALS[maneTypeLower]
@@ -204,11 +182,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            cam.End2D()
-            render.SetViewPort(0, 0, oldW, oldH)
-            render.PopRenderTarget()
-            HairColor2Material\SetTexture('$basetexture', rt)
-
+            HairColor2Material\SetTexture('$basetexture', @EndRT())
             PPM2.DebugPrint('Compiled mane textures for ', @ent, ' as part of ', @)
 
         data = @GetData()
@@ -277,21 +251,9 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->
-            oldW, oldH = ScrW(), ScrH()
-
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWings_rt", texSize, texSize, false)
-            rt\Download()
-            render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, texSize, texSize)
-            {:r, :g, :b} = @GetData()\GetBodyColor()
-            {:r, :g, :b} = @GetData()\GetBatWingColor() if @GetData()\GetSeparateWings()
-            render.Clear(r, g, b, 255, true, true)
-            cam.Start2D()
-            surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, texSize, texSize)
-
-            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GrabData('BodyColor')
+            {:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
+            @StartRT('BatWings_rt', texSize, r, g, b)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
@@ -299,12 +261,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            @BatWingsMaterial\SetTexture('$basetexture', rt)
-
-            cam.End2D()
-            render.SetViewPort(0, 0, oldW, oldH)
-            render.PopRenderTarget()
-
+            @BatWingsMaterial\SetTexture('$basetexture', @EndRT())
             PPM2.DebugPrint('Compiled Bat Wings texture for ', @ent, ' as part of ', @)
 
         data = @GetData()
@@ -356,21 +313,9 @@ class NewPonyTextureController extends PPM2.PonyTextureController
         texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
 
         continueCompilation = ->
-            oldW, oldH = ScrW(), ScrH()
-
-            rt = GetRenderTarget("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_BatWingsSkin_rt", texSize, texSize, false)
-            rt\Download()
-            render.PushRenderTarget(rt)
-            render.SetViewPort(0, 0, texSize, texSize)
-            {:r, :g, :b} = @GetData()\GetBodyColor()
-            {:r, :g, :b} = @GetData()\GetBatWingSkinColor() if @GetData()\GetSeparateWings()
-            render.Clear(r, g, b, 255, true, true)
-            cam.Start2D()
-            surface.SetDrawColor(r, g, b)
-            surface.DrawRect(0, 0, texSize, texSize)
-
-            surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
-            surface.DrawTexturedRect(0, 0, texSize, texSize)
+            {:r, :g, :b} = @GrabData('BodyColor')
+            {:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
+            @StartRT('BatWingsSkin_rt', texSize, r, g, b)
 
             for i, mat in pairs urlTextures
                 {:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
@@ -378,12 +323,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
                 surface.SetMaterial(mat)
                 surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-            @BatWingsSkinMaterial\SetTexture('$basetexture', rt)
-
-            cam.End2D()
-            render.SetViewPort(0, 0, oldW, oldH)
-            render.PopRenderTarget()
-
+            @BatWingsSkinMaterial\SetTexture('$basetexture', @EndRT())
             PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @ent, ' as part of ', @)
 
         data = @GetData()
