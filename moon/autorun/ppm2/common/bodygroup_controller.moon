@@ -104,19 +104,8 @@ class DefaultBodygroupController
         @controller = controller
         @objID = @@NEXT_OBJ_ID
         @@NEXT_OBJ_ID += 1
-        @SocksModelUpdateCooldown = 0
-        @SocksModelUpdateCount = 0
         @lastPAC3BoneReset = 0
         PPM2.DebugPrint('Created new bodygroups controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
-
-    UpdateCooldowns: =>
-        if CLIENT
-            @SocksModelUpdateCooldown = 0
-            @SocksModelUpdateCount = 0
-        rTime = RealTime()
-        if @SocksModelUpdateCooldown < rTime
-            @SocksModelUpdateCooldown = rTime + @@COOLDOWN_TIME
-            @SocksModelUpdateCount = 0
 
     __tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
     IsValid: => @isValid
@@ -130,10 +119,7 @@ class DefaultBodygroupController
     @ATTACHMENT_EYES_NAME = 'eyes'
 
     CreateSocksModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        return NULL unless @ent\IsPony()
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         return @socksModel if IsValid(@socksModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
@@ -142,46 +128,24 @@ class DefaultBodygroupController
                 PPM2.DebugPrint('Resuing ', @socksModel, ' as socks model for ', @ent)
                 return ent
 
-        @UpdateCooldowns()
-        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @SocksModelUpdateCount += 1
-
-        model = 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
-
-        @socksModel = ents.Create('prop_dynamic') if SERVER
-        @socksModel = ClientsideModel(model) if CLIENT
-        with @socksModel
+        with @socksModel = ClientsideModel('models/props_pony/ppm/cosmetics/ppm_socks.mdl')
             .isPonyPropModel = true
             .isSocks = true
             .manePlayer = @ent
-            \DrawShadow(true) if CLIENT
-            \SetModel(model)
+            \DrawShadow(true)
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
-            \SetNoDraw(true) if CLIENT
+            \SetNoDraw(true)
             \SetParent(@ent\GetEntity())
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
 
         PPM2.DebugPrint('Creating new socks model for ', @ent, ' as ', @socksModel)
-
-        if SERVER
-            timer.Simple .5, ->
-                return unless @isValid
-                return unless IsValid(@socksModel)
-                @GetData()\SetSocksModel(@socksModel)
-                @ent\SetNWEntity('PPM2.SocksModel', @socksModel) if IsValid(@ent)
-        else
-            @GetData()\SetSocksModel(@socksModel)
-
+        @GetData()\SetSocksModel(@socksModel)
         return @socksModel
 
     CreateNewSocksModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        return NULL unless @ent\IsPony()
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         return @newSocksModel if IsValid(@newSocksModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isNewSocks and ent.manePlayer == @ent
@@ -190,74 +154,46 @@ class DefaultBodygroupController
                 PPM2.DebugPrint('Resuing ', @newSocksModel, ' as socks model for ', @ent)
                 return ent
 
-        @UpdateCooldowns()
-        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @SocksModelUpdateCount += 1
-
-        model = 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
-
-        @newSocksModel = ents.Create('prop_dynamic') if SERVER
-        @newSocksModel = ClientsideModel(model) if CLIENT
-        with @newSocksModel
+        with @newSocksModel = ClientsideModel('models/props_pony/ppm/cosmetics/ppm2_socks.mdl')
             .isPonyPropModel = true
             .isNewSocks = true
             .manePlayer = @ent
-            \DrawShadow(true) if CLIENT
-            \SetModel(model)
+            \DrawShadow(true)
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
-            \SetNoDraw(true) if CLIENT
+            \SetNoDraw(true)
             \SetParent(@ent\GetEntity())
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
 
         PPM2.DebugPrint('Creating new socks model for ', @ent, ' as ', @newSocksModel)
-
-        if SERVER
-            timer.Simple .5, ->
-                return unless @isValid
-                return unless IsValid(@newSocksModel)
-                @GetData()\SetNewSocksModel(@newSocksModel)
-                @ent\SetNWEntity('PPM2.NewSocksModel', @newSocksModel) if IsValid(@ent)
-        else
-            @GetData()\SetNewSocksModel(@newSocksModel)
-
+        @GetData()\SetNewSocksModel(@newSocksModel)
         return @newSocksModel
 
     CreateNewSocksModelIfNotExists: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateNewSocksModel() if not IsValid(@newSocksModel)
         return NULL if not IsValid(@newSocksModel)
         @newSocksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
-        @newSocksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         @GetData()\SetNewSocksModel(@newSocksModel)
         return @newSocksModel
 
     CreateSocksModelIfNotExists: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateSocksModel() if not IsValid(@socksModel)
         return NULL if not IsValid(@socksModel)
         @socksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
-        @socksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         @GetData()\SetSocksModel(@socksModel)
         return @socksModel
 
     MergeModels: (targetEnt = NULL) =>
-        return unless @isValid
-        return unless IsValid(targetEnt)
+        return if SERVER or not @isValid or not IsValid(targetEnt)
         socks = @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
         socks2 = @CreateNewSocksModelIfNotExists() if @GetData()\GetSocksAsNewModel()
         if IsValid(socks)
             socks\SetParent(targetEnt)
-            socks\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
         if IsValid(socks2)
             socks2\SetParent(targetEnt)
-            socks2\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
 
     GetSocks: => @socksModel or NULL
 
@@ -531,38 +467,9 @@ class NewBodygroupController extends DefaultBodygroupController
 
     new: (...) =>
         super(...)
-        @UpperManeModelUpdateCooldown = 0
-        @UpperManeModelUpdateCount = 0
-        @LowerManeModelUpdateCooldown = 0
-        @LowerManeModelUpdateCount = 0
-        @TailModelUpdateCooldown = 0
-        @TailModelUpdateCount = 0
-
-    UpdateCooldowns: =>
-        super()
-        if CLIENT
-            @UpperManeModelUpdateCooldown = 0
-            @UpperManeModelUpdateCount = 0
-            @LowerManeModelUpdateCooldown = 0
-            @LowerManeModelUpdateCount = 0
-            @TailModelUpdateCooldown = 0
-            @TailModelUpdateCount = 0
-        rTime = RealTime()
-        if @UpperManeModelUpdateCooldown < rTime
-            @UpperManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
-            @UpperManeModelUpdateCount = 0
-        if @LowerManeModelUpdateCooldown < rTime
-            @LowerManeModelUpdateCooldown = rTime + @@COOLDOWN_TIME
-            @LowerManeModelUpdateCount = 0
-        if @TailModelUpdateCooldown < rTime
-            @TailModelUpdateCooldown = rTime + @@COOLDOWN_TIME
-            @TailModelUpdateCount = 0
 
     CreateUpperManeModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        return NULL unless @ent\IsPony()
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         return @maneModelUP if IsValid(@maneModelUP)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
@@ -571,22 +478,13 @@ class NewBodygroupController extends DefaultBodygroupController
                 PPM2.DebugPrint('Resuing ', @maneModelUP, ' as upper mane model for ', @ent)
                 return ent
 
-        @UpdateCooldowns()
-        return NULL if @UpperManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @UpperManeModelUpdateCount += 1
-
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
-        model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
-
-        @maneModelUP = ents.Create('prop_dynamic') if SERVER
-        @maneModelUP = ClientsideModel(model) if CLIENT
-        with @maneModelUP
+        with @maneModelUP = ClientsideModel("models/ppm/hair/ppm_manesetupper#{modelID}.mdl")
             .isPonyPropModel = true
             .upperMane = true
             .manePlayer = @ent
             \DrawShadow(true) if CLIENT
-            \SetModel(model)
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
@@ -607,11 +505,9 @@ class NewBodygroupController extends DefaultBodygroupController
             @GetData()\SetUpperManeModel(@maneModelUP)
 
         return @maneModelUP
+
     CreateLowerManeModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        return NULL unless @ent\IsPony()
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         return @maneModelLower if IsValid(@maneModelLower)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
@@ -620,47 +516,27 @@ class NewBodygroupController extends DefaultBodygroupController
                 PPM2.DebugPrint('Resuing ', @maneModelLower, ' as lower mane model for ', @ent)
                 return ent
 
-        @UpdateCooldowns()
-        return NULL if @LowerManeModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @LowerManeModelUpdateCount += 1
-
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
-        model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
-
-        @maneModelLower = ents.Create('prop_dynamic') if SERVER
-        @maneModelLower = ClientsideModel(model) if CLIENT
-        with @maneModelLower
+        with @maneModelLower = ClientsideModel("models/ppm/hair/ppm_manesetlower#{modelID}.mdl")
             .isPonyPropModel = true
             .lowerMane = true
             .manePlayer = @ent
-            \DrawShadow(true) if CLIENT
-            \SetModel(model)
+            \DrawShadow(true)
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
             \SetBodygroup(1, bodygroupID)
-            \SetNoDraw(true) if CLIENT
+            \SetNoDraw(true)
             \SetParent(@ent\GetEntity())
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
 
         PPM2.DebugPrint('Creating new lower mane model for ', @ent, ' as ', @maneModelLower)
-
-        if SERVER
-            timer.Simple .5, ->
-                return unless @isValid
-                return unless IsValid(@maneModelLower)
-                @GetData()\SetLowerManeModel(@maneModelLower)
-        else
-            @GetData()\SetLowerManeModel(@maneModelLower)
-
+        @GetData()\SetLowerManeModel(@maneModelLower)
         return @maneModelLower
+
     CreateTailModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        return NULL unless @ent\IsPony()
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         return @tailModel if IsValid(@tailModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
@@ -669,62 +545,40 @@ class NewBodygroupController extends DefaultBodygroupController
                 PPM2.DebugPrint('Resuing ', @tailModel, ' as tail model for ', @ent)
                 return ent
 
-        @UpdateCooldowns()
-        return NULL if @TailModelUpdateCount > @@COOLDOWN_MAX_COUNT
-        @TailModelUpdateCount += 1
-
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
-        model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
 
-        @tailModel = ents.Create('prop_dynamic') if SERVER
-        @tailModel = ClientsideModel(model) if CLIENT
-        with @tailModel
+        with @tailModel = ClientsideModel("models/ppm/hair/ppm_tailset#{modelID}.mdl")
             .isPonyPropModel = true
             .isTail = true
             .manePlayer = @ent
-            \DrawShadow(true) if CLIENT
-            \SetModel(model)
+            \DrawShadow(true)
             \SetPos(@ent\EyePos())
             \Spawn()
             \Activate()
-            \SetNoDraw(true) if CLIENT
+            \SetNoDraw(true)
             \SetBodygroup(1, bodygroupID)
             \SetParent(@ent\GetEntity())
-            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
             \AddEffects(EF_BONEMERGE)
 
         PPM2.DebugPrint('Creating new tail model for ', @ent, ' as ', @tailModel)
-
-        if SERVER
-            timer.Simple .5, ->
-                return unless @isValid
-                return unless IsValid(@tailModel)
-                @GetData()\SetTailModel(@tailModel)
-                @ent\SetNWEntity('PPM2.TailModel', @tailModel) if IsValid(@ent)
-        else
-            @GetData()\SetTailModel(@tailModel)
-
+        @GetData()\SetTailModel(@tailModel)
         return @tailModel
 
     CreateUpperManeModelIfNotExists: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateUpperManeModel() if not IsValid(@maneModelUP)
         @GetData()\SetUpperManeModel(@maneModelUP) if IsValid(@maneModelUP)
         return @maneModelUP
+
     CreateLowerManeModelIfNotExists: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateLowerManeModel() if not IsValid(@maneModelLower)
         @GetData()\SetLowerManeModel(@maneModelLower) if IsValid(@maneModelLower)
         return @maneModelLower
+
     CreateTailModelIfNotExists: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateTailModel() if not IsValid(@tailModel)
         @GetData()\SetTailModel(@tailModel) if IsValid(@tailModel)
         return @tailModel
@@ -737,60 +591,48 @@ class NewBodygroupController extends DefaultBodygroupController
         return unless @isValid
         super(targetEnt)
         return unless IsValid(targetEnt)
-        maneUpper = @CreateUpperManeModelIfNotExists()
-        maneLower = @CreateLowerManeModelIfNotExists()
-        tail = @CreateTailModelIfNotExists()
-        if IsValid(maneUpper)
-            maneUpper\SetParent(targetEnt)
-            maneUpper\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
-        if IsValid(maneLower)
-            maneLower\SetParent(targetEnt)
-            maneLower\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
-        if IsValid(tail)
-            tail\SetParent(targetEnt)
-            tail\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+        for e in *{@CreateUpperManeModelIfNotExists(), @CreateLowerManeModelIfNotExists(), @CreateTailModelIfNotExists()}
+            e\SetParent(targetEnt) if IsValid(e)
 
     UpdateUpperMane: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateUpperManeModelIfNotExists()
         return NULL if not IsValid(@maneModelUP)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetupper#{modelID}.mdl"
-        @maneModelUP\SetModel(model) if model ~= @maneModelUP\GetModel()
-        @maneModelUP\SetBodygroup(1, bodygroupID) if @maneModelUP\GetBodygroup(1) ~= bodygroupID
-        @maneModelUP\SetParent(@ent\GetEntity()) if @maneModelUP\GetParent() ~= @ent and IsValid(@ent)
+        with @maneModelUP
+            \SetModel(model) if model ~= \GetModel()
+            \SetBodygroup(1, bodygroupID) if \GetBodygroup(1) ~= bodygroupID
+            \SetParent(@ent\GetEntity()) if \GetParent() ~= @ent and IsValid(@ent)
         @GetData()\SetUpperManeModel(@maneModelUP)
         return @maneModelUP
+
     UpdateLowerMane: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateLowerManeModelIfNotExists()
         return NULL if not IsValid(@maneModelLower)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_manesetlower#{modelID}.mdl"
-        @maneModelLower\SetModel(model) if model ~= @maneModelLower\GetModel()
-        @maneModelLower\SetBodygroup(1, bodygroupID) if @maneModelLower\GetBodygroup(1) ~= bodygroupID
-        @maneModelLower\SetParent(@ent\GetEntity()) if IsValid(@ent)
+        with @maneModelLower
+            \SetModel(model) if model ~= \GetModel()
+            \SetBodygroup(1, bodygroupID) if \GetBodygroup(1) ~= bodygroupID
+            \SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetLowerManeModel(@maneModelLower)
         return @maneModelLower
+
     UpdateTailModel: =>
-        return NULL unless @isValid
-        return NULL if not IsValid(@ent)
-        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
         @CreateTailModelIfNotExists()
         return NULL if not IsValid(@tailModel)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
         model = "models/ppm/hair/ppm_tailset#{modelID}.mdl"
-        @tailModel\SetModel(model) if model ~= @tailModel\GetModel()
-        @tailModel\SetBodygroup(1, bodygroupID) if @tailModel\GetBodygroup(1) ~= bodygroupID
-        @tailModel\SetModelScale(@GetData()\GetTailSize())
-        @tailModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
+        with @tailModel
+            \SetModel(model) if model ~= \GetModel()
+            \SetBodygroup(1, bodygroupID) if \GetBodygroup(1) ~= bodygroupID
+            \SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetTailModel(@tailModel)
         return @tailModel
 
@@ -998,11 +840,9 @@ class NewBodygroupController extends DefaultBodygroupController
             when 'ManeTypeLowerNew'
                 @UpdateLowerMane() if CLIENT
             when 'TailSize', 'TailTypeNew'
-                return if SERVER
                 @UpdateTailModel()
                 @UpdateTailSize()
             when 'PonySize'
-                return if SERVER
                 @UpdateTailSize()
             when 'Race'
                 @ApplyRace()
