@@ -53,6 +53,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
     @NetworkVar('LowerManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
     @NetworkVar('TailModel',        rSEnt, wSEnt, StrongEntity(-1), nil, false)
     @NetworkVar('SocksModel',       rSEnt, wSEnt, StrongEntity(-1), nil, false)
+    @NetworkVar('NewSocksModel',    rSEnt, wSEnt, StrongEntity(-1), nil, false)
 
     @NetworkVar('Fly',                  rBool,   wBool,                 false)
     @NetworkVar('DisableTask',          rBool,   wBool,                 false)

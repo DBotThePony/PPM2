@@ -176,6 +176,66 @@ class DefaultBodygroupController
             @GetData()\SetSocksModel(@socksModel)
 
         return @socksModel
+
+    CreateNewSocksModel: =>
+        return NULL unless @isValid
+        return NULL if not IsValid(@ent)
+        return NULL unless @ent\IsPony()
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        return @newSocksModel if IsValid(@newSocksModel)
+        for ent in *ents.GetAll()
+            if ent.isPonyPropModel and ent.isNewSocks and ent.manePlayer == @ent
+                @newSocksModel = ent
+                @GetData()\SetNewSocksModel(@newSocksModel)
+                PPM2.DebugPrint('Resuing ', @newSocksModel, ' as socks model for ', @ent)
+                return ent
+
+        @UpdateCooldowns()
+        return NULL if @SocksModelUpdateCount > @@COOLDOWN_MAX_COUNT
+        @SocksModelUpdateCount += 1
+
+        model = 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
+
+        @newSocksModel = ents.Create('prop_dynamic') if SERVER
+        @newSocksModel = ClientsideModel(model) if CLIENT
+        with @newSocksModel
+            .isPonyPropModel = true
+            .isNewSocks = true
+            .manePlayer = @ent
+            \DrawShadow(true) if CLIENT
+            \SetModel(model)
+            \SetPos(@ent\EyePos())
+            \Spawn()
+            \Activate()
+            \SetNoDraw(true) if CLIENT
+            \SetParent(@ent\GetEntity())
+            \Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+            \AddEffects(EF_BONEMERGE)
+
+        PPM2.DebugPrint('Creating new socks model for ', @ent, ' as ', @newSocksModel)
+
+        if SERVER
+            timer.Simple .5, ->
+                return unless @isValid
+                return unless IsValid(@newSocksModel)
+                @GetData()\SetNewSocksModel(@newSocksModel)
+                @ent\SetNWEntity('PPM2.NewSocksModel', @newSocksModel) if IsValid(@ent)
+        else
+            @GetData()\SetNewSocksModel(@newSocksModel)
+
+        return @newSocksModel
+
+    CreateNewSocksModelIfNotExists: =>
+        return NULL unless @isValid
+        return NULL if not IsValid(@ent)
+        --return NULL if CLIENT and @GetData()\IsGoingToNetwork()
+        @CreateNewSocksModel() if not IsValid(@newSocksModel)
+        return NULL if not IsValid(@newSocksModel)
+        @newSocksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
+        @newSocksModel\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+        @GetData()\SetNewSocksModel(@newSocksModel)
+        return @newSocksModel
+
     CreateSocksModelIfNotExists: =>
         return NULL unless @isValid
         return NULL if not IsValid(@ent)
@@ -191,9 +251,13 @@ class DefaultBodygroupController
         return unless @isValid
         return unless IsValid(targetEnt)
         socks = @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
+        socks2 = @CreateNewSocksModelIfNotExists() if @GetData()\GetSocksAsNewModel()
         if IsValid(socks)
             socks\SetParent(targetEnt)
             socks\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
+        if IsValid(socks2)
+            socks2\SetParent(targetEnt)
+            socks2\Fire('SetParentAttachment', @@ATTACHMENT_EYES_NAME) if SERVER
 
     GetSocks: => @socksModel or NULL
 
@@ -308,7 +372,9 @@ class DefaultBodygroupController
             @UpdateTailSize()
             @UpdateManeSize()
         @ApplyRace()
-        @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
+        if createModels
+            @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
+            @CreateNewSocksModelIfNotExists() if @GetData()\GetSocksAsNewModel()
     ApplyBodygroups: (createModels = CLIENT) =>
         return unless @isValid
         return if not IsValid(@ent)
@@ -345,6 +411,11 @@ class DefaultBodygroupController
                     @CreateSocksModelIfNotExists()
                 else
                     @socksModel\Remove() if IsValid(@socksModel)
+            when 'SocksAsNewModel'
+                if state\GetValue()
+                    @CreateNewSocksModelIfNotExists()
+                else
+                    @newSocksModel\Remove() if IsValid(@newSocksModel)
             when 'Race'
                 @ApplyRace()
 
@@ -839,6 +910,7 @@ class NewBodygroupController extends DefaultBodygroupController
             @UpdateLowerMane()
             @UpdateTailModel()
             @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
+            @CreateNewSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsNewModel()
     RemoveModels: =>
         @maneModelUP\Remove() if IsValid(@maneModelUP)
         @maneModelLower\Remove() if IsValid(@maneModelLower)
@@ -947,6 +1019,11 @@ class NewBodygroupController extends DefaultBodygroupController
                     @CreateSocksModelIfNotExists()
                 else
                     @socksModel\Remove() if IsValid(@socksModel)
+            when 'SocksAsNewModel'
+                if state\GetValue()
+                    @CreateNewSocksModelIfNotExists()
+                else
+                    @newSocksModel\Remove() if IsValid(@newSocksModel)
 
 if CLIENT
     hook.Add 'PPM2_PACResetBones', 'PPM2.Bodygroups', (ent, data) ->

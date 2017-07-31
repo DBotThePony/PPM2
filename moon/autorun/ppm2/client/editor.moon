@@ -979,26 +979,43 @@ EditorPages = {
                 doAddPhongData(@, 'Body')
             @NumSlider('Neck Height', 'NeckSize', 2)
             @NumSlider('Legs Height', 'LegsSize', 2)
+
+            @Hr()
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
 
-            doAddPhongData(@, 'Socks') if ADVANCED_MODE\GetBool()
-            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
-                @CheckBox('Hoof Fluffers', 'HoofFluffers')
-                @NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                doAddPhongData(@, 'Socks')
+                @ComboBox('Socks Texture', 'SocksTexture')
+                @Label('Socks URL texture')
+                @URLInput('SocksTextureURL')
 
-            return if not ADVANCED_MODE\GetBool()
-            @ComboBox('Socks Texture', 'SocksTexture')
-            @Label('Socks URL texture')
-            @URLInput('SocksTextureURL')
+                if IS_USING_NEW(@IsNewEditor())
+                    @Hr()
+                    @CheckBox('Hoof Fluffers', 'HoofFluffers')
+                    @NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+
+                @Hr()
+                @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+
             @Hr()
-            @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
-            @Hr()
-            @CheckBox('Separate wings color from body', 'SeparateWings')
-            @CheckBox('Separate horn color from body', 'SeparateHorn')
-            @ColorBox('Wings color', 'WingsColor')
-            @ColorBox('Horn color', 'HornColor')
+            @CheckBox('Socks (as new model)', 'SocksAsNewModel')
+            @ColorBox('New Socks color 1', 'NewSocksColor1')
+            @ColorBox('New Socks color 2', 'NewSocksColor2')
+            @ColorBox('New Socks color 3', 'NewSocksColor3')
+
+            if ADVANCED_MODE\GetBool()
+                @Label('New Socks URL texture')
+                @URLInput('NewSocksTextureURL')
+
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                @CheckBox('Separate wings color from body', 'SeparateWings')
+                @CheckBox('Separate horn color from body', 'SeparateHorn')
+                @ColorBox('Wings color', 'WingsColor')
+                @ColorBox('Horn color', 'HornColor')
     }
 
     {

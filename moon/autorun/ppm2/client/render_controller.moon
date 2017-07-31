@@ -43,6 +43,8 @@ class PonyRenderController
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
         @socksModel\SetNoDraw(false) if IsValid(@socksModel)
+        @newSocksModel = data\GetNewSocksModel()
+        @newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
         @CreateFlexController() if @ent
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     GetEntity: => @ent
@@ -297,16 +299,20 @@ class PonyRenderController
 
     DrawModels: =>
         @socksModel\DrawModel() if IsValid(@socksModel)
+        @newSocksModel\DrawModel() if IsValid(@newSocksModel)
     HideModels: (status = true) =>
         return if @hideModels == status
         @socksModel\SetNoDraw(status) if IsValid(@socksModel)
+        @newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
         @hideModels = status
 
     PreDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
         with @GetTextureController()
             \PreDraw(ent, drawingNewTask)
-            \UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and (PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask)
+            if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
+                \UpdateSocks(@ent, @socksModel) if IsValid(@socksModel)
+                \UpdateNewSocks(@ent, @newSocksModel) if IsValid(@newSocksModel)
         @flexes\Think(ent) if @flexes
     PostDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
@@ -339,6 +345,10 @@ class PonyRenderController
                 @socksModel = @GetData()\GetSocksModel()
                 @socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
                 @GetTextureController()\UpdateSocks(@ent, @socksModel) if @GetTextureController() and IsValid(@socksModel)
+            when 'NewSocksModel'
+                @newSocksModel = @GetData()\GetNewSocksModel()
+                @newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
+                @GetTextureController()\UpdateNewSocks(@ent, @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
             when 'NoFlex'
                 if state\GetValue()
                     @flexes\ResetSequences() if @flexes

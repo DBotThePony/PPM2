@@ -239,6 +239,8 @@ class PonyTextureController
                 @DelayCompile('CompileCMark')
             when 'SocksColor', 'SocksTextureURL', 'SocksTexture', 'SocksDetailColor1', 'SocksDetailColor2', 'SocksDetailColor3', 'SocksDetailColor4', 'SocksDetailColor5', 'SocksDetailColor6'
                 @DelayCompile('CompileSocks')
+            when 'NewSocksColor1', 'NewSocksColor2', 'NewSocksColor3', 'NewSocksTextureURL'
+                @DelayCompile('CompileNewSocks')
             when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3', 'UseHornDetail', 'HornGlow', 'HornGlowSrength', 'HornDetailColor'
                 @DelayCompile('CompileHorn')
             when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
@@ -455,6 +457,8 @@ class PonyTextureController
     GetBodyName: => @BodyMaterialName
     GetSocks: => @SocksMaterial
     GetSocksName: => @SocksMaterialName
+    GetNewSocks: => @NewSocksColor1, @NewSocksColor2, @NewSocksBase
+    GetNewSocksName: => @NewSocksColor1Name, @NewSocksColor2Name, @NewSocksBaseName
     GetCMark: => @CMarkTexture
     GetCMarkName: => @CMarkTextureName
     GetGUICMark: => @CMarkTextureGUI
@@ -513,6 +517,7 @@ class PonyTextureController
         @CompileWings()
         @CompileCMark()
         @CompileSocks()
+        @CompileNewSocks()
         @CompileEye(false)
         @CompileEye(true)
         @compiled = true
@@ -611,6 +616,13 @@ class PonyTextureController
         return unless @compiled
         return unless @isValid
         socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
+
+    UpdateNewSocks: (ent = @ent, socksEnt) =>
+        return unless @compiled
+        return unless @isValid
+        socksEnt\SetSubMaterial(0, @NewSocksColor2Name)
+        socksEnt\SetSubMaterial(1, @NewSocksColor1Name)
+        socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
     @QUAD_SIZE_EYES = 256
     @QUAD_SIZE_EYES_HIRES = 512
@@ -726,8 +738,10 @@ class PonyTextureController
         if @GrabData('SeparateWingsPhong') and @WingsMaterial
             @ApplyPhongData(@WingsMaterial, 'Wings')
 
-        if @SocksMaterial
-            @ApplyPhongData(@SocksMaterial, 'Socks')
+        @ApplyPhongData(@SocksMaterial, 'Socks') if @SocksMaterial
+        @ApplyPhongData(@NewSocksColor1, 'Socks') if @NewSocksColor1
+        @ApplyPhongData(@NewSocksColor2, 'Socks') if @NewSocksColor2
+        @ApplyPhongData(@NewSocksBase, 'Socks') if @NewSocksBase
 
         if @GrabData('SeparateManePhong')
             @ApplyPhongData(@HairColor1Material, 'Mane')
@@ -1045,6 +1059,82 @@ class PonyTextureController
         if left == 0
             continueCompilation()
         return @HornMaterial
+
+    CompileNewSocks: =>
+        return unless @isValid
+
+        data = {
+            '$basetexture': 'models/debug/debugwhite'
+
+            '$model': '1'
+            '$ambientocclusion': '1'
+            '$lightwarptexture': 'models/ppm/base/lightwrap'
+            '$phong': '1'
+            '$phongexponent': '6'
+            '$phongboost': '0.1'
+            '$phongalbedotint': '1'
+            '$phongtint': '[1 .95 .95]'
+            '$phongfresnelranges': '[1 5 10]'
+            '$rimlight': '1'
+            '$rimlightexponent': '4.0'
+            '$rimlightboost': '2'
+            '$color': '[1 1 1]'
+            '$color2': '[1 1 1]'
+            '$cloakPassEnabled': '1'
+        }
+
+        textureColor1 = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Color1"
+            'shader': 'VertexLitGeneric'
+            'data': data
+        }
+
+        textureColor2 = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Color2"
+            'shader': 'VertexLitGeneric'
+            'data': data
+        }
+
+        textureBase = {
+            'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Base"
+            'shader': 'VertexLitGeneric'
+            'data': data
+        }
+
+        @NewSocksColor1Name = '!' .. textureColor1.name\lower()
+        @NewSocksColor2Name = '!' .. textureColor2.name\lower()
+        @NewSocksBaseName = '!' .. textureBase.name\lower()
+
+        @NewSocksColor1 = CreateMaterial(textureColor1.name, textureColor1.shader, textureColor1.data)
+        @NewSocksColor2 = CreateMaterial(textureColor2.name, textureColor2.shader, textureColor2.data)
+        @NewSocksBase = CreateMaterial(textureBase.name, textureBase.shader, textureBase.data)
+
+        @UpdatePhongData()
+
+        url = @GrabData('NewSocksTextureURL')
+        if url == '' or not url\find('^https?://')
+            {:r, :g, :b} = @GrabData('NewSocksColor1')
+            @NewSocksColor1\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+            @NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+            {:r, :g, :b} = @GrabData('NewSocksColor2')
+            @NewSocksColor2\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+            @NewSocksColor2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+            {:r, :g, :b} = @GrabData('NewSocksColor3')
+            @NewSocksBase\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+            @NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+            PPM2.DebugPrint('Compiled new socks texture for ', @ent, ' as part of ', @)
+        else
+            @@LoadURL url, texSize, texSize, (texture, panel, material) ->
+                for tex in *{@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
+                    tex\SetVector('$color', Vector(1, 1, 1))
+                    tex\SetVector('$color2', Vector(1, 1, 1))
+                    tex\SetTexture('$basetexture', texture)
+
+        return @NewSocksColor1, @NewSocksColor2, @NewSocksBase
+
     CompileSocks: =>
         return unless @isValid
         textureData = {

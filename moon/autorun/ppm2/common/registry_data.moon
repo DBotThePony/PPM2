@@ -334,10 +334,40 @@ PPM2.PonyDataRegistry = {
         type: 'BOOLEAN'
     }
 
+    'socks_model_new': {
+        default: -> false
+        getFunc: 'SocksAsNewModel'
+        type: 'BOOLEAN'
+    }
+
     'socks_model_color': {
         default: -> Color(255, 255, 255)
         getFunc: 'SocksColor'
         type: 'COLOR'
+    }
+
+    'socks_new_model_color1': {
+        default: -> Color(255, 255, 255)
+        getFunc: 'NewSocksColor1'
+        type: 'COLOR'
+    }
+
+    'socks_new_model_color2': {
+        default: -> Color(0, 0, 0)
+        getFunc: 'NewSocksColor2'
+        type: 'COLOR'
+    }
+
+    'socks_new_model_color3': {
+        default: -> Color(0, 0, 0)
+        getFunc: 'NewSocksColor3'
+        type: 'COLOR'
+    }
+
+    'socks_new_texture_url': {
+        default: -> ''
+        getFunc: 'NewSocksTextureURL'
+        type: 'URL'
     }
 
     'suit': {
