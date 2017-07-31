@@ -246,6 +246,7 @@ class DefaultBodygroupController
     Reset: => @ResetBodygroups()
     RemoveModels: =>
         @socksModel\Remove() if IsValid(@socksModel)
+        @newSocksModel\Remove() if IsValid(@newSocksModel)
 
     UpdateTailSize: (ent = @ent) =>
         return if not CLIENT
