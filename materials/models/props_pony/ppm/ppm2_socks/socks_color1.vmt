@@ -1,0 +1,17 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_pony/ppm/ppm2_socks/socks_color1"
+
+	"$model" 					"1"
+	"$ambientocclusion" 		"1"
+	"$lightwarptexture"		"models/props_pony/ppm/ppm2_socks/lightwarp"
+	"$phong"		"1"
+	"$phongexponent"		"5.000000"
+	"$phongboost"		"0.100000"
+	"$phongfresnelranges"		"[.25 .5 1]"
+	"$rimlight"		"1"
+	"$rimlightexponent"		"4.000000"
+	"$rimlightboost"		"2"
+	"$color2"		"{ 255 255 255 }"
+	"$cloakPassEnabled" 		"1"
+}
