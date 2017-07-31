@@ -667,13 +667,13 @@ class PonyTextureController
         socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
     @QUAD_SIZE_EYES = 256
-    @QUAD_SIZE_EYES_HIRES = 512
+    @QUAD_SIZE_EYES_HIRES = 1024
 
     @QUAD_SIZE_SOCKS = 512
     @QUAD_SIZE_SOCKS_HIRES = 1024
 
     @QUAD_SIZE_CMARK = 256
-    @QUAD_SIZE_CMARK_HIRES = 512
+    @QUAD_SIZE_CMARK_HIRES = 1024
 
     @QUAD_SIZE_WING = 128
     @QUAD_SIZE_WING_HIRES = 256
