@@ -543,7 +543,7 @@ class PonyTextureController
         error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
         @currentRTTrace = debug.traceback()
         @oldW, @oldH = ScrW(), ScrH()
-        render.SetViewPort(0, 0, texSize, texSize)
+        --render.SetViewPort(0, 0, texSize, texSize)
         rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{name}", texSize, texSize, false)
         rt\Download()
         render.PushRenderTarget(rt)
@@ -557,7 +557,7 @@ class PonyTextureController
 
     EndRT: =>
         cam.End2D()
-        render.SetViewPort(0, 0, @oldW, @oldH)
+        --render.SetViewPort(0, 0, @oldW, @oldH)
         render.PopRenderTarget()
         surface.DisableClipping(false)
         rt = @currentRT
