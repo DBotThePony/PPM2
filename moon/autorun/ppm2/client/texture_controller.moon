@@ -721,8 +721,8 @@ class PonyTextureController
         sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
         surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
-
-    GetPhongData: (prefix = 'Body') =>
+    ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false, noBump = false) =>
+        return if not matTarget
         PhongExponent = @GrabData(prefix .. 'PhongExponent')
         PhongBoost = @GrabData(prefix .. 'PhongBoost')
         PhongTint = @GrabData(prefix .. 'PhongTint')
@@ -730,6 +730,7 @@ class PonyTextureController
         PhongMiddle = @GrabData(prefix .. 'PhongMiddle')
         Lightwarp = @GrabData(prefix .. 'Lightwarp')
         LightwarpURL = @GrabData(prefix .. 'LightwarpURL')
+        BumpmapURL = @GrabData(prefix .. 'BumpmapURL')
         PhongSliding = @GrabData(prefix .. 'PhongSliding')
         {:r, :g, :b} = PhongTint
         r /= 255
@@ -737,11 +738,6 @@ class PonyTextureController
         b /= 255
         PhongTint = Vector(r, g, b)
         PhongFresnel = Vector(PhongFront, PhongMiddle, PhongSliding)
-        return PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL
-
-    ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false) =>
-        return if not matTarget
-        PhongExponent, PhongBoost, PhongTint, PhongFresnel, Lightwarp, LightwarpURL = @GetPhongData(prefix)
 
         if not lightwarpsOnly
             with matTarget
@@ -757,25 +753,32 @@ class PonyTextureController
             @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
                 matTarget\SetTexture('$lightwarptexture', tex)
 
+        if not noBump
+            if BumpmapURL == '' or not BumpmapURL\find('^https?://')
+                matTarget\SetUndefined('$bumpmap')
+            else
+                @@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
+                    matTarget\SetTexture('$bumpmap', tex)
+
     GetBodyPhongMaterials: (output = {}) =>
-        table.insert(output, @BodyMaterial) if @BodyMaterial
-        table.insert(output, @HornMaterial) if @HornMaterial and not @GrabData('SeparateHornPhong')
-        table.insert(output, @WingsMaterial) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
+        table.insert(output, {@BodyMaterial, false, false}) if @BodyMaterial
+        table.insert(output, {@HornMaterial, false, true}) if @HornMaterial and not @GrabData('SeparateHornPhong')
+        table.insert(output, {@WingsMaterial, false, false}) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
         if not @GrabData('SeparateManePhong')
-            table.insert(output, @HairColor1Material) if @HairColor1Material
-            table.insert(output, @HairColor2Material) if @HairColor2Material
+            table.insert(output, {@HairColor1Material, false, false}) if @HairColor1Material
+            table.insert(output, {@HairColor2Material, false, false}) if @HairColor2Material
         if not @GrabData('SeparateTailPhong')
-            table.insert(output, @TailColor1Material) if @TailColor1Material
-            table.insert(output, @TailColor2Material) if @TailColor2Material
+            table.insert(output, {@TailColor1Material, false, false}) if @TailColor1Material
+            table.insert(output, {@TailColor2Material, false, false}) if @TailColor2Material
 
     UpdatePhongData: =>
         proceed = {}
         @GetBodyPhongMaterials(proceed)
         for mat in *proceed
-            @ApplyPhongData(mat, 'Body')
+            @ApplyPhongData(mat[1], 'Body', mat[2], mat[3])
 
         if @GrabData('SeparateHornPhong') and @HornMaterial
-            @ApplyPhongData(@HornMaterial, 'Horn')
+            @ApplyPhongData(@HornMaterial, 'Horn', false, true)
 
         if @GrabData('SeparateWingsPhong') and @WingsMaterial
             @ApplyPhongData(@WingsMaterial, 'Wings')

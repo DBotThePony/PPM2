@@ -1074,6 +1074,12 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         type: 'URL'
     }
 
+    PPM2.PonyDataRegistry[ttype\lower() .. '_bumpmap_texture_url'] = {
+        default: -> ''
+        getFunc: ttype .. 'BumpmapURL'
+        type: 'URL'
+    }
+
 for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
     continue if not active
     PPM2.PonyDataRegistry["flex_disable_#{flex\lower()}"] = {

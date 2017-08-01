@@ -931,6 +931,8 @@ doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
     @ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
     @Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
     @URLInput(ttype .. 'LightwarpURL', spoiler)
+    @Label('Bumpmap input URL', spoiler)
+    @URLInput(ttype .. 'BumpmapURL', spoiler)
 
 EditorPages = {
     {
