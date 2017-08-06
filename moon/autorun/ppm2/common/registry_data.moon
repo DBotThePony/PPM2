@@ -569,6 +569,12 @@ PPM2.PonyDataRegistry = {
         getFunc: 'NoseColor'
         type: 'COLOR'
     }
+
+    'weapon_hide': {
+        default: -> true
+        getFunc: 'HideWeapons'
+        type: 'BOOLEAN'
+    }
 }
 
 for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}

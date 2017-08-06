@@ -956,14 +956,17 @@ EditorPages = {
             @NumSlider('Weight', 'Weight', 2)
             @NumSlider('Pony Size', 'PonySize', 2)
 
-            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
-                @Hr()
-                @CheckBox('No flexes on new model', 'NoFlex')
-                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-                flexes = @Spoiler('Flexes controls')
-                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-                flexes\SizeToContents()
+            if ADVANCED_MODE\GetBool()
+                @CheckBox('Should hide weapons', 'HideWeapons')
+
+                if IS_USING_NEW(@IsNewEditor())
+                    @Hr()
+                    @CheckBox('No flexes on new model', 'NoFlex')
+                    @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+                    flexes = @Spoiler('Flexes controls')
+                    for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                        @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+                    flexes\SizeToContents()
     }
 
     {
