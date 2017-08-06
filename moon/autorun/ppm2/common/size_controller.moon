@@ -58,6 +58,7 @@
 -- 40	Tail03
 
 USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
+ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 
 class PonySizeController
     @AVALIABLE_CONTROLLERS = {}
@@ -92,7 +93,7 @@ class PonySizeController
     @LEGS_BEHIND_3_2 = 10
 
     @NEXT_OBJ_ID = 0
-    
+
     new: (controller) =>
         @isValid = true
         @ent = controller.ent
@@ -109,6 +110,8 @@ class PonySizeController
     GetEntity: => @ent
     GetEntityID: => @entID
     GetDataID: => @entID
+    IsNetworked: => @controller\IsNetworked()
+    AllowResize: => not @controller\IsNetworked() or ALLOW_TO_MODIFY_SCALE\GetBool()
 
     @STEP_SIZE = 18
     @PONY_HULL = 19
@@ -135,23 +138,23 @@ class PonySizeController
             @ModifyLegs()
             @ModifyHull()
             @ModifyViewOffset()
-    
+
     ResetViewOffset: (ent = @ent) =>
         ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if ent.SetViewOffset
         ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if ent.SetViewOffsetDucked
-    
+
     ResetHulls: (ent = @ent) =>
         ent\ResetHull() if ent.ResetHull
         ent\SetStepSize(@@STEP_SIZE) if ent.SetStepSize
         ent.__ppm2_modified_hull = false
-    
+
     ResetJumpHeight: (ent = @ent) =>
         return if CLIENT
         return if not ent.SetJumpPower
         return if not ent.__ppm2_modified_jump
         ent\SetJumpPower(ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
         ent.__ppm2_modified_jump = false
-    
+
     ResetDrawMatrix: (ent = @ent) =>
         return if SERVER
         mat = Matrix()
@@ -164,7 +167,7 @@ class PonySizeController
         if USE_NEW_HULL\GetBool() or ent.__ppm2_modified_hull
             @ResetHulls(ent)
             @ResetJumpHeight(ent)
-        
+
         @ResetViewOffset(ent)
         @ResetDrawMatrix(ent)
         @ResetNeck(ent)
@@ -232,7 +235,7 @@ class PonySizeController
         @ResetNeck()
         @ResetLegs()
         @ModifyScale()
-    
+
     GetLegsSize: => @GetData()\GetLegsSize()
     GetLegsScale: => @GetData()\GetLegsSize()
     GetNeckSize: => @GetData()\GetNeckSize()
@@ -247,7 +250,7 @@ class PonySizeController
     PlayerRespawn: =>
         @ResetScale()
         @ModifyScale()
-    
+
     SlowUpdate: =>
         @ModifyScale()
 
@@ -260,27 +263,32 @@ class PonySizeController
         HULL_MAXS = Vector(@@HULL_MAXS)
         HULL_MAXS_DUCK = Vector(@@HULL_MAXS_DUCK)
 
-        HULL_MINS *= size
-        HULL_MAXS *= size
-        HULL_MAXS_DUCK *= size
+        if @AllowResize()
+            HULL_MINS *= size
+            HULL_MAXS *= size
+            HULL_MAXS_DUCK *= size
 
-        HULL_MINS.z *= legssize
-        HULL_MAXS.z *= legssize
-        HULL_MAXS_DUCK.z *= legssize
+            HULL_MINS.z *= legssize
+            HULL_MAXS.z *= legssize
+            HULL_MAXS_DUCK.z *= legssize
 
         with ent
             \SetHull(HULL_MINS, HULL_MAXS) if .SetHull
             \SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if .SetHullDuck
             \SetStepSize(@@STEP_SIZE * size * @GetLegsModifier(1.2)) if .SetStepSize
-    
+
     ModifyJumpHeight: (ent = @ent) =>
         return if CLIENT
         return if not @ent.SetJumpPower
         return if ent.__ppm2_modified_jump
         ent\SetJumpPower(ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
         ent.__ppm2_modified_jump = true
-    
-    GetLegsModifier: (mult = 0.4) => 1 + (@GetLegsSize() - 1) * mult
+
+    GetLegsModifier: (mult = 0.4) =>
+        if @AllowResize()
+            1 + (@GetLegsSize() - 1) * mult
+        else
+            1
 
     ModifyViewOffset: (ent = @ent) =>
         size = @GetPonySize()
@@ -290,40 +298,42 @@ class PonySizeController
         PLAYER_VIEW_OFFSET = Vector(PPM2.PLAYER_VIEW_OFFSET)
         PLAYER_VIEW_OFFSET_DUCK = Vector(PPM2.PLAYER_VIEW_OFFSET_DUCK)
 
-        PLAYER_VIEW_OFFSET *= size * necksize
-        PLAYER_VIEW_OFFSET_DUCK *= size * necksize
+        if @AllowResize()
+            PLAYER_VIEW_OFFSET *= size * necksize
+            PLAYER_VIEW_OFFSET_DUCK *= size * necksize
 
-        PLAYER_VIEW_OFFSET.z *= legssize
-        PLAYER_VIEW_OFFSET_DUCK.z *= legssize
+            PLAYER_VIEW_OFFSET.z *= legssize
+            PLAYER_VIEW_OFFSET_DUCK.z *= legssize
 
         ent\SetViewOffset(PLAYER_VIEW_OFFSET) if ent.SetViewOffset
         ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if ent.SetViewOffsetDucked
-    
+
     ModifyDrawMatrix: (ent = @ent) =>
         return if SERVER
+        return if not @AllowResize()
         mat = Matrix()
         mat\Scale(@@DEF_SCALE * @GetPonySize())
         ent\EnableMatrix('RenderMultiply', mat)
-    
+
     ModifyScale: (ent = @ent) =>
         return if not IsValid(ent)
         return if not ent\IsPony()
         return if ent.Alive and not ent\Alive()
-        size = @GetPonySize()
 
         if USE_NEW_HULL\GetBool()
             @ModifyHull(ent)
             @ModifyJumpHeight(ent)
-        
+
         @ModifyViewOffset(ent)
         @ModifyDrawMatrix(ent)
         if @lastPAC3BoneReset < RealTime()
             @ModifyNeck(ent)
             @ModifyLegs(ent)
-    
+
     ModifyNeck: (ent = @ent) =>
         return if SERVER
         return if not IsValid(ent)
+        return if not @AllowResize()
         size = (@GetNeckSize() - 1) * 3
         vec = Vector(size, -size, 0)
 
@@ -335,10 +345,11 @@ class PonySizeController
             \ManipulateBonePosition(@@NECK_BONE_2, vec + (boneAnimTable[@@NECK_BONE_2] or emptyVector))
             \ManipulateBonePosition(@@NECK_BONE_3, vec + (boneAnimTable[@@NECK_BONE_3] or emptyVector))
             \ManipulateBonePosition(@@NECK_BONE_4, vec + (boneAnimTable[@@NECK_BONE_4] or emptyVector))
-    
+
     ModifyLegs: (ent = @ent) =>
         return if SERVER
         return if not IsValid(ent)
+        return if not @AllowResize()
         realSizeModify = @GetLegsSize() - 1
         size = realSizeModify * 3
 
@@ -349,10 +360,10 @@ class PonySizeController
             \ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + (boneAnimTable[@@LEGS_BONE_ROOT] or emptyVector))
             \ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_1] or emptyVector))
             \ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_2] or emptyVector))
-            
+
             \ManipulateBonePosition(@@LEGS_FRONT_3, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_3] or emptyVector))
             \ManipulateBonePosition(@@LEGS_FRONT_4, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_4] or emptyVector))
-            
+
             \ManipulateBonePosition(@@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_5] or emptyVector))
             \ManipulateBonePosition(@@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_6] or emptyVector))
 
@@ -449,5 +460,13 @@ if CLIENT
             sizes\ModifyNeck()
             sizes\ModifyLegs()
             sizes.lastPAC3BoneReset = RealTime() + 1
+
+ppm2_sv_allow_resize = ->
+    for ply in *player.GetAll()
+        if data = ply\GetPonyData()
+            if scale = data\GetSizeController()
+                scale\Reset()
+
+cvars.AddChangeCallback 'ppm2_sv_allow_resize', ppm2_sv_allow_resize, 'PPM2.Scale'
 
 PPM2.GetSizeController = (model = 'models/ppm/player_default_base.mdl') -> PonySizeController.AVALIABLE_CONTROLLERS[model\lower()] or PonySizeController

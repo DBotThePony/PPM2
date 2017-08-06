@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
+
 PPM2.BODYGROUP_SKELETON = 0
 PPM2.BODYGROUP_GENDER = 1
 PPM2.BODYGROUP_HORN = 2
@@ -875,6 +877,15 @@ if CLIENT
             bodygroup\UpdateWings() if bodygroup.UpdateWings
             bodygroup\UpdateEars() if bodygroup.UpdateEars
             bodygroup.lastPAC3BoneReset = RealTime() + 1
+
+    ppm2_sv_allow_resize = ->
+        for ply in *player.GetAll()
+            if data = ply\GetPonyData()
+                if bodygroup = data\GetBodygroupController()
+                    bodygroup\ResetTail()
+                    bodygroup\ResetMane()
+
+    cvars.AddChangeCallback 'ppm2_sv_allow_resize', ppm2_sv_allow_resize, 'PPM2.Bodygroups'
 else
     hook.Add 'PlayerNoClip', 'PPM2.WingsCheck', =>
         timer.Simple 0, ->
