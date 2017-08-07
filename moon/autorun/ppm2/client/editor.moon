@@ -676,6 +676,7 @@ PANEL_SETTINGS_BASE = {
         @updateFuncs = {}
         @createdPanels = 1
         @isNewEditor = false
+        -- @resetCollapse = @Spoiler('Reset buttons')
 
     IsNewEditor: => @isNewEditor
     GetIsNewEditor: => @isNewEditor
@@ -692,9 +693,44 @@ PANEL_SETTINGS_BASE = {
     TargetData: => @data
     SetTargetData: (val) => @data = val
     DoUpdate: => func() for func in *@updateFuncs
+
+    CreateResetButton: (name = 'NULL', option = 'NULL', parent) =>
+        @createdPanels += 1
+        if not IsValid(parent)
+            with button = vgui.Create('DButton', @resetCollapse)
+                \SetParent(@resetCollapse)
+                \Dock(TOP)
+                \DockMargin(2, 0, 2, 0)
+                \SetText('Reset ' .. name)
+                .DoClick = ->
+                    dt = @GetTargetData()
+                    dt['Reset' .. option](dt)
+                    @ValueChanges(option, dt['Get' .. option](dt), button)
+        else
+            with button = vgui.Create('DButton', parent)
+                \SetParent(parent)
+                \DockMargin(0, 0, 0, 0)
+                \SetText('Reset ' .. name)
+                \SetSize(0, 0)
+                \SetTextColor(Color(255, 255, 255))
+                .Paint = (w, h) =>
+                    return if w == 0
+                    surface.SetDrawColor(0, 0, 0)
+                    surface.DrawRect(0, 0, w, h)
+                .DoClick = ->
+                    dt = @GetTargetData()
+                    dt['Reset' .. option](dt)
+                    @ValueChanges(option, dt['Get' .. option](dt), button)
+                .Think = ->
+                    if input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
+                        \SetSize(\GetParent()\GetSize())
+                    else
+                        \SetSize(0, 0)
+
     NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
         @createdPanels += 3
 		with withPanel = vgui.Create('DNumSlider', parent)
+            @CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
 			\SetTooltip("#{name}\nData value: #{option}")
@@ -768,6 +804,7 @@ PANEL_SETTINGS_BASE = {
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
         @createdPanels += 3
 		with withPanel = vgui.Create('DCheckBoxLabel', parent)
+            @CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
@@ -809,7 +846,8 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 270)
             \SetLabel(name)
             \SetExpanded(false)
-        @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @CreateResetButton(name, option, collapse)
         return box, collapse
     Spoiler: (name = 'Mysterious spoiler', parent = @scroll or @) =>
         @createdPanels += 2
@@ -825,79 +863,77 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 270)
             \SetLabel(name)
             \SetExpanded(false)
-        @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
         return canvas, collapse
     ComboBox: (name = 'Combo Box', option = '', choices, parent = @scroll or @) =>
         @createdPanels += 4
-        label = vgui.Create('DLabel', parent)
-        with label
+        with label = vgui.Create('DLabel', parent)
             \SetText(name)
             \SetTextColor(color_white)
             \Dock(TOP)
             \SetSize(0, 20)
             \DockMargin(5, 0, 5, 0)
             \SetMouseInputEnabled(true)
-        @scroll\AddItem(label) if IsValid(@scroll) and parent == @scroll
-        box = vgui.Create('DComboBox', label)
-        with box
-            \Dock(RIGHT)
-            \SetSize(170, 0)
-            \DockMargin(0, 0, 5, 0)
-            \SetSortItems(false)
-            \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
-            if choices
-                \AddChoice(choice) for choice in *choices
-            else
-                \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
-            .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
-                index -= 1
-                data = @GetTargetData()
-                return if not data
-                data["Set#{option}"](data, index, @GetShouldSaveData())
-                @ValueChanges(option, index, pnl)
-            table.insert @updateFuncs, ->
+            @scroll\AddItem(label) if IsValid(@scroll) and parent == @scroll
+            with box = vgui.Create('DComboBox', label)
+                \Dock(RIGHT)
+                \SetSize(170, 0)
+                \DockMargin(0, 0, 5, 0)
+                \SetSortItems(false)
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+                if choices
+                    \AddChoice(choice) for choice in *choices
+                else
+                    \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
+                .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+                    index -= 1
+                    data = @GetTargetData()
+                    return if not data
+                    data["Set#{option}"](data, index, @GetShouldSaveData())
+                    @ValueChanges(option, index, pnl)
+                table.insert @updateFuncs, ->
+                    \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+            @CreateResetButton(name, option, label)
         return box, label
     URLInput: (option = '', parent = @scroll or @) =>
         @createdPanels += 2
-        wrapper = vgui.Create('EditablePanel', parent)
-        with wrapper
+        with wrapper = vgui.Create('EditablePanel', parent)
             \Dock(TOP)
             \DockMargin(5, 10, 5, 10)
             \SetKeyboardInputEnabled(true)
             \SetMouseInputEnabled(true)
             \SetSize(0, 20)
-        textInput = vgui.Create('DTextEntry', wrapper)
-        @scroll\AddItem(wrapper) if IsValid(@scroll) and parent == @scroll
-        with textInput
-            \Dock(FILL)
-            \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            \SetKeyboardInputEnabled(true)
-            \SetMouseInputEnabled(true)
-            .OnEnter = ->
-                text = \GetValue()
-                if text\find('^https?://')
-                    @GetTargetData()["Set#{option}"](@GetTargetData(), text)
-                    @ValueChanges(option, text, textInput)
-                else
-                    @GetTargetData()["Set#{option}"](@GetTargetData(), '')
-                    @ValueChanges(option, '', textInput)
-            .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
-                switch key
-                    when KEY_FIRST
-                        return true
-                    when KEY_NONE
-                        return true
-                    when KEY_TAB
-                        return true
-                    when KEY_ENTER
+            @scroll\AddItem(wrapper) if IsValid(@scroll) and parent == @scroll
+            with textInput = vgui.Create('DTextEntry', wrapper)
+                @CreateResetButton('URL field', option, textInput)
+                \Dock(FILL)
+                \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+                \SetKeyboardInputEnabled(true)
+                \SetMouseInputEnabled(true)
+                .OnEnter = ->
+                    text = \GetValue()
+                    if text\find('^https?://')
+                        @GetTargetData()["Set#{option}"](@GetTargetData(), text)
+                        @ValueChanges(option, text, textInput)
+                    else
+                        @GetTargetData()["Set#{option}"](@GetTargetData(), '')
+                        @ValueChanges(option, '', textInput)
+                .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
+                    switch key
+                        when KEY_FIRST
+                            return true
+                        when KEY_NONE
+                            return true
+                        when KEY_TAB
+                            return true
+                        when KEY_ENTER
+                            .OnEnter()
+                            \KillFocus()
+                            return true
+                    timer.Create "PPM2.EditorCodeChange.#{option}", 1, 1, ->
+                        return if not IsValid(textInput)
                         .OnEnter()
-                        \KillFocus()
-                        return true
-                timer.Create "PPM2.EditorCodeChange.#{option}", 1, 1, ->
-                    return if not IsValid(textInput)
-                    .OnEnter()
-            table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+                table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
         return textInput
     ScrollPanel: =>
         return @scroll if IsValid(@scroll)
