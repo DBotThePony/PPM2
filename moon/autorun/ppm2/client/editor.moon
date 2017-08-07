@@ -1497,6 +1497,7 @@ EditorPages = {
             title = @Label('PPM/2')
             title\SetFont('PPM2.Title')
             title\SizeToContents()
+            @URLLabel('Join Discord!', 'https://discord.gg/HG9eS79')\SetFont('PPM2.AboutLabels')
             @URLLabel('PPM/2 is a Ponyscape project', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
             @URLLabel('PPM/2 was created and being developed by DBot', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
             @URLLabel('New models was created by Durpy', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
