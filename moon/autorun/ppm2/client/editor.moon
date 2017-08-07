@@ -706,6 +706,7 @@ PANEL_SETTINGS_BASE = {
                     dt = @GetTargetData()
                     dt['Reset' .. option](dt)
                     @ValueChanges(option, dt['Get' .. option](dt), button)
+                    @DoUpdate()
         else
             with button = vgui.Create('DButton', parent)
                 \SetParent(parent)
@@ -721,6 +722,7 @@ PANEL_SETTINGS_BASE = {
                     dt = @GetTargetData()
                     dt['Reset' .. option](dt)
                     @ValueChanges(option, dt['Get' .. option](dt), button)
+                    @DoUpdate()
                 .Think = ->
                     if input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
                         \SetSize(\GetParent()\GetSize())
