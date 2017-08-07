@@ -940,6 +940,15 @@ EditorPages = {
         'internal': 'main'
         'func': (sheet) =>
             @ScrollPanel()
+            @Button 'New File', ->
+                data = @GetTargetData()
+                return if not data
+                confirmed = ->
+                    data\SetFilename("new_pony-#{math.random(1, 100000)}")
+                    data\Reset()
+                    @ValueChanges()
+                Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
+
             @Button 'Randomize!', ->
                 data = @GetTargetData()
                 return if not data

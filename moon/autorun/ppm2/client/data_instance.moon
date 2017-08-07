@@ -28,7 +28,7 @@ class PonyDataInstance
         return output
 
     @PONY_DATA = PPM2.PonyDataRegistry
-    
+
     @PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
     @PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
 
@@ -42,7 +42,7 @@ class PonyDataInstance
             i += 1
             data.enumMapping[i] = enumVal
             data.enumMappingBackward[enumVal] = i
-    for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping, :enum, :min, :max} in pairs @PONY_DATA
+    for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping, :enum, :min, :max, :default} in pairs @PONY_DATA
         @__base["Get#{getFunc}"] = => @dataTable[key]
         @__base["GetMin#{getFunc}"] = => min if min
         @__base["GetMax#{getFunc}"] = => max if max
@@ -51,12 +51,14 @@ class PonyDataInstance
 
         @["GetMin#{getFunc}"] = => min if min
         @["GetMax#{getFunc}"] = => max if max
+        @["GetDefault#{getFunc}"] = default
         @["GetEnum#{getFunc}"] = => enum if enum
         @["Enum#{getFunc}"] = => enum if enum
 
         if enumMapping
             @__base["Get#{getFunc}Enum"] = => enumMapping[@dataTable[key]] or enumMapping[0] or @dataTable[key]
             @__base["GetEnum#{getFunc}"] = @__base["Get#{getFunc}Enum"]
+		@__base["Reset#{getFunc}"] = => @["Set#{getFunc}"](@, default())
 		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
             if type(val) == 'string' and enumMappingBackward
                 newVal = enumMappingBackward[val\upper()]
@@ -120,7 +122,9 @@ class PonyDataInstance
             @SetupData(data, true)
         elseif @exists and readIfExists
             @ReadFromDisk(force, doBackup)
-    
+
+    Reset: => @['Reset' .. getFunc](@) for k, {:getFunc} in pairs @@PONY_DATA
+
     @ERR_MISSING_PARAMETER = 4
     @ERR_MISSING_CONTENT = 5
 
@@ -147,7 +151,7 @@ class PonyDataInstance
                 bkName = "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.txt"
                 fRead = file.Read(@fpath, 'DATA')
                 file.Write(bkName, fRead)
-        
+
         for key, value in pairs data
             key = key\lower()
             map = @@PONY_DATA_MAPPING[key]
