@@ -29,7 +29,7 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
             if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply)
                 for wep in *ply\GetWeapons()
                     if wep
-                        if not wep.ShouldPonyDraw or not (wep\ShouldPonyDraw(ply) or hook.Run('ShouldDrawPonyWeapon', ply, wep))
+                        if not hook.Run('ShouldDrawPonyWeapon', ply, wep) and (not wep.ShouldPonyDraw or not wep\ShouldPonyDraw(ply))
                             wep\SetNoDraw(true)
                             wep.__ppm2_weapon_hit = true
                         elseif wep.__ppm2_weapon_hit
