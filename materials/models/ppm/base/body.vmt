@@ -4,12 +4,11 @@
 	"$lightwarptexture" "models/ppm/base/lightwrap"
 	"$halflambert" "1"
 
-	"$bumpmap" "models/ppm/base/render/body_n"
 	"$model" "1"
-	"$phong" "1" 
-	//"$basemapalphaphongmask" "1"
-	"$phongexponent" "0.6"
-	"$phongboost" "0.5"
+	"$phong" "1"
+	"$basemapalphaphongmask" "1"
+	"$phongexponent" "6"
+	"$phongboost" "0.05"
 	"$phongalbedotint" "1"
 	"$phongtint" "[1 .95 .95]"
 	"$phongfresnelranges"	"[0.5 6 10]"
@@ -17,4 +16,5 @@
 	$rimlight               1
 	$rimlightexponent       2
 	$rimlightboost          1
+	
 }

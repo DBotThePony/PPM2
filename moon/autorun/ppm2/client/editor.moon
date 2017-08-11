@@ -393,7 +393,6 @@ CALC_VIEW_PANEL = {
         origin = LocalPlayer()\GetPos() + @drawPos
         angles = @drawAngle
         newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
-        @moveAngle = angles
         return newData
 
     PrePlayerDraw: (ply = LocalPlayer()) =>
@@ -410,7 +409,7 @@ CALC_VIEW_PANEL = {
         @hold = true
         @SetCursor('sizeall')
         @mouseX, @mouseY = gui.MousePos()
-    
+
     IsActive: => @forward or @backward or @left or @right or @hold or @down or @up
 
     CheckCode: (code = KEY_NONE, status = false) =>
@@ -470,19 +469,19 @@ CALC_VIEW_PANEL = {
         speedModifier *= 0.5 if @slow
 
         if @forward
-            @drawPos += @moveAngle\Forward() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Forward() * speedModifier * delta * 100
 
         if @backward
-            @drawPos -= @moveAngle\Forward() * speedModifier * delta * 100
+            @drawPos -= @drawAngle\Forward() * speedModifier * delta * 100
 
         if @right
-            @drawPos += @moveAngle\Right() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Right() * speedModifier * delta * 100
 
         if @left
-            @drawPos -= @moveAngle\Right() * speedModifier * delta * 100
+            @drawPos -= @drawAngle\Right() * speedModifier * delta * 100
 
         if @up
-            @drawPos += @moveAngle\Up() * speedModifier * delta * 100
+            @drawPos += @drawAngle\Up() * speedModifier * delta * 100
 
         if @IsActive()
             if not @resizedToScreen
@@ -527,7 +526,7 @@ TATTOO_INPUT_GRABBER = {
     DataAdd: (key = '', val = 0) => @DataSet(key, @DataGet(key) + val)
 
     TriggerUpdate: => pnl\DoUpdate() for pnl in *@panelsToUpdate when IsValid(pnl)
-    
+
     Init: =>
         @targetID = 1
         @MakePopup()
@@ -567,7 +566,7 @@ To move tatto use WASD
 To Scale higher/lower use Up/Down arrows
 To Scale wider/smaller use Right/Left arrows
 To rotate left/right use Q/E")
-    
+
     HandleKey: (code = KEY_NONE, status = false) =>
         switch code
             when KEY_W
@@ -659,7 +658,7 @@ To rotate left/right use Q/E")
         if @rotateRight and @rotateRightTime < RealTime()
             @DataAdd('TattooRotate', @CONTINIOUS_ROTATE_STEP * ftime)
             @TriggerUpdate()
-    
+
     Paint: (w = 0, h = 0) =>
         surface.SetDrawColor(0, 0, 0, 150)
         surface.DrawRect(0, 0, w, h)
@@ -677,6 +676,7 @@ PANEL_SETTINGS_BASE = {
         @updateFuncs = {}
         @createdPanels = 1
         @isNewEditor = false
+        -- @resetCollapse = @Spoiler('Reset buttons')
 
     IsNewEditor: => @isNewEditor
     GetIsNewEditor: => @isNewEditor
@@ -693,9 +693,46 @@ PANEL_SETTINGS_BASE = {
     TargetData: => @data
     SetTargetData: (val) => @data = val
     DoUpdate: => func() for func in *@updateFuncs
+
+    CreateResetButton: (name = 'NULL', option = 'NULL', parent) =>
+        @createdPanels += 1
+        if not IsValid(parent)
+            with button = vgui.Create('DButton', @resetCollapse)
+                \SetParent(@resetCollapse)
+                \Dock(TOP)
+                \DockMargin(2, 0, 2, 0)
+                \SetText('Reset ' .. name)
+                .DoClick = ->
+                    dt = @GetTargetData()
+                    dt['Reset' .. option](dt)
+                    @ValueChanges(option, dt['Get' .. option](dt), button)
+                    @DoUpdate()
+        else
+            with button = vgui.Create('DButton', parent)
+                \SetParent(parent)
+                \DockMargin(0, 0, 0, 0)
+                \SetText('Reset ' .. name)
+                \SetSize(0, 0)
+                \SetTextColor(Color(255, 255, 255))
+                .Paint = (w, h) =>
+                    return if w == 0
+                    surface.SetDrawColor(0, 0, 0)
+                    surface.DrawRect(0, 0, w, h)
+                .DoClick = ->
+                    dt = @GetTargetData()
+                    dt['Reset' .. option](dt)
+                    @ValueChanges(option, dt['Get' .. option](dt), button)
+                    @DoUpdate()
+                .Think = ->
+                    if input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
+                        \SetSize(\GetParent()\GetSize())
+                    else
+                        \SetSize(0, 0)
+
     NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
         @createdPanels += 3
 		with withPanel = vgui.Create('DNumSlider', parent)
+            @CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
 			\SetTooltip("#{name}\nData value: #{option}")
@@ -769,6 +806,7 @@ PANEL_SETTINGS_BASE = {
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
         @createdPanels += 3
 		with withPanel = vgui.Create('DCheckBoxLabel', parent)
+            @CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
@@ -810,7 +848,8 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 270)
             \SetLabel(name)
             \SetExpanded(false)
-        @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @CreateResetButton(name, option, collapse)
         return box, collapse
     Spoiler: (name = 'Mysterious spoiler', parent = @scroll or @) =>
         @createdPanels += 2
@@ -826,79 +865,77 @@ PANEL_SETTINGS_BASE = {
             \SetSize(250, 270)
             \SetLabel(name)
             \SetExpanded(false)
-        @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
+            @scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
         return canvas, collapse
     ComboBox: (name = 'Combo Box', option = '', choices, parent = @scroll or @) =>
         @createdPanels += 4
-        label = vgui.Create('DLabel', parent)
-        with label
+        with label = vgui.Create('DLabel', parent)
             \SetText(name)
             \SetTextColor(color_white)
             \Dock(TOP)
             \SetSize(0, 20)
             \DockMargin(5, 0, 5, 0)
             \SetMouseInputEnabled(true)
-        @scroll\AddItem(label) if IsValid(@scroll) and parent == @scroll
-        box = vgui.Create('DComboBox', label)
-        with box
-            \Dock(RIGHT)
-            \SetSize(170, 0)
-            \DockMargin(0, 0, 5, 0)
-            \SetSortItems(false)
-            \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
-            if choices
-                \AddChoice(choice) for choice in *choices
-            else
-                \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
-            .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
-                index -= 1
-                data = @GetTargetData()
-                return if not data
-                data["Set#{option}"](data, index, @GetShouldSaveData())
-                @ValueChanges(option, index, pnl)
-            table.insert @updateFuncs, ->
+            @scroll\AddItem(label) if IsValid(@scroll) and parent == @scroll
+            with box = vgui.Create('DComboBox', label)
+                \Dock(RIGHT)
+                \SetSize(170, 0)
+                \DockMargin(0, 0, 5, 0)
+                \SetSortItems(false)
                 \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+                if choices
+                    \AddChoice(choice) for choice in *choices
+                else
+                    \AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
+                .OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+                    index -= 1
+                    data = @GetTargetData()
+                    return if not data
+                    data["Set#{option}"](data, index, @GetShouldSaveData())
+                    @ValueChanges(option, index, pnl)
+                table.insert @updateFuncs, ->
+                    \SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+            @CreateResetButton(name, option, label)
         return box, label
     URLInput: (option = '', parent = @scroll or @) =>
         @createdPanels += 2
-        wrapper = vgui.Create('EditablePanel', parent)
-        with wrapper
+        with wrapper = vgui.Create('EditablePanel', parent)
             \Dock(TOP)
             \DockMargin(5, 10, 5, 10)
             \SetKeyboardInputEnabled(true)
             \SetMouseInputEnabled(true)
             \SetSize(0, 20)
-        textInput = vgui.Create('DTextEntry', wrapper)
-        @scroll\AddItem(wrapper) if IsValid(@scroll) and parent == @scroll
-        with textInput
-            \Dock(FILL)
-            \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-            \SetKeyboardInputEnabled(true)
-            \SetMouseInputEnabled(true)
-            .OnEnter = ->
-                text = \GetValue()
-                if text\find('^https?://')
-                    @GetTargetData()["Set#{option}"](@GetTargetData(), text)
-                    @ValueChanges(option, text, textInput)
-                else
-                    @GetTargetData()["Set#{option}"](@GetTargetData(), '')
-                    @ValueChanges(option, '', textInput)
-            .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
-                switch key
-                    when KEY_FIRST
-                        return true
-                    when KEY_NONE
-                        return true
-                    when KEY_TAB
-                        return true
-                    when KEY_ENTER
+            @scroll\AddItem(wrapper) if IsValid(@scroll) and parent == @scroll
+            with textInput = vgui.Create('DTextEntry', wrapper)
+                @CreateResetButton('URL field', option, textInput)
+                \Dock(FILL)
+                \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+                \SetKeyboardInputEnabled(true)
+                \SetMouseInputEnabled(true)
+                .OnEnter = ->
+                    text = \GetValue()
+                    if text\find('^https?://')
+                        @GetTargetData()["Set#{option}"](@GetTargetData(), text)
+                        @ValueChanges(option, text, textInput)
+                    else
+                        @GetTargetData()["Set#{option}"](@GetTargetData(), '')
+                        @ValueChanges(option, '', textInput)
+                .OnKeyCodeTyped = (pnl, key = KEY_FIRST) ->
+                    switch key
+                        when KEY_FIRST
+                            return true
+                        when KEY_NONE
+                            return true
+                        when KEY_TAB
+                            return true
+                        when KEY_ENTER
+                            .OnEnter()
+                            \KillFocus()
+                            return true
+                    timer.Create "PPM2.EditorCodeChange.#{option}", 1, 1, ->
+                        return if not IsValid(textInput)
                         .OnEnter()
-                        \KillFocus()
-                        return true
-                timer.Create "PPM2.EditorCodeChange.#{option}", 1, 1, ->
-                    return if not IsValid(textInput)
-                    .OnEnter()
-            table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+                table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
         return textInput
     ScrollPanel: =>
         return @scroll if IsValid(@scroll)
@@ -932,6 +969,8 @@ doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
     @ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
     @Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
     @URLInput(ttype .. 'LightwarpURL', spoiler)
+    @Label('Bumpmap input URL', spoiler)
+    @URLInput(ttype .. 'BumpmapURL', spoiler)
 
 EditorPages = {
     {
@@ -939,6 +978,15 @@ EditorPages = {
         'internal': 'main'
         'func': (sheet) =>
             @ScrollPanel()
+            @Button 'New File', ->
+                data = @GetTargetData()
+                return if not data
+                confirmed = ->
+                    data\SetFilename("new_pony-#{math.random(1, 100000)}")
+                    data\Reset()
+                    @ValueChanges()
+                Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
+
             @Button 'Randomize!', ->
                 data = @GetTargetData()
                 return if not data
@@ -955,14 +1003,17 @@ EditorPages = {
             @NumSlider('Weight', 'Weight', 2)
             @NumSlider('Pony Size', 'PonySize', 2)
 
-            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
-                @Hr()
-                @CheckBox('No flexes on new model', 'NoFlex')
-                @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-                flexes = @Spoiler('Flexes controls')
-                for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-                    @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-                flexes\SizeToContents()
+            if ADVANCED_MODE\GetBool()
+                @CheckBox('Should hide weapons', 'HideWeapons')
+
+                if IS_USING_NEW(@IsNewEditor())
+                    @Hr()
+                    @CheckBox('No flexes on new model', 'NoFlex')
+                    @Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+                    flexes = @Spoiler('Flexes controls')
+                    for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+                        @CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+                    flexes\SizeToContents()
     }
 
     {
@@ -972,29 +1023,51 @@ EditorPages = {
             @ScrollPanel()
             @ComboBox('Bodysuit', 'Bodysuit')
             @ColorBox('Body color', 'BodyColor')
-            doAddPhongData(@, 'Body') if ADVANCED_MODE\GetBool()
+            if ADVANCED_MODE\GetBool()
+                @CheckBox('Inherit Lips Color from body', 'LipsColorInherit')
+                @CheckBox('Inherit Nose Color from body', 'NoseColorInherit')
+                @ColorBox('Lips Color', 'LipsColor')
+                @ColorBox('Nose Color', 'NoseColor')
+                doAddPhongData(@, 'Body')
             @NumSlider('Neck Height', 'NeckSize', 2)
             @NumSlider('Legs Height', 'LegsSize', 2)
+
+            @Hr()
             @CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
             @CheckBox('Socks (as model)', 'SocksAsModel')
             @ColorBox('Socks model color', 'SocksColor')
 
-            doAddPhongData(@, 'Socks') if ADVANCED_MODE\GetBool()
-            if ADVANCED_MODE\GetBool() and IS_USING_NEW(@IsNewEditor())
-                @CheckBox('Hoof Fluffers', 'HoofFluffers')
-                @NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                doAddPhongData(@, 'Socks')
+                @ComboBox('Socks Texture', 'SocksTexture')
+                @Label('Socks URL texture')
+                @URLInput('SocksTextureURL')
 
-            return if not ADVANCED_MODE\GetBool()
-            @ComboBox('Socks Texture', 'SocksTexture')
-            @Label('Socks URL texture')
-            @URLInput('SocksTextureURL')
+                if IS_USING_NEW(@IsNewEditor())
+                    @Hr()
+                    @CheckBox('Hoof Fluffers', 'HoofFluffers')
+                    @NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+
+                @Hr()
+                @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+
             @Hr()
-            @ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
-            @Hr()
-            @CheckBox('Separate wings color from body', 'SeparateWings')
-            @CheckBox('Separate horn color from body', 'SeparateHorn')
-            @ColorBox('Wings color', 'WingsColor')
-            @ColorBox('Horn color', 'HornColor')
+            @CheckBox('Socks (as new model)', 'SocksAsNewModel')
+            @ColorBox('New Socks color 1', 'NewSocksColor1')
+            @ColorBox('New Socks color 2', 'NewSocksColor2')
+            @ColorBox('New Socks color 3', 'NewSocksColor3')
+
+            if ADVANCED_MODE\GetBool()
+                @Label('New Socks URL texture')
+                @URLInput('NewSocksTextureURL')
+
+            if ADVANCED_MODE\GetBool()
+                @Hr()
+                @CheckBox('Separate wings color from body', 'SeparateWings')
+                @CheckBox('Separate horn color from body', 'SeparateHorn')
+                @ColorBox('Wings color', 'WingsColor')
+                @ColorBox('Horn color', 'HornColor')
     }
 
     {
@@ -1028,10 +1101,8 @@ EditorPages = {
             @NumSlider('Right Wing Inside', 'RWingZ', 2, right)
             return if not ADVANCED_MODE\GetBool()
             @Hr()
-            @Label('You might want to use "Glowing Horn"\nwith "Use Horn Detail"')
-            @CheckBox('Use Horn Detail', 'UseHornDetail')
             @ColorBox('Horn Detail Color', 'HornDetailColor')
-            @CheckBox('Glowing Horn', 'HornGlow')
+            @CheckBox('Glowing Horn Detail', 'HornGlow')
             @NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
     }
 
@@ -1138,7 +1209,20 @@ EditorPages = {
 
                 @Label('Eye URL texture')
                 @URLInput("EyeURL#{publicName}")
+
+                if ADVANCED_MODE\GetBool()
+                    @Label('Lightwarp has effect only on EyeRefract eyes')
+                    ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'
+                    @CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
+                    @CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
+                    @ComboBox('Lightwarp', ttype .. 'Lightwarp')
+                    @Label('Lightwarp texture URL input\nIt must be 256x16!')
+                    @URLInput(ttype .. 'LightwarpURL')
+                    @Label('Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror')
+                    @NumSlider('Glossiness' .. publicName, 'EyeGlossyStrength' .. publicName, 2)
+
                 @Label('When uring eye URL texture; options below have no effect')
+
                 @ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
                 @CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
                 @CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
@@ -1146,6 +1230,7 @@ EditorPages = {
                 @NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
 
                 if ADVANCED_MODE\GetBool()
+                    @CheckBox("#{prefix}Eye lines points inside", "EyeLineDirection#{publicName}")
                     @NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
                     @NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
 
@@ -1348,6 +1433,7 @@ EditorPages = {
         'internal': 'saves'
         'func': (sheet) =>
             @Label('Open file by double click')
+            @Button 'Reload file list', -> @rebuildFileList()
             list = vgui.Create('DListView', @)
             list\Dock(FILL)
             list\SetMultiSelect(false)
@@ -1406,6 +1492,7 @@ EditorPages = {
         'internal': 'oldsaves'
         'func': (sheet) =>
             @Label('!!! It may or may not work. You will be squished.')
+            @Button 'Reload file list', -> @rebuildFileList()
             list = vgui.Create('DListView', @)
             list\Dock(FILL)
             list\SetMultiSelect(false)
@@ -1448,6 +1535,7 @@ EditorPages = {
             title = @Label('PPM/2')
             title\SetFont('PPM2.Title')
             title\SizeToContents()
+            @URLLabel('Join Discord!', 'https://discord.gg/HG9eS79')\SetFont('PPM2.AboutLabels')
             @URLLabel('PPM/2 is a Ponyscape project', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
             @URLLabel('PPM/2 was created and being developed by DBot', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
             @URLLabel('New models was created by Durpy', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
@@ -1506,6 +1594,8 @@ STRETCHING_PANEL = {
 
 vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
+local cl_playermodel
+
 createTopButtons = (isNewEditor = false) =>
     W, H = @GetSize()
     saveAs = (callback = (->)) ->
@@ -1545,6 +1635,8 @@ createTopButtons = (isNewEditor = false) =>
                     nwdata.NETWORKED = false
                     nwdata\Create()
             @data\ApplyDataToObject(mainData, false) -- no save on apply
+            cl_playermodel = cl_playermodel or GetConVar('cl_playermodel')
+            RunConsoleCommand('cl_playermodel', 'pony') if not cl_playermodel\GetString()\find('pony')
 
     if not isNewEditor
         @selectModelBox = vgui.Create('DComboBox', @)
@@ -1611,6 +1703,12 @@ PPM2.OpenNewEditor = ->
             net.Start('PPM2.EditorStatus')
             net.WriteBool(true)
             net.SendToServer()
+        return
+
+    ply = LocalPlayer()
+    controller = ply\GetPonyData()
+    if not controller
+        Derma_Message('For some reason, your player has no NetworkedPonyData - Nothing to edit!\nTry ppm2_reload in your console and try to open editor again', 'Oops!', 'Okai')
         return
 
     PPM2.EditorTopFrame = vgui.Create('EditablePanel')
@@ -1681,8 +1779,7 @@ PPM2.OpenNewEditor = ->
     @menusBar\SetSize(0, 20)
 
     copy = PPM2.GetMainData()\Copy()
-    ply = LocalPlayer()
-    @controller = ply\GetPonyData()
+    @controller = controller
     copy\SetNetworkData(@controller)
     copy\SetNetworkOnChange(false)
     @data = copy
@@ -1863,8 +1960,11 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
     @Button 'Cleanup unused models', 'ppm2_cleanup'
     @Button 'Reload local data', 'ppm2_reload'
     @Button 'Require data from server', 'ppm2_require'
+    @CheckBox 'Draw hooves as hands', 'ppm2_cl_draw_hands'
     @CheckBox 'Alternative render', 'ppm2_alternative_render'
     @CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
     @CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
     @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
-    @CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
+    @CheckBox 'Enable real time eyes reflections', 'ppm2_cl_reflections'
+    @CheckBox 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
+    @CheckBox 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0

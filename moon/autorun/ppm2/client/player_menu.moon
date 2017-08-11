@@ -23,7 +23,7 @@ doPatch = =>
         if child\GetName() == 'DIconLayout'
             target = child
             break
-    
+
     return if not target
     local buttonTarget
 
@@ -37,7 +37,7 @@ doPatch = =>
         elseif cond2 and buttonChilds[2]\GetText() == 'Player Model'
             buttonTarget = button
             break
-    
+
     return if not buttonTarget
     {:title, :init, :icon, :width, :height, :onewindow} = list.Get('DesktopWindows').PlayerEditor
     buttonTarget.DoClick = ->
@@ -56,7 +56,7 @@ doPatch = =>
             if child\GetName() == 'DModelPanel'
                 targetModel = child
                 break
-        
+
         return if not targetModel
         targetModel.oldSetModel = targetModel.SetModel
         targetModel.SetModel = (model) =>
@@ -86,4 +86,3 @@ doPatch = =>
         hook.Run 'BuildPlayerModelMenu', buttonTarget, buttonTarget.Window
 
 hook.Add 'ContextMenuCreated', 'PPM2.PatchPlayerModelMenu', => timer.Simple 0, -> doPatch(@)
-        

@@ -43,6 +43,8 @@ class PonyRenderController
         @CreateLegs() if @ent == LocalPlayer()
         @socksModel = data\GetSocksModel()
         @socksModel\SetNoDraw(false) if IsValid(@socksModel)
+        @newSocksModel = data\GetNewSocksModel()
+        @newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
         @CreateFlexController() if @ent
     __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
     GetEntity: => @ent
@@ -66,7 +68,7 @@ class PonyRenderController
             .lastRedrawFix = 0
             \SetNoDraw(true)
             .__PPM2_PonyData = @GetData()
-        
+
         @GetData()\GetWeightController()\UpdateWeight(@legsModel)
 
         @lastLegUpdate = CurTime()
@@ -77,7 +79,7 @@ class PonyRenderController
         @duckOffsetHack = @@LEG_CLIP_OFFSET_STAND
         @legsClipPlane = @@LEG_CLIP_VECTOR
         return @legsModel
-    
+
     @LEG_SHIFT_CONST = 24
     @LEG_SHIFT_CONST_VEHICLE = 14
     @LEG_Z_CONST = 0
@@ -100,12 +102,12 @@ class PonyRenderController
         if seq ~= @legSeq
             @legSeq = seq
             @legsModel\ResetSequence(seq)
-        
+
         if @legBGSetup < ctime
             @legBGSetup = ctime + 1
             for group in *ply\GetBodyGroups()
                 @legsModel\SetBodygroup(group.id, ply\GetBodygroup(group.id))
-        
+
         with @legsModel
             \FrameAdvance(ctime - @lastLegUpdate)
             \SetPlaybackRate(@@LEG_ANIM_SPEED_CONST * ply\GetPlaybackRate())
@@ -115,14 +117,14 @@ class PonyRenderController
             \SetPoseParameter('move_yaw',     (ply\GetPoseParameter('move_yaw')   * 360) - 180)
             \SetPoseParameter('body_yaw',     (ply\GetPoseParameter('body_yaw')   * 180) - 90)
             \SetPoseParameter('spine_yaw',    (ply\GetPoseParameter('spine_yaw')  * 180) - 90)
-        
+
         if ply\InVehicle()
             local bonePos
 
             if bone = @legsModel\LookupBone('LrigNeck1')
                 if boneData = @legsModel\GetBonePosition(bone)
                     bonePos = boneData
-            
+
             veh = ply\GetVehicle()
             vehAng = veh\GetAngles()
             eyepos = EyePos()
@@ -160,7 +162,7 @@ class PonyRenderController
                 @duckOffsetHack = @@LEG_CLIP_OFFSET_DUCK
             else
                 @duckOffsetHack = Lerp(0.1, @duckOffsetHack, @@LEG_CLIP_OFFSET_STAND)
-            
+
             @legsModel\SetRenderAngles(newAng)
             @legsModel\SetAngles(newAng)
             @legsModel\SetRenderOrigin(newPos)
@@ -174,9 +176,9 @@ class PonyRenderController
             else
                 @legClipPlanePos = Vector(x, y, z + @duckOffsetHack)
 
-            
+
         @legClipDot = @legsClipPlane\Dot(@legClipPlanePos)
-    
+
     @LEG_CLIP_VECTOR = Vector(0, 0, -1)
     @LEGS_MAX_DISTANCE = 60 ^ 2
     DrawLegs: (start3D = false) =>
@@ -226,7 +228,7 @@ class PonyRenderController
         render.PopCustomClipPlane()
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
-    
+
     DrawLegsOverride: =>
         return if not @isValid
         return if not ENABLE_LEGS\GetBool()
@@ -248,7 +250,7 @@ class PonyRenderController
 
         render.PopCustomClipPlane()
         render.EnableClipping(oldClip)
-    
+
     DrawLegsDepth: (start3D = false) =>
         return if not @isValid
         return if not ENABLE_LEGS\GetBool()
@@ -273,7 +275,7 @@ class PonyRenderController
         render.PopCustomClipPlane()
         cam.End3D() if start3D
         render.EnableClipping(oldClip)
-    
+
     IsValid: => IsValid(@ent) and @isValid
     Reset: =>
         @flexes\Reset() if @flexes and @flexes.Reset
@@ -283,12 +285,12 @@ class PonyRenderController
         @flexes\Remove() if @flexes
         @GetTextureController()\Remove() if @GetTextureController and @GetTextureController()
         @isValid = false
-    
+
     PlayerDeath: =>
         return if not @isValid
         @HideModels(true)
         @GetTextureController()\ResetTextures() if @GetTextureController() and @ent\IsPony()
-    
+
     PlayerRespawn: =>
         return if not @isValid
         @HideModels(false) if @ent\IsPony()
@@ -297,17 +299,22 @@ class PonyRenderController
 
     DrawModels: =>
         @socksModel\DrawModel() if IsValid(@socksModel)
+        @newSocksModel\DrawModel() if IsValid(@newSocksModel)
     HideModels: (status = true) =>
         return if @hideModels == status
         @socksModel\SetNoDraw(status) if IsValid(@socksModel)
+        @newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
         @hideModels = status
 
-    PreDraw: (ent = @ent) =>
+    PreDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
-        @GetTextureController()\PreDraw(ent)
-        @GetTextureController()\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel) and PPM2.ALTERNATIVE_RENDER\GetBool()
+        with @GetTextureController()
+            \PreDraw(ent, drawingNewTask)
+            if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
+                \UpdateSocks(@ent, @socksModel) if IsValid(@socksModel)
+                \UpdateNewSocks(@ent, @newSocksModel) if IsValid(@newSocksModel)
         @flexes\Think(ent) if @flexes
-    PostDraw: (ent = @ent) =>
+    PostDraw: (ent = @ent, drawingNewTask = false) =>
         return if not @isValid
         @GetTextureController()\PostDraw(ent)
 
@@ -338,6 +345,10 @@ class PonyRenderController
                 @socksModel = @GetData()\GetSocksModel()
                 @socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
                 @GetTextureController()\UpdateSocks(@ent, @socksModel) if @GetTextureController() and IsValid(@socksModel)
+            when 'NewSocksModel'
+                @newSocksModel = @GetData()\GetNewSocksModel()
+                @newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
+                @GetTextureController()\UpdateNewSocks(@ent, @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
             when 'NoFlex'
                 if state\GetValue()
                     @flexes\ResetSequences() if @flexes
@@ -404,10 +415,10 @@ class NewPonyRenderController extends PonyRenderController
         @lowerManeModel\SetNoDraw(status) if IsValid(@lowerManeModel)
         @tailModel\SetNoDraw(status) if IsValid(@tailModel)
         super(status)
-    
-    PreDraw: (ent = @ent) =>
-        super(ent)
-        if PPM2.ALTERNATIVE_RENDER\GetBool()
+
+    PreDraw: (ent = @ent, drawingNewTask = false) =>
+        super(ent, drawingNewTask)
+        if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
             textures = @GetTextureController()
             return if not textures
             textures\UpdateUpperMane(@ent, @upperManeModel) if IsValid(@upperManeModel)

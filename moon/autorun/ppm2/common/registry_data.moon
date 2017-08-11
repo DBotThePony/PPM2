@@ -77,13 +77,13 @@ PPM2.PonyDataRegistry = {
         getFunc: 'Age'
         enum: {'FILLY', 'ADULT', 'MATURE'}
     }
-    
+
     'race': {
         default: -> PPM2.RACE_EARTH
         getFunc: 'Race'
         enum: [arg for arg in *PPM2.RACE_ENUMS]
     }
-    
+
     'wings_type': {
         default: -> 0
         getFunc: 'WingsType'
@@ -141,13 +141,13 @@ PPM2.PonyDataRegistry = {
         getFunc: 'EyelashType'
         enum: [arg for arg in *PPM2.EyelashTypes]
     }
-    
+
     'tail': {
         default: -> 0
         getFunc: 'TailType'
         enum: [arg for arg in *PPM2.AvaliableTails]
     }
-    
+
     'tail_new': {
         default: -> 0
         getFunc: 'TailTypeNew'
@@ -278,12 +278,6 @@ PPM2.PonyDataRegistry = {
         type: 'BOOLEAN'
     }
 
-    'use_horn_detail': {
-        default: -> false
-        getFunc: 'UseHornDetail'
-        type: 'BOOLEAN'
-    }
-
     'horn_glow': {
         default: -> false
         getFunc: 'HornGlow'
@@ -299,7 +293,7 @@ PPM2.PonyDataRegistry = {
     }
 
     'horn_detail_color': {
-        default: -> Color(255, 255, 255)
+        default: -> Color(90, 90, 90)
         getFunc: 'HornDetailColor'
         type: 'COLOR'
     }
@@ -340,10 +334,40 @@ PPM2.PonyDataRegistry = {
         type: 'BOOLEAN'
     }
 
+    'socks_model_new': {
+        default: -> false
+        getFunc: 'SocksAsNewModel'
+        type: 'BOOLEAN'
+    }
+
     'socks_model_color': {
         default: -> Color(255, 255, 255)
         getFunc: 'SocksColor'
         type: 'COLOR'
+    }
+
+    'socks_new_model_color1': {
+        default: -> Color(255, 255, 255)
+        getFunc: 'NewSocksColor1'
+        type: 'COLOR'
+    }
+
+    'socks_new_model_color2': {
+        default: -> Color(0, 0, 0)
+        getFunc: 'NewSocksColor2'
+        type: 'COLOR'
+    }
+
+    'socks_new_model_color3': {
+        default: -> Color(0, 0, 0)
+        getFunc: 'NewSocksColor3'
+        type: 'COLOR'
+    }
+
+    'socks_new_texture_url': {
+        default: -> ''
+        getFunc: 'NewSocksTextureURL'
+        type: 'URL'
     }
 
     'suit': {
@@ -521,6 +545,36 @@ PPM2.PonyDataRegistry = {
         max: 1
         type: 'FLOAT'
     }
+
+    'lips_color_inherit': {
+        default: -> true
+        getFunc: 'LipsColorInherit'
+        type: 'BOOLEAN'
+    }
+
+    'nose_color_inherit': {
+        default: -> true
+        getFunc: 'NoseColorInherit'
+        type: 'BOOLEAN'
+    }
+
+    'lips_color': {
+        default: -> Color(172, 92, 92)
+        getFunc: 'LipsColor'
+        type: 'COLOR'
+    }
+
+    'nose_color': {
+        default: -> Color(77, 84, 83)
+        getFunc: 'NoseColor'
+        type: 'COLOR'
+    }
+
+    'weapon_hide': {
+        default: -> true
+        getFunc: 'HideWeapons'
+        type: 'BOOLEAN'
+    }
 }
 
 for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
@@ -560,6 +614,12 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         type: 'COLOR'
     }
 
+    PPM2.PonyDataRegistry["eye_irisline_direction#{internal}"] = {
+        default: -> false
+        getFunc: "EyeLineDirection#{publicName}"
+        type: 'BOOLEAN'
+    }
+
     PPM2.PonyDataRegistry["eye_irisline2#{internal}"] = {
         default: -> Color(255, 255, 255)
         getFunc: "EyeIrisLine2#{publicName}"
@@ -595,6 +655,18 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
     PPM2.PonyDataRegistry["eye_derp#{internal}"] = {
         default: -> false
         getFunc: "DerpEyes#{publicName}"
+        type: 'BOOLEAN'
+    }
+
+    PPM2.PonyDataRegistry["eye_use_refract#{internal}"] = {
+        default: -> false
+        getFunc: "EyeRefract#{publicName}"
+        type: 'BOOLEAN'
+    }
+
+    PPM2.PonyDataRegistry["eye_cornera#{internal}"] = {
+        default: -> false
+        getFunc: "EyeCornerA#{publicName}"
         type: 'BOOLEAN'
     }
 
@@ -641,6 +713,14 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
         getFunc: "IrisHeight#{publicName}"
         min: PPM2.MIN_PUPIL_SIZE
         max: PPM2.MAX_PUPIL_SIZE
+        type: 'FLOAT'
+    }
+
+    PPM2.PonyDataRegistry["eye_glossy_reflection#{internal}"] = {
+        default: -> 0.16
+        getFunc: "EyeGlossyStrength#{publicName}"
+        min: 0
+        max: 1
         type: 'FLOAT'
     }
 
@@ -731,7 +811,7 @@ for i = 1, 6
         getFunc: "SocksDetailColor#{i}"
         type: 'COLOR'
     }
-    
+
     PPM2.PonyDataRegistry["mane_color_#{i}"] = {
         default: -> Color(255, 255, 255)
         getFunc: "ManeColor#{i}"
@@ -873,7 +953,7 @@ for i = 1, PPM2.MAX_TATTOOS
         getFunc: "TattooType#{i}"
         enum: [arg for arg in *PPM2.TATTOOS_REGISTRY]
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_posx_#{i}"] = {
         default: -> 0
         getFunc: "TattooPosX#{i}"
@@ -881,7 +961,7 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 100
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_posy_#{i}"] = {
         default: -> 0
         getFunc: "TattooPosY#{i}"
@@ -890,7 +970,7 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 100
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_rotate_#{i}"] = {
         default: -> 0
         getFunc: "TattooRotate#{i}"
@@ -898,7 +978,7 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 180
         type: 'INT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_scalex_#{i}"] = {
         default: -> 1
         getFunc: "TattooScaleX#{i}"
@@ -906,7 +986,7 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 10
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_glow_strength_#{i}"] = {
         default: -> 1
         getFunc: "TattooGlowStrength#{i}"
@@ -914,7 +994,7 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 1
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_scaley_#{i}"] = {
         default: -> 1
         getFunc: "TattooScaleY#{i}"
@@ -922,26 +1002,26 @@ for i = 1, PPM2.MAX_TATTOOS
         max: 10
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_glow_#{i}"] = {
         default: -> false
         getFunc: "TattooGlow#{i}"
         type: 'BOOLEAN'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_over_detail_#{i}"] = {
         default: -> false
         getFunc: "TattooOverDetail#{i}"
         type: 'BOOLEAN'
     }
-    
+
     PPM2.PonyDataRegistry["tattoo_color_#{i}"] = {
         default: -> Color(255, 255, 255)
         getFunc: "TattooColor#{i}"
         type: 'COLOR'
     }
 
-for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes'}
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
         default: -> 3
         getFunc: ttype .. 'PhongExponent'
@@ -949,7 +1029,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         max: 10
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_boost'] = {
         default: -> 0.09
         getFunc: ttype .. 'PhongBoost'
@@ -957,7 +1037,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         max: 1
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_front'] = {
         default: -> 1
         getFunc: ttype .. 'PhongFront'
@@ -965,7 +1045,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         max: 20
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_middle'] = {
         default: -> 5
         getFunc: ttype .. 'PhongMiddle'
@@ -973,7 +1053,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         max: 20
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_sliding'] = {
         default: -> 10
         getFunc: ttype .. 'PhongSliding'
@@ -981,7 +1061,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         max: 20
         type: 'FLOAT'
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_phong_tint'] = {
         default: -> Color(255, 200, 200)
         getFunc: ttype .. 'PhongTint'
@@ -993,10 +1073,16 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
         getFunc: ttype .. 'Lightwarp'
         enum: [arg for arg in *PPM2.AvaliableLightwarps]
     }
-    
+
     PPM2.PonyDataRegistry[ttype\lower() .. '_lightwarp_texture_url'] = {
         default: -> ''
         getFunc: ttype .. 'LightwarpURL'
+        type: 'URL'
+    }
+
+    PPM2.PonyDataRegistry[ttype\lower() .. '_bumpmap_texture_url'] = {
+        default: -> ''
+        getFunc: ttype .. 'BumpmapURL'
         type: 'URL'
     }
 
@@ -1014,9 +1100,10 @@ for key, value in pairs PPM2.PonyDataRegistry
         value.max = #value.enum - 1
         value.type = 'INT'
 
-for key, value in pairs PPM2.PonyDataRegistry
     switch value.type
         when 'INT'
+            error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
+            error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
             value.fix = INT_FIXER(value.default, value.min, value.max)
             if value.min >= 0
                 selectBits = 16
@@ -1032,6 +1119,8 @@ for key, value in pairs PPM2.PonyDataRegistry
                 value.read = rInt(selectBits, value.min, value.max)
                 value.write = wInt(value.default(), selectBits)
         when 'FLOAT'
+            error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
+            error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
             value.fix = FLOAT_FIXER(value.default, value.min, value.max)
             value.read = rFloat(value.min, value.max)
             value.write = (arg = value.default()) -> wFloat(arg)
