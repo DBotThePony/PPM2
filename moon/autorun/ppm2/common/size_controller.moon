@@ -311,6 +311,7 @@ class PonySizeController
     ModifyDrawMatrix: (ent = @ent) =>
         return if SERVER
         return if not @AllowResize()
+        return if ent.RenderOverride -- PAC3 and other stuff that can change this value
         mat = Matrix()
         mat\Scale(@@DEF_SCALE * @GetPonySize())
         ent\EnableMatrix('RenderMultiply', mat)
