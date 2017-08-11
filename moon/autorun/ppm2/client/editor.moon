@@ -677,6 +677,13 @@ PANEL_SETTINGS_BASE = {
         @createdPanels = 1
         @isNewEditor = false
         -- @resetCollapse = @Spoiler('Reset buttons')
+        @populated = false
+
+    Populate: =>
+    Think: =>
+        if not @populated
+            @populated = true
+            @Populate()
 
     IsNewEditor: => @isNewEditor
     GetIsNewEditor: => @isNewEditor
@@ -1694,6 +1701,9 @@ createTopButtons = (isNewEditor = false) =>
 PPM2.OpenNewEditor = ->
     if IsValid(PPM2.EditorTopFrame)
         with PPM2.EditorTopFrame
+            if .TargetModel ~= LocalPlayer()\GetModel()
+                \Remove()
+                return PPM2.OpenNewEditor()
             \SetVisible(true)
             .controller = LocalPlayer()\GetPonyData() or .controller
             .data\ApplyDataToObject(.controller, false)
@@ -1719,6 +1729,8 @@ PPM2.OpenNewEditor = ->
     topSize = 55
     @SetSize(ScrW(), topSize)
     sysTime = SysTime()
+
+    @TargetModel = LocalPlayer()\GetModel()
 
     @btnClose = vgui.Create('DButton', @)
 	@btnClose\SetText('')
@@ -1805,8 +1817,7 @@ PPM2.OpenNewEditor = ->
         pnl\SetTargetData(copy)
         pnl\Dock(FILL)
         pnl.frame = @
-        func(pnl, @menus)
-        createdPanels += pnl.createdPanels
+        pnl.Populate = -> func(pnl, @menus)
         @panels[internal] = pnl
 
     @leftPanel\MakePopup()
@@ -1817,7 +1828,7 @@ PPM2.OpenNewEditor = ->
     net.SendToServer()
 
     iTime = math.floor((SysTime() - sysTime) * 1000)
-    PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
+    -- PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
 PPM2.OpenOldEditor = ->
     if IsValid(PPM2.OldEditorFrame)
@@ -1898,8 +1909,7 @@ PPM2.OpenOldEditor = ->
         pnl\SetTargetData(copy)
         pnl\Dock(FILL)
         pnl.frame = @
-        func(pnl, @menus)
-        createdPanels += pnl.createdPanels
+        pnl.Populate = -> func(pnl, @menus)
         @panels[internal] = pnl
 
     net.Start('PPM2.EditorStatus')
@@ -1907,7 +1917,7 @@ PPM2.OpenOldEditor = ->
     net.SendToServer()
 
     iTime = math.floor((SysTime() - sysTime) * 1000)
-    PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
+    -- PPM2.Message('Initialized Pony editor in ', iTime, ' milliseconds (created nearly ', createdPanels, ' panels). Look how slow your PC is xd')
 
 PPM2.OpenEditor = ->
     if LocalPlayer()\IsPony()
