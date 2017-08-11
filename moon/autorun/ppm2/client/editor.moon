@@ -1694,6 +1694,9 @@ createTopButtons = (isNewEditor = false) =>
 PPM2.OpenNewEditor = ->
     if IsValid(PPM2.EditorTopFrame)
         with PPM2.EditorTopFrame
+            if .TargetModel ~= LocalPlayer()\GetModel()
+                \Remove()
+                return PPM2.OpenNewEditor()
             \SetVisible(true)
             .controller = LocalPlayer()\GetPonyData() or .controller
             .data\ApplyDataToObject(.controller, false)
@@ -1719,6 +1722,8 @@ PPM2.OpenNewEditor = ->
     topSize = 55
     @SetSize(ScrW(), topSize)
     sysTime = SysTime()
+
+    @TargetModel = LocalPlayer()\GetModel()
 
     @btnClose = vgui.Create('DButton', @)
 	@btnClose\SetText('')
