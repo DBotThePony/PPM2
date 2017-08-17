@@ -1614,7 +1614,7 @@ createTopButtons = (isNewEditor = false) =>
             @unsavedChanges = false
             @model.unsavedChanges = false if IsValid(@model)
             @SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
-            @panels.saves.rebuildFileList()
+            @panels.saves.rebuildFileList() if @panels.saves and @panels.saves.rebuildFileList
             callback(txt)
         Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
 
