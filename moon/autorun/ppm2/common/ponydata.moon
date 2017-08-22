@@ -104,6 +104,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
             return unless IsValid(@ent)
             @Reset()
     GenericDataChange: (state) =>
+        hook.Run 'PPM2_PonyDataChanges', @ent, @, state
         if state\GetKey() == 'Entity' and IsValid(@GetEntity())
             @SetupEntity(@GetEntity())
 
