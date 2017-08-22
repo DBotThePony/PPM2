@@ -76,11 +76,14 @@ if CLIENT
     include 'client/player_menu.lua'
     include 'client/editor.lua'
     include 'client/rag_edit.lua'
-    include 'client/pac3_patch.lua'
 
     for ent in *ents.GetAll()
         if ent.isPonyLegsModel
             ent\Remove()
+
+    hook.Add 'PAC3ResetBones', 'PPM2.ResetBones', (ent) ->
+        data = ent\GetPonyData()
+        hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data) if data
 else
     CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
     resource.AddWorkshop('933203381')
@@ -119,7 +122,6 @@ else
     AddCSLuaFile 'client/emotes.lua'
     AddCSLuaFile 'client/player_menu.lua'
     AddCSLuaFile 'client/rag_edit.lua'
-    AddCSLuaFile 'client/pac3_patch.lua'
     AddCSLuaFile 'client/functions.lua'
     AddCSLuaFile 'client/new_texture_controller.lua'
     include 'server/hooks.lua'
