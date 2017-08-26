@@ -32,7 +32,7 @@ URL_COLOR = Color(174, 124, 192)
 PPM2.Format = (...) ->
 	previousColor = DEFAULT_TEXT_COLOR
 	output = {previousColor}
-	
+
 	for value in *{...}
 		switch type(value)
 			when 'table'
@@ -211,13 +211,7 @@ entMeta.IsNewPony = =>
             oldModel = @__ppm2_lastmodel
             @__ppm2_lastmodel = model
             data\ModelChanges(oldModel, model)
-    switch model
-        when 'models/ppm/player_default_base_new.mdl'
-            return true
-        when 'models/ppm/player_default_base_new_nj.mdl'
-            return true
-        else
-            return false
+    return model == 'models/ppm/player_default_base_new.mdl' or model == 'models/ppm/player_default_base_new_nj.mdl'
 
 entMeta.IsPonyCached = =>
     switch @__ppm2_lastmodel
