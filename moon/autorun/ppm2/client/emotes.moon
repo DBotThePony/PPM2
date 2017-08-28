@@ -134,7 +134,6 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
         \SetSize(200, 300)
         .Paint = ->
         \SetMouseInputEnabled(true)
-    checkboxes = {}
     @buttons = for {:name, :id, :sequence, :time, :fexists, :filecrop} in *PPM2.AVALIABLE_EMOTES
         with btn = vgui.Create('DButton', @scroll)
             \SetTextColor(BUTTON_TEXT_COLOR)
@@ -165,7 +164,6 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
                     return if .suppress
                     BUTTON_CLICK_FUNC(btn, true) if newVal
                     BUTTON_CLICK_FUNC(btn, false, true) if not newVal
-            table.insert(checkboxes, .checkbox)
             if fexists
                 image = vgui.Create('DImage', btn)
                 with image
