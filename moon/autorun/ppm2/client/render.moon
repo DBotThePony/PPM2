@@ -15,6 +15,7 @@
 -- limitations under the License.
 --
 
+RENDER_HORN_GLOW = CreateConVar('ppm2_horn_glow', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn glow when player uses physgun')
 TASK_RENDER_TYPE = CreateConVar('ppm2_task_render_type', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Task rendering type (e.g. pony ragdolls and NPCs). 1 - better render; less conflicts; more FPS. 0 - "old-style" render; possible conflicts;')
 DRAW_LEGS_DEPTH = CreateConVar('ppm2_render_legsdepth', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Render legs in depth pass. Useful with Boken DoF enabled')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
@@ -174,6 +175,7 @@ PPM2.PostPlayerDraw = =>
 
 do
     hornGlowStatus = {}
+
     hook.Add 'Think', 'PPM2.HornEffects', =>
         frame = FrameNumber()
         for ent, status in pairs hornGlowStatus
@@ -182,13 +184,13 @@ do
             elseif status.frame ~= frame
                 status.data\SetHornGlow(status.prevStatus)
                 hornGlowStatus[ent] = nil
-            else
-                status.data\SetHornGlow(status.isEnabled) if status.data\GetHornGlow() ~= status.isEnabled
+            elseif not status.prevStatus and RENDER_HORN_GLOW\GetBool() and status.data\GetHornGlow() ~= status.isEnabled
+                status.data\SetHornGlow(status.isEnabled)
+
     hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false) =>
         data = @GetPonyData()
         return if not data
         return if data\GetRace() ~= PPM2.RACE_UNICORN and data\GetRace() ~= PPM2.RACE_ALICORN
-        return if not hornGlowStatus[@] and data\GetHornGlow()
         if not hornGlowStatus[@]
             hornGlowStatus[@] = {frame: FrameNumber(), prevStatus: data\GetHornGlow(), :data, :isEnabled}
         else
