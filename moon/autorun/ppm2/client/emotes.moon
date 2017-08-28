@@ -145,9 +145,7 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
             .hoverDelta = 0
             .sendToServer = sendToServer
             .target = target
-            .DoClick = ->
-                BUTTON_CLICK_FUNC(btn)
-                checkbox2\SetChecked(false) for checkbox2 in *checkboxes when IsValid(checkbox2)
+            .DoClick = BUTTON_CLICK_FUNC
             \SetSize(200, 32)
             \SetText(name)
             \SetFont('HudHintTextLarge')
@@ -157,13 +155,14 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
                 \DockMargin(2, 8, 2, 8)
                 \SetSize(16, 16)
                 \SetChecked(false)
-                if ponyData = target\GetPonyData()
-                    if renderController = ponyData\GetRenderController()
-                        if flexController = renderController\GetFlexController()
-                            \SetChecked(flexController\HasSequence(sequence .. '_endless'))
+                .Think = ->
+                    if IsValid(target)
+                        if ponyData = target\GetPonyData()
+                            if renderController = ponyData\GetRenderController()
+                                if flexController = renderController\GetFlexController()
+                                    \SetChecked(flexController\HasSequence(sequence .. '_endless'))
                 .OnChange = (checkbox3, newVal) ->
                     return if .suppress
-                    checkbox2\SetChecked(false) for checkbox2 in *checkboxes when IsValid(checkbox2) and checkbox2 ~= checkbox3
                     BUTTON_CLICK_FUNC(btn, true) if newVal
                     BUTTON_CLICK_FUNC(btn, false, true) if not newVal
             table.insert(checkboxes, .checkbox)
