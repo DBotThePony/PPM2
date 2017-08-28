@@ -172,6 +172,29 @@ PPM2.PostPlayerDraw = =>
     renderController = data\GetRenderController()
     renderController\PostDraw() if renderController
 
+do
+    hornGlowStatus = {}
+    hook.Add 'Think', 'PPM2.HornEffects', =>
+        frame = FrameNumber()
+        for ent, status in pairs hornGlowStatus
+            if not IsValid(ent)
+                hornGlowStatus[ent] = nil
+            elseif status.frame ~= frame
+                status.data\SetHornGlow(status.prevStatus)
+                hornGlowStatus[ent] = nil
+            else
+                status.data\SetHornGlow(status.isEnabled) if status.data\GetHornGlow() ~= status.isEnabled
+    hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false) =>
+        data = @GetPonyData()
+        return if not data
+        return if data\GetRace() ~= PPM2.RACE_UNICORN and data\GetRace() ~= PPM2.RACE_ALICORN
+        return if not hornGlowStatus[@] and data\GetHornGlow()
+        if not hornGlowStatus[@]
+            hornGlowStatus[@] = {frame: FrameNumber(), prevStatus: data\GetHornGlow(), :data, :isEnabled}
+        else
+            hornGlowStatus[@].frame = FrameNumber()
+            hornGlowStatus[@].isEnabled = isEnabled
+
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
