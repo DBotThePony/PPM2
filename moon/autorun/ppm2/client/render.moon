@@ -16,6 +16,8 @@
 --
 
 RENDER_HORN_GLOW = CreateConVar('ppm2_horn_glow', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn glow when player uses physgun')
+HORN_PARTICLES = CreateConVar('ppm2_horn_particles', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn particles when player uses physgun')
+HORN_FP = CreateConVar('ppm2_horn_firstperson', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn effetcs in first person')
 TASK_RENDER_TYPE = CreateConVar('ppm2_task_render_type', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Task rendering type (e.g. pony ragdolls and NPCs). 1 - better render; less conflicts; more FPS. 0 - "old-style" render; possible conflicts;')
 DRAW_LEGS_DEPTH = CreateConVar('ppm2_render_legsdepth', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Render legs in depth pass. Useful with Boken DoF enabled')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
@@ -175,27 +177,125 @@ PPM2.PostPlayerDraw = =>
 
 do
     hornGlowStatus = {}
+    smokeMaterial = 'ppm/hornsmoke'
+    fireMat = 'particle/fire'
+    hornShift = Vector(1, 0.15, 14.5)
 
     hook.Add 'Think', 'PPM2.HornEffects', =>
         frame = FrameNumber()
         for ent, status in pairs hornGlowStatus
             if not IsValid(ent)
+                status.emmiter\Finish() if IsValid(status.emmiter)
+                status.emmiterProp\Finish() if IsValid(status.emmiterProp)
                 hornGlowStatus[ent] = nil
             elseif status.frame ~= frame
                 status.data\SetHornGlow(status.prevStatus)
+                status.emmiter\Finish() if IsValid(status.emmiter)
+                status.emmiterProp\Finish() if IsValid(status.emmiterProp)
                 hornGlowStatus[ent] = nil
-            elseif not status.prevStatus and RENDER_HORN_GLOW\GetBool() and status.data\GetHornGlow() ~= status.isEnabled
-                status.data\SetHornGlow(status.isEnabled)
+            else
+                if not status.prevStatus and RENDER_HORN_GLOW\GetBool() and status.data\GetHornGlow() ~= status.isEnabled
+                    status.data\SetHornGlow(status.isEnabled)
+                if status.attach and IsValid(status.target)
+                    grabHornPos = Vector(hornShift) * status.data\GetPonySize()
+                    {:Pos, :Ang} = ent\GetAttachment(status.attach)
+                    grabHornPos\Rotate(Ang)
+                    if status.isEnabled and IsValid(status.emmiter) and status.nextSmokeParticle < RealTime()
+                        status.nextSmokeParticle = RealTime() + math.Rand(0.1, 0.5)
+                        for i = 1, math.random(1, 4)
+                            vec = VectorRand()
+                            calcPos = Pos + grabHornPos + vec
+                            with particle = status.emmiter\Add(smokeMaterial, calcPos)
+                                \SetRollDelta(math.rad(math.random(0, 360)))
+                                \SetPos(calcPos)
+                                life = math.Rand(0.9, 3)
+                                \SetStartAlpha(math.random(80, 170))
+                                \SetDieTime(life)
+                                \SetColor(status.color.r, status.color.g, status.color.b)
+                                \SetEndAlpha(0)
+                                size = math.Rand(2, 3)
+                                \SetEndSize(math.Rand(2, size))
+                                \SetStartSize(size)
+                                \SetGravity(Vector())
+                                \SetAirResistance(10)
+                                vecRand = VectorRand()
+                                vecRand.z *= 2
+                                \SetVelocity(vecRand * status.data\GetPonySize() * 2)
+                                \SetCollide(false)
+                        for i = 1, math.random(2, 4)
+                            vec = VectorRand() * 3
+                            calcPos = Pos + grabHornPos + vec
+                            with particle = status.emmiter\Add(fireMat, calcPos)
+                                \SetRollDelta(math.rad(math.random(0, 360)))
+                                \SetPos(calcPos)
+                                life = math.Rand(0.9, 6)
+                                \SetStartAlpha(math.random(80, 170))
+                                \SetDieTime(life)
+                                \SetColor(status.color2.r, status.color2.g, status.color2.b)
+                                \SetEndAlpha(0)
+                                \SetEndSize(0)
+                                \SetStartSize(math.Rand(2, 3))
+                                \SetGravity(Vector())
+                                \SetAirResistance(0)
+                                calcVel = calcPos - status.tpos
+                                calcVel\Normalize()
+                                calcVel *= calcPos\Distance(status.tpos) * .2
+                                \SetVelocity(-calcVel)
+                                \SetCollide(false)
+                    if status.isEnabled and IsValid(status.emmiterProp) and status.nextGrabParticle < RealTime() and status.mins and status.maxs
+                        status.nextGrabParticle = RealTime() + math.Rand(0.2, 0.9)
+                        status.emmiterProp\SetPos(status.tpos)
+                        for i = 1, math.random(5, 10)
+                            calcPos = Vector(math.Rand(status.mins.x, status.maxs.x), math.Rand(status.mins.y, status.maxs.y), math.Rand(status.mins.z, status.maxs.z))
+                            with particle = status.emmiterProp\Add(fireMat, calcPos)
+                                \SetRollDelta(math.rad(math.random(0, 360)))
+                                \SetPos(calcPos)
+                                life = math.Rand(0.9, 6)
+                                \SetStartAlpha(math.random(130, 230))
+                                \SetDieTime(life)
+                                \SetColor(status.bcolor.r, status.bcolor.g, status.bcolor.b)
+                                \SetEndAlpha(0)
+                                \SetEndSize(math.Rand(5, 15))
+                                \SetStartSize(0)
+                                \SetGravity(Vector(0, 0, -math.Rand(5, 15)))
+                                \SetAirResistance(15)
+                                \SetVelocity(VectorRand())
+                                \SetCollide(false)
 
-    hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false) =>
+    hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false, target = NULL, bone = 0, hitPos = Vector()) =>
+        return if not HORN_FP\GetBool() and @ == LocalPlayer() and not @ShouldDrawLocalPlayer()
         data = @GetPonyData()
         return if not data
         return if data\GetRace() ~= PPM2.RACE_UNICORN and data\GetRace() ~= PPM2.RACE_ALICORN
         if not hornGlowStatus[@]
-            hornGlowStatus[@] = {frame: FrameNumber(), prevStatus: data\GetHornGlow(), :data, :isEnabled}
+            hornGlowStatus[@] = {
+                frame: FrameNumber()
+                prevStatus: data\GetHornGlow()
+                :data, :isEnabled, :hitPos, :target, :bone
+                tpos: @GetPos()
+                attach: @LookupAttachment('eyes')
+                nextSmokeParticle: 0
+                nextGrabParticle: 0
+            }
+
+            if HORN_PARTICLES\GetBool()
+                hornGlowStatus[@].emmiter = ParticleEmitter(EyePos())
+                hornGlowStatus[@].emmiterProp = ParticleEmitter(EyePos())
+
+            hornGlowStatus[@].color = data\GetBodyColor()
+            hornGlowStatus[@].bcolor = hornGlowStatus[@].color
+            hornGlowStatus[@].color2 = data\GetHornDetailColor()
+            hornGlowStatus[@].color = data\GetHornColor() if data\GetSeparateHorn()
         else
             hornGlowStatus[@].frame = FrameNumber()
             hornGlowStatus[@].isEnabled = isEnabled
+            hornGlowStatus[@].target = target
+            hornGlowStatus[@].bone = bone
+            hornGlowStatus[@].hitPos = hitPos
+            if IsValid(target)
+                hornGlowStatus[@].tpos = target\GetPos() + hitPos
+                hornGlowStatus[@].mins, hornGlowStatus[@].maxs = target\WorldSpaceAABB()
+        return not IsValid(target)
 
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
