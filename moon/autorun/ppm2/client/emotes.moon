@@ -33,9 +33,11 @@ net.Receive 'PPM2.AngerAnimation', ->
 net.Receive 'PPM2.PlayEmote', ->
     emoteID = net.ReadUInt(8)
     ply = net.ReadEntity()
+    isEndless = net.ReadBool()
+    shouldStop = net.ReadBool()
     return if not IsValid(ply) or not ply\GetPonyData()
     return if not PPM2.AVALIABLE_EMOTES[emoteID]
-    hook.Call('PPM2_EmoteAnimation', nil, ply, PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time)
+    hook.Call('PPM2_EmoteAnimation', nil, ply, PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time, isEndless, shouldStop)
 
 PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
 PPM2.EmotesPanel\Remove() if IsValid(PPM2.EmotesPanel)
@@ -43,6 +45,8 @@ PPM2.EmotesPanel\Remove() if IsValid(PPM2.EmotesPanel)
 CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
     args[1] = args[1] or ''
     emoteID = tonumber(args[1])
+    isEndless = tobool(args[2])
+    shouldStop = tobool(args[3])
 
     if emoteID
         if not PPM2.AVALIABLE_EMOTES[emoteID]
@@ -50,6 +54,8 @@ CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
             return
         net.Start('PPM2.PlayEmote')
         net.WriteUInt(emoteID, 8)
+        net.WriteBool(isEndless)
+        net.WriteBool(shouldStop)
         net.SendToServer()
         hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), PPM2.AVALIABLE_EMOTES[emoteID].sequence, PPM2.AVALIABLE_EMOTES[emoteID].time)
     else
@@ -59,6 +65,8 @@ CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
             return
         net.Start('PPM2.PlayEmote')
         net.WriteUInt(PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].id, 8)
+        net.WriteBool(isEndless)
+        net.WriteBool(shouldStop)
         net.SendToServer()
         hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), emoteID, PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].time)
 
@@ -81,14 +89,16 @@ BUTTON_DRAW_FUNC = (w = 0, h = 0) =>
     surface.SetDrawColor(col, col, col, 150)
     surface.DrawRect(0, 0, w, h)
 
-BUTTON_CLICK_FUNC = =>
+BUTTON_CLICK_FUNC = (isEndless = false, shouldStop = false) =>
     if @sendToServer
         net.Start('PPM2.PlayEmote')
         net.WriteUInt(@id, 8)
+        net.WriteBool(isEndless)
+        net.WriteBool(shouldStop)
         net.SendToServer()
-        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), @sequence, @time)
+        hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), @sequence, @time, isEndless, shouldStop)
     else
-        hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time)
+        hook.Call('PPM2_EmoteAnimation', nil, @target, @sequence, @time, isEndless, shouldStop)
 
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
@@ -104,12 +114,14 @@ IMAGE_PANEL_THINK = =>
         if @oldHover
             @oldHover = false
             @hoverPnl\SetVisible(false)
+
 HOVERED_IMAGE_PANEL_THINK = =>
     if not @parent\IsValid()
         @Remove()
         return
     if @parent.lastThink < RealTime()
         @SetVisible(false)
+
 PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) ->
     self = vgui.Create('DPanel', parent)
     @SetSize(200, 300)
@@ -122,9 +134,9 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
         \SetSize(200, 300)
         .Paint = ->
         \SetMouseInputEnabled(true)
+    checkboxes = {}
     @buttons = for {:name, :id, :sequence, :time, :fexists, :filecrop} in *PPM2.AVALIABLE_EMOTES
-        btn = vgui.Create('DButton', @scroll)
-        with btn
+        with btn = vgui.Create('DButton', @scroll)
             \SetTextColor(BUTTON_TEXT_COLOR)
             .Paint = BUTTON_DRAW_FUNC
             .id = id
@@ -133,11 +145,28 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
             .hoverDelta = 0
             .sendToServer = sendToServer
             .target = target
-            .DoClick = BUTTON_CLICK_FUNC
+            .DoClick = ->
+                BUTTON_CLICK_FUNC(btn)
+                checkbox2\SetChecked(false) for checkbox2 in *checkboxes when IsValid(checkbox2)
             \SetSize(200, 32)
             \SetText(name)
             \SetFont('HudHintTextLarge')
             \Dock(TOP)
+            with .checkbox = \Add('DCheckBox')
+                \Dock(RIGHT)
+                \DockMargin(2, 8, 2, 8)
+                \SetSize(16, 16)
+                \SetChecked(false)
+                if ponyData = target\GetPonyData()
+                    if renderController = ponyData\GetRenderController()
+                        if flexController = renderController\GetFlexController()
+                            \SetChecked(flexController\HasSequence(sequence .. '_endless'))
+                .OnChange = (checkbox3, newVal) ->
+                    return if .suppress
+                    checkbox2\SetChecked(false) for checkbox2 in *checkboxes when IsValid(checkbox2) and checkbox2 ~= checkbox3
+                    BUTTON_CLICK_FUNC(btn, true) if newVal
+                    BUTTON_CLICK_FUNC(btn, false, true) if not newVal
+            table.insert(checkboxes, .checkbox)
             if fexists
                 image = vgui.Create('DImage', btn)
                 with image
@@ -192,6 +221,7 @@ hook.Add 'StartChat', 'PPM2.Emotes', ->
             PPM2.EmotesPanel\SetVisible(false)
             PPM2.EmotesPanel\SetMouseInputEnabled(false)
             PPM2.EmotesPanel\KillFocus()
+
 hook.Add 'FinishChat', 'PPM2.Emotes', ->
     if IsValid(PPM2.EmotesPanel)
         PPM2.EmotesPanel\KillFocus()

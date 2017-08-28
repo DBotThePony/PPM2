@@ -14,7 +14,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
--- 
+--
 -- 0	eyes_updown
 -- 1	eyes_rightleft
 -- 2	JawOpen
@@ -89,9 +89,9 @@ class FlexState
         @useLerp = true
         @lerpMultiplier = 1
         @activeID = "DisableFlex#{@flexName}"
-    
+
     __tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
-    
+
     GetFlexID: => @flexID
     GetFlexName: => @flexName
     SetUseLerp: (val = true) => @useLerp = val
@@ -100,7 +100,7 @@ class FlexState
     SetLerpModify: (val = 1) => @lerpMultiplier = val
     GetLerpModify: => @lerpMultiplier
     LerpModify: => @lerpMultiplier
-    
+
     GetModifierID: (name = '') =>
         return @modifiersNames[name] if @modifiersNames[name]
         @nextModifierID += 1
@@ -166,20 +166,20 @@ class FlexState
     AddRealValue: (val = 0) => @SetRealValue(@target + val)
     Think: (ent = @ent, delta = 0) =>
         return if not @active
-        
+
         if @useModifiers
             @current = 0
             @scale = @originalscale * @scaleModify
             @speed = @originalspeed * @speedModify
-            
+
             for i = 1, #@modifiers
                 @modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
                 @current += @modifiers[i]
-            
+
             @scale += modif for modif in *@scaleModifiers
             @speed += modif for modif in *@speedModifiers
             @current = math.Clamp(@current, @min, @max) * @scale
-        
+
         if not IsValid(@ent)
             @ent = @controller.ent
             ent = @ent
@@ -248,9 +248,9 @@ class FlexSequence
         @pausedSequences = {}
         @createfunc() if @createfunc
         @resetfunc() if @resetfunc
-    
+
     __tostring: => "[#{@@__name}:#{@name}]"
-    
+
     SetTime: (newTime = @time, refresh = true) =>
         @frame = 0
         @start = RealTime() if refresh
@@ -262,7 +262,7 @@ class FlexSequence
         @finish = @start + @time
         @deltaAnim = 1
         @resetfunc() if @resetfunc
-    
+
     GetController: => @controller
     GetEntity: => @ent
     GetName: => @name
@@ -292,7 +292,7 @@ class FlexSequence
             if @HasFinished()
                 @Stop()
                 return false
-        
+
             @deltaAnim = (@finish - RealTime()) / @time
             if @deltaAnim < 0
                 @deltaAnim = 1
@@ -306,7 +306,7 @@ class FlexSequence
                 if status == false
                     @Stop()
                     return false
-        
+
         return true
     Pause: =>
         return false if @paused
@@ -554,15 +554,15 @@ class PonyFlexController
                 Grin = @GetModifierID(1)
                 GrinState = @GetFlexState(1)
                 GrinState\SetModifierWeight(Grin, .6)
-                
+
                 Left_Blink = @GetModifierID(2)
                 Left_BlinkState = @GetFlexState(2)
                 Left_BlinkState\SetModifierWeight(Left_Blink, .9)
-                
+
                 Right_Blink = @GetModifierID(3)
                 Right_BlinkState = @GetFlexState(3)
                 Right_BlinkState\SetModifierWeight(Right_Blink, .9)
-                
+
                 JawOpen = @GetModifierID(4)
                 JawOpenState = @GetFlexState(4)
                 JawOpenState\SetModifierScale(JawOpen, 2)
@@ -944,6 +944,19 @@ class PonyFlexController
         seq.numid = i for i, seq in pairs child.FLEX_SEQUENCES
         child.FLEX_SEQUENCES_TABLE = {seq.name, seq for seq in *child.FLEX_SEQUENCES}
         child.FLEX_SEQUENCES_TABLE[seq.numid] = seq for seq in *child.FLEX_SEQUENCES
+        lastID = child.FLEX_SEQUENCES[#child.FLEX_SEQUENCES].numid + 1
+
+        for emote in *PPM2.AVALIABLE_EMOTES
+            getFlex = child.FLEX_SEQUENCES_TABLE[emote.sequence]
+            if getFlex
+                copyFlex = {k, v for k, v in pairs getFlex}
+                copyFlex.repeat = true
+                copyFlex.numid = lastID
+                copyFlex.name ..= '_endless'
+                lastID += 1
+                child.FLEX_SEQUENCES_TABLE[copyFlex.name] = copyFlex
+                child.FLEX_SEQUENCES_TABLE[copyFlex.numid] = copyFlex
+                table.insert(child.FLEX_LIST, copyFlex)
     @__inherited(@)
 
     @NEXT_HOOK_ID = 0
@@ -976,7 +989,7 @@ class PonyFlexController
         @Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
         @Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
         PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
-    
+
     IsValid: => @isValid
     StartSequence: (seqID = '', time) =>
         return false if not @isValid
@@ -1004,7 +1017,7 @@ class PonyFlexController
         return false if not @isValid
         return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
         return false
-    
+
     EndSequence: (seqID = '', callStop = true) =>
         return false if not @isValid
         return false if not @currentSequences[seqID]
@@ -1012,12 +1025,12 @@ class PonyFlexController
         @currentSequences[seqID] = nil
         @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
         return true
-    
+
     ResetSequences: =>
         return false if not @isValid
         for seq in *@currentSequencesIterable
             seq\Stop()
-        
+
         @currentSequences = {}
         @currentSequencesIterable = {}
         state\Reset(false) for state in *@statesIterable
@@ -1025,9 +1038,9 @@ class PonyFlexController
         for seq in *@@FLEX_SEQUENCES
             continue if not seq.autostart
             @StartSequence(seq.name)
-    
+
     Reset: => @ResetSequences()
-    
+
     PlayerRespawn: =>
         return if not @isValid
         @ResetSequences()
@@ -1035,7 +1048,7 @@ class PonyFlexController
     HasSequence: (seqID = '') =>
         return false if not @isValid
         @currentSequences[seqID] and true or false
-    
+
     GetFlexState: (name = '') => @statesTable[name]
     RebuildIterableList: =>
         return false if not @isValid
@@ -1063,7 +1076,7 @@ class PonyFlexController
             return nil
         hook.Add id, @hookID, newFunc
         table.insert(@hooks, id)
-    
+
     OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
         return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
         switch text\lower()
@@ -1114,12 +1127,16 @@ class PonyFlexController
         return if ply\GetEntity() ~= @ent\GetEntity()
         @EndSequence('kill_grin')
         @RestartSequence('anger')
-    PPM2_EmoteAnimation: (ply = NULL, emote = '', time) =>
+    PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
         return if ply\GetEntity() ~= @ent\GetEntity()
         for {:sequence} in *PPM2.AVALIABLE_EMOTES
-            continue if sequence == emote
-            @EndSequence(sequence)
-        @RestartSequence(emote, time)
+            if shouldStop or sequence ~= emote
+                @EndSequence(sequence)
+                @EndSequence(sequence .. '_endless')
+        if isEndless
+            time = nil
+            emote ..= '_endless'
+        @RestartSequence(emote, time) if not shouldStop
 
     RemoveHooks: =>
         for iHook in *@hooks

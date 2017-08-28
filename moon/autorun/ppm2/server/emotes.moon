@@ -57,6 +57,8 @@ net.Receive 'PPM2.PlayEmote', (len = 0, ply = NULL) ->
     return if not IsValid(ply)
     self = ply
     emoteID = net.ReadUInt(8)
+    isEndless = net.ReadBool()
+    shouldStop = net.ReadBool()
     return if not PPM2.AVALIABLE_EMOTES[emoteID]
     @__ppm2_last_played_emote = @__ppm2_last_played_emote or 0
     return if @__ppm2_last_played_emote > RealTime()
@@ -64,4 +66,6 @@ net.Receive 'PPM2.PlayEmote', (len = 0, ply = NULL) ->
     net.Start('PPM2.PlayEmote')
     net.WriteUInt(emoteID, 8)
     net.WriteEntity(ply)
+    net.WriteBool(isEndless)
+    net.WriteBool(shouldStop)
     net.SendOmit(ply)
