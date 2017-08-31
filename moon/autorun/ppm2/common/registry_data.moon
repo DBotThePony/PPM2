@@ -278,6 +278,12 @@ PPM2.PonyDataRegistry = {
 		type: 'BOOLEAN'
 	}
 
+	'separate_magic_color': {
+		default: -> false
+		getFunc: 'SeparateMagicColor'
+		type: 'BOOLEAN'
+	}
+
 	'horn_magic_color': {
 		default: -> Color(255, 255, 255)
 		getFunc: 'HornMagicColor'

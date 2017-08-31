@@ -189,7 +189,7 @@ do
 		for ent, status in pairs hornGlowStatus
 			if IsValid(ent) and status.frame == frame and IsValid(status.target)
 				additional = math.sin(cTime / 2 + status.haloSeed * 3) * 40
-				newCol = PPM2.AddColor(status.bcolor, Color(additional, additional, additional))
+				newCol = PPM2.AddColor(status.color, Color(additional, additional, additional))
 				halo.Add({status.target}, newCol, math.sin(cTime + status.haloSeed) * 4 + 8, math.cos(cTime + status.haloSeed) * 4 + 8, 2)
 
 	hook.Add 'Think', 'PPM2.HornEffects', =>
@@ -212,14 +212,14 @@ do
 					{:Pos, :Ang} = ent\GetAttachment(status.attach)
 					grabHornPos\Rotate(Ang)
 					if status.isEnabled and IsValid(status.emmiter) and status.nextSmokeParticle < RealTime()
-						status.nextSmokeParticle = RealTime() + math.Rand(0.1, 0.5)
+						status.nextSmokeParticle = RealTime() + math.Rand(0.05, 0.2)
 						for i = 1, math.random(1, 4)
 							vec = VectorRand()
 							calcPos = Pos + grabHornPos + vec
 							with particle = status.emmiter\Add(smokeMaterial, calcPos)
 								\SetRollDelta(math.rad(math.random(0, 360)))
 								\SetPos(calcPos)
-								life = math.Rand(0.9, 3)
+								life = math.Rand(0.5, 0.9)
 								\SetStartAlpha(math.random(80, 170))
 								\SetDieTime(life)
 								\SetColor(status.color.r, status.color.g, status.color.b)
@@ -231,46 +231,26 @@ do
 								\SetAirResistance(10)
 								vecRand = VectorRand()
 								vecRand.z *= 2
-								\SetVelocity(vecRand * status.data\GetPonySize() * 2)
-								\SetCollide(false)
-						for i = 1, math.random(2, 4)
-							vec = VectorRand() * 3
-							calcPos = Pos + grabHornPos + vec
-							with particle = status.emmiter\Add(fireMat, calcPos)
-								\SetRollDelta(math.rad(math.random(0, 360)))
-								\SetPos(calcPos)
-								life = math.Rand(0.9, 6)
-								\SetStartAlpha(math.random(80, 170))
-								\SetDieTime(life)
-								\SetColor(status.color2.r, status.color2.g, status.color2.b)
-								\SetEndAlpha(0)
-								\SetEndSize(0)
-								\SetStartSize(math.Rand(2, 3))
-								\SetGravity(Vector())
-								\SetAirResistance(0)
-								calcVel = calcPos - status.tpos
-								calcVel\Normalize()
-								calcVel *= calcPos\Distance(status.tpos) * .2
-								\SetVelocity(-calcVel)
+								\SetVelocity(ent\GetVelocity() + vecRand * status.data\GetPonySize() * 2)
 								\SetCollide(false)
 					if status.isEnabled and IsValid(status.emmiterProp) and status.nextGrabParticle < RealTime() and status.mins and status.maxs
-						status.nextGrabParticle = RealTime() + math.Rand(0.2, 0.9)
+						status.nextGrabParticle = RealTime() + math.Rand(0.05, 0.3)
 						status.emmiterProp\SetPos(status.tpos)
-						for i = 1, math.random(5, 10)
+						for i = 1, math.random(2, 6)
 							calcPos = Vector(math.Rand(status.mins.x, status.maxs.x), math.Rand(status.mins.y, status.maxs.y), math.Rand(status.mins.z, status.maxs.z))
 							with particle = status.emmiterProp\Add(fireMat, calcPos)
 								\SetRollDelta(math.rad(math.random(0, 360)))
 								\SetPos(calcPos)
-								life = math.Rand(0.9, 6)
+								life = math.Rand(0.5, 0.9)
 								\SetStartAlpha(math.random(130, 230))
 								\SetDieTime(life)
-								\SetColor(status.bcolor.r, status.bcolor.g, status.bcolor.b)
+								\SetColor(status.color.r, status.color.g, status.color.b)
 								\SetEndAlpha(0)
-								\SetEndSize(math.Rand(5, 15))
-								\SetStartSize(0)
-								\SetGravity(Vector(0, 0, -math.Rand(5, 15)))
+								\SetEndSize(0)
+								\SetStartSize(math.Rand(2, 6))
+								\SetGravity(Vector())
 								\SetAirResistance(15)
-								\SetVelocity(VectorRand())
+								\SetVelocity(VectorRand() * 2)
 								\SetCollide(false)
 
 	hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false, target = NULL, bone = 0, hitPos = Vector()) =>
@@ -289,33 +269,35 @@ do
 				nextGrabParticle: 0
 			}
 
-			if HORN_PARTICLES\GetBool()
-				hornGlowStatus[@].emmiter = ParticleEmitter(EyePos())
-				hornGlowStatus[@].emmiterProp = ParticleEmitter(EyePos())
+			with hornGlowStatus[@]
+				if HORN_PARTICLES\GetBool()
+					.emmiter = ParticleEmitter(EyePos())
+					.emmiterProp = ParticleEmitter(EyePos())
 
-			hornGlowStatus[@].color = data\GetBodyColor()
-			hornGlowStatus[@].color2 = data\GetHornDetailColor()
-			hornGlowStatus[@].haloSeed = math.rad(math.random(-1000, 1000))
+				.color = data\GetHornMagicColor()
+				.haloSeed = math.rad(math.random(-1000, 1000))
 
-			if data\GetSeparateHorn()
-				hornGlowStatus[@].color = data\GetHornColor()
-				hornGlowStatus[@].bcolor = data\GetHornMagicColor()
-			else
-				if not data\GetSeparateEyes()
-					hornGlowStatus[@].bcolor = PPM2.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
-				else
-					lerpLeft = PPM2.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
-					lerpRight = PPM2.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
-					hornGlowStatus[@].bcolor = PPM2.LerpColor(0.5, lerpLeft, lerpRight)
+				if not data\GetSeparateMagicColor()
+					if not data\GetSeparateEyes()
+						.color = PPM2.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
+					else
+						lerpLeft = PPM2.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
+						lerpRight = PPM2.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
+						.color = PPM2.LerpColor(0.5, lerpLeft, lerpRight)
 		else
-			hornGlowStatus[@].frame = FrameNumber()
-			hornGlowStatus[@].isEnabled = isEnabled
-			hornGlowStatus[@].target = target
-			hornGlowStatus[@].bone = bone
-			hornGlowStatus[@].hitPos = hitPos
-			if IsValid(target)
-				hornGlowStatus[@].tpos = target\GetPos() + hitPos
-				hornGlowStatus[@].mins, hornGlowStatus[@].maxs = target\WorldSpaceAABB()
+			with hornGlowStatus[@]
+				.frame = FrameNumber()
+				.isEnabled = isEnabled
+				.target = target
+				.bone = bone
+				.hitPos = hitPos
+				if IsValid(target)
+					.tpos = target\GetPos() + hitPos
+					center = target\WorldSpaceCenter()
+					.center = center
+					mins, maxs = target\WorldSpaceAABB()
+					.mins = center + (mins - center) * 1.2
+					.maxs = center + (maxs - center) * 1.2
 		return false if HORN_HIDE_BEAM\GetBool() and IsValid(target)
 
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2

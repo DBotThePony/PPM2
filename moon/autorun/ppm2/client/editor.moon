@@ -1086,6 +1086,7 @@ EditorPages = {
 			@CheckBox('Separate wings phong settings from body', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
 			@CheckBox('Separate horn color from body', 'SeparateHorn')
 			@CheckBox('Separate horn phong settings from body', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
+			@CheckBox('Separate magic color from eye color', 'SeparateMagicColor')
 			@Hr()
 			@ColorBox('Wings color', 'WingsColor')
 			doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
