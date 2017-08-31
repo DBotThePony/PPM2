@@ -212,14 +212,14 @@ do
 					{:Pos, :Ang} = ent\GetAttachment(status.attach)
 					grabHornPos\Rotate(Ang)
 					if status.isEnabled and IsValid(status.emmiter) and status.nextSmokeParticle < RealTime()
-						status.nextSmokeParticle = RealTime() + math.Rand(0.05, 0.2)
+						status.nextSmokeParticle = RealTime() + math.Rand(0.1, 0.2)
 						for i = 1, math.random(1, 4)
 							vec = VectorRand()
 							calcPos = Pos + grabHornPos + vec
 							with particle = status.emmiter\Add(smokeMaterial, calcPos)
 								\SetRollDelta(math.rad(math.random(0, 360)))
 								\SetPos(calcPos)
-								life = math.Rand(0.5, 0.9)
+								life = math.Rand(0.6, 0.9)
 								\SetStartAlpha(math.random(80, 170))
 								\SetDieTime(life)
 								\SetColor(status.color.r, status.color.g, status.color.b)
@@ -250,7 +250,7 @@ do
 								\SetStartSize(math.Rand(2, 6))
 								\SetGravity(Vector())
 								\SetAirResistance(15)
-								\SetVelocity(VectorRand() * 2)
+								\SetVelocity(VectorRand() * 6)
 								\SetCollide(false)
 
 	hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false, target = NULL, bone = 0, hitPos = Vector()) =>
