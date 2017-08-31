@@ -284,9 +284,13 @@ do
                 hornGlowStatus[@].emmiterProp = ParticleEmitter(EyePos())
 
             hornGlowStatus[@].color = data\GetBodyColor()
-            hornGlowStatus[@].bcolor = hornGlowStatus[@].color
             hornGlowStatus[@].color2 = data\GetHornDetailColor()
-            hornGlowStatus[@].color = data\GetHornColor() if data\GetSeparateHorn()
+
+            if data\GetSeparateHorn()
+                hornGlowStatus[@].color = data\GetHornColor()
+                hornGlowStatus[@].bcolor = data\GetHornMagicColor()
+            else
+                hornGlowStatus[@].bcolor = hornGlowStatus[@].color
         else
             hornGlowStatus[@].frame = FrameNumber()
             hornGlowStatus[@].isEnabled = isEnabled

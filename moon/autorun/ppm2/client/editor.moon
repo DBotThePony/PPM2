@@ -1090,6 +1090,7 @@ EditorPages = {
             @ColorBox('Wings color', 'WingsColor')
             doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
             @ColorBox('Horn color', 'HornColor')
+            @ColorBox('Horn magic color', 'HornMagicColor')
             doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
             @Hr()
             @ColorBox('Bat Wings color', 'BatWingColor')
