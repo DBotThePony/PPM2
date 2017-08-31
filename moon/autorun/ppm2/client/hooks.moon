@@ -22,24 +22,25 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
             ent.__cachedIsPony = ent\IsPony()
 
     for ply in *player.GetAll()
-        ply.__cachedIsPony = ply\IsPony()
-        ponydata = ply\GetPonyData()
+        if not ply\IsDormant()
+            ply.__cachedIsPony = ply\IsPony()
+            ponydata = ply\GetPonyData()
 
-        if ply.__cachedIsPony
-            if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply)
-                for wep in *ply\GetWeapons()
-                    if wep
-                        if not hook.Run('ShouldDrawPonyWeapon', ply, wep) and (not wep.ShouldPonyDraw or not wep\ShouldPonyDraw(ply))
-                            wep\SetNoDraw(true)
-                            wep.__ppm2_weapon_hit = true
-                        elseif wep.__ppm2_weapon_hit
+            if ply.__cachedIsPony
+                if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply)
+                    for wep in *ply\GetWeapons()
+                        if wep
+                            if not hook.Run('ShouldDrawPonyWeapon', ply, wep) and (not wep.ShouldPonyDraw or not wep\ShouldPonyDraw(ply))
+                                wep\SetNoDraw(true)
+                                wep.__ppm2_weapon_hit = true
+                            elseif wep.__ppm2_weapon_hit
+                                wep\SetNoDraw(false)
+                                ply.__ppm2_weapon_hit = false
+                else
+                    for wep in *ply\GetWeapons()
+                        if wep and wep.__ppm2_weapon_hit
                             wep\SetNoDraw(false)
                             ply.__ppm2_weapon_hit = false
-            else
-                for wep in *ply\GetWeapons()
-                    if wep and wep.__ppm2_weapon_hit
-                        wep\SetNoDraw(false)
-                        ply.__ppm2_weapon_hit = false
 
 PlayerRespawn = ->
     ent = net.ReadEntity()

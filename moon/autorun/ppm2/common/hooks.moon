@@ -17,18 +17,19 @@
 
 timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
     for ply in *player.GetAll()
-        model = ply\GetModel()
-        ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
-        if ply.__ppm2_lastmodel ~= model
-            data = ply\GetPonyData()
-            if data and data.ModelChanges
-                oldModel = ply.__ppm2_lastmodel
-                ply.__ppm2_lastmodel = model
-                data\ModelChanges(oldModel, model)
-                
+        if not ply\IsDormant()
+            model = ply\GetModel()
+            ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
+            if ply.__ppm2_lastmodel ~= model
+                data = ply\GetPonyData()
+                if data and data.ModelChanges
+                    oldModel = ply.__ppm2_lastmodel
+                    ply.__ppm2_lastmodel = model
+                    data\ModelChanges(oldModel, model)
+
     for task in *PPM2.NetworkedPonyData.RenderTasks
         ply = task.ent
-        if IsValid(ply)
+        if IsValid(ply) and not ply\IsDormant()
             model = ply\GetModel()
             ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
             if ply.__ppm2_lastmodel ~= model
@@ -44,9 +45,9 @@ do
         PPM2.Message debug.traceback()
     timer.Create 'PPM2.SlowUpdate', CLIENT and 0.5 or 5, 0, ->
         for ply in *player.GetAll()
-            continue if not ply\Alive() or not ply\IsPonyCached() or not ply\GetPonyData()
-            data = ply\GetPonyData()
-            xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
+            if ply\Alive() and ply\IsPonyCached() and ply\GetPonyData() and not ply\IsDormant()
+                data = ply\GetPonyData()
+                xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
         for task in *PPM2.NetworkedPonyData.RenderTasks
             if IsValid(task.ent) and task.ent\IsPony()
                 xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
