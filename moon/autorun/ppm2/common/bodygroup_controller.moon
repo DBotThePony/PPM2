@@ -17,6 +17,14 @@
 
 ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 
+TRACKED_ENTS = {}
+TRACKED_ENTS_FRAME = 0
+ents_GetAll = ->
+    if TRACKED_ENTS_FRAME ~= FrameNumber()
+        TRACKED_ENTS = ents.GetAll()
+        TRACKED_ENTS_FRAME = FrameNumber()
+    return TRACKED_ENTS
+
 PPM2.BODYGROUP_SKELETON = 0
 PPM2.BODYGROUP_GENDER = 1
 PPM2.BODYGROUP_HORN = 2
@@ -123,7 +131,7 @@ class DefaultBodygroupController
     CreateSocksModel: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @socksModel if IsValid(@socksModel)
-        for ent in *ents.GetAll()
+        for ent in *ents_GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
                 @socksModel = ent
                 @GetData()\SetSocksModel(@socksModel)
@@ -149,7 +157,7 @@ class DefaultBodygroupController
     CreateNewSocksModel: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @newSocksModel if IsValid(@newSocksModel)
-        for ent in *ents.GetAll()
+        for ent in *ents_GetAll()
             if ent.isPonyPropModel and ent.isNewSocks and ent.manePlayer == @ent
                 @newSocksModel = ent
                 @GetData()\SetNewSocksModel(@newSocksModel)
@@ -474,7 +482,7 @@ class NewBodygroupController extends DefaultBodygroupController
     CreateUpperManeModel: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @maneModelUP if IsValid(@maneModelUP)
-        for ent in *ents.GetAll()
+        for ent in *ents_GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
                 @maneModelUP = ent
                 @GetData()\SetUpperManeModel(@maneModelUP)
@@ -512,7 +520,7 @@ class NewBodygroupController extends DefaultBodygroupController
     CreateLowerManeModel: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @maneModelLower if IsValid(@maneModelLower)
-        for ent in *ents.GetAll()
+        for ent in *ents_GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
                 @maneModelLower = ent
                 @GetData()\SetLowerManeModel(@maneModelLower)
@@ -541,7 +549,7 @@ class NewBodygroupController extends DefaultBodygroupController
     CreateTailModel: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @tailModel if IsValid(@tailModel)
-        for ent in *ents.GetAll()
+        for ent in *ents_GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
                 @tailModel = ent
                 @GetData()\SetTailModel(@tailModel)
