@@ -93,7 +93,7 @@ class NetworkedObject
 			util.AddNetworkString(@NW_ReceiveID)
 			util.AddNetworkString(@NW_Rejected)
 			util.AddNetworkString(@NW_Broadcast)
-		
+
 		net.Receive @NW_Create, (len = 0, ply = NULL) -> @OnNetworkedCreated(ply, len)
 		net.Receive @NW_Modify, (len = 0, ply = NULL) -> @OnNetworkedModify(ply, len)
 		net.Receive @NW_Remove, (len = 0, ply = NULL) -> @OnNetworkedDelete(ply, len)
@@ -127,9 +127,9 @@ class NetworkedObject
 	-- @__inherited = (child) => child.Setup(child)
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
-        defFunc = defValue
-        defFunc = (-> defValue) if type(defValue) ~= 'function'
-        strName = "_NW_#{getName}"
+		defFunc = defValue
+		defFunc = (-> defValue) if type(defValue) ~= 'function'
+		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
 		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id, :onSet}
@@ -154,7 +154,7 @@ class NetworkedObject
 				else
 					net.Broadcast()
 	@NetworkVar = (...) => @AddNetworkVar(...)
-	
+
 	@NW_ClientsideCreation = false
 	@NW_RemoveOnPlayerLeave = true
 	@OnNetworkedCreated = (ply = NULL, len = 0) =>
@@ -179,7 +179,7 @@ class NetworkedObject
 				ply[@NW_CooldownTimer] = RealTime() + 10
 			else
 				ply[@NW_CooldownTimerCount] += 1
-			
+
 			if ply[@NW_CooldownTimerCount] >= 3
 				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
 				if ply[@NW_CooldownMessage] < RealTime()
@@ -230,7 +230,7 @@ class NetworkedObject
 			net.SendOmit(ply)
 		@OnNetworkedModifyCallback(state)
 	@OnNetworkedModifyCallback = (state) => -- Override
-	
+
 	@OnNetworkedDelete = (ply = NULL, len = 0) =>
 		return if not @NW_ClientsideCreation and IsValid(ply)
 		id = net.ReadUInt(16)
@@ -239,7 +239,7 @@ class NetworkedObject
 		obj\Remove(true)
 		@OnNetworkedDeleteCallback(obj, ply, len)
 	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
-	
+
 	@ReadNetworkData = =>
 		output = {strName, {getName, readFunc()} for {:getName, :strName, :readFunc} in *@NW_Vars}
 		return output
@@ -249,7 +249,7 @@ class NetworkedObject
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
 
-        @[data.strName] = data.defFunc() for data in *@@NW_Vars when data.defFunc
+		@[data.strName] = data.defFunc() for data in *@@NW_Vars when data.defFunc
 
 		if SERVER
 			@netID = @@NW_NextObjectID
@@ -257,13 +257,13 @@ class NetworkedObject
 		else
 			netID = -1 if netID == nil
 			@netID = netID
-		
+
 		@@NW_Objects[@netID] = @
 		@NW_Player = NULL if SERVER
 		@NW_Player = LocalPlayer() if CLIENT
 		@isLocal = localObject
 		@NW_Player = LocalPlayer() if localObject
-	
+
 	GetOwner: => @NW_Player
 	IsValid: => @valid
 	IsNetworked: => @NETWORKED
@@ -288,7 +288,7 @@ class NetworkedObject
 				net.Broadcast()
 			else
 				net.SendOmit(@NW_Player)
-	
+
 	NetworkDataChanges: (state) => -- Override
 	SetLocalChange: (state) => -- Override
 	ReadNetworkData: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
@@ -299,28 +299,28 @@ class NetworkedObject
 			if not validPly or applyEntities or not isentity(state\GetValue())
 				state\Apply()
 				@NetworkDataChanges(state) unless silent
-	
+
 	NetworkedIterable: (grabEntities = true) =>
 		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars when grabEntities or not checkForEntity(@[strName])]
 		return data
-    
-    ApplyDataToObject: (target, applyEntities = false) =>
-        for {key, value} in *@NetworkedIterable(applyEntities)
-            target["Set#{key}"](target, value) if target["Set#{key}"]
-        return target
-	
+
+	ApplyDataToObject: (target, applyEntities = false) =>
+		for {key, value} in *@NetworkedIterable(applyEntities)
+			target["Set#{key}"](target, value) if target["Set#{key}"]
+		return target
+
 	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
 	ReBroadcast: =>
-        return false if not @NETWORKED
-        return false if CLIENT
-        net.Start(@@NW_Broadcast)
-        net.WriteUInt(@netID, 16)
-        @WriteNetworkData()
-        net.Broadcast()
-        return true
+		return false if not @NETWORKED
+		return false if CLIENT
+		net.Start(@@NW_Broadcast)
+		net.WriteUInt(@netID, 16)
+		@WriteNetworkData()
+		net.Broadcast()
+		return true
 	SendVar: (Var = '') =>
 		return if @[Var] == nil
-	
+
 	__tostring: => "[NetworkedObject:#{@netID}|#{@ent}]"
 
 	Create: =>

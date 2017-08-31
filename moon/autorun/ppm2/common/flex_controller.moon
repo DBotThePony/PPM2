@@ -60,1119 +60,1119 @@
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
 class FlexState
-    new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
-        @controller = controller
-        @ent = controller.ent
-        @name = flexName
-        @flexName = flexName
-        @flexID = flexID
-        @id = flexID
-        @scale = scale
-        @speed = speed
-        @originalscale = scale
-        @originalspeed = speed
-        @min = min
-        @max = max
-        @current = -1
-        @target = 0
-        @speedModify = 1
-        @scaleModify = 1
-        @speedModifiers = {}
-        @scaleModifiers = {}
-        @modifiers = {}
-        @modifiersSpeeds = {}
-        @modifiersTargets = {}
-        @modifiersNames = {}
-        @useModifiers = useModifiers
-        @nextModifierID = 0
-        @active = active
-        @useLerp = true
-        @lerpMultiplier = 1
-        @activeID = "DisableFlex#{@flexName}"
+	new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
+		@controller = controller
+		@ent = controller.ent
+		@name = flexName
+		@flexName = flexName
+		@flexID = flexID
+		@id = flexID
+		@scale = scale
+		@speed = speed
+		@originalscale = scale
+		@originalspeed = speed
+		@min = min
+		@max = max
+		@current = -1
+		@target = 0
+		@speedModify = 1
+		@scaleModify = 1
+		@speedModifiers = {}
+		@scaleModifiers = {}
+		@modifiers = {}
+		@modifiersSpeeds = {}
+		@modifiersTargets = {}
+		@modifiersNames = {}
+		@useModifiers = useModifiers
+		@nextModifierID = 0
+		@active = active
+		@useLerp = true
+		@lerpMultiplier = 1
+		@activeID = "DisableFlex#{@flexName}"
 
-    __tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
+	__tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
 
-    GetFlexID: => @flexID
-    GetFlexName: => @flexName
-    SetUseLerp: (val = true) => @useLerp = val
-    GetUseLerp: => @useLerp
-    UseLerp: => @useLerp
-    SetLerpModify: (val = 1) => @lerpMultiplier = val
-    GetLerpModify: => @lerpMultiplier
-    LerpModify: => @lerpMultiplier
+	GetFlexID: => @flexID
+	GetFlexName: => @flexName
+	SetUseLerp: (val = true) => @useLerp = val
+	GetUseLerp: => @useLerp
+	UseLerp: => @useLerp
+	SetLerpModify: (val = 1) => @lerpMultiplier = val
+	GetLerpModify: => @lerpMultiplier
+	LerpModify: => @lerpMultiplier
 
-    GetModifierID: (name = '') =>
-        return @modifiersNames[name] if @modifiersNames[name]
-        @nextModifierID += 1
-        id = @nextModifierID
-        @modifiersNames[name] = id
-        @speedModifiers[id] = 0
-        @scaleModifiers[id] = 0
-        @modifiers[id] = 0
-        @modifiersSpeeds[id] = 1
-        @modifiersTargets[id] = 0
-        return id
-    SetModifierWeight: (modifID, val = 0) =>
-        return if not modifID
-        return if not @modifiersTargets[modifID]
-        @modifiersTargets[modifID] = val
-    SetModifierSpeed: (modifID, val = 0) =>
-        return if not modifID
-        return if not @modifiersSpeeds[modifID]
-        @modifiersSpeeds[modifID] = val
-    SetModifierScale: (modifID, val = 0) =>
-        return if not modifID
-        return if not @scaleModifiers[modifID]
-        @scaleModifiers[modifID] = val
-    SetModifierScale: (modifID, val = 0) =>
-        return if not modifID
-        return if not @speedModifiers[modifID]
-        @speedModifiers[modifID] = val
-    ResetModifiers: (name = '', hard = false) =>
-        return false if not @modifiersNames[name]
-        id = @modifiersNames[name]
-        @speedModifiers[id] = 0
-        @scaleModifiers[id] = 0
-        @modifiers[id] = 0 if hard
-        @modifiersTargets[id] = 0
-        @modifiersSpeeds[id] = 1 if hard
-        return true
-    GetEntity: => @ent
-    GetData: => @controller
-    GetController: => @controller
-    GetValue: => @current
-    GetRealValue: => @target
-    SetValue: (val = @target) =>
-        @current = math.Clamp(val, @min, @max) * @scale * @scaleModify
-        @target = @target
-    SetRealValue: (val = @target) => @target = math.Clamp(val, @min, @max) * @scale * @scaleModify
+	GetModifierID: (name = '') =>
+		return @modifiersNames[name] if @modifiersNames[name]
+		@nextModifierID += 1
+		id = @nextModifierID
+		@modifiersNames[name] = id
+		@speedModifiers[id] = 0
+		@scaleModifiers[id] = 0
+		@modifiers[id] = 0
+		@modifiersSpeeds[id] = 1
+		@modifiersTargets[id] = 0
+		return id
+	SetModifierWeight: (modifID, val = 0) =>
+		return if not modifID
+		return if not @modifiersTargets[modifID]
+		@modifiersTargets[modifID] = val
+	SetModifierSpeed: (modifID, val = 0) =>
+		return if not modifID
+		return if not @modifiersSpeeds[modifID]
+		@modifiersSpeeds[modifID] = val
+	SetModifierScale: (modifID, val = 0) =>
+		return if not modifID
+		return if not @scaleModifiers[modifID]
+		@scaleModifiers[modifID] = val
+	SetModifierScale: (modifID, val = 0) =>
+		return if not modifID
+		return if not @speedModifiers[modifID]
+		@speedModifiers[modifID] = val
+	ResetModifiers: (name = '', hard = false) =>
+		return false if not @modifiersNames[name]
+		id = @modifiersNames[name]
+		@speedModifiers[id] = 0
+		@scaleModifiers[id] = 0
+		@modifiers[id] = 0 if hard
+		@modifiersTargets[id] = 0
+		@modifiersSpeeds[id] = 1 if hard
+		return true
+	GetEntity: => @ent
+	GetData: => @controller
+	GetController: => @controller
+	GetValue: => @current
+	GetRealValue: => @target
+	SetValue: (val = @target) =>
+		@current = math.Clamp(val, @min, @max) * @scale * @scaleModify
+		@target = @target
+	SetRealValue: (val = @target) => @target = math.Clamp(val, @min, @max) * @scale * @scaleModify
 
-    GetScale: => @scale
-    GetSpeed: => @speed
-    GetScaleModify: => @scaleModify
-    GetSpeedModify: => @speedModify
-    GetOriginalScale: => @originalscale
-    GetOriginalSpeed: => @originalspeed
+	GetScale: => @scale
+	GetSpeed: => @speed
+	GetScaleModify: => @scaleModify
+	GetSpeedModify: => @speedModify
+	GetOriginalScale: => @originalscale
+	GetOriginalSpeed: => @originalspeed
 
-    SetScale: (val = @scale) => @scale = val
-    GetSpeed: (val = @speed) => @speed = val
-    SetScaleModify: (val = @scaleModify) => @scaleModify = val
-    GetSpeedModify: (val = @speedModify) => @speedModify = val
+	SetScale: (val = @scale) => @scale = val
+	GetSpeed: (val = @speed) => @speed = val
+	SetScaleModify: (val = @scaleModify) => @scaleModify = val
+	GetSpeedModify: (val = @speedModify) => @speedModify = val
 
-    GetIsActive: => @active
-    SetIsActive: (val = true) => @active = val
+	GetIsActive: => @active
+	SetIsActive: (val = true) => @active = val
 
-    AddValue: (val = 0) => @SetValue(@current + val)
-    AddRealValue: (val = 0) => @SetRealValue(@target + val)
-    Think: (ent = @ent, delta = 0) =>
-        return if not @active
+	AddValue: (val = 0) => @SetValue(@current + val)
+	AddRealValue: (val = 0) => @SetRealValue(@target + val)
+	Think: (ent = @ent, delta = 0) =>
+		return if not @active
 
-        if @useModifiers
-            @current = 0
-            @scale = @originalscale * @scaleModify
-            @speed = @originalspeed * @speedModify
+		if @useModifiers
+			@current = 0
+			@scale = @originalscale * @scaleModify
+			@speed = @originalspeed * @speedModify
 
-            for i = 1, #@modifiers
-                @modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
-                @current += @modifiers[i]
+			for i = 1, #@modifiers
+				@modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
+				@current += @modifiers[i]
 
-            @scale += modif for modif in *@scaleModifiers
-            @speed += modif for modif in *@speedModifiers
-            @current = math.Clamp(@current, @min, @max) * @scale
+			@scale += modif for modif in *@scaleModifiers
+			@speed += modif for modif in *@speedModifiers
+			@current = math.Clamp(@current, @min, @max) * @scale
 
-        if not IsValid(@ent)
-            @ent = @controller.ent
-            ent = @ent
+		if not IsValid(@ent)
+			@ent = @controller.ent
+			ent = @ent
 
-        ent\SetFlexWeight(@flexID, @current)
-    DataChanges: (state) =>
-        return if state\GetKey() ~= @activeID
-        @SetIsActive(not state\GetValue())
-        @GetController()\RebuildIterableList()
-        @Reset()
-    Reset: (resetVars = true) =>
-        for name, id in pairs @modifiersNames
-            @speedModifiers[id] = 0
-            @scaleModifiers[id] = 0
-            @modifiers[id] = 0
-            @modifiersTargets[id] = 0
-            @modifiersSpeeds[id] = 1
-        if resetVars
-            @scaleModify = 1
-            @speedModify = 1
-        @scale = @originalscale * @scaleModify
-        @speed = @originalspeed * @speedModify
-        @target = 0
-        @current = 0
-        @ent\SetFlexWeight(@flexID, 0) if IsValid(@ent)
+		ent\SetFlexWeight(@flexID, @current)
+	DataChanges: (state) =>
+		return if state\GetKey() ~= @activeID
+		@SetIsActive(not state\GetValue())
+		@GetController()\RebuildIterableList()
+		@Reset()
+	Reset: (resetVars = true) =>
+		for name, id in pairs @modifiersNames
+			@speedModifiers[id] = 0
+			@scaleModifiers[id] = 0
+			@modifiers[id] = 0
+			@modifiersTargets[id] = 0
+			@modifiersSpeeds[id] = 1
+		if resetVars
+			@scaleModify = 1
+			@speedModify = 1
+		@scale = @originalscale * @scaleModify
+		@speed = @originalspeed * @speedModify
+		@target = 0
+		@current = 0
+		@ent\SetFlexWeight(@flexID, 0) if IsValid(@ent)
 
 PPM2.FlexState = FlexState
 
 class FlexSequence
-    new: (controller, data) =>
-        {
-            'name': @name
-            'repeat': @dorepeat
-            'frames': @frames
-            'time': @time
-            'func': @func
-            'reset': @resetfunc
-            'create': @createfunc
-            'ids': @flexIDsIterable
-            'numid': @numid
-        } = data
+	new: (controller, data) =>
+		{
+			'name': @name
+			'repeat': @dorepeat
+			'frames': @frames
+			'time': @time
+			'func': @func
+			'reset': @resetfunc
+			'create': @createfunc
+			'ids': @flexIDsIterable
+			'numid': @numid
+		} = data
 
-        @flexIDS = {}
-        @flexStates = {}
-        i = 1
-        for id in *data.ids
-            state = controller\GetFlexState(id)
-            num = state\GetModifierID(@name)
-            @["flex_#{id}"] = num
-            @flexIDS[id] = num
-            @flexStates[id] = state
-            @flexStates[i] = state
-            @flexIDS[i] = num
-            i += 1
+		@flexIDS = {}
+		@flexStates = {}
+		i = 1
+		for id in *data.ids
+			state = controller\GetFlexState(id)
+			num = state\GetModifierID(@name)
+			@["flex_#{id}"] = num
+			@flexIDS[id] = num
+			@flexStates[id] = state
+			@flexStates[i] = state
+			@flexIDS[i] = num
+			i += 1
 
-        @ent = controller.ent
-        @controller = controller
-        @frame = 0
-        @start = RealTime()
-        @finish = @start + @time
-        @deltaAnim = 1
-        @speed = 1
-        @scale = 1
-        @valid = true
-        @paused = false
-        @pausedSequences = {}
-        @createfunc() if @createfunc
-        @resetfunc() if @resetfunc
+		@ent = controller.ent
+		@controller = controller
+		@frame = 0
+		@start = RealTime()
+		@finish = @start + @time
+		@deltaAnim = 1
+		@speed = 1
+		@scale = 1
+		@valid = true
+		@paused = false
+		@pausedSequences = {}
+		@createfunc() if @createfunc
+		@resetfunc() if @resetfunc
 
-    __tostring: => "[#{@@__name}:#{@name}]"
+	__tostring: => "[#{@@__name}:#{@name}]"
 
-    SetTime: (newTime = @time, refresh = true) =>
-        @frame = 0
-        @start = RealTime() if refresh
-        @time = newTime
-        @finish = @start + @time
-    Reset: =>
-        @frame = 0
-        @start = RealTime()
-        @finish = @start + @time
-        @deltaAnim = 1
-        @resetfunc() if @resetfunc
+	SetTime: (newTime = @time, refresh = true) =>
+		@frame = 0
+		@start = RealTime() if refresh
+		@time = newTime
+		@finish = @start + @time
+	Reset: =>
+		@frame = 0
+		@start = RealTime()
+		@finish = @start + @time
+		@deltaAnim = 1
+		@resetfunc() if @resetfunc
 
-    GetController: => @controller
-    GetEntity: => @ent
-    GetName: => @name
-    GetRepeat: => @dorepeat
-    GetFrames: => @frames
-    GetFrame: => @frames
-    GetTime: => @time
-    GetThinkFunc: => @func
-    GetCreatFunc: => @createfunc
-    GetSpeed: => @speed
-    GetAnimationSpeed: => @speed
-    GetScale: => @scale
-    GetModifierID: (id = '') => @flexIDS[id]
-    GetFlexState: (id = '') => @flexStates[id]
+	GetController: => @controller
+	GetEntity: => @ent
+	GetName: => @name
+	GetRepeat: => @dorepeat
+	GetFrames: => @frames
+	GetFrame: => @frames
+	GetTime: => @time
+	GetThinkFunc: => @func
+	GetCreatFunc: => @createfunc
+	GetSpeed: => @speed
+	GetAnimationSpeed: => @speed
+	GetScale: => @scale
+	GetModifierID: (id = '') => @flexIDS[id]
+	GetFlexState: (id = '') => @flexStates[id]
 
-    SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
-    SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
+	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
+	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
 
-    IsValid: => @valid
-    Think: (delta = 0) =>
-        @ent = @controller.ent
-        return false if not IsValid(@ent)
-        if @paused
-            @finish += delta
-            @start += delta
-        else
-            if @HasFinished()
-                @Stop()
-                return false
+	IsValid: => @valid
+	Think: (delta = 0) =>
+		@ent = @controller.ent
+		return false if not IsValid(@ent)
+		if @paused
+			@finish += delta
+			@start += delta
+		else
+			if @HasFinished()
+				@Stop()
+				return false
 
-            @deltaAnim = (@finish - RealTime()) / @time
-            if @deltaAnim < 0
-                @deltaAnim = 1
-                @frame = 0
-                @start = RealTime()
-                @finish = @start + @time
-            @frame += 1
+			@deltaAnim = (@finish - RealTime()) / @time
+			if @deltaAnim < 0
+				@deltaAnim = 1
+				@frame = 0
+				@start = RealTime()
+				@finish = @start + @time
+			@frame += 1
 
-            if @func
-                status = @func(delta, 1 - @deltaAnim)
-                if status == false
-                    @Stop()
-                    return false
+			if @func
+				status = @func(delta, 1 - @deltaAnim)
+				if status == false
+					@Stop()
+					return false
 
-        return true
-    Pause: =>
-        return false if @paused
-        @paused = true
-        return true
-    Resume: =>
-        return false if not @paused
-        @paused = false
-        return true
-    PauseSequence: (id = '') =>
-        @pausedSequences[id] = true
-        @GetController()\PauseSequence(id)
-    ResumeSequence: (id = '') =>
-        @pausedSequences[id] = false
-        @GetController()\ResumeSequence(id)
-    Stop: =>
-        for id in *@flexIDsIterable
-            @GetController()\GetFlexState(id)\ResetModifiers(@name)
-        for id, bool in pairs @pausedSequences
-            @GetController()\ResumeSequence(id) if bool
-        @valid = false
-    Remove: => @Stop()
-    HasFinished: =>
-        return false if @dorepeat
-        return RealTime() > @finish
+		return true
+	Pause: =>
+		return false if @paused
+		@paused = true
+		return true
+	Resume: =>
+		return false if not @paused
+		@paused = false
+		return true
+	PauseSequence: (id = '') =>
+		@pausedSequences[id] = true
+		@GetController()\PauseSequence(id)
+	ResumeSequence: (id = '') =>
+		@pausedSequences[id] = false
+		@GetController()\ResumeSequence(id)
+	Stop: =>
+		for id in *@flexIDsIterable
+			@GetController()\GetFlexState(id)\ResetModifiers(@name)
+		for id, bool in pairs @pausedSequences
+			@GetController()\ResumeSequence(id) if bool
+		@valid = false
+	Remove: => @Stop()
+	HasFinished: =>
+		return false if @dorepeat
+		return RealTime() > @finish
 
 PPM2.FlexSequence = FlexSequence
 
 class PonyFlexController
-    @AVALIABLE_CONTROLLERS = {}
-    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
+	@AVALIABLE_CONTROLLERS = {}
+	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
-    @FLEX_LIST = {
-        {flex: 'eyes_updown',       scale: 1, speed: 1, active: false}
-        {flex: 'eyes_rightleft',    scale: 1, speed: 1, active: false}
-        {flex: 'JawOpen',           scale: 1, speed: 1, active: true}
-        {flex: 'JawClose',          scale: 1, speed: 1, active: true}
-        {flex: 'Smirk',             scale: 1, speed: 1, active: true}
-        {flex: 'Frown',             scale: 1, speed: 1, active: true}
-        {flex: 'Stretch',           scale: 1, speed: 1, active: false}
-        {flex: 'Pucker',            scale: 1, speed: 1, active: false}
-        {flex: 'Grin',              scale: 1, speed: 1, active: true}
-        {flex: 'CatFace',           scale: 1, speed: 1, active: true}
-        {flex: 'Mouth_O',           scale: 1, speed: 1, active: true}
-        {flex: 'Mouth_O2',          scale: 1, speed: 1, active: true}
-        {flex: 'Mouth_Full',        scale: 1, speed: 1, active: false}
-        {flex: 'Tongue_Out',        scale: 1, speed: 1, active: true}
-        {flex: 'Tongue_Up',         scale: 1, speed: 1, active: true}
-        {flex: 'Tongue_Down',       scale: 1, speed: 1, active: true}
-        {flex: 'NoEyelashes',       scale: 1, speed: 1, active: false}
-        {flex: 'Eyes_Blink',        scale: 1, speed: 1, active: false}
-        {flex: 'Left_Blink',        scale: 1, speed: 1, active: true}
-        {flex: 'Right_Blink',       scale: 1, speed: 1, active: true}
-        {flex: 'Scrunch',           scale: 1, speed: 1, active: true}
-        {flex: 'FatButt',           scale: 1, speed: 1, active: false}
-        {flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
-        {flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
-        {flex: 'Throat_Bulge',      scale: 1, speed: 1, active: true}
-        {flex: 'Male',              scale: 1, speed: 1, active: false}
-        {flex: 'Hoof_Fluffers',     scale: 1, speed: 1, active: false}
-        {flex: 'o3o',               scale: 1, speed: 1, active: true}
-        {flex: 'Ear_Fluffers',      scale: 1, speed: 1, active: false}
-        {flex: 'Fangs',             scale: 1, speed: 1, active: false}
-        {flex: 'Claw_Teeth',        scale: 1, speed: 1, active: false}
-        {flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
-        {flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
-        {flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
-        {flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
-        {flex: 'Male_2',            scale: 1, speed: 1, active: false}
-        {flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
-        {flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
-        {flex: 'Lowerlid_Raise',    scale: 1, speed: 1, active: false}
-        {flex: 'Happy_Eyes',        scale: 1, speed: 1, active: true}
-        {flex: 'Duck',              scale: 1, speed: 1, active: true}
+	@FLEX_LIST = {
+		{flex: 'eyes_updown',       scale: 1, speed: 1, active: false}
+		{flex: 'eyes_rightleft',    scale: 1, speed: 1, active: false}
+		{flex: 'JawOpen',           scale: 1, speed: 1, active: true}
+		{flex: 'JawClose',          scale: 1, speed: 1, active: true}
+		{flex: 'Smirk',             scale: 1, speed: 1, active: true}
+		{flex: 'Frown',             scale: 1, speed: 1, active: true}
+		{flex: 'Stretch',           scale: 1, speed: 1, active: false}
+		{flex: 'Pucker',            scale: 1, speed: 1, active: false}
+		{flex: 'Grin',              scale: 1, speed: 1, active: true}
+		{flex: 'CatFace',           scale: 1, speed: 1, active: true}
+		{flex: 'Mouth_O',           scale: 1, speed: 1, active: true}
+		{flex: 'Mouth_O2',          scale: 1, speed: 1, active: true}
+		{flex: 'Mouth_Full',        scale: 1, speed: 1, active: false}
+		{flex: 'Tongue_Out',        scale: 1, speed: 1, active: true}
+		{flex: 'Tongue_Up',         scale: 1, speed: 1, active: true}
+		{flex: 'Tongue_Down',       scale: 1, speed: 1, active: true}
+		{flex: 'NoEyelashes',       scale: 1, speed: 1, active: false}
+		{flex: 'Eyes_Blink',        scale: 1, speed: 1, active: false}
+		{flex: 'Left_Blink',        scale: 1, speed: 1, active: true}
+		{flex: 'Right_Blink',       scale: 1, speed: 1, active: true}
+		{flex: 'Scrunch',           scale: 1, speed: 1, active: true}
+		{flex: 'FatButt',           scale: 1, speed: 1, active: false}
+		{flex: 'Stomach_Out',       scale: 1, speed: 1, active: true}
+		{flex: 'Stomach_In',        scale: 1, speed: 1, active: true}
+		{flex: 'Throat_Bulge',      scale: 1, speed: 1, active: true}
+		{flex: 'Male',              scale: 1, speed: 1, active: false}
+		{flex: 'Hoof_Fluffers',     scale: 1, speed: 1, active: false}
+		{flex: 'o3o',               scale: 1, speed: 1, active: true}
+		{flex: 'Ear_Fluffers',      scale: 1, speed: 1, active: false}
+		{flex: 'Fangs',             scale: 1, speed: 1, active: false}
+		{flex: 'Claw_Teeth',        scale: 1, speed: 1, active: false}
+		{flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
+		{flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
+		{flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
+		{flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
+		{flex: 'Male_2',            scale: 1, speed: 1, active: false}
+		{flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
+		{flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
+		{flex: 'Lowerlid_Raise',    scale: 1, speed: 1, active: false}
+		{flex: 'Happy_Eyes',        scale: 1, speed: 1, active: true}
+		{flex: 'Duck',              scale: 1, speed: 1, active: true}
 
-    }
+	}
 
-    @FLEX_SEQUENCES = {
-        {
-            'name': 'anger'
-            'autostart': false
-            'repeat': false
-            'time': 5
-            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch'}
-            'reset': =>
-                @SetTime(math.random(15, 45) / 10)
-                @lastStrengthUpdate = @lastStrengthUpdate or 0
-                if @lastStrengthUpdate < RealTime()
-                    @lastStrengthUpdate = RealTime() + 2
-                    @frownStrength = math.random(40, 100) / 100
-                    @grinStrength = math.random(15, 40) / 100
-                    @angryStrength = math.random(30, 80) / 100
-                    @scrunchStrength = math.random(50, 100) / 100
-                    @SetModifierWeight(1, @frownStrength)
-                    @SetModifierWeight(2, @grinStrength)
-                    @SetModifierWeight(3, @angryStrength)
-                    @SetModifierWeight(4, @scrunchStrength)
-        }
+	@FLEX_SEQUENCES = {
+		{
+			'name': 'anger'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch'}
+			'reset': =>
+				@SetTime(math.random(15, 45) / 10)
+				@lastStrengthUpdate = @lastStrengthUpdate or 0
+				if @lastStrengthUpdate < RealTime()
+					@lastStrengthUpdate = RealTime() + 2
+					@frownStrength = math.random(40, 100) / 100
+					@grinStrength = math.random(15, 40) / 100
+					@angryStrength = math.random(30, 80) / 100
+					@scrunchStrength = math.random(50, 100) / 100
+					@SetModifierWeight(1, @frownStrength)
+					@SetModifierWeight(2, @grinStrength)
+					@SetModifierWeight(3, @angryStrength)
+					@SetModifierWeight(4, @scrunchStrength)
+		}
 
-        {
-            'name': 'sad'
-            'autostart': false
-            'repeat': false
-            'time': 5
-            'ids': {'Frown', 'Grin', 'sad_eyes'}
-            'reset': =>
-                @SetTime(math.random(15, 45) / 10)
-                @lastStrengthUpdate = @lastStrengthUpdate or 0
-                if @lastStrengthUpdate < RealTime()
-                    @lastStrengthUpdate = RealTime() + 2
-                    @frownStrength = math.random(40, 100) / 100
-                    @grinStrength = math.random(15, 40) / 100
-                    @angryStrength = math.random(30, 80) / 100
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, @frownStrength)
-                @SetModifierWeight(2, @grinStrength)
-                @SetModifierWeight(3, @angryStrength)
-        }
+		{
+			'name': 'sad'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Frown', 'Grin', 'sad_eyes'}
+			'reset': =>
+				@SetTime(math.random(15, 45) / 10)
+				@lastStrengthUpdate = @lastStrengthUpdate or 0
+				if @lastStrengthUpdate < RealTime()
+					@lastStrengthUpdate = RealTime() + 2
+					@frownStrength = math.random(40, 100) / 100
+					@grinStrength = math.random(15, 40) / 100
+					@angryStrength = math.random(30, 80) / 100
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, @frownStrength)
+				@SetModifierWeight(2, @grinStrength)
+				@SetModifierWeight(3, @angryStrength)
+		}
 
-        {
-            'name': 'eyes_idle'
-            'autostart': true
-            'repeat': true
-            'time': 5
-            'ids': {'Left_Blink', 'Right_Blink'}
-            'func': (delta, timeOfAnim) =>
-                return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-                left, right = @GetModifierID(1), @GetModifierID(2)
-                leftState, rightState = @GetFlexState(1), @GetFlexState(2)
-                value = math.abs(math.sin(RealTime() * .5) * .15)
-                leftState\SetModifierWeight(left, value)
-                rightState\SetModifierWeight(right, value)
-        }
+		{
+			'name': 'eyes_idle'
+			'autostart': true
+			'repeat': true
+			'time': 5
+			'ids': {'Left_Blink', 'Right_Blink'}
+			'func': (delta, timeOfAnim) =>
+				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				left, right = @GetModifierID(1), @GetModifierID(2)
+				leftState, rightState = @GetFlexState(1), @GetFlexState(2)
+				value = math.abs(math.sin(RealTime() * .5) * .15)
+				leftState\SetModifierWeight(left, value)
+				rightState\SetModifierWeight(right, value)
+		}
 
-        {
-            'name': 'eyes_close'
-            'autostart': true
-            'repeat': true
-            'time': 5
-            'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
-            'func': (delta, timeOfAnim) =>
-                return if not @ent\GetNWBool('PPM2.IsDeathRagdoll')
-                @SetModifierWeight(1, 1)
-                @SetModifierWeight(2, 1)
-                @SetModifierWeight(3, 0.5)
-        }
+		{
+			'name': 'eyes_close'
+			'autostart': true
+			'repeat': true
+			'time': 5
+			'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
+			'func': (delta, timeOfAnim) =>
+				return if not @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				@SetModifierWeight(1, 1)
+				@SetModifierWeight(2, 1)
+				@SetModifierWeight(3, 0.5)
+		}
 
-        {
-            'name': 'body_idle'
-            'autostart': true
-            'repeat': true
-            'time': 2
-            'ids': {'Stomach_Out', 'Stomach_In'}
-            'func': (delta, timeOfAnim) =>
-                return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-                In, Out = @GetModifierID(1), @GetModifierID(2)
-                InState, OutState = @GetFlexState(1), @GetFlexState(2)
-                abs = math.abs(0.5 - timeOfAnim)
-                InState\SetModifierWeight(In, abs)
-                OutState\SetModifierWeight(Out, abs)
-        }
+		{
+			'name': 'body_idle'
+			'autostart': true
+			'repeat': true
+			'time': 2
+			'ids': {'Stomach_Out', 'Stomach_In'}
+			'func': (delta, timeOfAnim) =>
+				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				In, Out = @GetModifierID(1), @GetModifierID(2)
+				InState, OutState = @GetFlexState(1), @GetFlexState(2)
+				abs = math.abs(0.5 - timeOfAnim)
+				InState\SetModifierWeight(In, abs)
+				OutState\SetModifierWeight(Out, abs)
+		}
 
-        {
-            'name': 'health_idle'
-            'autostart': true
-            'repeat': true
-            'time': 5
-            'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
-            'func': (delta, timeOfAnim) =>
-                return false if not @ent\IsPlayer() and not @ent\IsNPC() and @ent.Type ~= 'nextbot'
-                frown = @GetModifierID(1)
-                frownState = @GetFlexState(1)
-                left, right = @GetModifierID(2), @GetModifierID(3)
-                leftState, rightState = @GetFlexState(2), @GetFlexState(3)
-                Mouth_O, Mouth_OState = @GetModifierID(4), @GetFlexState(4)
-                Scrunch = @GetModifierID(4)
-                ScrunchState = @GetFlexState(4)
+		{
+			'name': 'health_idle'
+			'autostart': true
+			'repeat': true
+			'time': 5
+			'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
+			'func': (delta, timeOfAnim) =>
+				return false if not @ent\IsPlayer() and not @ent\IsNPC() and @ent.Type ~= 'nextbot'
+				frown = @GetModifierID(1)
+				frownState = @GetFlexState(1)
+				left, right = @GetModifierID(2), @GetModifierID(3)
+				leftState, rightState = @GetFlexState(2), @GetFlexState(3)
+				Mouth_O, Mouth_OState = @GetModifierID(4), @GetFlexState(4)
+				Scrunch = @GetModifierID(4)
+				ScrunchState = @GetFlexState(4)
 
-                hp, mhp = @ent\Health(), @ent\GetMaxHealth()
-                mhp = 1 if mhp == 0
-                div = hp / mhp
-                strength = math.Clamp(1.5 - div * 1.5, 0, 1)
-                frownState\SetModifierWeight(frown, strength)
-                ScrunchState\SetModifierWeight(Scrunch, strength * .5)
-                leftState\SetModifierWeight(left, strength * .1)
-                rightState\SetModifierWeight(right, strength * .1)
-                Mouth_OState\SetModifierWeight(Mouth_O, strength * .8)
+				hp, mhp = @ent\Health(), @ent\GetMaxHealth()
+				mhp = 1 if mhp == 0
+				div = hp / mhp
+				strength = math.Clamp(1.5 - div * 1.5, 0, 1)
+				frownState\SetModifierWeight(frown, strength)
+				ScrunchState\SetModifierWeight(Scrunch, strength * .5)
+				leftState\SetModifierWeight(left, strength * .1)
+				rightState\SetModifierWeight(right, strength * .1)
+				Mouth_OState\SetModifierWeight(Mouth_O, strength * .8)
 
-                JawOpen = @GetModifierID(6)
-                JawOpenState = @GetFlexState(6)
+				JawOpen = @GetModifierID(6)
+				JawOpenState = @GetFlexState(6)
 
-                if strength > .75
-                    JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTime() * strength * 3) * .1)
-                else
-                    JawOpenState\SetModifierWeight(JawOpen, 0)
+				if strength > .75
+					JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTime() * strength * 3) * .1)
+				else
+					JawOpenState\SetModifierWeight(JawOpen, 0)
 
-                if div >= 2
-                    @SetModifierWeight(7, .5)
-                else
-                    @SetModifierWeight(7, 0)
-        }
+				if div >= 2
+					@SetModifierWeight(7, .5)
+				else
+					@SetModifierWeight(7, 0)
+		}
 
-        {
-            'name': 'greeny'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'Grin'}
-            'func': (delta, timeOfAnim) =>
-                Grin = @GetModifierID(1)
-                GrinState = @GetFlexState(1)
-                strength = .5 + math.sin(RealTime() * 2) * .25
-                GrinState\SetModifierWeight(Grin, strength)
-        }
+		{
+			'name': 'greeny'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'Grin'}
+			'func': (delta, timeOfAnim) =>
+				Grin = @GetModifierID(1)
+				GrinState = @GetFlexState(1)
+				strength = .5 + math.sin(RealTime() * 2) * .25
+				GrinState\SetModifierWeight(Grin, strength)
+		}
 
-        {
-            'name': 'big_grin'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Grin'}
-            'func': (delta, timeOfAnim) =>
-                Grin = @GetModifierID(1)
-                GrinState = @GetFlexState(1)
-                GrinState\SetModifierWeight(Grin, 1)
-        }
+		{
+			'name': 'big_grin'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Grin'}
+			'func': (delta, timeOfAnim) =>
+				Grin = @GetModifierID(1)
+				GrinState = @GetFlexState(1)
+				GrinState\SetModifierWeight(Grin, 1)
+		}
 
-        {
-            'name': 'o3o'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'o3o'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, 1)
-        }
+		{
+			'name': 'o3o'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'o3o'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 1)
+		}
 
-        {
-            'name': 'xd'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Grin', 'Left_Blink', 'Right_Blink', 'JawOpen'}
-            'func': (delta, timeOfAnim) =>
-                Grin = @GetModifierID(1)
-                GrinState = @GetFlexState(1)
-                GrinState\SetModifierWeight(Grin, .6)
+		{
+			'name': 'xd'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Grin', 'Left_Blink', 'Right_Blink', 'JawOpen'}
+			'func': (delta, timeOfAnim) =>
+				Grin = @GetModifierID(1)
+				GrinState = @GetFlexState(1)
+				GrinState\SetModifierWeight(Grin, .6)
 
-                Left_Blink = @GetModifierID(2)
-                Left_BlinkState = @GetFlexState(2)
-                Left_BlinkState\SetModifierWeight(Left_Blink, .9)
+				Left_Blink = @GetModifierID(2)
+				Left_BlinkState = @GetFlexState(2)
+				Left_BlinkState\SetModifierWeight(Left_Blink, .9)
 
-                Right_Blink = @GetModifierID(3)
-                Right_BlinkState = @GetFlexState(3)
-                Right_BlinkState\SetModifierWeight(Right_Blink, .9)
+				Right_Blink = @GetModifierID(3)
+				Right_BlinkState = @GetFlexState(3)
+				Right_BlinkState\SetModifierWeight(Right_Blink, .9)
 
-                JawOpen = @GetModifierID(4)
-                JawOpenState = @GetFlexState(4)
-                JawOpenState\SetModifierScale(JawOpen, 2)
-                JawOpenState\SetModifierWeight(JawOpen, (timeOfAnim % .1) * 2)
-        }
+				JawOpen = @GetModifierID(4)
+				JawOpenState = @GetFlexState(4)
+				JawOpenState\SetModifierScale(JawOpen, 2)
+				JawOpenState\SetModifierWeight(JawOpen, (timeOfAnim % .1) * 2)
+		}
 
-        {
-            'name': 'tongue'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'JawOpen', 'Tongue_Out'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, .1)
-                @SetModifierWeight(2, 1)
-        }
+		{
+			'name': 'tongue'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'JawOpen', 'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, .1)
+				@SetModifierWeight(2, 1)
+		}
 
-        {
-            'name': 'angry_tongue'
-            'autostart': false
-            'repeat': false
-            'time': 6
-            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out'}
-            'reset': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, math.random(40, 100) / 100)
-                @SetModifierWeight(2, math.random(15, 40) / 100)
-                @SetModifierWeight(3, math.random(30, 80) / 100)
-                @SetModifierWeight(4, math.random(50, 100) / 100)
-                @SetModifierWeight(5, math.random(10, 15) / 100)
-                @SetModifierWeight(6, math.random(80, 100) / 100)
-        }
+		{
+			'name': 'angry_tongue'
+			'autostart': false
+			'repeat': false
+			'time': 6
+			'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out'}
+			'reset': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, math.random(40, 100) / 100)
+				@SetModifierWeight(2, math.random(15, 40) / 100)
+				@SetModifierWeight(3, math.random(30, 80) / 100)
+				@SetModifierWeight(4, math.random(50, 100) / 100)
+				@SetModifierWeight(5, math.random(10, 15) / 100)
+				@SetModifierWeight(6, math.random(80, 100) / 100)
+		}
 
-        {
-            'name': 'pffff'
-            'autostart': false
-            'repeat': false
-            'time': 6
-            'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out', 'Tongue_Down', 'Tongue_Up'}
-            'reset': =>
-                @SetModifierWeight(1, math.random(40, 100) / 100)
-                @SetModifierWeight(2, math.random(15, 40) / 100)
-                @SetModifierWeight(3, math.random(30, 80) / 100)
-                @SetModifierWeight(4, math.random(50, 100) / 100)
-                @SetModifierWeight(5, math.random(10, 15) / 100)
-                @SetModifierWeight(6, math.random(80, 100) / 100)
-            'func': (delta, timeOfAnim) =>
-                val = math.sin(RealTime() * 8) * .6
-                if val > 0
-                    @SetModifierWeight(7, val)
-                    @SetModifierWeight(8, 0)
-                else
-                    @SetModifierWeight(7, 0)
-                    @SetModifierWeight(8, -val)
-        }
+		{
+			'name': 'pffff'
+			'autostart': false
+			'repeat': false
+			'time': 6
+			'ids': {'Frown', 'Grin', 'angry_eyes', 'Scrunch', 'JawOpen', 'Tongue_Out', 'Tongue_Down', 'Tongue_Up'}
+			'reset': =>
+				@SetModifierWeight(1, math.random(40, 100) / 100)
+				@SetModifierWeight(2, math.random(15, 40) / 100)
+				@SetModifierWeight(3, math.random(30, 80) / 100)
+				@SetModifierWeight(4, math.random(50, 100) / 100)
+				@SetModifierWeight(5, math.random(10, 15) / 100)
+				@SetModifierWeight(6, math.random(80, 100) / 100)
+			'func': (delta, timeOfAnim) =>
+				val = math.sin(RealTime() * 8) * .6
+				if val > 0
+					@SetModifierWeight(7, val)
+					@SetModifierWeight(8, 0)
+				else
+					@SetModifierWeight(7, 0)
+					@SetModifierWeight(8, -val)
+		}
 
-        {
-            'name': 'cat'
-            'autostart': false
-            'repeat': false
-            'time': 5
-            'ids': {'CatFace'}
-            'func': (delta, timeOfAnim) =>
-                Grin = @GetModifierID(1)
-                GrinState = @GetFlexState(1)
-                GrinState\SetModifierWeight(Grin, 1)
-        }
+		{
+			'name': 'cat'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'CatFace'}
+			'func': (delta, timeOfAnim) =>
+				Grin = @GetModifierID(1)
+				GrinState = @GetFlexState(1)
+				GrinState\SetModifierWeight(Grin, 1)
+		}
 
-        {
-            'name': 'ooo'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'Mouth_O2', 'Mouth_O'}
-            'func': (delta, timeOfAnim) =>
-                timeOfAnim *= 2
-                Grin = @GetModifierID(1)
-                GrinState = @GetFlexState(1)
-                GrinState\SetModifierWeight(Grin, timeOfAnim)
-                Grin = @GetModifierID(2)
-                GrinState = @GetFlexState(2)
-                GrinState\SetModifierWeight(Grin, timeOfAnim)
-        }
+		{
+			'name': 'ooo'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'Mouth_O2', 'Mouth_O'}
+			'func': (delta, timeOfAnim) =>
+				timeOfAnim *= 2
+				Grin = @GetModifierID(1)
+				GrinState = @GetFlexState(1)
+				GrinState\SetModifierWeight(Grin, timeOfAnim)
+				Grin = @GetModifierID(2)
+				GrinState = @GetFlexState(2)
+				GrinState\SetModifierWeight(Grin, timeOfAnim)
+		}
 
-        {
-            'name': 'talk'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
-            'create': =>
-                @talkAnim = for i = 0, 1, 0.05
-                    rand = math.random(1, 100) / 100
-                    if rand <= .25
-                        {1 * rand, 0.4 * rand, 2 * rand, 0}
-                    elseif rand >= .25 and rand < .4
-                        rand *= .8
-                        {2 * rand, .6 * rand, 0, 1 * rand}
-                    elseif rand >= .4 and rand < .75
-                        rand *= .6
-                        {1 * rand, 0, 1 * rand, 2 * rand}
-                    elseif rand >= .75
-                        rand *= .4
-                        {1.5 * rand, 0, 1 * rand, 0}
-                @SetModifierSpeed(1, 2)
-                @SetModifierSpeed(2, 2)
-                @SetModifierSpeed(3, 2)
-                @SetModifierSpeed(4, 2)
-            'func': (delta, timeOfAnim) =>
-                JawOpen = @GetModifierID(1)
-                JawOpenState = @GetFlexState(1)
-                Tongue_OutOpen = @GetModifierID(2)
-                Tongue_OutOpenState = @GetFlexState(2)
-                Tongue_UpOpen = @GetModifierID(3)
-                Tongue_UpOpenState = @GetFlexState(3)
-                Tongue_DownOpen = @GetModifierID(4)
-                Tongue_DownOpenState = @GetFlexState(4)
-                cPos = math.floor(timeOfAnim * 20) + 1
-                data = @talkAnim[cPos]
-                return if not data
-                {jaw, out, up, down} = data
-                JawOpenState\SetModifierWeight(JawOpen, jaw)
-                Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
-                Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
-                Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
-        }
+		{
+			'name': 'talk'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
+			'create': =>
+				@talkAnim = for i = 0, 1, 0.05
+					rand = math.random(1, 100) / 100
+					if rand <= .25
+						{1 * rand, 0.4 * rand, 2 * rand, 0}
+					elseif rand >= .25 and rand < .4
+						rand *= .8
+						{2 * rand, .6 * rand, 0, 1 * rand}
+					elseif rand >= .4 and rand < .75
+						rand *= .6
+						{1 * rand, 0, 1 * rand, 2 * rand}
+					elseif rand >= .75
+						rand *= .4
+						{1.5 * rand, 0, 1 * rand, 0}
+				@SetModifierSpeed(1, 2)
+				@SetModifierSpeed(2, 2)
+				@SetModifierSpeed(3, 2)
+				@SetModifierSpeed(4, 2)
+			'func': (delta, timeOfAnim) =>
+				JawOpen = @GetModifierID(1)
+				JawOpenState = @GetFlexState(1)
+				Tongue_OutOpen = @GetModifierID(2)
+				Tongue_OutOpenState = @GetFlexState(2)
+				Tongue_UpOpen = @GetModifierID(3)
+				Tongue_UpOpenState = @GetFlexState(3)
+				Tongue_DownOpen = @GetModifierID(4)
+				Tongue_DownOpenState = @GetFlexState(4)
+				cPos = math.floor(timeOfAnim * 20) + 1
+				data = @talkAnim[cPos]
+				return if not data
+				{jaw, out, up, down} = data
+				JawOpenState\SetModifierWeight(JawOpen, jaw)
+				Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
+				Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
+				Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
+		}
 
-        {
-            'name': 'talk_endless'
-            'autostart': false
-            'repeat': true
-            'time': 4
-            'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
-            'create': =>
-                @talkAnim = for i = 0, 1, 0.05
-                    rand = math.random(1, 100) / 100
-                    if rand <= .25
-                        {1 * rand, 0.4 * rand, 2 * rand, 0}
-                    elseif rand >= .25 and rand < .4
-                        rand *= .8
-                        {2 * rand, .6 * rand, 0, 1 * rand}
-                    elseif rand >= .4 and rand < .75
-                        rand *= .6
-                        {1 * rand, 0, 1 * rand, 2 * rand}
-                    elseif rand >= .75
-                        rand *= .4
-                        {1.5 * rand, 0, 1 * rand, 0}
-                @SetModifierSpeed(1, 2)
-                @SetModifierSpeed(2, 2)
-                @SetModifierSpeed(3, 2)
-                @SetModifierSpeed(4, 2)
-            'func': (delta, timeOfAnim) =>
-                JawOpen = @GetModifierID(1)
-                JawOpenState = @GetFlexState(1)
-                Tongue_OutOpen = @GetModifierID(2)
-                Tongue_OutOpenState = @GetFlexState(2)
-                Tongue_UpOpen = @GetModifierID(3)
-                Tongue_UpOpenState = @GetFlexState(3)
-                Tongue_DownOpen = @GetModifierID(4)
-                Tongue_DownOpenState = @GetFlexState(4)
-                cPos = math.floor(timeOfAnim * 20) + 1
-                data = @talkAnim[cPos]
-                return if not data
-                {jaw, out, up, down} = data
-                volume = @ent\VoiceVolume() * 6
-                jaw *= volume
-                out *= volume
-                up *= volume
-                down *= volume
-                JawOpenState\SetModifierWeight(JawOpen, jaw)
-                Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
-                Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
-                Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
-        }
+		{
+			'name': 'talk_endless'
+			'autostart': false
+			'repeat': true
+			'time': 4
+			'ids': {'JawOpen', 'Tongue_Out', 'Tongue_Up', 'Tongue_Down'}
+			'create': =>
+				@talkAnim = for i = 0, 1, 0.05
+					rand = math.random(1, 100) / 100
+					if rand <= .25
+						{1 * rand, 0.4 * rand, 2 * rand, 0}
+					elseif rand >= .25 and rand < .4
+						rand *= .8
+						{2 * rand, .6 * rand, 0, 1 * rand}
+					elseif rand >= .4 and rand < .75
+						rand *= .6
+						{1 * rand, 0, 1 * rand, 2 * rand}
+					elseif rand >= .75
+						rand *= .4
+						{1.5 * rand, 0, 1 * rand, 0}
+				@SetModifierSpeed(1, 2)
+				@SetModifierSpeed(2, 2)
+				@SetModifierSpeed(3, 2)
+				@SetModifierSpeed(4, 2)
+			'func': (delta, timeOfAnim) =>
+				JawOpen = @GetModifierID(1)
+				JawOpenState = @GetFlexState(1)
+				Tongue_OutOpen = @GetModifierID(2)
+				Tongue_OutOpenState = @GetFlexState(2)
+				Tongue_UpOpen = @GetModifierID(3)
+				Tongue_UpOpenState = @GetFlexState(3)
+				Tongue_DownOpen = @GetModifierID(4)
+				Tongue_DownOpenState = @GetFlexState(4)
+				cPos = math.floor(timeOfAnim * 20) + 1
+				data = @talkAnim[cPos]
+				return if not data
+				{jaw, out, up, down} = data
+				volume = @ent\VoiceVolume() * 6
+				jaw *= volume
+				out *= volume
+				up *= volume
+				down *= volume
+				JawOpenState\SetModifierWeight(JawOpen, jaw)
+				Tongue_OutOpenState\SetModifierWeight(Tongue_OutOpen, out)
+				Tongue_UpOpenState\SetModifierWeight(Tongue_UpOpen, up)
+				Tongue_DownOpenState\SetModifierWeight(Tongue_DownOpen, down)
+		}
 
-        {
-            'name': 'eyes_blink'
-            'autostart': true
-            'repeat': true
-            'time': 7
-            'ids': {'Left_Blink', 'Right_Blink'}
-            'create': =>
-                @SetModifierSpeed(1, 5)
-                @SetModifierSpeed(2, 5)
-            'reset': =>
-                @nextBlink = math.random(300, 600) / 1000
-                @nextBlinkLength = math.random(15, 30) / 1000
-                @min, @max = @nextBlink, @nextBlink + @nextBlinkLength
-            'func': (delta, timeOfAnim) =>
-                if @min > timeOfAnim or @max < timeOfAnim
-                    if @blinkHit
-                        @blinkHit = false
-                        @SetModifierWeight(1, 0)
-                        @SetModifierWeight(2, 0)
-                    return
-                len = (timeOfAnim - @min) / @nextBlinkLength
-                @SetModifierWeight(1, math.sin(len * math.pi))
-                @SetModifierWeight(2, math.sin(len * math.pi))
-                @blinkHit = true
-        }
+		{
+			'name': 'eyes_blink'
+			'autostart': true
+			'repeat': true
+			'time': 7
+			'ids': {'Left_Blink', 'Right_Blink'}
+			'create': =>
+				@SetModifierSpeed(1, 5)
+				@SetModifierSpeed(2, 5)
+			'reset': =>
+				@nextBlink = math.random(300, 600) / 1000
+				@nextBlinkLength = math.random(15, 30) / 1000
+				@min, @max = @nextBlink, @nextBlink + @nextBlinkLength
+			'func': (delta, timeOfAnim) =>
+				if @min > timeOfAnim or @max < timeOfAnim
+					if @blinkHit
+						@blinkHit = false
+						@SetModifierWeight(1, 0)
+						@SetModifierWeight(2, 0)
+					return
+				len = (timeOfAnim - @min) / @nextBlinkLength
+				@SetModifierWeight(1, math.sin(len * math.pi))
+				@SetModifierWeight(2, math.sin(len * math.pi))
+				@blinkHit = true
+		}
 
-        {
-            'name': 'hurt'
-            'autostart': false
-            'repeat': false
-            'time': 4
-            'ids': {'JawOpen', 'Frown', 'Grin', 'Scrunch'}
-            'reset': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, math.random(4, 16) / 100)
-                @SetModifierWeight(2, math.random(60, 70) / 100)
-                @SetModifierWeight(3, math.random(30, 40) / 100)
-                @SetModifierWeight(4, math.random(70, 90) / 100)
-        }
+		{
+			'name': 'hurt'
+			'autostart': false
+			'repeat': false
+			'time': 4
+			'ids': {'JawOpen', 'Frown', 'Grin', 'Scrunch'}
+			'reset': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, math.random(4, 16) / 100)
+				@SetModifierWeight(2, math.random(60, 70) / 100)
+				@SetModifierWeight(3, math.random(30, 40) / 100)
+				@SetModifierWeight(4, math.random(70, 90) / 100)
+		}
 
-        {
-            'name': 'kill_grin'
-            'autostart': false
-            'repeat': false
-            'time': 8
-            'ids': {'Smirk', 'Frown', 'Grin'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, .51)
-                @SetModifierWeight(2, .38)
-                @SetModifierWeight(3, .66)
-        }
+		{
+			'name': 'kill_grin'
+			'autostart': false
+			'repeat': false
+			'time': 8
+			'ids': {'Smirk', 'Frown', 'Grin'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, .51)
+				@SetModifierWeight(2, .38)
+				@SetModifierWeight(3, .66)
+		}
 
-        {
-            'name': 'sorry'
-            'autostart': false
-            'repeat': false
-            'time': 8
-            'ids': {'Frown', 'Stretch', 'Grin', 'Scrunch', 'sad_eyes'}
-            'create': =>
-                @SetModifierWeight(1, math.random(45, 75) / 100)
-                @SetModifierWeight(2, math.random(45, 75) / 100)
-                @SetModifierWeight(3, math.random(70, 100) / 100)
-                @SetModifierWeight(4, math.random(7090, 100) / 100)
-        }
+		{
+			'name': 'sorry'
+			'autostart': false
+			'repeat': false
+			'time': 8
+			'ids': {'Frown', 'Stretch', 'Grin', 'Scrunch', 'sad_eyes'}
+			'create': =>
+				@SetModifierWeight(1, math.random(45, 75) / 100)
+				@SetModifierWeight(2, math.random(45, 75) / 100)
+				@SetModifierWeight(3, math.random(70, 100) / 100)
+				@SetModifierWeight(4, math.random(7090, 100) / 100)
+		}
 
-        {
-            'name': 'scrunch'
-            'autostart': false
-            'repeat': false
-            'time': 6
-            'ids': {'Scrunch'}
-            'create': =>
-                @SetModifierWeight(1, math.random(80, 100) / 100)
-        }
+		{
+			'name': 'scrunch'
+			'autostart': false
+			'repeat': false
+			'time': 6
+			'ids': {'Scrunch'}
+			'create': =>
+				@SetModifierWeight(1, math.random(80, 100) / 100)
+		}
 
-        {
-            'name': 'gulp'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'Throat_Bulge', 'Frown', 'Grin'}
-            'create': =>
-                @SetModifierWeight(2, 1)
-                @SetModifierWeight(3, math.random(35, 55) / 100)
-            'func': (delta, timeOfAnim) =>
-                if timeOfAnim > 0.5
-                    @SetModifierWeight(1, (1 - timeOfAnim) * 2)
-                else
-                    @SetModifierWeight(1, timeOfAnim * 2)
-        }
+		{
+			'name': 'gulp'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'Throat_Bulge', 'Frown', 'Grin'}
+			'create': =>
+				@SetModifierWeight(2, 1)
+				@SetModifierWeight(3, math.random(35, 55) / 100)
+			'func': (delta, timeOfAnim) =>
+				if timeOfAnim > 0.5
+					@SetModifierWeight(1, (1 - timeOfAnim) * 2)
+				else
+					@SetModifierWeight(1, timeOfAnim * 2)
+		}
 
-        {
-            'name': 'blahblah'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'o3o', 'Mouth_O'}
-            'create': =>
-                @SetModifierWeight(1, 1)
-                @talkAnim = [math.random(50, 70) / 100 for i = 0, 1, 0.05]
-            'func': (delta, timeOfAnim) =>
-                cPos = math.floor(timeOfAnim * 20) + 1
-                data = @talkAnim[cPos]
-                return if not data
-                @SetModifierWeight(2, data)
-        }
+		{
+			'name': 'blahblah'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'o3o', 'Mouth_O'}
+			'create': =>
+				@SetModifierWeight(1, 1)
+				@talkAnim = [math.random(50, 70) / 100 for i = 0, 1, 0.05]
+			'func': (delta, timeOfAnim) =>
+				cPos = math.floor(timeOfAnim * 20) + 1
+				data = @talkAnim[cPos]
+				return if not data
+				@SetModifierWeight(2, data)
+		}
 
-        {
-            'name': 'wink_left'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'Frown', 'Stretch', 'Grin', 'Left_Blink'}
-            'create': =>
-                @SetModifierWeight(1, math.random(40, 60) / 100)
-                @SetModifierWeight(2, math.random(30, 50) / 100)
-                @SetModifierWeight(3, math.random(60, 100) / 100)
-                @SetModifierWeight(4, 1)
-                @PauseSequence('eyes_blink')
-        }
+		{
+			'name': 'wink_left'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'Frown', 'Stretch', 'Grin', 'Left_Blink'}
+			'create': =>
+				@SetModifierWeight(1, math.random(40, 60) / 100)
+				@SetModifierWeight(2, math.random(30, 50) / 100)
+				@SetModifierWeight(3, math.random(60, 100) / 100)
+				@SetModifierWeight(4, 1)
+				@PauseSequence('eyes_blink')
+		}
 
-        {
-            'name': 'wink_right'
-            'autostart': false
-            'repeat': false
-            'time': 2
-            'ids': {'Frown', 'Stretch', 'Grin', 'Right_Blink'}
-            'create': =>
-                @SetModifierWeight(1, math.random(40, 60) / 100)
-                @SetModifierWeight(2, math.random(30, 50) / 100)
-                @SetModifierWeight(3, math.random(60, 100) / 100)
-                @SetModifierWeight(4, 1)
-                @PauseSequence('eyes_blink')
-        }
+		{
+			'name': 'wink_right'
+			'autostart': false
+			'repeat': false
+			'time': 2
+			'ids': {'Frown', 'Stretch', 'Grin', 'Right_Blink'}
+			'create': =>
+				@SetModifierWeight(1, math.random(40, 60) / 100)
+				@SetModifierWeight(2, math.random(30, 50) / 100)
+				@SetModifierWeight(3, math.random(60, 100) / 100)
+				@SetModifierWeight(4, 1)
+				@PauseSequence('eyes_blink')
+		}
 
-        {
-            'name': 'happy_eyes'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Happy_Eyes'}
-            'create': =>
-                @SetModifierWeight(1, 1)
-                @PauseSequence('eyes_blink')
-        }
+		{
+			'name': 'happy_eyes'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Happy_Eyes'}
+			'create': =>
+				@SetModifierWeight(1, 1)
+				@PauseSequence('eyes_blink')
+		}
 
-        {
-            'name': 'happy_grin'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Happy_Eyes', 'Grin'}
-            'create': =>
-                @SetModifierWeight(1, 1)
-                @SetModifierWeight(2, 1)
-                @PauseSequence('eyes_blink')
-        }
+		{
+			'name': 'happy_grin'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Happy_Eyes', 'Grin'}
+			'create': =>
+				@SetModifierWeight(1, 1)
+				@SetModifierWeight(2, 1)
+				@PauseSequence('eyes_blink')
+		}
 
-        {
-            'name': 'duck'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Duck'}
-            'create': =>
-                @SetModifierWeight(1, math.random(70, 90) / 100)
-        }
+		{
+			'name': 'duck'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Duck'}
+			'create': =>
+				@SetModifierWeight(1, math.random(70, 90) / 100)
+		}
 
-        {
-            'name': 'duck_insanity'
-            'autostart': false
-            'repeat': false
-            'time': 3
-            'ids': {'Duck'}
-            'func': (delta, timeOfAnim) =>
-                @SetModifierWeight(1, math.abs(math.sin(timeOfAnim * @GetTime() * 4)))
-        }
+		{
+			'name': 'duck_insanity'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'ids': {'Duck'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, math.abs(math.sin(timeOfAnim * @GetTime() * 4)))
+		}
 
-        {
-            'name': 'duck_quack'
-            'autostart': false
-            'repeat': false
-            'time': 5
-            'ids': {'Duck', 'JawOpen'}
-            'create': =>
-                @talkAnim = for i = 0, 1, 0.1
-                    rand = math.random(1, 100)
-                    rand > 50 and 1 or 0
-                @SetModifierWeight(1, math.random(70, 90) / 100)
-            'func': (delta, timeOfAnim) =>
-                cPos = math.floor(timeOfAnim * 10) + 1
-                data = @talkAnim[cPos]
-                return if not data
-                @SetModifierWeight(2, data)
-        }
-    }
+		{
+			'name': 'duck_quack'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Duck', 'JawOpen'}
+			'create': =>
+				@talkAnim = for i = 0, 1, 0.1
+					rand = math.random(1, 100)
+					rand > 50 and 1 or 0
+				@SetModifierWeight(1, math.random(70, 90) / 100)
+			'func': (delta, timeOfAnim) =>
+				cPos = math.floor(timeOfAnim * 10) + 1
+				data = @talkAnim[cPos]
+				return if not data
+				@SetModifierWeight(2, data)
+		}
+	}
 
-    @__inherited: (child) =>
-        child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-        @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-        for i, flex in pairs child.FLEX_LIST
-            flex.id = i - 1
-            flex.targetName = "target#{flex.flex}"
-        child.FLEX_IDS = {flex.id, flex for flex in *child.FLEX_LIST}
-        child.FLEX_TABLE = {flex.flex, flex for flex in *child.FLEX_LIST}
-        seq.numid = i for i, seq in pairs child.FLEX_SEQUENCES
-        child.FLEX_SEQUENCES_TABLE = {seq.name, seq for seq in *child.FLEX_SEQUENCES}
-        child.FLEX_SEQUENCES_TABLE[seq.numid] = seq for seq in *child.FLEX_SEQUENCES
-        lastID = child.FLEX_SEQUENCES[#child.FLEX_SEQUENCES].numid + 1
+	@__inherited: (child) =>
+		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
+		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
+		for i, flex in pairs child.FLEX_LIST
+			flex.id = i - 1
+			flex.targetName = "target#{flex.flex}"
+		child.FLEX_IDS = {flex.id, flex for flex in *child.FLEX_LIST}
+		child.FLEX_TABLE = {flex.flex, flex for flex in *child.FLEX_LIST}
+		seq.numid = i for i, seq in pairs child.FLEX_SEQUENCES
+		child.FLEX_SEQUENCES_TABLE = {seq.name, seq for seq in *child.FLEX_SEQUENCES}
+		child.FLEX_SEQUENCES_TABLE[seq.numid] = seq for seq in *child.FLEX_SEQUENCES
+		lastID = child.FLEX_SEQUENCES[#child.FLEX_SEQUENCES].numid + 1
 
-        for emote in *PPM2.AVALIABLE_EMOTES
-            getFlex = child.FLEX_SEQUENCES_TABLE[emote.sequence]
-            if getFlex
-                copyFlex = {k, v for k, v in pairs getFlex}
-                copyFlex.repeat = true
-                copyFlex.numid = lastID
-                copyFlex.name ..= '_endless'
-                lastID += 1
-                child.FLEX_SEQUENCES_TABLE[copyFlex.name] = copyFlex
-                child.FLEX_SEQUENCES_TABLE[copyFlex.numid] = copyFlex
-                table.insert(child.FLEX_LIST, copyFlex)
-    @__inherited(@)
+		for emote in *PPM2.AVALIABLE_EMOTES
+			getFlex = child.FLEX_SEQUENCES_TABLE[emote.sequence]
+			if getFlex
+				copyFlex = {k, v for k, v in pairs getFlex}
+				copyFlex.repeat = true
+				copyFlex.numid = lastID
+				copyFlex.name ..= '_endless'
+				lastID += 1
+				child.FLEX_SEQUENCES_TABLE[copyFlex.name] = copyFlex
+				child.FLEX_SEQUENCES_TABLE[copyFlex.numid] = copyFlex
+				table.insert(child.FLEX_LIST, copyFlex)
+	@__inherited(@)
 
-    @NEXT_HOOK_ID = 0
+	@NEXT_HOOK_ID = 0
 
-    new: (data) =>
-        @isValid = true
-        @controller = data
-        @ent = data.ent
-        @states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
-        @statesTable = {state\GetFlexName(), state for state in *@states}
-        @statesTable[state\GetFlexName()\lower()] = state for state in *@states
-        @statesTable[state\GetFlexID()] = state for state in *@states
-        @RebuildIterableList()
-        ponyData = data\GetData()
-        flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
-        flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
-        @hooks = {}
-        @@NEXT_HOOK_ID += 1
-        @fid = @@NEXT_HOOK_ID
-        @hookID = "PPM2.FlexController.#{@@NEXT_HOOK_ID}"
-        @lastThink = RealTime()
-        @currentSequences = {}
-        @currentSequencesIterable = {}
-        @ResetSequences()
-        @Hook('OnPlayerChat', @OnPlayerChat)
-        @Hook('PlayerStartVoice', @PlayerStartVoice)
-        @Hook('PlayerEndVoice', @PlayerEndVoice)
-        @Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
-        @Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
-        @Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
-        @Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
-        PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
+	new: (data) =>
+		@isValid = true
+		@controller = data
+		@ent = data.ent
+		@states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
+		@statesTable = {state\GetFlexName(), state for state in *@states}
+		@statesTable[state\GetFlexName()\lower()] = state for state in *@states
+		@statesTable[state\GetFlexID()] = state for state in *@states
+		@RebuildIterableList()
+		ponyData = data\GetData()
+		flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
+		flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
+		@hooks = {}
+		@@NEXT_HOOK_ID += 1
+		@fid = @@NEXT_HOOK_ID
+		@hookID = "PPM2.FlexController.#{@@NEXT_HOOK_ID}"
+		@lastThink = RealTime()
+		@currentSequences = {}
+		@currentSequencesIterable = {}
+		@ResetSequences()
+		@Hook('OnPlayerChat', @OnPlayerChat)
+		@Hook('PlayerStartVoice', @PlayerStartVoice)
+		@Hook('PlayerEndVoice', @PlayerEndVoice)
+		@Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
+		@Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
+		@Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
+		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
+		PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
 
-    IsValid: => @isValid
-    StartSequence: (seqID = '', time) =>
-        return false if not @isValid
-        return @currentSequences[seqID] if @currentSequences[seqID]
-        return if not @@FLEX_SEQUENCES_TABLE[seqID]
-        @currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
-        @currentSequences[seqID]\SetTime(time) if time
-        @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-        return @currentSequences[seqID]
+	IsValid: => @isValid
+	StartSequence: (seqID = '', time) =>
+		return false if not @isValid
+		return @currentSequences[seqID] if @currentSequences[seqID]
+		return if not @@FLEX_SEQUENCES_TABLE[seqID]
+		@currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
+		@currentSequences[seqID]\SetTime(time) if time
+		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
+		return @currentSequences[seqID]
 
-    RestartSequence: (seqID = '', time) =>
-        return false if not @isValid
-        if @currentSequences[seqID]
-            @currentSequences[seqID]\Reset()
-            @currentSequences[seqID]\SetTime(time)
-            return @currentSequences[seqID]
-        return @StartSequence(seqID, time)
+	RestartSequence: (seqID = '', time) =>
+		return false if not @isValid
+		if @currentSequences[seqID]
+			@currentSequences[seqID]\Reset()
+			@currentSequences[seqID]\SetTime(time)
+			return @currentSequences[seqID]
+		return @StartSequence(seqID, time)
 
-    PauseSequence: (seqID = '') =>
-        return false if not @isValid
-        return @currentSequences[seqID]\Pause() if @currentSequences[seqID]
-        return false
+	PauseSequence: (seqID = '') =>
+		return false if not @isValid
+		return @currentSequences[seqID]\Pause() if @currentSequences[seqID]
+		return false
 
-    ResumeSequence: (seqID = '') =>
-        return false if not @isValid
-        return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
-        return false
+	ResumeSequence: (seqID = '') =>
+		return false if not @isValid
+		return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
+		return false
 
-    EndSequence: (seqID = '', callStop = true) =>
-        return false if not @isValid
-        return false if not @currentSequences[seqID]
-        @currentSequences[seqID]\Stop() if callStop
-        @currentSequences[seqID] = nil
-        @currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-        return true
+	EndSequence: (seqID = '', callStop = true) =>
+		return false if not @isValid
+		return false if not @currentSequences[seqID]
+		@currentSequences[seqID]\Stop() if callStop
+		@currentSequences[seqID] = nil
+		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
+		return true
 
-    ResetSequences: =>
-        return false if not @isValid
-        for seq in *@currentSequencesIterable
-            seq\Stop()
+	ResetSequences: =>
+		return false if not @isValid
+		for seq in *@currentSequencesIterable
+			seq\Stop()
 
-        @currentSequences = {}
-        @currentSequencesIterable = {}
-        state\Reset(false) for state in *@statesIterable
+		@currentSequences = {}
+		@currentSequencesIterable = {}
+		state\Reset(false) for state in *@statesIterable
 
-        for seq in *@@FLEX_SEQUENCES
-            continue if not seq.autostart
-            @StartSequence(seq.name)
+		for seq in *@@FLEX_SEQUENCES
+			continue if not seq.autostart
+			@StartSequence(seq.name)
 
-    Reset: => @ResetSequences()
+	Reset: => @ResetSequences()
 
-    PlayerRespawn: =>
-        return if not @isValid
-        @ResetSequences()
+	PlayerRespawn: =>
+		return if not @isValid
+		@ResetSequences()
 
-    HasSequence: (seqID = '') =>
-        return false if not @isValid
-        @currentSequences[seqID] and true or false
+	HasSequence: (seqID = '') =>
+		return false if not @isValid
+		@currentSequences[seqID] and true or false
 
-    GetFlexState: (name = '') => @statesTable[name]
-    RebuildIterableList: =>
-        return false if not @isValid
-        @statesIterable = [state for state in *@states when state\GetIsActive()]
-    DataChanges: (state) =>
-        return if not @isValid
-        flexState\DataChanges(state) for flexState in *@states
-        if state\GetKey() == 'UseFlexLerp'
-            flex\SetUseLerp(state\GetValue()) for flex in *@states
-        if state\GetKey() == 'FlexLerpMultiplier'
-            flex\SetLerpModify(state\GetValue()) for flex in *@states
-    GetEntity: => @ent
-    GetData: => @controller
-    GetController: => @controller
+	GetFlexState: (name = '') => @statesTable[name]
+	RebuildIterableList: =>
+		return false if not @isValid
+		@statesIterable = [state for state in *@states when state\GetIsActive()]
+	DataChanges: (state) =>
+		return if not @isValid
+		flexState\DataChanges(state) for flexState in *@states
+		if state\GetKey() == 'UseFlexLerp'
+			flex\SetUseLerp(state\GetValue()) for flex in *@states
+		if state\GetKey() == 'FlexLerpMultiplier'
+			flex\SetLerpModify(state\GetValue()) for flex in *@states
+	GetEntity: => @ent
+	GetData: => @controller
+	GetController: => @controller
 
-    Hook: (id, func) =>
-        return if not @isValid
-        newFunc = (...) ->
-            if not IsValid(@ent)
-                @ent = @GetData().ent
-            if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
-                @RemoveHooks()
-                return
-            func(@, ...)
-            return nil
-        hook.Add id, @hookID, newFunc
-        table.insert(@hooks, id)
+	Hook: (id, func) =>
+		return if not @isValid
+		newFunc = (...) ->
+			if not IsValid(@ent)
+				@ent = @GetData().ent
+			if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
+				@RemoveHooks()
+				return
+			func(@, ...)
+			return nil
+		hook.Add id, @hookID, newFunc
+		table.insert(@hooks, id)
 
-    OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
-        return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
-        switch text\lower()
-            when 'o', ':o', 'о', 'О', ':о', ':О'
-                @RestartSequence('ooo')
-            when ':3', ':з'
-                @RestartSequence('cat')
-            when ':d'
-                @RestartSequence('big_grin')
-            when 'xd', 'exdi'
-                @RestartSequence('xd')
-            when ':p'
-                @RestartSequence('tongue')
-            when '>:p', '>:р', '>:Р'
-                @RestartSequence('angry_tongue')
-            when ':р', ':Р'
-                @RestartSequence('tongue')
-            when ':c', 'o3o', 'oops', ':С', ':с', '(', ':('
-                @RestartSequence('sad')
-            when 'sorry'
-                @RestartSequence('sorry')
-            when 'okay mate', 'okay, mate'
-                @RestartSequence('wink_left')
-            else
-                if string.find(text, 'hehehe') or string.find(text, 'hahaha')
-                    @RestartSequence('greeny')
-                elseif string.find(text, '^pff+')
-                    @RestartSequence('pffff')
-                elseif string.find(text, '^blah blah')
-                    @RestartSequence('blahblah')
-                else
-                    @RestartSequence('talk')
-    PlayerStartVoice: (ply = NULL) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        @StartSequence('talk_endless')
-    PlayerEndVoice: (ply = NULL) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        @EndSequence('talk_endless')
-    PPM2_HurtAnimation: (ply = NULL) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        @RestartSequence('hurt')
-        @EndSequence('kill_grin')
-    PPM2_KillAnimation: (ply = NULL) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        @RestartSequence('kill_grin')
-        @EndSequence('anger')
-    PPM2_AngerAnimation: (ply = NULL) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        @EndSequence('kill_grin')
-        @RestartSequence('anger')
-    PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
-        return if ply\GetEntity() ~= @ent\GetEntity()
-        for {:sequence} in *PPM2.AVALIABLE_EMOTES
-            if shouldStop or sequence ~= emote
-                @EndSequence(sequence)
-                @EndSequence(sequence .. '_endless')
-        if isEndless
-            time = nil
-            emote ..= '_endless'
-        @RestartSequence(emote, time) if not shouldStop
+	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
+		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
+		switch text\lower()
+			when 'o', ':o', 'о', 'О', ':о', ':О'
+				@RestartSequence('ooo')
+			when ':3', ':з'
+				@RestartSequence('cat')
+			when ':d'
+				@RestartSequence('big_grin')
+			when 'xd', 'exdi'
+				@RestartSequence('xd')
+			when ':p'
+				@RestartSequence('tongue')
+			when '>:p', '>:р', '>:Р'
+				@RestartSequence('angry_tongue')
+			when ':р', ':Р'
+				@RestartSequence('tongue')
+			when ':c', 'o3o', 'oops', ':С', ':с', '(', ':('
+				@RestartSequence('sad')
+			when 'sorry'
+				@RestartSequence('sorry')
+			when 'okay mate', 'okay, mate'
+				@RestartSequence('wink_left')
+			else
+				if string.find(text, 'hehehe') or string.find(text, 'hahaha')
+					@RestartSequence('greeny')
+				elseif string.find(text, '^pff+')
+					@RestartSequence('pffff')
+				elseif string.find(text, '^blah blah')
+					@RestartSequence('blahblah')
+				else
+					@RestartSequence('talk')
+	PlayerStartVoice: (ply = NULL) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		@StartSequence('talk_endless')
+	PlayerEndVoice: (ply = NULL) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		@EndSequence('talk_endless')
+	PPM2_HurtAnimation: (ply = NULL) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		@RestartSequence('hurt')
+		@EndSequence('kill_grin')
+	PPM2_KillAnimation: (ply = NULL) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		@RestartSequence('kill_grin')
+		@EndSequence('anger')
+	PPM2_AngerAnimation: (ply = NULL) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		@EndSequence('kill_grin')
+		@RestartSequence('anger')
+	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
+		return if ply\GetEntity() ~= @ent\GetEntity()
+		for {:sequence} in *PPM2.AVALIABLE_EMOTES
+			if shouldStop or sequence ~= emote
+				@EndSequence(sequence)
+				@EndSequence(sequence .. '_endless')
+		if isEndless
+			time = nil
+			emote ..= '_endless'
+		@RestartSequence(emote, time) if not shouldStop
 
-    RemoveHooks: =>
-        for iHook in *@hooks
-            hook.Remove iHook, @hookID
+	RemoveHooks: =>
+		for iHook in *@hooks
+			hook.Remove iHook, @hookID
 
-    Think: (ent = @ent) =>
-        return if DISABLE_FLEXES\GetBool()
-        return if not @isValid
-        if not IsValid(@ent)
-            @ent = @GetData().ent
-            ent = @ent
-        return if not IsValid(ent) or ent\IsDormant()
-        delta = RealTime() - @lastThink
-        @lastThink = RealTime()
-        state\Think(ent, delta) for state in *@statesIterable
-        for seq in *@currentSequencesIterable
-            if not seq\IsValid()
-                @EndSequence(seq\GetName(), false)
-                break
-            seq\Think(delta)
-    __tostring: => "[#{@@__name}:#{@fid}:#{#@currentSequencesIterable}|#{@GetData()}]"
-    Remove: =>
-        @isValid = false
-        @RemoveHooks()
+	Think: (ent = @ent) =>
+		return if DISABLE_FLEXES\GetBool()
+		return if not @isValid
+		if not IsValid(@ent)
+			@ent = @GetData().ent
+			ent = @ent
+		return if not IsValid(ent) or ent\IsDormant()
+		delta = RealTime() - @lastThink
+		@lastThink = RealTime()
+		state\Think(ent, delta) for state in *@statesIterable
+		for seq in *@currentSequencesIterable
+			if not seq\IsValid()
+				@EndSequence(seq\GetName(), false)
+				break
+			seq\Think(delta)
+	__tostring: => "[#{@@__name}:#{@fid}:#{#@currentSequencesIterable}|#{@GetData()}]"
+	Remove: =>
+		@isValid = false
+		@RemoveHooks()
 
 do
-    ppm2_disable_flexes = (cvar, oldval, newval) ->
-        for ply in *player.GetAll()
-            data = ply\GetPonyData()
-            continue if not data
-            renderer = data\GetRenderController()
-            continue if not renderer
-            flex = renderer\GetFlexController()
-            continue if not flex
-            flex\ResetSequences()
-    cvars.AddChangeCallback 'ppm2_disable_flexes', ppm2_disable_flexes, 'ppm2_disable_flexes'
+	ppm2_disable_flexes = (cvar, oldval, newval) ->
+		for ply in *player.GetAll()
+			data = ply\GetPonyData()
+			continue if not data
+			renderer = data\GetRenderController()
+			continue if not renderer
+			flex = renderer\GetFlexController()
+			continue if not flex
+			flex\ResetSequences()
+	cvars.AddChangeCallback 'ppm2_disable_flexes', ppm2_disable_flexes, 'ppm2_disable_flexes'
 
 PPM2.PonyFlexController = PonyFlexController
 PPM2.GetFlexController = (model = 'models/ppm/player_default_base_new.mdl') -> PonyFlexController.AVALIABLE_CONTROLLERS[model]

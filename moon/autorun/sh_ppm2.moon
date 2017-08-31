@@ -61,70 +61,70 @@ include 'common/size_controller.lua'
 include 'common/hooks.lua'
 
 if CLIENT
-    PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
-    file.CreateDir('ppm2')
-    file.CreateDir('ppm2/backups')
-    include 'client/data_instance.lua'
-    include 'client/materials_registry.lua'
-    include 'client/texture_controller.lua'
-    include 'client/new_texture_controller.lua'
-    include 'client/render.lua'
-    include 'client/hooks.lua'
-    include 'client/functions.lua'
-    include 'client/render_controller.lua'
-    include 'client/emotes.lua'
-    include 'client/player_menu.lua'
-    include 'client/editor.lua'
-    include 'client/rag_edit.lua'
+	PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
+	file.CreateDir('ppm2')
+	file.CreateDir('ppm2/backups')
+	include 'client/data_instance.lua'
+	include 'client/materials_registry.lua'
+	include 'client/texture_controller.lua'
+	include 'client/new_texture_controller.lua'
+	include 'client/render.lua'
+	include 'client/hooks.lua'
+	include 'client/functions.lua'
+	include 'client/render_controller.lua'
+	include 'client/emotes.lua'
+	include 'client/player_menu.lua'
+	include 'client/editor.lua'
+	include 'client/rag_edit.lua'
 
-    for ent in *ents.GetAll()
-        if ent.isPonyLegsModel
-            ent\Remove()
+	for ent in *ents.GetAll()
+		if ent.isPonyLegsModel
+			ent\Remove()
 
-    hook.Add 'PAC3ResetBones', 'PPM2.ResetBones', (ent) ->
-        data = ent\GetPonyData()
-        hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data) if data
+	hook.Add 'PAC3ResetBones', 'PPM2.ResetBones', (ent) ->
+		data = ent\GetPonyData()
+		hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data) if data
 else
-    CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
-    resource.AddWorkshop('933203381')
+	CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
+	resource.AddWorkshop('933203381')
 
-    util.AddNetworkString('PPM2.RequestPonyData')
-    util.AddNetworkString('PPM2.PlayerRespawn')
-    util.AddNetworkString('PPM2.PlayerDeath')
-    util.AddNetworkString('PPM2.PostPlayerDeath')
-    util.AddNetworkString('PPM2.Require')
-    util.AddNetworkString('PPM2.EditorStatus')
-    util.AddNetworkString('PPM2.NotifyDisconnect')
-    util.AddNetworkString('PPM2.PonyDataRemove')
-    util.AddNetworkString('PPM2.RagdollEdit')
-    util.AddNetworkString('PPM2.RagdollEditFlex')
-    util.AddNetworkString('PPM2.RagdollEditEmote')
+	util.AddNetworkString('PPM2.RequestPonyData')
+	util.AddNetworkString('PPM2.PlayerRespawn')
+	util.AddNetworkString('PPM2.PlayerDeath')
+	util.AddNetworkString('PPM2.PostPlayerDeath')
+	util.AddNetworkString('PPM2.Require')
+	util.AddNetworkString('PPM2.EditorStatus')
+	util.AddNetworkString('PPM2.NotifyDisconnect')
+	util.AddNetworkString('PPM2.PonyDataRemove')
+	util.AddNetworkString('PPM2.RagdollEdit')
+	util.AddNetworkString('PPM2.RagdollEditFlex')
+	util.AddNetworkString('PPM2.RagdollEditEmote')
 
-    AddCSLuaFile 'common/networked_object.lua'
-    AddCSLuaFile 'common/registry.lua'
-    AddCSLuaFile 'common/registry_data.lua'
-    AddCSLuaFile 'common/ponydata.lua'
-    AddCSLuaFile 'common/hooks.lua'
-    AddCSLuaFile 'common/bodygroup_controller.lua'
-    AddCSLuaFile 'common/weight_controller.lua'
-    AddCSLuaFile 'common/flex_controller.lua'
-    AddCSLuaFile 'common/functions.lua'
-    AddCSLuaFile 'common/emotes.lua'
-    AddCSLuaFile 'common/ponyfly.lua'
-    AddCSLuaFile 'common/size_controller.lua'
-    AddCSLuaFile 'client/data_instance.lua'
-    AddCSLuaFile 'client/materials_registry.lua'
-    AddCSLuaFile 'client/texture_controller.lua'
-    AddCSLuaFile 'client/render.lua'
-    AddCSLuaFile 'client/hooks.lua'
-    AddCSLuaFile 'client/render_controller.lua'
-    AddCSLuaFile 'client/editor.lua'
-    AddCSLuaFile 'client/emotes.lua'
-    AddCSLuaFile 'client/player_menu.lua'
-    AddCSLuaFile 'client/rag_edit.lua'
-    AddCSLuaFile 'client/functions.lua'
-    AddCSLuaFile 'client/new_texture_controller.lua'
-    include 'server/hooks.lua'
-    include 'server/emotes.lua'
-    include 'server/hitgroups.lua'
-    include 'server/rag_edit.lua'
+	AddCSLuaFile 'common/networked_object.lua'
+	AddCSLuaFile 'common/registry.lua'
+	AddCSLuaFile 'common/registry_data.lua'
+	AddCSLuaFile 'common/ponydata.lua'
+	AddCSLuaFile 'common/hooks.lua'
+	AddCSLuaFile 'common/bodygroup_controller.lua'
+	AddCSLuaFile 'common/weight_controller.lua'
+	AddCSLuaFile 'common/flex_controller.lua'
+	AddCSLuaFile 'common/functions.lua'
+	AddCSLuaFile 'common/emotes.lua'
+	AddCSLuaFile 'common/ponyfly.lua'
+	AddCSLuaFile 'common/size_controller.lua'
+	AddCSLuaFile 'client/data_instance.lua'
+	AddCSLuaFile 'client/materials_registry.lua'
+	AddCSLuaFile 'client/texture_controller.lua'
+	AddCSLuaFile 'client/render.lua'
+	AddCSLuaFile 'client/hooks.lua'
+	AddCSLuaFile 'client/render_controller.lua'
+	AddCSLuaFile 'client/editor.lua'
+	AddCSLuaFile 'client/emotes.lua'
+	AddCSLuaFile 'client/player_menu.lua'
+	AddCSLuaFile 'client/rag_edit.lua'
+	AddCSLuaFile 'client/functions.lua'
+	AddCSLuaFile 'client/new_texture_controller.lua'
+	include 'server/hooks.lua'
+	include 'server/emotes.lua'
+	include 'server/hitgroups.lua'
+	include 'server/rag_edit.lua'

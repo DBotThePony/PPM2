@@ -16,73 +16,73 @@
 --
 
 doPatch = =>
-    return if not @IsValid()
-    local target
+	return if not @IsValid()
+	local target
 
-    for child in *@GetChildren()
-        if child\GetName() == 'DIconLayout'
-            target = child
-            break
+	for child in *@GetChildren()
+		if child\GetName() == 'DIconLayout'
+			target = child
+			break
 
-    return if not target
-    local buttonTarget
+	return if not target
+	local buttonTarget
 
-    for button in *target\GetChildren()
-        buttonChilds = button\GetChildren()
-        cond1 = buttonChilds[1] and buttonChilds[1]\GetName() == 'DLabel'
-        cond2 = buttonChilds[2] and buttonChilds[2]\GetName() == 'DLabel'
-        if cond1 and buttonChilds[1]\GetText() == 'Player Model'
-            buttonTarget = button
-            break
-        elseif cond2 and buttonChilds[2]\GetText() == 'Player Model'
-            buttonTarget = button
-            break
+	for button in *target\GetChildren()
+		buttonChilds = button\GetChildren()
+		cond1 = buttonChilds[1] and buttonChilds[1]\GetName() == 'DLabel'
+		cond2 = buttonChilds[2] and buttonChilds[2]\GetName() == 'DLabel'
+		if cond1 and buttonChilds[1]\GetText() == 'Player Model'
+			buttonTarget = button
+			break
+		elseif cond2 and buttonChilds[2]\GetText() == 'Player Model'
+			buttonTarget = button
+			break
 
-    return if not buttonTarget
-    {:title, :init, :icon, :width, :height, :onewindow} = list.Get('DesktopWindows').PlayerEditor
-    buttonTarget.DoClick = ->
-        return buttonTarget.Window\Center() if onewindow and IsValid(buttonTarget.Window)
+	return if not buttonTarget
+	{:title, :init, :icon, :width, :height, :onewindow} = list.Get('DesktopWindows').PlayerEditor
+	buttonTarget.DoClick = ->
+		return buttonTarget.Window\Center() if onewindow and IsValid(buttonTarget.Window)
 
-        buttonTarget.Window = @Add('DFrame')
-        with buttonTarget.Window
-            \SetSize(width, height)
-            \SetTitle(title)
-            \Center()
+		buttonTarget.Window = @Add('DFrame')
+		with buttonTarget.Window
+			\SetSize(width, height)
+			\SetTitle(title)
+			\Center()
 
-        init(buttonTarget, buttonTarget.Window)
-        local targetModel
+		init(buttonTarget, buttonTarget.Window)
+		local targetModel
 
-        for child in *buttonTarget.Window\GetChildren()
-            if child\GetName() == 'DModelPanel'
-                targetModel = child
-                break
+		for child in *buttonTarget.Window\GetChildren()
+			if child\GetName() == 'DModelPanel'
+				targetModel = child
+				break
 
-        return if not targetModel
-        targetModel.oldSetModel = targetModel.SetModel
-        targetModel.SetModel = (model) =>
-            oldModel = @Entity\GetModel()
-            oldPonyData = @Entity\GetPonyData()
-            @oldSetModel(model)
-            if IsValid(@Entity) and oldPonyData
-                oldPonyData\SetupEntity(@Entity)
-                oldPonyData\ModelChanges(oldModel, model)
-        targetModel.PreDrawModel = (ent) =>
-            controller = @ponyController
-            return if not controller
-            return if not ent\IsPony()
-            controller\SetupEntity(ent) if controller.ent ~= ent
-            controller\GetRenderController()\DrawModels()
-            controller\GetRenderController()\PreDraw(ent)
-            controller\GetRenderController()\HideModels(true)
-            bg = controller\GetBodygroupController()
-            bg\ApplyBodygroups() if bg
+		return if not targetModel
+		targetModel.oldSetModel = targetModel.SetModel
+		targetModel.SetModel = (model) =>
+			oldModel = @Entity\GetModel()
+			oldPonyData = @Entity\GetPonyData()
+			@oldSetModel(model)
+			if IsValid(@Entity) and oldPonyData
+				oldPonyData\SetupEntity(@Entity)
+				oldPonyData\ModelChanges(oldModel, model)
+		targetModel.PreDrawModel = (ent) =>
+			controller = @ponyController
+			return if not controller
+			return if not ent\IsPony()
+			controller\SetupEntity(ent) if controller.ent ~= ent
+			controller\GetRenderController()\DrawModels()
+			controller\GetRenderController()\PreDraw(ent)
+			controller\GetRenderController()\HideModels(true)
+			bg = controller\GetBodygroupController()
+			bg\ApplyBodygroups() if bg
 
-        copy = PPM2.GetMainData()\Copy()
-        controller = copy\CreateCustomController(targetModel.Entity)
-        copy\SetController(controller)
-        controller\SetDisableTask(true)
-        targetModel.ponyController = controller
+		copy = PPM2.GetMainData()\Copy()
+		controller = copy\CreateCustomController(targetModel.Entity)
+		copy\SetController(controller)
+		controller\SetDisableTask(true)
+		targetModel.ponyController = controller
 
-        hook.Run 'BuildPlayerModelMenu', buttonTarget, buttonTarget.Window
+		hook.Run 'BuildPlayerModelMenu', buttonTarget, buttonTarget.Window
 
 hook.Add 'ContextMenuCreated', 'PPM2.PatchPlayerModelMenu', => timer.Simple 0, -> doPatch(@)
