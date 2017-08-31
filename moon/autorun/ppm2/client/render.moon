@@ -182,6 +182,16 @@ do
     fireMat = 'particle/fire'
     hornShift = Vector(1, 0.15, 14.5)
 
+    hook.Add 'PreDrawHalos', 'PPM2.HornEffects', =>
+        return if not HORN_HIDE_BEAM\GetBool()
+        frame = FrameNumber()
+        cTime = (RealTime() % 20) * 4
+        for ent, status in pairs hornGlowStatus
+            if IsValid(ent) and status.frame == frame and IsValid(status.target)
+                additional = math.sin(cTime / 2 + status.haloSeed * 3) * 40
+                newCol = PPM2.AddColor(status.bcolor, Color(additional, additional, additional))
+                halo.Add({status.target}, newCol, math.sin(cTime + status.haloSeed) * 4 + 8, math.cos(cTime + status.haloSeed) * 4 + 8, 2)
+
     hook.Add 'Think', 'PPM2.HornEffects', =>
         frame = FrameNumber()
         for ent, status in pairs hornGlowStatus
@@ -285,12 +295,18 @@ do
 
             hornGlowStatus[@].color = data\GetBodyColor()
             hornGlowStatus[@].color2 = data\GetHornDetailColor()
+            hornGlowStatus[@].haloSeed = math.rad(math.random(-1000, 1000))
 
             if data\GetSeparateHorn()
                 hornGlowStatus[@].color = data\GetHornColor()
                 hornGlowStatus[@].bcolor = data\GetHornMagicColor()
             else
-                hornGlowStatus[@].bcolor = hornGlowStatus[@].color
+                if not data\GetSeparateEyes()
+                    hornGlowStatus[@].bcolor = PPM2.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
+                else
+                    lerpLeft = PPM2.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
+                    lerpRight = PPM2.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
+                    hornGlowStatus[@].bcolor = PPM2.LerpColor(0.5, lerpLeft, lerpRight)
         else
             hornGlowStatus[@].frame = FrameNumber()
             hornGlowStatus[@].isEnabled = isEnabled
@@ -300,7 +316,7 @@ do
             if IsValid(target)
                 hornGlowStatus[@].tpos = target\GetPos() + hitPos
                 hornGlowStatus[@].mins, hornGlowStatus[@].maxs = target\WorldSpaceAABB()
-        return not IsValid(target) if HORN_HIDE_BEAM\GetBool()
+        return false if HORN_HIDE_BEAM\GetBool() and IsValid(target)
 
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2

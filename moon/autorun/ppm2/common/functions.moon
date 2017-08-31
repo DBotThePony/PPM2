@@ -82,6 +82,30 @@ PPM2.Format = (...) ->
 				table.insert(output, tostring(value))
 	return output
 
+PPM2.LerpColor = (lerpValue = 0.5, lerpFrom, lerpTo, affertAlpha = false) ->
+    if affertAlpha
+        {r: r1, g: g1, b: b1, a: a1} = lerpFrom
+        {r: r2, g: g2, b: b2, a: a2} = lerpTo
+        r, g, b, a = Lerp(lerpValue, r1, r2), Lerp(lerpValue, g1, g2), Lerp(lerpValue, b1, b2), Lerp(lerpValue, a1, a2)
+        return Color(r, g, b, a)
+    else
+        {r: r1, g: g1, b: b1} = lerpFrom
+        {r: r2, g: g2, b: b2} = lerpTo
+        r, g, b = Lerp(lerpValue, r1, r2), Lerp(lerpValue, g1, g2), Lerp(lerpValue, b1, b2)
+        return Color(r, g, b)
+
+PPM2.AddColor = (addFrom, addTo, affertAlpha = false) ->
+    if affertAlpha
+        {r: r1, g: g1, b: b1, a: a1} = addFrom
+        {r: r2, g: g2, b: b2, a: a2} = addTo
+        r, g, b, a = math.Clamp(r1 + r2, 0, 255), math.Clamp(g1 + g2, 0, 255), math.Clamp(b1 + b2, 0, 255), math.Clamp(a1 + a2, 0, 255)
+        return Color(r, g, b, a)
+    else
+        {r: r1, g: g1, b: b1} = addFrom
+        {r: r2, g: g2, b: b2} = addTo
+        r, g, b = math.Clamp(r1 + r2, 0, 255), math.Clamp(g1 + g2, 0, 255), math.Clamp(b1 + b2, 0, 255)
+        return Color(r, g, b)
+
 PPM2.Message = (...) ->
     frmt = PPM2.Format(...)
     MsgC(PREFIX_COLOR, PREFIX, unpack(frmt))
