@@ -146,7 +146,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
         else
             @alreadyCalledRespawn = false
             @alreadyCalledDeath = false
-        @ApplyBodygroups(CLIENT)
+        @ApplyBodygroups(CLIENT, true)
         @SetFly(false) if SERVER
 
         if scale = @GetSizeController()

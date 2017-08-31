@@ -306,7 +306,7 @@ class DefaultBodygroupController
             \ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_6] or emptyVector))
             \ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_7] or emptyVector))
 
-    SlowUpdate: (createModels = CLIENT, ent = @ent) =>
+    SlowUpdate: (createModels = CLIENT, ent = @ent, force = false) =>
         return if not IsValid(ent)
         return if not ent\IsPony()
         with ent
@@ -320,14 +320,14 @@ class DefaultBodygroupController
             @UpdateManeSize()
         @ApplyRace()
         if createModels
-            @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
-            @CreateNewSocksModelIfNotExists() if @GetData()\GetSocksAsNewModel()
-    ApplyBodygroups: (createModels = CLIENT) =>
+            @CreateSocksModelIfNotExists(force) if @GetData()\GetSocksAsModel()
+            @CreateNewSocksModelIfNotExists(force) if @GetData()\GetSocksAsNewModel()
+    ApplyBodygroups: (createModels = CLIENT, force = false) =>
         return unless @isValid
         return if not IsValid(@ent)
         @ResetBodygroups()
         return if not @ent\IsPony()
-        @SlowUpdate(createModels)
+        @SlowUpdate(createModels, force)
 
     Remove: =>
         @RemoveModels()
@@ -721,7 +721,7 @@ class NewBodygroupController extends DefaultBodygroupController
         @ResetEars()
         super()
 
-    SlowUpdate: (createModels = CLIENT) =>
+    SlowUpdate: (createModels = CLIENT, force = false) =>
         return if not IsValid(@ent)
         return if not @ent\IsPony()
         @ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)
@@ -759,22 +759,22 @@ class NewBodygroupController extends DefaultBodygroupController
 
         @ApplyRace()
         if createModels
-            @UpdateUpperMane()
-            @UpdateLowerMane()
-            @UpdateTailModel()
-            @CreateSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsModel()
-            @CreateNewSocksModelIfNotExists() if createModels and @GetData()\GetSocksAsNewModel()
+            @UpdateUpperMane(force)
+            @UpdateLowerMane(force)
+            @UpdateTailModel(force)
+            @CreateSocksModelIfNotExists(force) if createModels and @GetData()\GetSocksAsModel()
+            @CreateNewSocksModelIfNotExists(force) if createModels and @GetData()\GetSocksAsNewModel()
     RemoveModels: =>
         @maneModelUP\Remove() if IsValid(@maneModelUP)
         @maneModelLower\Remove() if IsValid(@maneModelLower)
         @tailModel\Remove() if IsValid(@tailModel)
         super()
-    ApplyBodygroups: (createModels = CLIENT) =>
+    ApplyBodygroups: (createModels = CLIENT, force = false) =>
         return unless @isValid
         return if not IsValid(@ent)
         @ResetBodygroups()
         return @RemoveModels() if not @ent\IsPony()
-        @SlowUpdate(createModels)
+        @SlowUpdate(createModels, force)
 
     @NOCLIP_ANIMATIONS = {9, 10, 11}
 
