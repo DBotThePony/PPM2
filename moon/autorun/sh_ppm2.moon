@@ -50,7 +50,6 @@ AddCSLuaFile = (f) -> AddCSLuaFile_("autorun/ppm2/#{f}")
 include 'common/networked_object.lua'
 include 'common/registry.lua'
 include 'common/functions.lua'
-include 'common/hooks.lua'
 include 'common/bodygroup_controller.lua'
 include 'common/weight_controller.lua'
 include 'common/emotes.lua'
@@ -59,6 +58,7 @@ include 'common/registry_data.lua'
 include 'common/ponydata.lua'
 include 'common/ponyfly.lua'
 include 'common/size_controller.lua'
+include 'common/hooks.lua'
 
 if CLIENT
     PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
