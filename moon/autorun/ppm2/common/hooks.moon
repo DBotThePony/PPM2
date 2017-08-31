@@ -16,8 +16,8 @@
 --
 
 do
-    import GetModel, IsDormant, GetPonyData from FindMetaTable('Entity')
-    timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
+    import GetModel, IsDormant, GetPonyData, IsValid from FindMetaTable('Entity')
+    callback = ->
         for ply in *player.GetAll()
             if not IsDormant(ply)
                 model = GetModel(ply)
@@ -40,6 +40,9 @@ do
                         oldModel = ply.__ppm2_lastmodel
                         ply.__ppm2_lastmodel = model
                         data\ModelChanges(oldModel, model)
+    timer.Create 'PPM2.ModelWatchdog', 1, 0, ->
+        status, err = pcall callback
+        print('PPM2 Error: ' .. err) if not status
 
 do
     catchError = (err) ->

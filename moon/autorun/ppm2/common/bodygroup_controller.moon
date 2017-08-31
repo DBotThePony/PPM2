@@ -120,8 +120,8 @@ class DefaultBodygroupController
     @ATTACHMENT_EYES = 4
     @ATTACHMENT_EYES_NAME = 'eyes'
 
-    CreateSocksModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
+    CreateSocksModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @socksModel if IsValid(@socksModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isSocks and ent.manePlayer == @ent
@@ -146,8 +146,8 @@ class DefaultBodygroupController
         @GetData()\SetSocksModel(@socksModel)
         return @socksModel
 
-    CreateNewSocksModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
+    CreateNewSocksModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @newSocksModel if IsValid(@newSocksModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isNewSocks and ent.manePlayer == @ent
@@ -172,17 +172,17 @@ class DefaultBodygroupController
         @GetData()\SetNewSocksModel(@newSocksModel)
         return @newSocksModel
 
-    CreateNewSocksModelIfNotExists: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateNewSocksModel() if not IsValid(@newSocksModel)
+    CreateNewSocksModelIfNotExists: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
+        @CreateNewSocksModel(force) if not IsValid(@newSocksModel)
         return NULL if not IsValid(@newSocksModel)
         @newSocksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetNewSocksModel(@newSocksModel)
         return @newSocksModel
 
-    CreateSocksModelIfNotExists: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateSocksModel() if not IsValid(@socksModel)
+    CreateSocksModelIfNotExists: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
+        @CreateSocksModel(force) if not IsValid(@socksModel)
         return NULL if not IsValid(@socksModel)
         @socksModel\SetParent(@ent\GetEntity()) if IsValid(@ent)
         @GetData()\SetSocksModel(@socksModel)
@@ -190,8 +190,8 @@ class DefaultBodygroupController
 
     MergeModels: (targetEnt = NULL) =>
         return if SERVER or not @isValid or not IsValid(targetEnt)
-        socks = @CreateSocksModelIfNotExists() if @GetData()\GetSocksAsModel()
-        socks2 = @CreateNewSocksModelIfNotExists() if @GetData()\GetSocksAsNewModel()
+        socks = @CreateSocksModelIfNotExists(true) if @GetData()\GetSocksAsModel()
+        socks2 = @CreateNewSocksModelIfNotExists(true) if @GetData()\GetSocksAsNewModel()
         if IsValid(socks)
             socks\SetParent(targetEnt)
         if IsValid(socks2)
@@ -471,8 +471,8 @@ class NewBodygroupController extends DefaultBodygroupController
     new: (...) =>
         super(...)
 
-    CreateUpperManeModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
+    CreateUpperManeModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @maneModelUP if IsValid(@maneModelUP)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.upperMane and ent.manePlayer == @ent
@@ -509,8 +509,8 @@ class NewBodygroupController extends DefaultBodygroupController
 
         return @maneModelUP
 
-    CreateLowerManeModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
+    CreateLowerManeModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @maneModelLower if IsValid(@maneModelLower)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.lowerMane and ent.manePlayer == @ent
@@ -538,8 +538,8 @@ class NewBodygroupController extends DefaultBodygroupController
         @GetData()\SetLowerManeModel(@maneModelLower)
         return @maneModelLower
 
-    CreateTailModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
+    CreateTailModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
         return @tailModel if IsValid(@tailModel)
         for ent in *ents.GetAll()
             if ent.isPonyPropModel and ent.isTail and ent.manePlayer == @ent
@@ -568,21 +568,21 @@ class NewBodygroupController extends DefaultBodygroupController
         @GetData()\SetTailModel(@tailModel)
         return @tailModel
 
-    CreateUpperManeModelIfNotExists: =>
+    CreateUpperManeModelIfNotExists: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateUpperManeModel() if not IsValid(@maneModelUP)
+        @CreateUpperManeModel(force) if not IsValid(@maneModelUP)
         @GetData()\SetUpperManeModel(@maneModelUP) if IsValid(@maneModelUP)
         return @maneModelUP
 
-    CreateLowerManeModelIfNotExists: =>
+    CreateLowerManeModelIfNotExists: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateLowerManeModel() if not IsValid(@maneModelLower)
+        @CreateLowerManeModel(force) if not IsValid(@maneModelLower)
         @GetData()\SetLowerManeModel(@maneModelLower) if IsValid(@maneModelLower)
         return @maneModelLower
 
-    CreateTailModelIfNotExists: =>
+    CreateTailModelIfNotExists: (force = false) =>
         return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateTailModel() if not IsValid(@tailModel)
+        @CreateTailModel(force) if not IsValid(@tailModel)
         @GetData()\SetTailModel(@tailModel) if IsValid(@tailModel)
         return @tailModel
 
@@ -594,12 +594,12 @@ class NewBodygroupController extends DefaultBodygroupController
         return unless @isValid
         super(targetEnt)
         return unless IsValid(targetEnt)
-        for e in *{@CreateUpperManeModelIfNotExists(), @CreateLowerManeModelIfNotExists(), @CreateTailModelIfNotExists()}
+        for e in *{@CreateUpperManeModelIfNotExists(true), @CreateLowerManeModelIfNotExists(true), @CreateTailModelIfNotExists(true)}
             e\SetParent(targetEnt) if IsValid(e)
 
-    UpdateUpperMane: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateUpperManeModelIfNotExists()
+    UpdateUpperMane: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
+        @CreateUpperManeModelIfNotExists(force)
         return NULL if not IsValid(@maneModelUP)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeNew())
         modelID = "0" .. modelID if modelID < 10
@@ -611,9 +611,9 @@ class NewBodygroupController extends DefaultBodygroupController
         @GetData()\SetUpperManeModel(@maneModelUP)
         return @maneModelUP
 
-    UpdateLowerMane: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateLowerManeModelIfNotExists()
+    UpdateLowerMane: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
+        @CreateLowerManeModelIfNotExists(force)
         return NULL if not IsValid(@maneModelLower)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetManeTypeLowerNew())
         modelID = "0" .. modelID if modelID < 10
@@ -625,9 +625,9 @@ class NewBodygroupController extends DefaultBodygroupController
         @GetData()\SetLowerManeModel(@maneModelLower)
         return @maneModelLower
 
-    UpdateTailModel: =>
-        return NULL if SERVER or not @isValid or not IsValid(@ent) or not @ent\IsPony()
-        @CreateTailModelIfNotExists()
+    UpdateTailModel: (force = false) =>
+        return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
+        @CreateTailModelIfNotExists(force)
         return NULL if not IsValid(@tailModel)
         modelID, bodygroupID = PPM2.TransformNewModelID(@GetData()\GetTailTypeNew())
         modelID = "0" .. modelID if modelID < 10
