@@ -59,8 +59,14 @@
 
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
-class FlexState
+class FlexState extends PPM2.ModifierBase
+	@Setup: =>
+		@RegisterModifier('Speed', 0)
+		@RegisterModifier('Scale', 0)
+		@RegisterModifier('Weight', 0)
+
 	new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
+		super()
 		@controller = controller
 		@ent = controller.ent
 		@name = flexName
@@ -77,14 +83,8 @@ class FlexState
 		@target = 0
 		@speedModify = 1
 		@scaleModify = 1
-		@speedModifiers = {}
-		@scaleModifiers = {}
 		@modifiers = {}
-		@modifiersSpeeds = {}
-		@modifiersTargets = {}
-		@modifiersNames = {}
 		@useModifiers = useModifiers
-		@nextModifierID = 0
 		@active = active
 		@useLerp = true
 		@lerpMultiplier = 1
@@ -101,42 +101,6 @@ class FlexState
 	GetLerpModify: => @lerpMultiplier
 	LerpModify: => @lerpMultiplier
 
-	GetModifierID: (name = '') =>
-		return @modifiersNames[name] if @modifiersNames[name]
-		@nextModifierID += 1
-		id = @nextModifierID
-		@modifiersNames[name] = id
-		@speedModifiers[id] = 0
-		@scaleModifiers[id] = 0
-		@modifiers[id] = 0
-		@modifiersSpeeds[id] = 1
-		@modifiersTargets[id] = 0
-		return id
-	SetModifierWeight: (modifID, val = 0) =>
-		return if not modifID
-		return if not @modifiersTargets[modifID]
-		@modifiersTargets[modifID] = val
-	SetModifierSpeed: (modifID, val = 0) =>
-		return if not modifID
-		return if not @modifiersSpeeds[modifID]
-		@modifiersSpeeds[modifID] = val
-	SetModifierScale: (modifID, val = 0) =>
-		return if not modifID
-		return if not @scaleModifiers[modifID]
-		@scaleModifiers[modifID] = val
-	SetModifierScale: (modifID, val = 0) =>
-		return if not modifID
-		return if not @speedModifiers[modifID]
-		@speedModifiers[modifID] = val
-	ResetModifiers: (name = '', hard = false) =>
-		return false if not @modifiersNames[name]
-		id = @modifiersNames[name]
-		@speedModifiers[id] = 0
-		@scaleModifiers[id] = 0
-		@modifiers[id] = 0 if hard
-		@modifiersTargets[id] = 0
-		@modifiersSpeeds[id] = 1 if hard
-		return true
 	GetEntity: => @ent
 	GetData: => @controller
 	GetController: => @controller
@@ -172,12 +136,12 @@ class FlexState
 			@scale = @originalscale * @scaleModify
 			@speed = @originalspeed * @speedModify
 
-			for i = 1, #@modifiers
-				@modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
+			for i = 1, #@WeightModifiers
+				@modifiers[i] = Lerp(delta * 30 * @speed * @speedModify * @lerpMultiplier, @modifiers[i] or 0, @WeightModifiers[i])
 				@current += @modifiers[i]
 
-			@scale += modif for modif in *@scaleModifiers
-			@speed += modif for modif in *@speedModifiers
+			@scale += modif for modif in *@ScaleModifiers
+			@speed += modif for modif in *@SpeedModifiers
 			@current = math.Clamp(@current, @min, @max) * @scale
 
 		if not IsValid(@ent)
@@ -192,11 +156,7 @@ class FlexState
 		@Reset()
 	Reset: (resetVars = true) =>
 		for name, id in pairs @modifiersNames
-			@speedModifiers[id] = 0
-			@scaleModifiers[id] = 0
-			@modifiers[id] = 0
-			@modifiersTargets[id] = 0
-			@modifiersSpeeds[id] = 1
+			@ResetModifiers(name)
 		if resetVars
 			@scaleModify = 1
 			@speedModify = 1
