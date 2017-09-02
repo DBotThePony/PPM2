@@ -28,19 +28,205 @@ class PPM2.ModifierBase
 			if data.name == modifName
 				data.def = def
 				return
-		table.insert(@MODIFIERS, {name: modifName, :def, :iName})
+
+		targetTable = {
+			name: modifName
+			:def, :iName
+			clamp: (val) -> val
+			clampFinal: (val) -> val
+			lerpFunc: Lerp
+		}
+
+		table.insert(@MODIFIERS, targetTable)
+
 		@__base['SetModifier' .. modifName] = (modifID, val = 0) =>
 			return if not modifID
 			return if not @[iName][modifID]
-			@[iName][modifID] = val
+			@[iName][modifID] = targetTable.clamp(val)
+		@__base['GetModifier' .. modifName] = (modifID, val = 0) =>
+			return if not modifID
+			if targetTable.isLerped
+				return @[targetTable.iNameLerp][modifID]
+			else
+				return @[iName][modifID]
 		@__base['Calculate' .. modifName] = =>
 			calc = calculateStart
 			calc += modif for modif in *@[iName]
-			return calc
+			return targetTable.clampFinal(calc)
+
+	@SetModifierMinMax: (modifName = 'MyModifier', mins, maxs) =>
+		for data in *@MODIFIERS
+			if data.name == modifName
+				data.mins = mins
+				data.maxs = maxs
+				if not mins and not maxs
+					data.clamp = (val) -> val
+				elseif not mins
+					data.clamp = (val) -> math.min(val, maxs)
+				elseif not maxs
+					data.clamp = (val) -> math.max(val, mins)
+				else
+					data.clamp = (val) -> math.Clamp(val, mins, maxs)
+				return true
+		return false
+
+	@SetModifierMinMaxFinal: (modifName = 'MyModifier', mins, maxs) =>
+		for data in *@MODIFIERS
+			if data.name == modifName
+				data.minsFinal = mins
+				data.maxsFinal = maxs
+				if not mins and not maxs
+					data.clampFinal = (val) -> val
+				elseif not mins
+					data.clampFinal = (val) -> math.min(val, maxs)
+				elseif not maxs
+					data.clampFinal = (val) -> math.max(val, mins)
+				else
+					data.clamp = (val) -> math.Clamp(val, mins, maxs)
+				return true
+		return false
+
+	RegisterModifier: (modifName = 'MyModifier', def = 0, calculateStart = 0) =>
+		iName = modifName .. 'Modifiers'
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				data.def = def
+				return
+
+		targetTable = {
+			name: modifName
+			:def, :iName
+			clamp: (val) -> val
+			clampFinal: (val) -> val
+			lerpFunc: Lerp
+		}
+
+		table.insert(@CUSTOM_MODIFIERS, targetTable)
+
+		@['SetModifier' .. modifName] = (modifID, val = 0) =>
+			return if not modifID
+			return if not @[iName][modifID]
+			@[iName][modifID] = targetTable.clamp(val)
+		@['GetModifier' .. modifName] = (modifID, val = 0) =>
+			return if not modifID
+			if targetTable.isLerped
+				return @[targetTable.iNameLerp][modifID]
+			else
+				return @[iName][modifID]
+		@['GetRawModifier' .. modifName] = (modifID, val = 0) =>
+			return if not modifID
+			return @[iName][modifID]
+		@['Calculate' .. modifName] = =>
+			if targetTable.isLerped
+				calc = calculateStart
+				calc += modif for modif in *@[targetTable.iNameLerp]
+				return targetTable.clampFinal(calc)
+			else
+				calc = calculateStart
+				calc += modif for modif in *@[iName]
+				return targetTable.clampFinal(calc)
+
+	SetModifierMinMax: (modifName = 'MyModifier', mins, maxs) =>
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				data.mins = mins
+				data.maxs = maxs
+				if not mins and not maxs
+					data.clamp = (val) -> val
+				elseif not mins
+					data.clamp = (val) -> math.min(val, maxs)
+				elseif not maxs
+					data.clamp = (val) -> math.max(val, mins)
+				else
+					data.clamp = (val) -> math.Clamp(val, mins, maxs)
+				return true
+		return false
+
+	SetModifierMinMaxFinal: (modifName = 'MyModifier', mins, maxs) =>
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				data.minsFinal = mins
+				data.maxsFinal = maxs
+				if not mins and not maxs
+					data.clampFinal = (val) -> val
+				elseif not mins
+					data.clampFinal = (val) -> math.min(val, maxs)
+				elseif not maxs
+					data.clampFinal = (val) -> math.max(val, mins)
+				else
+					data.clamp = (val) -> math.Clamp(val, mins, maxs)
+				return true
+		return false
+
+	@SetupLerpTables: (modifName = 'MyModifier') =>
+		for data in *@MODIFIERS
+			if data.name == modifName
+				data.isLerped = true
+				data.iNameLerp = data.iName .. 'Lerp'
+				@__base[data.iNameLerp] = data.lerpTable
+				return true, data.lerpTable
+		return false
+
+	SetupLerpTables: (modifName = 'MyModifier') =>
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				data.isLerped = true
+				data.lerpTable = {k, v for k, v in pairs @[data.iName]}
+				data.iNameLerp = data.iName .. 'Lerp'
+				@[data.iNameLerp] = data.lerpTable
+				return true, data.lerpTable
+		return false
+
+	@SetLerpFunc: (modifName = 'MyModifier', func = Lerp) =>
+		for data in *@MODIFIERS
+			if data.name == modifName
+				data.lerpFunc = func
+				return true
+		return false
+
+	SetLerpFunc: (modifName = 'MyModifier', func = Lerp) =>
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				data.lerpFunc = func
+				return true
+		return false
+
+	TriggerLerp: (modifName = 'MyModifier', lerpBy = 0.5) =>
+		for data in *@CUSTOM_MODIFIERS
+			if data.name == modifName
+				@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+				return true
+		for data in *@MODIFIERS
+			if data.name == modifName
+				@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+				return true
+		return false
+
+	TriggerLerpAll: (lerpBy = 0.5) =>
+		for data in *@CUSTOM_MODIFIERS
+			@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+		for data in *@MODIFIERS
+			@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+		return false
+
+	@ClearModifiers: =>
+		for modif in *@MODIFIERS
+			@__base['SetModifier' .. modif.name] = nil
+			@__base['Calculate' .. modif.name] = nil
+		@MODIFIERS = {}
+
+	ClearModifiers: =>
+		for modif in *@CUSTOM_MODIFIERS
+			@[modif.iName] = nil
+			@['SetModifier' .. modif.name] = nil
+			@['Calculate' .. modif.name] = nil
+		@CUSTOM_MODIFIERS = {}
 
 	new: =>
+		@CUSTOM_MODIFIERS = {}
 		for modif in *@@MODIFIERS
 			@[modif.iName] = {}
+			@[modif.iNameLerp] = {} if modif.iNameLerp
 		@modifiersNames = {}
 		@nextModifierID = 0
 
@@ -50,9 +236,16 @@ class PPM2.ModifierBase
 		id = @nextModifierID
 		@modifiersNames[name] = id
 		@[modif.iName][id] = modif.def for modif in *@@MODIFIERS
+		@[modif.iNameLerp][id] = modif.def for modif in *@@MODIFIERS when modif.iNameLerp
+		@[modif.iName][id] = modif.def for modif in *@CUSTOM_MODIFIERS
+		@[modif.iNameLerp][id] = modif.def for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
 		return id
+
 	ResetModifiers: (name = '') =>
 		return false if not @modifiersNames[name]
 		id = @modifiersNames[name]
 		@[modif.iName][id] = modif.def for modif in *@@MODIFIERS
+		@[modif.iNameLerp][id] = modif.def for modif in *@@MODIFIERS when modif.iNameLerp
+		@[modif.iName][id] = modif.def for modif in *@CUSTOM_MODIFIERS
+		@[modif.iNameLerp][id] = modif.def for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
 		return true
