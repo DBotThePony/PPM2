@@ -213,8 +213,7 @@ class FlexSequence extends PPM2.SequenceBase
 
 PPM2.FlexSequence = FlexSequence
 
-class PonyFlexController
-	@AVALIABLE_CONTROLLERS = {}
+class PonyFlexController extends PPM2.ControllerChildren
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
 	@FLEX_LIST = {
@@ -811,7 +810,6 @@ class PonyFlexController
 
 	@__inherited: (child) =>
 		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
 		for i, flex in pairs child.FLEX_LIST
 			flex.id = i - 1
 			flex.targetName = "target#{flex.flex}"
@@ -838,9 +836,7 @@ class PonyFlexController
 	@NEXT_HOOK_ID = 0
 
 	new: (data) =>
-		@isValid = true
-		@controller = data
-		@ent = data.ent
+		super(data)
 		@states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
 		@statesTable = {state\GetFlexName(), state for state in *@states}
 		@statesTable[state\GetFlexName()\lower()] = state for state in *@states

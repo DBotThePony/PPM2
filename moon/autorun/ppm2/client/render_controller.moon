@@ -20,22 +20,12 @@ ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony le
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 
-class PonyRenderController
-	@AVALIABLE_CONTROLLERS = {}
+class PonyRenderController extends PPM2.ControllerChildren
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-	@__inherited(@)
-	@NEXT_OBJ_ID = 0
 
 	CompileTextures: => @GetTextureController()\CompileTextures() if @GetTextureController and @GetTextureController()
 	new: (data) =>
-		@objID = @@NEXT_OBJ_ID
-		@@NEXT_OBJ_ID += 1
-		@isValid = true
-		@networkedData = data
-		@ent = data.ent
+		super(data)
 		@hideModels = false
 		@modelCached = data\GetModel()
 		@IGNORE_DRAW = false
@@ -46,10 +36,9 @@ class PonyRenderController
 		@newSocksModel = data\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
 		@CreateFlexController() if @ent
-	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
+
 	GetEntity: => @ent
-	GetData: => @networkedData
-	GetModel: => @networkedData\GetModel()
+	GetModel: => @controller\GetModel()
 
 	GetLegs: =>
 		return NULL if not @isValid

@@ -48,6 +48,7 @@ include = (f) -> include_("autorun/ppm2/#{f}")
 AddCSLuaFile = (f) -> AddCSLuaFile_("autorun/ppm2/#{f}")
 
 include 'common/modifier_base.lua'
+include 'common/controller_children.lua'
 include 'common/networked_object.lua'
 include 'common/sequence_base.lua'
 include 'common/registry.lua'
@@ -102,6 +103,9 @@ else
 	util.AddNetworkString('PPM2.RagdollEditFlex')
 	util.AddNetworkString('PPM2.RagdollEditEmote')
 
+	AddCSLuaFile 'common/modifier_base.lua'
+	AddCSLuaFile 'common/controller_children.lua'
+	AddCSLuaFile 'common/sequence_base.lua'
 	AddCSLuaFile 'common/networked_object.lua'
 	AddCSLuaFile 'common/registry.lua'
 	AddCSLuaFile 'common/registry_data.lua'

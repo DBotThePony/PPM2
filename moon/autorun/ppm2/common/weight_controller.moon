@@ -59,14 +59,8 @@
 -- 39	Tail02
 -- 40	Tail03
 
-class PonyWeightController
-	@AVALIABLE_CONTROLLERS = {}
+class PonyWeightController extends PPM2.ControllerChildren
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-	@__inherited(@)
-
 	@HARD_LIMIT_MINIMAL = 0.1
 	@HARD_LIMIT_MAXIMAL = 3
 
