@@ -168,16 +168,10 @@ class FlexState extends PPM2.ModifierBase
 
 PPM2.FlexState = FlexState
 
-class FlexSequence
+class FlexSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
+		super(data, controller)
 		{
-			'name': @name
-			'repeat': @dorepeat
-			'frames': @frames
-			'time': @time
-			'func': @func
-			'reset': @resetfunc
-			'create': @createfunc
 			'ids': @flexIDsIterable
 			'numid': @numid
 		} = data
@@ -197,101 +191,25 @@ class FlexSequence
 
 		@ent = controller.ent
 		@controller = controller
-		@frame = 0
-		@start = RealTime()
-		@finish = @start + @time
-		@deltaAnim = 1
-		@speed = 1
-		@scale = 1
-		@valid = true
-		@paused = false
-		@pausedSequences = {}
-		@createfunc() if @createfunc
-		@resetfunc() if @resetfunc
-
-	__tostring: => "[#{@@__name}:#{@name}]"
-
-	SetTime: (newTime = @time, refresh = true) =>
-		@frame = 0
-		@start = RealTime() if refresh
-		@time = newTime
-		@finish = @start + @time
-	Reset: =>
-		@frame = 0
-		@start = RealTime()
-		@finish = @start + @time
-		@deltaAnim = 1
-		@resetfunc() if @resetfunc
+		@Launch()
 
 	GetController: => @controller
 	GetEntity: => @ent
-	GetName: => @name
-	GetRepeat: => @dorepeat
-	GetFrames: => @frames
-	GetFrame: => @frames
-	GetTime: => @time
-	GetThinkFunc: => @func
-	GetCreatFunc: => @createfunc
-	GetSpeed: => @speed
-	GetAnimationSpeed: => @speed
-	GetScale: => @scale
 	GetModifierID: (id = '') => @flexIDS[id]
 	GetFlexState: (id = '') => @flexStates[id]
 
-	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
-	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
-
-	IsValid: => @valid
 	Think: (delta = 0) =>
 		@ent = @controller.ent
 		return false if not IsValid(@ent)
-		if @paused
-			@finish += delta
-			@start += delta
-		else
-			if @HasFinished()
-				@Stop()
-				return false
+		super(delta)
 
-			@deltaAnim = (@finish - RealTime()) / @time
-			if @deltaAnim < 0
-				@deltaAnim = 1
-				@frame = 0
-				@start = RealTime()
-				@finish = @start + @time
-			@frame += 1
-
-			if @func
-				status = @func(delta, 1 - @deltaAnim)
-				if status == false
-					@Stop()
-					return false
-
-		return true
-	Pause: =>
-		return false if @paused
-		@paused = true
-		return true
-	Resume: =>
-		return false if not @paused
-		@paused = false
-		return true
-	PauseSequence: (id = '') =>
-		@pausedSequences[id] = true
-		@GetController()\PauseSequence(id)
-	ResumeSequence: (id = '') =>
-		@pausedSequences[id] = false
-		@GetController()\ResumeSequence(id)
 	Stop: =>
-		for id in *@flexIDsIterable
-			@GetController()\GetFlexState(id)\ResetModifiers(@name)
+		super()
 		for id, bool in pairs @pausedSequences
-			@GetController()\ResumeSequence(id) if bool
-		@valid = false
-	Remove: => @Stop()
-	HasFinished: =>
-		return false if @dorepeat
-		return RealTime() > @finish
+			@controller\ResumeSequence(id) if bool
+
+	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
+	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
 
 PPM2.FlexSequence = FlexSequence
 
@@ -394,11 +312,9 @@ class PonyFlexController
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
 				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-				left, right = @GetModifierID(1), @GetModifierID(2)
-				leftState, rightState = @GetFlexState(1), @GetFlexState(2)
 				value = math.abs(math.sin(RealTime() * .5) * .15)
-				leftState\SetModifierWeight(left, value)
-				rightState\SetModifierWeight(right, value)
+				@SetModifierWeight(1, value)
+				@SetModifierWeight(2, value)
 		}
 
 		{

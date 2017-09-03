@@ -49,6 +49,7 @@ AddCSLuaFile = (f) -> AddCSLuaFile_("autorun/ppm2/#{f}")
 
 include 'common/networked_object.lua'
 include 'common/modifier_base.lua'
+include 'common/sequence_base.lua'
 include 'common/registry.lua'
 include 'common/functions.lua'
 include 'common/bodygroup_controller.lua'
