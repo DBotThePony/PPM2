@@ -16,7 +16,7 @@
 --
 
 class PPM2.SequenceBase
-	new: (data, parent) =>
+	new: (parent, data) =>
 		{
 			'name': @name
 			'repeat': @dorepeat
@@ -50,6 +50,11 @@ class PPM2.SequenceBase
 		@start = RealTime() if refresh
 		@time = newTime
 		@finish = @start + @time
+
+	SetInfinite: (val) => @dorepeat = val
+	SetIsInfinite: (val) => @dorepeat = val
+	GetInfinite: => @dorepeat
+	GetIsInfinite: => @dorepeat
 
 	Reset: =>
 		@frame = 0
@@ -114,9 +119,8 @@ class PPM2.SequenceBase
 		@parent\ResumeSequence(id) if @parent
 
 	Stop: =>
-		if @parent
-			for id in *@flexIDsIterable
-				@parent\GetFlexState(id)\ResetModifiers(@name)
+		for id, bool in pairs @pausedSequences
+			@controller\ResumeSequence(id) if bool
 		@valid = false
 
 	Remove: => @Stop()

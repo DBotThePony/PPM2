@@ -65,6 +65,7 @@ class PPM2.SequenceHolder extends PPM2.ControllerChildren
 		return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
 		return false
 
+	StopSequence: (...) => @EndSequence(...)
 	EndSequence: (seqID = '', callStop = true) =>
 		return false if not @isValid
 		return false if not @currentSequences[seqID]
@@ -82,6 +83,10 @@ class PPM2.SequenceHolder extends PPM2.ControllerChildren
 
 	Reset: => @ResetSequences()
 
+	RemoveHooks: =>
+		for iHook in *@hooks
+			hook.Remove iHook, @hookID
+
 	PlayerRespawn: =>
 		return if not @isValid
 		@ResetSequences()
@@ -89,6 +94,8 @@ class PPM2.SequenceHolder extends PPM2.ControllerChildren
 	HasSequence: (seqID = '') =>
 		return false if not @isValid
 		@currentSequences[seqID] and true or false
+
+	GetSequence: (seqID = '') => @currentSequences[seqID]
 
 	Hook: (id, func) =>
 		return if not @isValid
@@ -104,15 +111,20 @@ class PPM2.SequenceHolder extends PPM2.ControllerChildren
 		table.insert(@hooks, id)
 
 	Think: (ent = @ent) =>
-		return if not @isValid
+		return if not @IsValid()
 		delta = RealTime() - @lastThink
 		@lastThink = RealTime()
 		@lastThinkDelta = delta
-		if not IsValid(@ent)
+		if @nwController and not IsValid(@ent)
 			@ent = @nwController.ent
 			ent = @ent
 		return if not IsValid(ent) or ent\IsDormant()
-		@TriggerLerpAll(delta * 5)
+		for seq in *@currentSequencesIterable
+			if not seq\IsValid()
+				@EndSequence(seq\GetName(), false)
+				break
+			seq\Think(delta)
+		@TriggerLerpAll(delta * 10)
 		return delta
 
 	Remove: =>

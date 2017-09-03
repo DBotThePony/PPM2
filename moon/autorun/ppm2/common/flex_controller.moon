@@ -137,7 +137,7 @@ class FlexState extends PPM2.ModifierBase
 			@speed = @originalspeed * @speedModify
 
 			for i = 1, #@WeightModifiers
-				@modifiers[i] = Lerp(delta * 30 * @speed * @speedModify * @lerpMultiplier, @modifiers[i] or 0, @WeightModifiers[i])
+				@modifiers[i] = Lerp(delta * 15 * @speed * @speedModify * @lerpMultiplier, @modifiers[i] or 0, @WeightModifiers[i])
 				@current += @modifiers[i]
 
 			@scale += modif for modif in *@ScaleModifiers
@@ -170,7 +170,7 @@ PPM2.FlexState = FlexState
 
 class FlexSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
-		super(data, controller)
+		super(controller, data)
 
 		{
 			'ids': @flexIDsIterable
@@ -206,8 +206,9 @@ class FlexSequence extends PPM2.SequenceBase
 
 	Stop: =>
 		super()
-		for id, bool in pairs @pausedSequences
-			@controller\ResumeSequence(id) if bool
+		if @parent
+			for id in *@flexIDsIterable
+				@parent\GetFlexState(id)\ResetModifiers(@name)
 
 	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
 	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
@@ -215,6 +216,7 @@ class FlexSequence extends PPM2.SequenceBase
 PPM2.FlexSequence = FlexSequence
 
 class PonyFlexController extends PPM2.SequenceHolder
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
 	@FLEX_LIST = {
@@ -815,14 +817,6 @@ class PonyFlexController extends PPM2.SequenceHolder
 			flex.targetName = "target#{flex.flex}"
 		@FLEX_IDS = {flex.id, flex for flex in *@FLEX_LIST}
 		@FLEX_TABLE = {flex.flex, flex for flex in *@FLEX_LIST}
-		for emote in *PPM2.AVALIABLE_EMOTES
-			for getFlex in *@SEQUENCES
-				if getFlex.name == emote.sequence
-					copyFlex = {k, v for k, v in pairs getFlex}
-					copyFlex.repeat = true
-					copyFlex.name ..= '_endless'
-					table.insert(@SEQUENCES, copyFlex)
-					break
 
 	@SetupFlexesTables()
 
@@ -842,10 +836,6 @@ class PonyFlexController extends PPM2.SequenceHolder
 		@Hook('OnPlayerChat', @OnPlayerChat)
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
-		@Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
-		@Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
-		@Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
-		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
 		@ResetSequences()
 		PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
 
@@ -904,32 +894,6 @@ class PonyFlexController extends PPM2.SequenceHolder
 	PlayerEndVoice: (ply = NULL) =>
 		return if ply\GetEntity() ~= @ent\GetEntity()
 		@EndSequence('talk_endless')
-	PPM2_HurtAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@RestartSequence('hurt')
-		@EndSequence('kill_grin')
-	PPM2_KillAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@RestartSequence('kill_grin')
-		@EndSequence('anger')
-	PPM2_AngerAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@EndSequence('kill_grin')
-		@RestartSequence('anger')
-	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		for {:sequence} in *PPM2.AVALIABLE_EMOTES
-			if shouldStop or sequence ~= emote
-				@EndSequence(sequence)
-				@EndSequence(sequence .. '_endless')
-		if isEndless
-			time = nil
-			emote ..= '_endless'
-		@RestartSequence(emote, time) if not shouldStop
-
-	RemoveHooks: =>
-		for iHook in *@hooks
-			hook.Remove iHook, @hookID
 
 	ResetSequences: =>
 		super()
@@ -940,11 +904,6 @@ class PonyFlexController extends PPM2.SequenceHolder
 		delta = super(ent)
 		return if not delta
 		state\Think(ent, delta) for state in *@statesIterable
-		for seq in *@currentSequencesIterable
-			if not seq\IsValid()
-				@EndSequence(seq\GetName(), false)
-				break
-			seq\Think(delta)
 		return delta
 
 do

@@ -78,6 +78,7 @@ PPM2.BODYGROUP_EYELASH = 8
 -- 40	Tail03
 
 class DefaultBodygroupController extends PPM2.ControllerChildren
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl'}
 
 	@BODYGROUP_SKELETON = 0
@@ -872,7 +873,7 @@ class NewBodygroupController extends DefaultBodygroupController
 					@newSocksModel\Remove() if IsValid(@newSocksModel)
 
 if CLIENT
-	hook.Add 'PPM2_PACResetBones', 'PPM2.Bodygroups', (ent, data) ->
+	hook.Add 'PPM2.SetupBones', 'PPM2.Bodygroups', (ent, data) ->
 		if bodygroup = data\GetBodygroupController()
 			bodygroup.ent = ent
 			bodygroup\UpdateTailSize()

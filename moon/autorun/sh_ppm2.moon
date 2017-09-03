@@ -86,10 +86,6 @@ if CLIENT
 	for ent in *ents.GetAll()
 		if ent.isPonyLegsModel
 			ent\Remove()
-
-	hook.Add 'PAC3ResetBones', 'PPM2.ResetBones', (ent) ->
-		data = ent\GetPonyData()
-		hook.Call('PPM2_PACResetBones', nil, StrongEntity(ent), data) if data
 else
 	CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
 	resource.AddWorkshop('933203381')

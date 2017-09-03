@@ -21,6 +21,7 @@ USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use R
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 
 class PonyRenderController extends PPM2.ControllerChildren
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
 	CompileTextures: => @GetTextureController()\CompileTextures() if @GetTextureController and @GetTextureController()
@@ -35,7 +36,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@socksModel\SetNoDraw(false) if IsValid(@socksModel)
 		@newSocksModel = data\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
-		@CreateFlexController() if @ent
+		if @ent
+			@CreateFlexController()
+			@CreateEmotesController()
 
 	GetEntity: => @ent
 	GetModel: => @controller\GetModel()
@@ -268,10 +271,12 @@ class PonyRenderController extends PPM2.ControllerChildren
 	IsValid: => IsValid(@ent) and @isValid
 	Reset: =>
 		@flexes\Reset() if @flexes and @flexes.Reset
+		@emotes\Reset() if @emotes and @emotes.Reset
 		@GetTextureController()\Reset() if @GetTextureController and @GetTextureController() and @GetTextureController().Reset
 		@GetTextureController()\ResetTextures() if @GetTextureController and @GetTextureController()
 	Remove: =>
 		@flexes\Remove() if @flexes
+		@emotes\Remove() if @emotes
 		@GetTextureController()\Remove() if @GetTextureController and @GetTextureController()
 		@isValid = false
 
@@ -303,6 +308,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 				\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel)
 				\UpdateNewSocks(@ent, @newSocksModel) if IsValid(@newSocksModel)
 		@flexes\Think(ent) if @flexes
+		@emotes\Think(ent) if @emotes
 	PostDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
 		@GetTextureController()\PostDraw(ent)
@@ -326,6 +332,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @ent
 		@GetTextureController()\DataChanges(state)
 		@flexes\DataChanges(state) if @flexes
+		@emotes\DataChanges(state) if @emotes
 		switch state\GetKey()
 			when 'Weight'
 				@armsWeightSetup = false
@@ -351,6 +358,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@renderController = cls(@)
 		@renderController.ent = @ent
 		return @renderController
+
 	CreateFlexController: =>
 		return @flexes if not @isValid
 		return if @GetData()\GetNoFlex()
@@ -360,7 +368,18 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@flexes = cls(@)
 		@flexes.ent = @ent
 		return @flexes
+
+	CreateEmotesController: =>
+		return @emotes if not @isValid
+		if not @emotes
+			cls = PPM2.GetPonyExpressionsController(@modelCached)
+			return if not cls
+			@emotes = cls(@)
+		@emotes.ent = @ent
+		return @emotes
+
 	GetFlexController: => @flexes
+	GetEmotesController: => @emotes
 
 class NewPonyRenderController extends PonyRenderController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}

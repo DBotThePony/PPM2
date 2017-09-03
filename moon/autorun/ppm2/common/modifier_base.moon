@@ -44,7 +44,11 @@ class PPM2.ModifierBase
 			clamp: (val) -> val
 			clampFinal: (val) -> val
 			lerpFunc: Lerp
+			:calculateStart
 		}
+
+		targetTable.def = (-> def) if type(def) ~= 'function'
+		targetTable.calculateStart = (-> calculateStart) if type(calculateStart) ~= 'function'
 
 		table.insert(@MODIFIERS, targetTable)
 
@@ -61,11 +65,11 @@ class PPM2.ModifierBase
 				return @[iName][modifID]
 
 		@__base['Calculate' .. modifName] = (inputAdd) =>
-			calc = calculateStart
+			calc = targetTable.calculateStart()
 			calc += inputAdd if inputAdd
-			if targetTable.isLerped
+			if targetTable.isLerped and @[targetTable.iNameLerp]
 				calc += modif for modif in *@[targetTable.iNameLerp]
-			else
+			elseif @[iName]
 				calc += modif for modif in *@[iName]
 			return targetTable.clampFinal(calc)
 
@@ -114,9 +118,14 @@ class PPM2.ModifierBase
 			clamp: (val) -> val
 			clampFinal: (val) -> val
 			lerpFunc: Lerp
+			:calculateStart
 		}
 
+		targetTable.def = (-> def) if type(def) ~= 'function'
+		targetTable.calculateStart = (-> calculateStart) if type(calculateStart) ~= 'function'
+
 		table.insert(@CUSTOM_MODIFIERS, targetTable)
+		@[iName] = {}
 
 		@['SetModifier' .. modifName] = (modifID, val = 0) =>
 			return if not modifID
@@ -135,11 +144,11 @@ class PPM2.ModifierBase
 			return @[iName][modifID]
 
 		@['Calculate' .. modifName] = (inputAdd) =>
-			calc = calculateStart
+			calc = targetTable.calculateStart()
 			calc += inputAdd if inputAdd
-			if targetTable.isLerped
+			if targetTable.isLerped and @[targetTable.iNameLerp]
 				calc += modif for modif in *@[targetTable.iNameLerp]
-			else
+			elseif @[iName]
 				calc += modif for modif in *@[iName]
 			return targetTable.clampFinal(calc)
 
@@ -180,8 +189,7 @@ class PPM2.ModifierBase
 			if data.name == modifName
 				data.isLerped = true
 				data.iNameLerp = data.iName .. 'Lerp'
-				@__base[data.iNameLerp] = data.lerpTable
-				return true, data.lerpTable
+				return true
 		return false
 
 	SetupLerpTables: (modifName = 'MyModifier') =>
@@ -222,15 +230,17 @@ class PPM2.ModifierBase
 	TriggerLerpAll: (lerpBy = 0.5) =>
 		outputTriggered = {}
 		for modif in *@CUSTOM_MODIFIERS
-			for id = 1, #@[modif.iNameLerp]
-				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
-					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
-					table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
+			if modif.iNameLerp
+				for id = 1, #@[modif.iNameLerp]
+					if @[modif.iNameLerp][id] ~= @[modif.iName][id]
+						@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+						table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
 		for modif in *@@MODIFIERS
-			for id = 1, #@[modif.iNameLerp]
-				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
-					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
-					table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
+			if modif.iNameLerp
+				for id = 1, #@[modif.iNameLerp]
+					if @[modif.iNameLerp][id] ~= @[modif.iName][id]
+						@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+						table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
 		return outputTriggered
 
 	@ClearModifiers: =>
@@ -259,17 +269,18 @@ class PPM2.ModifierBase
 		@nextModifierID += 1
 		id = @nextModifierID
 		@modifiersNames[name] = id
-		@[modif.iName][id] = modif.def for modif in *@@MODIFIERS
-		@[modif.iNameLerp][id] = modif.def for modif in *@@MODIFIERS when modif.iNameLerp
-		@[modif.iName][id] = modif.def for modif in *@CUSTOM_MODIFIERS
-		@[modif.iNameLerp][id] = modif.def for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
+		@[modif.iName][id] = modif.def() for modif in *@@MODIFIERS
+		@[modif.iNameLerp][id] = modif.def() for modif in *@@MODIFIERS when modif.iNameLerp
+		@[modif.iName][id] = modif.def() for modif in *@CUSTOM_MODIFIERS
+		@[modif.iNameLerp][id] = modif.def() for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
 		return id
 
-	ResetModifiers: (name = '') =>
+	ResetModifiers: (name = '', hard = false) =>
 		return false if not @modifiersNames[name]
 		id = @modifiersNames[name]
-		@[modif.iName][id] = modif.def for modif in *@@MODIFIERS
-		@[modif.iNameLerp][id] = modif.def for modif in *@@MODIFIERS when modif.iNameLerp
-		@[modif.iName][id] = modif.def for modif in *@CUSTOM_MODIFIERS
-		@[modif.iNameLerp][id] = modif.def for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
+		@[modif.iName][id] = modif.def() for modif in *@@MODIFIERS
+		@[modif.iName][id] = modif.def() for modif in *@CUSTOM_MODIFIERS
+		if hard
+			@[modif.iNameLerp][id] = modif.def() for modif in *@@MODIFIERS when modif.iNameLerp
+			@[modif.iNameLerp][id] = modif.def() for modif in *@CUSTOM_MODIFIERS when modif.iNameLerp
 		return true

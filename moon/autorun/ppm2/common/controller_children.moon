@@ -19,10 +19,10 @@ class PPM2.ControllerChildren extends PPM2.ModifierBase
 	--@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {}
 	@__inherited: (child) =>
-		child.AVALIABLE_CONTROLLERS = {} if not child.AVALIABLE_CONTROLLERS
+		child.NEXT_OBJ_ID = 0
+		return if not child.AVALIABLE_CONTROLLERS
 		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
 		child.AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-		child.NEXT_OBJ_ID = 0
 
 	@SelectController = (model = 'models/ppm/player_default_base.mdl') => @AVALIABLE_CONTROLLERS[model\lower()] or @
 
@@ -31,10 +31,16 @@ class PPM2.ControllerChildren extends PPM2.ModifierBase
 	new: (controller) =>
 		super()
 		@isValid = true
-		@ent = controller.ent
-		@entID = controller.entID
-		@controller = controller
-		@nwController = controller
+		if controller
+			@ent = controller.ent
+			@entID = controller.entID
+			@controller = controller
+			@nwController = controller
+		else
+			@ent = NULL
+			@entID = -1
+			@controller = nil
+			@nwController = nil
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0

@@ -61,6 +61,7 @@ USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY
 ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 
 class PonySizeController extends PPM2.ControllerChildren
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
 	@NECK_BONE_1 = 4
@@ -450,7 +451,7 @@ class NewPonySizeContoller extends PonySizeController
 		super(...)
 
 if CLIENT
-	hook.Add 'PPM2_PACResetBones', 'PPM2.Size', (ent, data) ->
+	hook.Add 'PPM2.SetupBones', 'PPM2.Size', (ent, data) ->
 		if sizes = data\GetSizeController()
 			sizes.ent = ent
 			sizes\ModifyNeck()

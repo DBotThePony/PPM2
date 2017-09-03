@@ -60,6 +60,7 @@
 -- 40	Tail03
 
 class PonyWeightController extends PPM2.ControllerChildren
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 	@HARD_LIMIT_MINIMAL = 0.1
 	@HARD_LIMIT_MAXIMAL = 3
@@ -122,7 +123,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@isValid = false
 
 if CLIENT
-	hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
+	hook.Add 'PPM2.SetupBones', 'PPM2.Weight', (ent, data) ->
 		if weight = data\GetWeightController()
 			weight.ent = ent
 			weight.lastPAC3BoneReset = RealTime() + 1

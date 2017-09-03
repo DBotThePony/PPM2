@@ -69,8 +69,8 @@ hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
 class PonyTextureController extends PPM2.ControllerChildren
+	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-	@__inherited(@)
 
 	@UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.UPPER_MANE_DETAILS}
 	@LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.LOWER_MANE_DETAILS}

@@ -332,6 +332,8 @@ MODEL_BOX_PANEL = {
 				size\ModifyNeck()
 				size\ModifyLegs()
 				size\ModifyScale()
+		PPM2.EntityBonesModifier.resetBones(@model)
+		@model.__ppmBonesModifiers\Think() if @model.__ppmBonesModifiers
 		@model\DrawModel()
 		@controller\GetRenderController()\PostDraw(@model) if @controller
 		render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
