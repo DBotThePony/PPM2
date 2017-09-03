@@ -60,79 +60,79 @@
 -- 40	Tail03
 
 class PonyWeightController
-    @AVALIABLE_CONTROLLERS = {}
-    @MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-    @__inherited: (child) =>
-        child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-        @AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-    @__inherited(@)
+	@AVALIABLE_CONTROLLERS = {}
+	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
+	@__inherited: (child) =>
+		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
+		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
+	@__inherited(@)
 
-    @HARD_LIMIT_MINIMAL = 0.1
-    @HARD_LIMIT_MAXIMAL = 3
+	@HARD_LIMIT_MINIMAL = 0.1
+	@HARD_LIMIT_MAXIMAL = 3
 
-    @NEXT_OBJ_ID = 0
+	@NEXT_OBJ_ID = 0
 
-    new: (data, applyWeight = true) =>
-        @isValid = true
-        @networkedData = data
-        @ent = data.ent
-        @objID = @@NEXT_OBJ_ID
-        @@NEXT_OBJ_ID += 1
-        @lastPAC3BoneReset = 0
-        @SetWeight(data\GetWeight())
-        @UpdateWeight() if IsValid(@ent) and applyWeight
-        PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
-    
-    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
-    IsValid: => IsValid(@ent) and @isValid
-    GetEntity: => @ent
-    GetData: => @networkedData
-    GetController: => @networkedData
-    GetModel: => @networkedData\GetModel()
+	new: (data, applyWeight = true) =>
+		@isValid = true
+		@networkedData = data
+		@ent = data.ent
+		@objID = @@NEXT_OBJ_ID
+		@@NEXT_OBJ_ID += 1
+		@lastPAC3BoneReset = 0
+		@SetWeight(data\GetWeight())
+		@UpdateWeight() if IsValid(@ent) and applyWeight
+		PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
 
-    @WEIGHT_BONES = {
-        {id: 0, scale: 0.7}
-        {id: 1, scale: 0.7}
-        {id: 2, scale: 0.7}
-        {id: 3, scale: 0.7}
-    }
+	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
+	IsValid: => IsValid(@ent) and @isValid
+	GetEntity: => @ent
+	GetData: => @networkedData
+	GetController: => @networkedData
+	GetModel: => @networkedData\GetModel()
 
-    table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
+	@WEIGHT_BONES = {
+		{id: 0, scale: 0.7}
+		{id: 1, scale: 0.7}
+		{id: 2, scale: 0.7}
+		{id: 3, scale: 0.7}
+	}
 
-    DataChanges: (state) =>
-        return if not IsValid(@ent)
-        return if state\GetKey() ~= 'Weight'
-        return if not @isValid
-        @SetWeight(state\GetValue())
-        @UpdateWeight()
+	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
 
-    SetWeight: (weight = 1) => @weight = math.Clamp(weight, @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
-    SlowUpdate: => @UpdateWeight() if @lastPAC3BoneReset < RealTime()
+	DataChanges: (state) =>
+		return if not IsValid(@ent)
+		return if state\GetKey() ~= 'Weight'
+		return if not @isValid
+		@SetWeight(state\GetValue())
+		@UpdateWeight()
 
-    @DEFAULT_BONE_SIZE = Vector(1, 1, 1)
-    ResetBones: (ent = @ent) =>
-        return if not IsValid(ent)
-        return if not @isValid
-        for {:id} in *@@WEIGHT_BONES
-            ent\ManipulateBoneScale(id, @@DEFAULT_BONE_SIZE)
-    Reset: => @ResetBones()
-    UpdateWeight: (ent = @ent) =>
-        return if not IsValid(ent)
-        return if not @isValid
-        @ResetBones(ent)
-        return if not @ent\IsPony()
-        for {:id, :scale} in *@@WEIGHT_BONES
-            delta = (@weight - 1) * scale
-            ent\ManipulateBoneScale(id, Vector(1 + delta, 1 + delta, 1 + delta))
-    Remove: =>
-        @isValid = false
+	SetWeight: (weight = 1) => @weight = math.Clamp(weight, @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
+	SlowUpdate: => @UpdateWeight() if @lastPAC3BoneReset < RealTime()
+
+	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
+	ResetBones: (ent = @ent) =>
+		return if not IsValid(ent)
+		return if not @isValid
+		for {:id} in *@@WEIGHT_BONES
+			ent\ManipulateBoneScale(id, @@DEFAULT_BONE_SIZE)
+	Reset: => @ResetBones()
+	UpdateWeight: (ent = @ent) =>
+		return if not IsValid(ent)
+		return if not @isValid
+		@ResetBones(ent)
+		return if not @ent\IsPony()
+		for {:id, :scale} in *@@WEIGHT_BONES
+			delta = (@weight - 1) * scale
+			ent\ManipulateBoneScale(id, Vector(1 + delta, 1 + delta, 1 + delta))
+	Remove: =>
+		@isValid = false
 
 if CLIENT
-    hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
-        if weight = data\GetWeightController()
-            weight.ent = ent
-            weight.lastPAC3BoneReset = RealTime() + 1
-            weight\UpdateWeight()
+	hook.Add 'PPM2_PACResetBones', 'PPM2.Weight', (ent, data) ->
+		if weight = data\GetWeightController()
+			weight.ent = ent
+			weight.lastPAC3BoneReset = RealTime() + 1
+			weight\UpdateWeight()
 --
 -- 0	LrigPelvis
 -- 1	Lrig_LEG_BL_Femur
@@ -181,23 +181,23 @@ if CLIENT
 -- 44	Tail03
 
 class NewPonyWeightController extends PonyWeightController
-    @MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
+	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
-    __tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
+	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
-    @WEIGHT_BONES = {
-        {id: 0, scale: 0.7}
-        {id: 1, scale: 0.7}
-        {id: 6, scale: 0.7}
-        {id: 11, scale: 0.7}
-        {id: 12, scale: 0.7}
-        {id: 13, scale: 0.7}
-        {id: 14, scale: 0.7}
-        {id: 20, scale: 0.7}
-    }
+	@WEIGHT_BONES = {
+		{id: 0, scale: 0.7}
+		{id: 1, scale: 0.7}
+		{id: 6, scale: 0.7}
+		{id: 11, scale: 0.7}
+		{id: 12, scale: 0.7}
+		{id: 13, scale: 0.7}
+		{id: 14, scale: 0.7}
+		{id: 20, scale: 0.7}
+	}
 
-    table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 1, 10
-    table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 14, 28
+	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 1, 10
+	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 14, 28
 
 PPM2.PonyWeightController = PonyWeightController
 PPM2.NewPonyWeightController = NewPonyWeightController

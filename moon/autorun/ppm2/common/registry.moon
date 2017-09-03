@@ -61,108 +61,108 @@ PPM2.MIN_EYE_ROTATION = -180
 PPM2.MAX_EYE_ROTATION = 180
 
 PPM2.AvaliableTails = {
-    'MAILCALL'
-    'FLOOFEH'
-    'ADVENTUROUS'
-    'SHOWBOAT'
-    'ASSERTIVE'
-    'BOLD'
-    'STUMPY'
-    'SPEEDSTER'
-    'EDGY'
-    'RADICAL'
-    'BOOKWORM'
-    'BUMPKIN'
-    'POOFEH'
-    'CURLY'
-    'NONE'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'SPEEDSTER'
+	'EDGY'
+	'RADICAL'
+	'BOOKWORM'
+	'BUMPKIN'
+	'POOFEH'
+	'CURLY'
+	'NONE'
 }
 
 PPM2.AvaliableUpperManes = {
-    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
-    'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
-    'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'NONE'
+	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
+	'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
+	'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'NONE'
 }
 
 PPM2.AvaliableLowerManes = {
-    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-    'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
-    'BOOKWORM', 'BUMPKIN', 'CURLY', 'NONE'
+	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+	'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
+	'BOOKWORM', 'BUMPKIN', 'CURLY', 'NONE'
 }
 
 PPM2.EyelashTypes = {
-    'Default', 'Double', 'Coy', 'Full', 'Mess', 'None'
+	'Default', 'Double', 'Coy', 'Full', 'Mess', 'None'
 }
 
 PPM2.BodyDetails = {
-    'None', 'Leg gradient', 'Lines', 'Stripes', 'Head stripes'
-    'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
-    'Hooves big rnd', 'Hooves small rnd', 'Spots 1', 'Robotic'
-    'DASH-E', 'Eye Scar', 'Eye Wound', 'Scars', 'MGS Socks'
-    'Sharp Hooves', 'Sharp Hooves 2', 'Muzzle', 'Eye Scar Left'
-    'Eye Scar Right'
+	'None', 'Leg gradient', 'Lines', 'Stripes', 'Head stripes'
+	'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
+	'Hooves big rnd', 'Hooves small rnd', 'Spots 1', 'Robotic'
+	'DASH-E', 'Eye Scar', 'Eye Wound', 'Scars', 'MGS Socks'
+	'Sharp Hooves', 'Sharp Hooves 2', 'Muzzle', 'Eye Scar Left'
+	'Eye Scar Right'
 }
 
 PPM2.BodyDetailsEnum = {
-    'NONE', 'GRADIENT', 'LINES', 'STRIPES', 'HSTRIPES'
-    'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
-    'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS', 'ROBOTIC'
-    'DASH_E', 'EYE_SCAR', 'EYE_WOUND', 'SCARS', 'MGS_SOCKS'
-    'SHARP_HOOVES', 'SHARP_HOOVES_2', 'MUZZLE', 'EYE_SCAR_LEFT'
-    'EYE_SCAR_RIGHT'
+	'NONE', 'GRADIENT', 'LINES', 'STRIPES', 'HSTRIPES'
+	'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
+	'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS', 'ROBOTIC'
+	'DASH_E', 'EYE_SCAR', 'EYE_WOUND', 'SCARS', 'MGS_SOCKS'
+	'SHARP_HOOVES', 'SHARP_HOOVES_2', 'MUZZLE', 'EYE_SCAR_LEFT'
+	'EYE_SCAR_RIGHT'
 }
 
 PPM2.SocksTypes = {
-    'DEFAULT'
-    'GEOMETRIC1'
-    'GEOMETRIC2'
-    'GEOMETRIC3'
-    'GEOMETRIC4'
-    'GEOMETRIC5'
-    'GEOMETRIC6'
-    'GEOMETRIC7'
-    'GEOMETRIC8'
-    'DARK1'
-    'FLOWERS10'
-    'FLOWERS11'
-    'FLOWERS12'
-    'FLOWERS13'
-    'FLOWERS14'
-    'FLOWERS15'
-    'FLOWERS16'
-    'FLOWERS17'
-    'FLOWERS18'
-    'FLOWERS19'
-    'FLOWERS2'
-    'FLOWERS20'
-    'FLOWERS3'
-    'FLOWERS4'
-    'FLOWERS5'
-    'FLOWERS6'
-    'FLOWERS7'
-    'FLOWERS8'
-    'FLOWERS9'
-    'GREY1'
-    'GREY2'
-    'GREY3'
-    'HEARTS1'
-    'HEARTS2'
-    'SNOW1'
-    'WALLPAPER1'
-    'WALLPAPER2'
-    'WALLPAPER3'
+	'DEFAULT'
+	'GEOMETRIC1'
+	'GEOMETRIC2'
+	'GEOMETRIC3'
+	'GEOMETRIC4'
+	'GEOMETRIC5'
+	'GEOMETRIC6'
+	'GEOMETRIC7'
+	'GEOMETRIC8'
+	'DARK1'
+	'FLOWERS10'
+	'FLOWERS11'
+	'FLOWERS12'
+	'FLOWERS13'
+	'FLOWERS14'
+	'FLOWERS15'
+	'FLOWERS16'
+	'FLOWERS17'
+	'FLOWERS18'
+	'FLOWERS19'
+	'FLOWERS2'
+	'FLOWERS20'
+	'FLOWERS3'
+	'FLOWERS4'
+	'FLOWERS5'
+	'FLOWERS6'
+	'FLOWERS7'
+	'FLOWERS8'
+	'FLOWERS9'
+	'GREY1'
+	'GREY2'
+	'GREY3'
+	'HEARTS1'
+	'HEARTS2'
+	'SNOW1'
+	'WALLPAPER1'
+	'WALLPAPER2'
+	'WALLPAPER3'
 }
 
 PPM2.AvaliableLightwarps = {
-    'SFM_PONY'
-    'AIRBRUSH'
-    'HARD_LIGHT'
-    'PURPLE_SKY'
-    'SPAWN'
-    'TF2'
-    'TF2_CINEMATIC'
-    'TF2_CLASSIC'
-    'WELL_OILED'
+	'SFM_PONY'
+	'AIRBRUSH'
+	'HARD_LIGHT'
+	'PURPLE_SKY'
+	'SPAWN'
+	'TF2'
+	'TF2_CINEMATIC'
+	'TF2_CLASSIC'
+	'WELL_OILED'
 }
 
 PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
@@ -170,53 +170,53 @@ PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
 PPM2.AvaliableLightwarpsPaths = ['models/ppm/lightwarps/' .. mat\lower() for mat in *PPM2.AvaliableLightwarps]
 
 PPM2.DefaultCutiemarks = {
-    '8ball', 'dice', 'magichat',
-    'magichat02', 'record', 'microphone',
-    'bits', 'checkered', 'lumps',
-    'mirror', 'camera', 'magnifier',
-    'padlock', 'binaryfile', 'floppydisk',
-    'cube', 'bulb', 'battery',
-    'deskfan', 'flames', 'alarm',
-    'myon', 'beer', 'berryglass',
-    'roadsign', 'greentree', 'seasons',
-    'palette', 'palette02', 'palette03',
-    'lightningstone', 'partiallycloudy', 'thunderstorm',
-    'storm', 'stoppedwatch', 'twistedclock',
-    'surfboard', 'surfboard02', 'star',
-    'ussr', 'vault', 'anarchy',
-    'suit', 'deathscythe', 'shoop',
-    'smiley', 'dawsome', 'weegee'
-    'applej', 'applem', 'bon_bon', 'carrots', 'celestia', 'cloudy', 'custom01', 'custom02', 'derpy', 'firezap',
-    'fluttershy', 'fruits', 'island', 'lyra', 'mine', 'note', 'octavia', 'pankk', 'pinkie_pie', 'rainbow_dash',
-    'rarity', 'rosen', 'sflowers', 'storm', 'time', 'time2', 'trixie', 'twilight', 'waters', 'weer', 'zecora'
+	'8ball', 'dice', 'magichat',
+	'magichat02', 'record', 'microphone',
+	'bits', 'checkered', 'lumps',
+	'mirror', 'camera', 'magnifier',
+	'padlock', 'binaryfile', 'floppydisk',
+	'cube', 'bulb', 'battery',
+	'deskfan', 'flames', 'alarm',
+	'myon', 'beer', 'berryglass',
+	'roadsign', 'greentree', 'seasons',
+	'palette', 'palette02', 'palette03',
+	'lightningstone', 'partiallycloudy', 'thunderstorm',
+	'storm', 'stoppedwatch', 'twistedclock',
+	'surfboard', 'surfboard02', 'star',
+	'ussr', 'vault', 'anarchy',
+	'suit', 'deathscythe', 'shoop',
+	'smiley', 'dawsome', 'weegee'
+	'applej', 'applem', 'bon_bon', 'carrots', 'celestia', 'cloudy', 'custom01', 'custom02', 'derpy', 'firezap',
+	'fluttershy', 'fruits', 'island', 'lyra', 'mine', 'note', 'octavia', 'pankk', 'pinkie_pie', 'rainbow_dash',
+	'rarity', 'rosen', 'sflowers', 'storm', 'time', 'time2', 'trixie', 'twilight', 'waters', 'weer', 'zecora'
 }
 
 PPM2.AvaliableUpperManesNew = {
-    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
-    'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
-    'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR'
-    'TIMID', 'FILLY', 'MECHANIC', 'MOON', 'CLOUD'
-    'DRUNK', 'EMO'
-    'NONE'
+	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
+	'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
+	'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR'
+	'TIMID', 'FILLY', 'MECHANIC', 'MOON', 'CLOUD'
+	'DRUNK', 'EMO'
+	'NONE'
 }
 
 PPM2.AvaliableLowerManesNew = {
-    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-    'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
-    'BOOKWORM', 'BUMPKIN', 'CURLY'
-    'TIMID', 'MOON', 'BUN', 'CLOUD', 'EMO'
-    'NONE'
+	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+	'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
+	'BOOKWORM', 'BUMPKIN', 'CURLY'
+	'TIMID', 'MOON', 'BUN', 'CLOUD', 'EMO'
+	'NONE'
 }
 
 PPM2.AvaliableTailsNew = {
-    'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-    'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'EDGY'
-    'RADICAL', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY'
-    'NONE'
+	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
+	'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'EDGY'
+	'RADICAL', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY'
+	'NONE'
 }
 
 PPM2.AvaliableEyeTypes = {
-    'DEFAULT', 'APERTURE'
+	'DEFAULT', 'APERTURE'
 }
 
 PPM2.AvaliablePonyWings = {'DEFAULT', 'BATPONY'}
@@ -224,10 +224,10 @@ PPM2.AvaliablePonyWings = {'DEFAULT', 'BATPONY'}
 PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOLTS_LIGHT', 'WONDERBOLTS_FULL', 'WONDERBOLTS_LIGHT', 'SPIDERMANE_LIGHT', 'SPIDERMANE_FULL'}
 
 do
-    i = -1
-    for mark in *PPM2.DefaultCutiemarks
-        i += 1
-        PPM2["CMARK_#{mark\upper()}"] = i
+	i = -1
+	for mark in *PPM2.DefaultCutiemarks
+		i += 1
+		PPM2["CMARK_#{mark\upper()}"] = i
 
 PPM2.MIN_EYELASHES = 0
 PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
@@ -295,10 +295,10 @@ PPM2.MAX_MALE_BUFF = 2
 PPM2.MAX_TATTOOS = 25
 
 PPM2.TATTOOS_REGISTRY = {
-    'NONE', 'ARROW', 'BLADES', 'CROSS', 'DIAMONDINNER', 'DIAMONDOUTER'
-    'DRACO', 'EVILHEART', 'HEARTWAVE', 'JUNCTION', 'NOTE', 'NOTE2'
-    'TATTOO1', 'TATTOO2', 'TATTOO3', 'TATTOO4', 'TATTOO5', 'TATTOO6', 'TATTOO7'
-    'WING'
+	'NONE', 'ARROW', 'BLADES', 'CROSS', 'DIAMONDINNER', 'DIAMONDOUTER'
+	'DRACO', 'EVILHEART', 'HEARTWAVE', 'JUNCTION', 'NOTE', 'NOTE2'
+	'TATTOO1', 'TATTOO2', 'TATTOO3', 'TATTOO4', 'TATTOO5', 'TATTOO6', 'TATTOO7'
+	'WING'
 }
 
 PPM2.MIN_TATTOOS = 0

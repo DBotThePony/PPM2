@@ -31,41 +31,41 @@ sk_player_arm = GetConVar('sk_player_arm')
 sk_player_leg = GetConVar('sk_player_leg')
 
 hook.Add 'ScalePlayerDamage', 'PPM2.PlayerDamage', (group = HITGROUP_GENERIC, dmg) =>
-    return if not @IsPonyCached()
-    
-    -- Reset damage to its original value
-    -- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L180-L184
-    -- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L923-L946
-    switch group
-        when HITGROUP_HEAD
-            dmg\ScaleDamage(1 / sk_player_head\GetFloat())
-        when HITGROUP_CHEST
-            dmg\ScaleDamage(1 / sk_player_chest\GetFloat())
-        when HITGROUP_STOMACH
-            dmg\ScaleDamage(1 / sk_player_stomach\GetFloat())
-        when HITGROUP_RIGHTARM
-            dmg\ScaleDamage(1 / sk_player_arm\GetFloat())
-        when HITGROUP_RIGHTLEG
-            dmg\ScaleDamage(1 / sk_player_leg\GetFloat())
-    
-    return if not ENABLE_SCAILING\GetBool()
-    
-    switch group
-        when HITGROUP_HEAD
-            dmg\ScaleDamage(HEAD\GetFloat())
-        when HITGROUP_CHEST
-            dmg\ScaleDamage(CHEST\GetFloat())
-        when HITGROUP_STOMACH
-            dmg\ScaleDamage(STOMACH\GetFloat())
-        when HITGROUP_LEFTARM
-            dmg\ScaleDamage(LEFTARM\GetFloat())
-        when HITGROUP_RIGHTARM
-            dmg\ScaleDamage(RIGHTARM\GetFloat())
-        when HITGROUP_LEFTLEG
-            dmg\ScaleDamage(RIGHTLEG\GetFloat())
-        when HITGROUP_RIGHTLEG
-            dmg\ScaleDamage(RIGHTLEG\GetFloat())
-        when HITGROUP_GEAR
-            dmg\ScaleDamage(CHEST\GetFloat())
-        else
-            dmg\ScaleDamage(1)
+	return if not @IsPonyCached()
+
+	-- Reset damage to its original value
+	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L180-L184
+	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L923-L946
+	switch group
+		when HITGROUP_HEAD
+			dmg\ScaleDamage(1 / sk_player_head\GetFloat())
+		when HITGROUP_CHEST
+			dmg\ScaleDamage(1 / sk_player_chest\GetFloat())
+		when HITGROUP_STOMACH
+			dmg\ScaleDamage(1 / sk_player_stomach\GetFloat())
+		when HITGROUP_RIGHTARM
+			dmg\ScaleDamage(1 / sk_player_arm\GetFloat())
+		when HITGROUP_RIGHTLEG
+			dmg\ScaleDamage(1 / sk_player_leg\GetFloat())
+
+	return if not ENABLE_SCAILING\GetBool()
+
+	switch group
+		when HITGROUP_HEAD
+			dmg\ScaleDamage(HEAD\GetFloat())
+		when HITGROUP_CHEST
+			dmg\ScaleDamage(CHEST\GetFloat())
+		when HITGROUP_STOMACH
+			dmg\ScaleDamage(STOMACH\GetFloat())
+		when HITGROUP_LEFTARM
+			dmg\ScaleDamage(LEFTARM\GetFloat())
+		when HITGROUP_RIGHTARM
+			dmg\ScaleDamage(RIGHTARM\GetFloat())
+		when HITGROUP_LEFTLEG
+			dmg\ScaleDamage(RIGHTLEG\GetFloat())
+		when HITGROUP_RIGHTLEG
+			dmg\ScaleDamage(RIGHTLEG\GetFloat())
+		when HITGROUP_GEAR
+			dmg\ScaleDamage(CHEST\GetFloat())
+		else
+			dmg\ScaleDamage(1)
