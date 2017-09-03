@@ -45,6 +45,18 @@ do
 		print('PPM2 Error: ' .. err) if not status
 
 do
+	import GetModel, IsDormant, GetPonyData, IsValid, IsPonyCached from FindMetaTable('Entity')
+	hook.Add 'Think', 'PPM2.PonyDataThink', ->
+		for ply in *player.GetAll()
+			if not IsDormant(ply) and IsPonyCached(ply)
+				data = GetPonyData(ply)
+				data\Think() if data
+		for task in *PPM2.NetworkedPonyData.RenderTasks
+			ply = task.ent
+			if IsValid(ply) and not IsDormant(ply) and IsPonyCached(ply)
+				task\Think()
+
+do
 	catchError = (err) ->
 		PPM2.Message 'Slow Update Error: ', err
 		PPM2.Message debug.traceback()

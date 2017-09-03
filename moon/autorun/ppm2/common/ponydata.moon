@@ -60,25 +60,37 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 	@NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
 	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
 
+	@SetupModifiers: =>
+		for key, value in pairs PPM2.PonyDataRegistry
+			if value.modifiers
+				@RegisterModifier(value.getFunc, 0, 0)
+				@SetModifierMinMaxFinal(value.getFunc, value.min, value.max) if value.min or value.max
+				@SetupLerpTables(value.getFunc)
+				strName = '_NW_' .. value.getFunc
+				funcLerp = 'Calculate' .. value.getFunc
+				@__base['Get' .. value.getFunc] = => @[funcLerp](@, @[strName])
+
 	for key, value in pairs PPM2.PonyDataRegistry
 		@NetworkVar(value.getFunc, value.read, value.write, value.default)
+
+	new: (netID, ent) =>
+		@recomputeTextures = true
+		@isValid = true
+		super(netID)
+		if ent
+			@modelCached = ent\GetModel()
+			@SetEntity(ent)
+			@SetupEntity(ent)
+
+	IsValid: => @isValid
+	GetModel: => @modelCached
+	EntIndex: => @entID
 
 	Clone: (target = @ent) =>
 		copy = @@(nil, target)
 		@ApplyDataToObject(copy)
 		return copy
 
-	new: (netID, ent) =>
-		@recomputeTextures = true
-		@isValid = true
-		if ent
-			@modelCached = ent\GetModel()
-			@SetEntity(ent)
-			@SetupEntity(ent)
-		super(netID)
-	IsValid: => @isValid
-	GetModel: => @modelCached
-	EntIndex: => @entID
 	SetupEntity: (ent) =>
 		if ent.__PPM2_PonyData
 			return if ent.__PPM2_PonyData\GetOwner() and IsValid(ent.__PPM2_PonyData\GetOwner()) and StrongEntity(ent.__PPM2_PonyData\GetOwner()) ~= StrongEntity(@GetOwner())
@@ -90,19 +102,20 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 		@ent = ent
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
+		@lastLerpThink = RealTime()
 		@ModelChanges(@modelCached, @modelCached)
 		@Reset()
-		if CLIENT
-			timer.Simple 0, ->
-				@GetRenderController()\CompileTextures() if @GetRenderController()
+		timer.Simple(0, -> @GetRenderController()\CompileTextures() if @GetRenderController()) if CLIENT
 		PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
+
 	ModelChanges: (old = @ent\GetModel(), new = old) =>
 		@modelCached = new
 		@SetFly(false) if SERVER
 		timer.Simple 0.5, ->
 			return unless IsValid(@ent)
 			@Reset()
+
 	GenericDataChange: (state) =>
 		hook.Run 'PPM2_PonyDataChanges', @ent, @, state
 		if state\GetKey() == 'Entity' and IsValid(@GetEntity())
@@ -136,6 +149,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			@GetWeightController()\Reset() if @GetWeightController().Reset
 			@GetRenderController()\Reset() if @GetRenderController().Reset
 			@GetBodygroupController()\Reset() if @GetBodygroupController().Reset
+
 	PlayerRespawn: =>
 		return if not IsValid(@ent)
 		@ent.__cachedIsPony = @ent\IsPony()
@@ -188,13 +202,25 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 	ApplyBodygroups: (updateModels = CLIENT) => @GetBodygroupController()\ApplyBodygroups(updateModels) if @ent
 	SetLocalChange: (state) => @GenericDataChange(state)
 	NetworkDataChanges: (state) => @GenericDataChange(state)
+
 	SlowUpdate: =>
 		@GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
 		@GetWeightController()\SlowUpdate() if @GetWeightController()
 		if scale = @GetSizeController()
 			scale\SlowUpdate()
 
+	Think: =>
+		time = RealTime()
+		delta = time - @lastLerpThink
+		@lastLerpThink = time
+		if @isValid and IsValid(@ent)
+			for change in *@TriggerLerpAll(delta * 5)
+				state = PPM2.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
+				state\SetCantApply(true)
+				@GenericDataChange(state)
+
 	GetFlightController: => @flightController
+
 	GetRenderController: =>
 		return if SERVER
 		return @renderController if not @isValid
@@ -209,6 +235,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			@renderController = cls(@)
 		@renderController.ent = @ent
 		return @renderController
+
 	GetWeightController: =>
 		return if SERVER
 		return @weightController if not @isValid
@@ -224,6 +251,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			@weightController = cls(@)
 		@weightController.ent = @ent
 		return @weightController
+
 	GetSizeController: =>
 		return @scaleController if not @isValid
 		if not @scaleController or @modelCached ~= @modelScale
@@ -239,6 +267,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 		@scaleController.ent = @ent
 		return @scaleController
 	GetScaleController: => @GetSizeController()
+
 	GetBodygroupController: =>
 		return @bodygroups if not @isValid
 		if not @bodygroups or @modelBodygroups ~= @modelCached
@@ -253,6 +282,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			@bodygroups = cls(@)
 		@bodygroups.ent = @ent
 		return @bodygroups
+
 	Remove: (byClient = false) =>
 		@@NW_Objects[@netID] = nil if @NETWORKED
 		@isValid = false
@@ -268,6 +298,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 		@GetSizeController()\Remove() if @GetSizeController()
 		@flightController\Switch(false) if @flightController
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
+
 	__tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 PPM2.NetworkedPonyData = NetworkedPonyData

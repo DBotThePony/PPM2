@@ -15,12 +15,21 @@
 -- limitations under the License.
 --
 
+-- uuuuuuuuugh
+Lerp = (byVal, fromValue, intoValue) ->
+	delta = intoValue - fromValue
+	if delta < 0 and delta > -0.025
+		return intoValue
+	elseif delta > 0 and delta < 0.025
+		return intoValue
+	return fromValue + delta * byVal
+
 class PPM2.ModifierBase
 	@MODIFIERS = {}
-	@Setup: =>
+	@SetupModifiers: =>
 	@__inherited: (child) =>
 		child.MODIFIERS = {}
-		child\Setup()
+		child\SetupModifiers()
 
 	@RegisterModifier: (modifName = 'MyModifier', def = 0, calculateStart = 0) =>
 		iName = modifName .. 'Modifiers'
@@ -51,9 +60,13 @@ class PPM2.ModifierBase
 			else
 				return @[iName][modifID]
 
-		@__base['Calculate' .. modifName] = =>
+		@__base['Calculate' .. modifName] = (inputAdd) =>
 			calc = calculateStart
-			calc += modif for modif in *@[iName]
+			calc += inputAdd if inputAdd
+			if targetTable.isLerped
+				calc += modif for modif in *@[targetTable.iNameLerp]
+			else
+				calc += modif for modif in *@[iName]
 			return targetTable.clampFinal(calc)
 
 	@SetModifierMinMax: (modifName = 'MyModifier', mins, maxs) =>
@@ -84,7 +97,7 @@ class PPM2.ModifierBase
 				elseif not maxs
 					data.clampFinal = (val) -> math.max(val, mins)
 				else
-					data.clamp = (val) -> math.Clamp(val, mins, maxs)
+					data.clampFinal = (val) -> math.Clamp(val, mins, maxs)
 				return true
 		return false
 
@@ -109,24 +122,26 @@ class PPM2.ModifierBase
 			return if not modifID
 			return if not @[iName][modifID]
 			@[iName][modifID] = targetTable.clamp(val)
+
 		@['GetModifier' .. modifName] = (modifID, val = 0) =>
 			return if not modifID
 			if targetTable.isLerped
 				return @[targetTable.iNameLerp][modifID]
 			else
 				return @[iName][modifID]
+
 		@['GetRawModifier' .. modifName] = (modifID, val = 0) =>
 			return if not modifID
 			return @[iName][modifID]
-		@['Calculate' .. modifName] = =>
+
+		@['Calculate' .. modifName] = (inputAdd) =>
+			calc = calculateStart
+			calc += inputAdd if inputAdd
 			if targetTable.isLerped
-				calc = calculateStart
 				calc += modif for modif in *@[targetTable.iNameLerp]
-				return targetTable.clampFinal(calc)
 			else
-				calc = calculateStart
 				calc += modif for modif in *@[iName]
-				return targetTable.clampFinal(calc)
+			return targetTable.clampFinal(calc)
 
 	SetModifierMinMax: (modifName = 'MyModifier', mins, maxs) =>
 		for data in *@CUSTOM_MODIFIERS
@@ -210,12 +225,12 @@ class PPM2.ModifierBase
 			for id = 1, #@[modif.iNameLerp]
 				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
 					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
-					table.insert(outputTriggered, {modif.iName, @[modif.iNameLerp][id]})
+					table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
 		for modif in *@@MODIFIERS
 			for id = 1, #@[modif.iNameLerp]
 				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
 					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
-					table.insert(outputTriggered, {modif.iName, @[modif.iNameLerp][id]})
+					table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
 		return outputTriggered
 
 	@ClearModifiers: =>

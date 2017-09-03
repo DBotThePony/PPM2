@@ -251,8 +251,10 @@ class PonyTextureController
 				elseif @@TAIL_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileEye', true)
-					@DelayCompile('CompileEye', false)
+					--@DelayCompile('CompileEye', true)
+					--@DelayCompile('CompileEye', false)
+					@CompileEye(true)
+					@CompileEye(false)
 				elseif @@BODY_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
