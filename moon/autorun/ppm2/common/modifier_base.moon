@@ -43,12 +43,14 @@ class PPM2.ModifierBase
 			return if not modifID
 			return if not @[iName][modifID]
 			@[iName][modifID] = targetTable.clamp(val)
+
 		@__base['GetModifier' .. modifName] = (modifID, val = 0) =>
 			return if not modifID
 			if targetTable.isLerped
 				return @[targetTable.iNameLerp][modifID]
 			else
 				return @[iName][modifID]
+
 		@__base['Calculate' .. modifName] = =>
 			calc = calculateStart
 			calc += modif for modif in *@[iName]
@@ -192,22 +194,29 @@ class PPM2.ModifierBase
 		return false
 
 	TriggerLerp: (modifName = 'MyModifier', lerpBy = 0.5) =>
-		for data in *@CUSTOM_MODIFIERS
-			if data.name == modifName
-				@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+		for modif in *@CUSTOM_MODIFIERS
+			if modif.name == modifName
+				@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp] when @[modif.iNameLerp][id] ~= @[modif.iName][id]
 				return true
-		for data in *@MODIFIERS
-			if data.name == modifName
-				@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
+		for modif in *@@MODIFIERS
+			if modif.name == modifName
+				@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp] when @[modif.iNameLerp][id] ~= @[modif.iName][id]
 				return true
 		return false
 
 	TriggerLerpAll: (lerpBy = 0.5) =>
-		for data in *@CUSTOM_MODIFIERS
-			@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
-		for data in *@MODIFIERS
-			@[modif.iNameLerp][id] = data.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id]) for id = 1, #@[modif.iNameLerp]
-		return false
+		outputTriggered = {}
+		for modif in *@CUSTOM_MODIFIERS
+			for id = 1, #@[modif.iNameLerp]
+				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
+					table.insert(outputTriggered, modif.iName)
+					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+		for modif in *@@MODIFIERS
+			for id = 1, #@[modif.iNameLerp]
+				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
+					table.insert(outputTriggered, modif.iName)
+					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+		return outputTriggered
 
 	@ClearModifiers: =>
 		for modif in *@MODIFIERS
