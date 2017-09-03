@@ -79,58 +79,6 @@ MODEL_BOX_PANEL = {
 		'Jump':        160
 	}
 
-	EDITOR_SEQUENCES: {
-		-- idle
-		{
-			time: 5
-			func: (dist, ang, delta) -> dist, ang
-		}
-
-		-- Slow move to left
-		{
-			time: 5
-			func: (dist, ang, delta) ->
-				ang.y += delta * 10
-				return dist, ang
-		}
-
-		-- Eyes
-		{
-			time: 5
-			func: (dist, ang, delta) ->
-				return 40, Angle(0, 0, 0)
-		}
-
-		-- Left view
-		{
-			time: 3
-			func: (dist, ang, delta) ->
-				return 80, Angle(0, 90, 0)
-		}
-
-		-- Move to right
-		{
-			time: 7
-			func: (dist, ang, delta) ->
-				ang.y -= 10 * delta
-				return 80, ang
-		}
-
-		-- Eyes (bottom)
-		{
-			time: 5
-			func: (dist, ang, delta) ->
-				return 20, Angle(40, 0, 0)
-		}
-
-		-- Look at top mane
-		{
-			time: 5
-			func: (dist, ang, delta) ->
-				return 50, Angle(-20, 180, 0)
-		}
-	}
-
 	Init: =>
 		@animRate = 1
 		@seq = @SEQUENCE_STAND
@@ -144,7 +92,6 @@ MODEL_BOX_PANEL = {
 		@mouseX, @mouseY = 0, 0
 		@SetMouseInputEnabled(true)
 		@editorSeq = 1
-		@nextSeq = @EDITOR_SEQUENCES[@editorSeq].time + RealTime()
 		@playing = true
 		@lastTick = RealTime()
 		@SetCursor('none')
@@ -152,23 +99,6 @@ MODEL_BOX_PANEL = {
 		@buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
 		@buildingModel\SetNoDraw(true)
 		@buildingModel\SetModelScale(0.9)
-
-		-- @animButton = vgui.Create('DButton', @)
-		-- with @animButton
-		--     \SetSize(120, 20)
-		--     \SetText('Playing animation')
-		--     .LastStatus = true
-		--     .Think = ->
-		--         if .LastStatus ~= @playing
-		--             .LastStatus = @playing
-		--             \SetText('Playing Animation') if @playing
-		--             \SetText('Play Animation') if not @playing
-		--     .DoClick = ->
-		--         @playing = not @playing
-		--         if @playing
-		--             @editorSeq = 1
-		--             @nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
-		--             @ResetPosition()
 
 		@seqButton = vgui.Create('DComboBox', @)
 		with @seqButton
@@ -183,7 +113,6 @@ MODEL_BOX_PANEL = {
 		@vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
 
 	PerformLayout: (w = 0, h = 0) =>
-		--@animButton\SetPos(w - 130, 10)
 		@seqButton\SetPos(10, 10)
 		@emotesPanel\SetPos(10, 40) if IsValid(@emotesPanel)
 
@@ -192,19 +121,12 @@ MODEL_BOX_PANEL = {
 		@hold = true
 		@SetCursor('sizeall')
 		@holdLast = RealTime() + .1
-		@oldPlaying = @playing
-		@playing = false
 		@mouseX, @mouseY = gui.MousePos()
+
 	OnMouseReleased: (code = MOUSE_LEFT) =>
 		return if code ~= MOUSE_LEFT
 		@hold = false
 		@SetCursor('none')
-		if @holdLast > RealTime()
-			@playing = true
-			if not @oldPlaying
-				@editorSeq = 1
-				@nextSeq = RealTime() + @EDITOR_SEQUENCES[@editorSeq].time
-				@ResetPosition()
 
 	SetController: (val) => @controller = val
 
@@ -251,28 +173,6 @@ MODEL_BOX_PANEL = {
 			@model\SetPoseParameter('move_x', 1)
 
 		@hold = @IsHovered() if @hold
-
-		-- if @playing
-		--     cseq = @EDITOR_SEQUENCES[@editorSeq]
-		--     if @nextSeq < rtime
-		--         @editorSeq += 1
-		--         @editorSeq = 1 if not @EDITOR_SEQUENCES[@editorSeq]
-		--         cseq = @EDITOR_SEQUENCES[@editorSeq]
-		--         @nextSeq = rtime + cseq.time
-
-		--     {:p, :y, :r} = @targetAngle
-		--     @targetDistToPony, @targetAngle = cseq.func(@targetDistToPony, Angle(p, y, r), delta)
-		--     @targetDistToPony = math.Clamp(@targetDistToPony, 20, 150)
-		--     @targetAngle.p = math.Clamp(@targetAngle.p, -40, 10)
-		-- else
-		--     if @hold
-		--         x, y = gui.MousePos()
-		--         deltaX, deltaY = x - @mouseX, y - @mouseY
-		--         @mouseX, @mouseY = x, y
-		--         {:pitch, :yaw, :roll} = @targetAngle
-		--         yaw -= deltaX * .5
-		--         pitch = math.Clamp(pitch - deltaY * .5, -40, 10)
-		--         @targetAngle = Angle(pitch, yaw, roll)
 
 		if @hold
 			x, y = gui.MousePos()
