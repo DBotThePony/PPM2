@@ -65,7 +65,7 @@ class NetworkChangeState
 	Revert: => @obj[@key] = @oldValue
 	Apply: => @obj[@key] = @newValue
 
-class NetworkedObject
+class NetworkedObject extends PPM2.ModifierBase
 	@Setup = =>
 		@NW_Vars = {} if @NW_Vars == nil
 		@NW_VarsTable = {}
@@ -245,6 +245,7 @@ class NetworkedObject
 		return output
 
 	new: (netID, localObject = false) =>
+		super()
 		@valid = true
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
