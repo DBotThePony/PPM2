@@ -49,12 +49,14 @@ AddCSLuaFile = (f) -> AddCSLuaFile_("autorun/ppm2/#{f}")
 
 include 'common/modifier_base.lua'
 include 'common/controller_children.lua'
-include 'common/networked_object.lua'
 include 'common/sequence_base.lua'
+include 'common/sequence_holder.lua'
+include 'common/networked_object.lua'
 include 'common/registry.lua'
 include 'common/functions.lua'
 include 'common/bodygroup_controller.lua'
 include 'common/weight_controller.lua'
+include 'common/pony_expressions_controller.lua'
 include 'common/emotes.lua'
 include 'common/flex_controller.lua'
 include 'common/registry_data.lua'
@@ -67,6 +69,7 @@ if CLIENT
 	PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_ARCHIVE}, 'Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.')
 	file.CreateDir('ppm2')
 	file.CreateDir('ppm2/backups')
+	include 'client/bones_modifier.lua'
 	include 'client/data_instance.lua'
 	include 'client/materials_registry.lua'
 	include 'client/texture_controller.lua'
@@ -106,6 +109,7 @@ else
 	AddCSLuaFile 'common/modifier_base.lua'
 	AddCSLuaFile 'common/controller_children.lua'
 	AddCSLuaFile 'common/sequence_base.lua'
+	AddCSLuaFile 'common/sequence_holder.lua'
 	AddCSLuaFile 'common/networked_object.lua'
 	AddCSLuaFile 'common/registry.lua'
 	AddCSLuaFile 'common/registry_data.lua'
@@ -118,6 +122,8 @@ else
 	AddCSLuaFile 'common/emotes.lua'
 	AddCSLuaFile 'common/ponyfly.lua'
 	AddCSLuaFile 'common/size_controller.lua'
+	AddCSLuaFile 'common/pony_expressions_controller.lua'
+	AddCSLuaFile 'client/bones_modifier.lua'
 	AddCSLuaFile 'client/data_instance.lua'
 	AddCSLuaFile 'client/materials_registry.lua'
 	AddCSLuaFile 'client/texture_controller.lua'

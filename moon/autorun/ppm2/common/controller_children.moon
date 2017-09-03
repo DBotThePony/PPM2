@@ -29,6 +29,7 @@ class PPM2.ControllerChildren extends PPM2.ModifierBase
 	@NEXT_OBJ_ID = 0
 
 	new: (controller) =>
+		super()
 		@isValid = true
 		@ent = controller.ent
 		@entID = controller.entID

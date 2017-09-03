@@ -171,6 +171,7 @@ PPM2.FlexState = FlexState
 class FlexSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
 		super(data, controller)
+
 		{
 			'ids': @flexIDsIterable
 			'numid': @numid
@@ -213,7 +214,7 @@ class FlexSequence extends PPM2.SequenceBase
 
 PPM2.FlexSequence = FlexSequence
 
-class PonyFlexController extends PPM2.ControllerChildren
+class PonyFlexController extends PPM2.SequenceHolder
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
 	@FLEX_LIST = {
@@ -261,7 +262,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 
 	}
 
-	@FLEX_SEQUENCES = {
+	@SEQUENCES = {
 		{
 			'name': 'anger'
 			'autostart': false
@@ -808,32 +809,25 @@ class PonyFlexController extends PPM2.ControllerChildren
 		}
 	}
 
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		for i, flex in pairs child.FLEX_LIST
+	@SetupFlexesTables: =>
+		for i, flex in pairs @FLEX_LIST
 			flex.id = i - 1
 			flex.targetName = "target#{flex.flex}"
-		child.FLEX_IDS = {flex.id, flex for flex in *child.FLEX_LIST}
-		child.FLEX_TABLE = {flex.flex, flex for flex in *child.FLEX_LIST}
-		seq.numid = i for i, seq in pairs child.FLEX_SEQUENCES
-		child.FLEX_SEQUENCES_TABLE = {seq.name, seq for seq in *child.FLEX_SEQUENCES}
-		child.FLEX_SEQUENCES_TABLE[seq.numid] = seq for seq in *child.FLEX_SEQUENCES
-		lastID = child.FLEX_SEQUENCES[#child.FLEX_SEQUENCES].numid + 1
-
+		@FLEX_IDS = {flex.id, flex for flex in *@FLEX_LIST}
+		@FLEX_TABLE = {flex.flex, flex for flex in *@FLEX_LIST}
 		for emote in *PPM2.AVALIABLE_EMOTES
-			getFlex = child.FLEX_SEQUENCES_TABLE[emote.sequence]
-			if getFlex
-				copyFlex = {k, v for k, v in pairs getFlex}
-				copyFlex.repeat = true
-				copyFlex.numid = lastID
-				copyFlex.name ..= '_endless'
-				lastID += 1
-				child.FLEX_SEQUENCES_TABLE[copyFlex.name] = copyFlex
-				child.FLEX_SEQUENCES_TABLE[copyFlex.numid] = copyFlex
-				table.insert(child.FLEX_LIST, copyFlex)
-	@__inherited(@)
+			for getFlex in *@SEQUENCES
+				if getFlex.name == emote.sequence
+					copyFlex = {k, v for k, v in pairs getFlex}
+					copyFlex.repeat = true
+					copyFlex.name ..= '_endless'
+					table.insert(@SEQUENCES, copyFlex)
+					break
+
+	@SetupFlexesTables()
 
 	@NEXT_HOOK_ID = 0
+	@SequenceObject = FlexSequence
 
 	new: (data) =>
 		super(data)
@@ -845,14 +839,6 @@ class PonyFlexController extends PPM2.ControllerChildren
 		ponyData = data\GetData()
 		flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
 		flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
-		@hooks = {}
-		@@NEXT_HOOK_ID += 1
-		@fid = @@NEXT_HOOK_ID
-		@hookID = "PPM2.FlexController.#{@@NEXT_HOOK_ID}"
-		@lastThink = RealTime()
-		@currentSequences = {}
-		@currentSequencesIterable = {}
-		@ResetSequences()
 		@Hook('OnPlayerChat', @OnPlayerChat)
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
@@ -860,66 +846,10 @@ class PonyFlexController extends PPM2.ControllerChildren
 		@Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
 		@Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
 		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
+		@ResetSequences()
 		PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
 
 	IsValid: => @isValid
-	StartSequence: (seqID = '', time) =>
-		return false if not @isValid
-		return @currentSequences[seqID] if @currentSequences[seqID]
-		return if not @@FLEX_SEQUENCES_TABLE[seqID]
-		@currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
-		@currentSequences[seqID]\SetTime(time) if time
-		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-		return @currentSequences[seqID]
-
-	RestartSequence: (seqID = '', time) =>
-		return false if not @isValid
-		if @currentSequences[seqID]
-			@currentSequences[seqID]\Reset()
-			@currentSequences[seqID]\SetTime(time)
-			return @currentSequences[seqID]
-		return @StartSequence(seqID, time)
-
-	PauseSequence: (seqID = '') =>
-		return false if not @isValid
-		return @currentSequences[seqID]\Pause() if @currentSequences[seqID]
-		return false
-
-	ResumeSequence: (seqID = '') =>
-		return false if not @isValid
-		return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
-		return false
-
-	EndSequence: (seqID = '', callStop = true) =>
-		return false if not @isValid
-		return false if not @currentSequences[seqID]
-		@currentSequences[seqID]\Stop() if callStop
-		@currentSequences[seqID] = nil
-		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-		return true
-
-	ResetSequences: =>
-		return false if not @isValid
-		for seq in *@currentSequencesIterable
-			seq\Stop()
-
-		@currentSequences = {}
-		@currentSequencesIterable = {}
-		state\Reset(false) for state in *@statesIterable
-
-		for seq in *@@FLEX_SEQUENCES
-			continue if not seq.autostart
-			@StartSequence(seq.name)
-
-	Reset: => @ResetSequences()
-
-	PlayerRespawn: =>
-		return if not @isValid
-		@ResetSequences()
-
-	HasSequence: (seqID = '') =>
-		return false if not @isValid
-		@currentSequences[seqID] and true or false
 
 	GetFlexState: (name = '') => @statesTable[name]
 	RebuildIterableList: =>
@@ -935,19 +865,6 @@ class PonyFlexController extends PPM2.ControllerChildren
 	GetEntity: => @ent
 	GetData: => @controller
 	GetController: => @controller
-
-	Hook: (id, func) =>
-		return if not @isValid
-		newFunc = (...) ->
-			if not IsValid(@ent)
-				@ent = @GetData().ent
-			if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
-				@RemoveHooks()
-				return
-			func(@, ...)
-			return nil
-		hook.Add id, @hookID, newFunc
-		table.insert(@hooks, id)
 
 	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
 		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
@@ -1014,25 +931,21 @@ class PonyFlexController extends PPM2.ControllerChildren
 		for iHook in *@hooks
 			hook.Remove iHook, @hookID
 
+	ResetSequences: =>
+		super()
+		state\Reset(false) for state in *@statesIterable
+
 	Think: (ent = @ent) =>
 		return if DISABLE_FLEXES\GetBool()
-		return if not @isValid
-		if not IsValid(@ent)
-			@ent = @GetData().ent
-			ent = @ent
-		return if not IsValid(ent) or ent\IsDormant()
-		delta = RealTime() - @lastThink
-		@lastThink = RealTime()
+		delta = super(ent)
+		return if not delta
 		state\Think(ent, delta) for state in *@statesIterable
 		for seq in *@currentSequencesIterable
 			if not seq\IsValid()
 				@EndSequence(seq\GetName(), false)
 				break
 			seq\Think(delta)
-	__tostring: => "[#{@@__name}:#{@fid}:#{#@currentSequencesIterable}|#{@GetData()}]"
-	Remove: =>
-		@isValid = false
-		@RemoveHooks()
+		return delta
 
 do
 	ppm2_disable_flexes = (cvar, oldval, newval) ->
