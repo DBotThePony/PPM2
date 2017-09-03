@@ -209,13 +209,13 @@ class PPM2.ModifierBase
 		for modif in *@CUSTOM_MODIFIERS
 			for id = 1, #@[modif.iNameLerp]
 				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
-					table.insert(outputTriggered, modif.iName)
 					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+					table.insert(outputTriggered, {modif.iName, @[modif.iNameLerp][id]})
 		for modif in *@@MODIFIERS
 			for id = 1, #@[modif.iNameLerp]
 				if @[modif.iNameLerp][id] ~= @[modif.iName][id]
-					table.insert(outputTriggered, modif.iName)
 					@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+					table.insert(outputTriggered, {modif.iName, @[modif.iNameLerp][id]})
 		return outputTriggered
 
 	@ClearModifiers: =>
