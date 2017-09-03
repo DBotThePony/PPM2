@@ -184,8 +184,8 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			--@RegisterModifier(name .. 'Jiggle', 0)
 			{i, name, 'Calculate' .. name .. 'Position', 'Calculate' .. name .. 'Scale', 'Calculate' .. name .. 'Angles'}
 
-	Think: =>
-		return if not super() or @callFrame == FrameNumber()
+	Think: (force = false) =>
+		return if not super() or not force and @callFrame == FrameNumber()
 		@callFrame = FrameNumber()
 		for data in *@bonesIterable
 			id = data[1]

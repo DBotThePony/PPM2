@@ -304,6 +304,8 @@ CALC_VIEW_PANEL = {
 		if data = ply\GetPonyData()
 			if bg = data\GetBodygroupController()
 				bg\ApplyBodygroups()
+		ply.__ppmBonesModifiers\Think(true) if ply.__ppmBonesModifiers
+		return
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		return if code ~= MOUSE_LEFT
