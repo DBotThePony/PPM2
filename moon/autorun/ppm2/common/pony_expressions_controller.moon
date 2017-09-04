@@ -111,6 +111,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'sorry'
 			'flexSequence': 'sorry'
+			'bonesSequence': {'floppy_ears'}
 			'autostart': false
 			'repeat': false
 			'time': 8
@@ -143,6 +144,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'wink_left'
 			'flexSequence': 'wink_left'
+			'bonesSequence': 'forward_left'
 			'autostart': false
 			'repeat': false
 			'time': 2
@@ -151,6 +153,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'wink_right'
 			'flexSequence': 'wink_right'
+			'bonesSequence': 'forward_right'
 			'autostart': false
 			'repeat': false
 			'time': 2
@@ -280,6 +283,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'ooo'
 			'flexSequence': 'ooo'
+			'bonesSequence': 'neck_flopping_backward'
 			'autostart': false
 			'repeat': false
 			'time': 2
@@ -288,6 +292,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'anger'
 			'flexSequence': 'anger'
+			'bonesSequence': 'forward_ears'
 			'autostart': false
 			'repeat': false
 			'time': 5
@@ -303,6 +308,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		@Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
 		@Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
 		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
+		@Hook('OnPlayerChat', @OnPlayerChat)
 		@ResetSequences()
 		PPM2.DebugPrint('Created new PonyExpressionsController for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
@@ -320,6 +326,39 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		return if ply\GetEntity() ~= @ent\GetEntity()
 		@EndSequence('kill_grin')
 		@RestartSequence('anger')
+
+	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
+		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
+		switch text\lower()
+			when 'o', ':o', 'о', 'О', ':о', ':О'
+				@RestartSequence('ooo')
+			when ':3', ':з'
+				@RestartSequence('cat')
+			when ':d'
+				@RestartSequence('big_grin')
+			when 'xd', 'exdi'
+				@RestartSequence('xd')
+			when ':p'
+				@RestartSequence('tongue')
+			when '>:p', '>:р', '>:Р'
+				@RestartSequence('angry_tongue')
+			when ':р', ':Р'
+				@RestartSequence('tongue')
+			when ':c', 'o3o', 'oops', ':С', ':с', '(', ':('
+				@RestartSequence('sad')
+			when 'sorry'
+				@RestartSequence('sorry')
+			when 'okay mate', 'okay, mate'
+				@RestartSequence('wink_left')
+			else
+				if string.find(text, 'hehehe') or string.find(text, 'hahaha')
+					@RestartSequence('greeny')
+				elseif string.find(text, '^pff+')
+					@RestartSequence('pffff')
+				elseif string.find(text, '^blah blah')
+					@RestartSequence('blahblah')
+				else
+					@RestartSequence('talk')
 
 	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
 		return if ply\GetEntity() ~= @ent\GetEntity()

@@ -121,6 +121,49 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 				@SetBoneAngles(2, Angle(0, 84, -40))
 			'func': (delta, timeOfAnim) =>
 		}
+
+		{
+			'name': 'forward_ears'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'Ear_L', 'Ear_R'}
+			'reset': =>
+				@SetBoneAngles(1, Angle(0, -15, -27))
+				@SetBoneAngles(2, Angle(0, 15, -27))
+			'func': (delta, timeOfAnim) =>
+		}
+
+		{
+			'name': 'neck_flopping_backward'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'bones': {'LrigNeck3'}
+			'reset': =>
+			'func': (delta, timeOfAnim) =>
+				@SetBoneAngles(1, Angle(0, -12 * timeOfAnim, math.sin(RealTime() * 4) * 20))
+		}
+
+		{
+			'name': 'forward_left'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'bones': {'LrigNeck3'}
+			'reset': =>
+				@SetBoneAngles(1, Angle(10, 12, -9))
+		}
+
+		{
+			'name': 'forward_right'
+			'autostart': false
+			'repeat': false
+			'time': 3
+			'bones': {'LrigNeck3'}
+			'reset': =>
+				@SetBoneAngles(1, Angle(-10, 12, 9))
+		}
 	}
 
 	@SequenceObject = BonesSequence
@@ -128,11 +171,12 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', (a, b) ->
 		return if a or b
 		frame = FrameNumber()
+		rtime = RealTime()
 		for obj in *@OBJECTS
 			if not obj\IsValid()
 				@OBJECTS = [obj for obj in *@OBJECTS when obj\IsValid()]
 				return
-			if obj.callFrame ~= frame and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+			if obj.callFrame ~= frame and (not obj.pac3Last or obj.pac3Last < rtime) and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
 				resetBones(obj.ent)
 				data = obj.ent\GetPonyData()
 				hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
@@ -212,6 +256,8 @@ with FindMetaTable('Entity')
 hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 	data = @GetPonyData()
 	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-	@__ppmBonesModifiers\Think() if @__ppmBonesModifiers
+	if @__ppmBonesModifiers
+		@__ppmBonesModifiers\Think()
+		@__ppmBonesModifiers.pac3Last = RealTime() + 0.2
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()
