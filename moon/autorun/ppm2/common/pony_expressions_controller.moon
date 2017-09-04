@@ -259,6 +259,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'angry_tongue'
 			'flexSequence': 'angry_tongue'
+			'bonesSequence': 'forward_ears'
 			'autostart': false
 			'repeat': false
 			'time': 6
@@ -267,6 +268,7 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'pffff'
 			'flexSequence': 'pffff'
+			'bonesSequence': 'forward_ears'
 			'autostart': false
 			'repeat': false
 			'time': 6
