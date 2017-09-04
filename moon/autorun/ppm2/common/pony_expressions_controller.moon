@@ -326,6 +326,54 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'lips_licking'
+			'flexSequence': 'lips_lick'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'reset': =>
+		}
+
+		{
+			'name': 'lips_licking_suggestive'
+			'bonesSequence': 'floppy_ears_weak'
+			'flexSequence': {'lips_lick', 'face_smirk', 'suggestive_eyes'}
+			'autostart': false
+			'repeat': false
+			'time': 4
+			'reset': =>
+		}
+
+		{
+			'name': 'suggestive_eyes'
+			'flexSequence': {'suggestive_eyes'}
+			'autostart': false
+			'repeat': false
+			'time': 4
+			'reset': =>
+		}
+
+		{
+			'name': 'suggestive'
+			'bonesSequence': 'floppy_ears_weak'
+			'flexSequence': {'suggestive_eyes', 'tongue_pullout', 'suggestive_open'}
+			'autostart': false
+			'repeat': false
+			'time': 4
+			'reset': =>
+		}
+
+		{
+			'name': 'suggestive_wo'
+			'bonesSequence': 'floppy_ears_weak'
+			'flexSequence': {'suggestive_eyes', 'suggestive_open_anim'}
+			'autostart': false
+			'repeat': false
+			'time': 4
+			'reset': =>
+		}
+
+		{
 			'name': 'wild'
 			'bonesSequence': 'neck_backward'
 			'autostart': false

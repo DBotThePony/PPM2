@@ -320,6 +320,77 @@ class PonyFlexController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'suggestive_eyes'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'sad_eyes', 'Eyes_Blink_Lower'}
+			'reset': =>
+				@SetModifierWeight(1, 0.28)
+				@SetModifierWeight(2, 0.4)
+				@PauseSequence('eyes_blink')
+				@PauseSequence('eyes_idle')
+		}
+
+		{
+			'name': 'lips_lick'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out', 'Tongue_Up'}
+			'reset': =>
+				@SetModifierWeight(1, 0.9)
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(2, 0.75 + math.sin(RealTime() * 7) * 0.25)
+		}
+
+		{
+			'name': 'tongue_pullout'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.15 + math.sin(RealTime() * 10) * 0.1)
+		}
+
+		{
+			'name': 'suggestive_open'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Pucker', 'JawOpen', 'Scrunch'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.28, 0.34))
+				@SetModifierWeight(2, math.Rand(0.35, 0.40))
+				@SetModifierWeight(3, math.Rand(0.45, 0.50))
+		}
+
+		{
+			'name': 'suggestive_open_anim'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Pucker', 'JawOpen', 'Scrunch'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.28, 0.34))
+				@SetModifierWeight(3, math.Rand(0.45, 0.50))
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(2, 0.2 + math.sin(RealTime() * 16) * 0.07)
+		}
+
+		{
+			'name': 'face_smirk'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Smirk', 'Frown'}
+			'reset': =>
+				@SetModifierWeight(1, 0.78)
+				@SetModifierWeight(2, 0.61)
+		}
+
+		{
 			'name': 'eyes_idle'
 			'autostart': true
 			'repeat': true
