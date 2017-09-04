@@ -214,9 +214,12 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		{
 			'name': 'hurt'
 			'flexSequence': 'hurt'
+			'bonesSequence': 'floppy_ears_weak'
 			'autostart': false
 			'repeat': false
 			'time': 4
+			'reset': =>
+				@SetControllerModifier('IrisSize', -0.3)
 		}
 
 		{
@@ -308,7 +311,9 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 			'bonesSequence': 'forward_ears'
 			'autostart': false
 			'repeat': false
-			'time': 5
+			'time': 4
+			'reset': =>
+				@SetControllerModifier('IrisSize', -0.2)
 		}
 
 		{

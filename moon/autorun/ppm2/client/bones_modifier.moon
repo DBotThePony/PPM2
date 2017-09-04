@@ -123,6 +123,18 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'floppy_ears_weak'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'Ear_L', 'Ear_R'}
+			'reset': =>
+				@SetBoneAngles(1, Angle(0, -20, -20))
+				@SetBoneAngles(2, Angle(0, 20, -20))
+			'func': (delta, timeOfAnim) =>
+		}
+
+		{
 			'name': 'forward_ears'
 			'autostart': false
 			'repeat': false
