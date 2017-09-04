@@ -433,6 +433,11 @@ class NewPonyRenderController extends PonyRenderController
 			textures\UpdateLowerMane(@ent, @lowerManeModel) if IsValid(@lowerManeModel)
 			textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
 
+hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
+	if data = @GetPonyData()
+		if renderer = data\GetRenderController()
+			renderer\HideModels(not should)
+
 PPM2.PonyRenderController = PonyRenderController
 PPM2.NewPonyRenderController = NewPonyRenderController
 PPM2.GetPonyRenderController = (model = 'models/ppm/player_default_base.mdl') -> PonyRenderController.AVALIABLE_CONTROLLERS[model\lower()] or PonyRenderController
