@@ -254,7 +254,7 @@ class PonyFlexController extends PPM2.SequenceHolder
 		{flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
 		{flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
 		{flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
-		{flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
+		{flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: true}
 		{flex: 'Male_2',            scale: 1, speed: 1, active: false}
 		{flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
 		{flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
@@ -304,6 +304,19 @@ class PonyFlexController extends PPM2.SequenceHolder
 				@SetModifierWeight(1, @frownStrength)
 				@SetModifierWeight(2, @grinStrength)
 				@SetModifierWeight(3, @angryStrength)
+		}
+
+		{
+			'name': 'ugh'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'sad_eyes', 'Eyes_Blink_Lower'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.27, 0.34))
+				@SetModifierWeight(2, math.Rand(0.3, 0.35))
+				@PauseSequence('eyes_blink')
+				@PauseSequence('eyes_idle')
 		}
 
 		{

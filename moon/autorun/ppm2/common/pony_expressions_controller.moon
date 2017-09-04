@@ -317,6 +317,15 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'ugh'
+			'flexSequence': 'ugh'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'reset': =>
+		}
+
+		{
 			'name': 'wild'
 			'bonesSequence': 'neck_backward'
 			'autostart': false
