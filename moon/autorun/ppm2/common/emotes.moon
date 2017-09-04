@@ -23,6 +23,12 @@ PPM2.AVALIABLE_EMOTES = {
 	}
 
 	{
+		'name': 'Wild'
+		'sequence': 'wild'
+		'time': 3
+	}
+
+	{
 		'name': 'Grin'
 		'sequence': 'big_grin'
 		'time': 6

@@ -146,6 +146,33 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'neck_backward'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'LrigNeck3'}
+			'reset': => @SetBoneAngles(1, Angle(0, -12, 0))
+		}
+
+		{
+			'name': 'neck_left'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'LrigNeck3'}
+			'reset': => @SetBoneAngles(1, Angle(14, 0, 12))
+		}
+
+		{
+			'name': 'neck_right'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'LrigNeck3'}
+			'reset': => @SetBoneAngles(1, Angle(-14, 0, -12))
+		}
+
+		{
 			'name': 'forward_left'
 			'autostart': false
 			'repeat': false
