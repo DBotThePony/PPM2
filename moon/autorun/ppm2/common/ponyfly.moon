@@ -227,47 +227,46 @@ class PonyflyController
 
 PPM2.PonyflyController = PonyflyController
 
+import IsPonyCached, GetPonyData, GetTable, AnimRestartGesture, SetIK, IsNewPonyCached from FindMetaTable('Entity')
+
 hook.Add 'SetupMove', 'PPM2.Ponyfly', (movedata, cmd) =>
-	return if not @IsPonyCached()
-	data = @GetPonyData()
-	return if not data
-	return if not data\GetFly()
+	return if not IsPonyCached(@)
+	data = GetPonyData(@)
+	return if not data or not data\GetFly()
 	flight = data\GetFlightController()
 	return if not flight
 	return flight\SetupMove(movedata, cmd)
 
 hook.Add 'Move', 'PPM2.Ponyfly', (movedata) =>
-	return if not @IsPonyCached()
-	data = @GetPonyData()
-	return if not data
-	return if not data\GetFly()
+	return if not IsPonyCached(@)
+	data = GetPonyData(@)
+	return if not data or not data\GetFly()
 	flight = data\GetFlightController()
 	return if not flight
 	return flight\Think(movedata)
 
 hook.Add 'FinishMove', 'PPM2.Ponyfly', (movedata) =>
-	return if not @IsPonyCached()
-	data = @GetPonyData()
-	return if not data
-	return if not data\GetFly()
+	return if not IsPonyCached(@)
+	data = GetPonyData(@)
+	return if not data or not data\GetFly()
 	flight = data\GetFlightController()
 	return if not flight
 	return flight\FinishMove(movedata)
 
 hook.Add 'CalcMainActivity', 'PPM2.Ponyfly', (movedata) =>
-	return if not @IsNewPonyCached()
-	if data = @GetPonyData()
+	return if not IsNewPonyCached(@)
+	if data = GetPonyData(@)
 		if data\GetFly()
 			if not @isPlayingPPM2Anim
 				@isPlayingPPM2Anim = true
-				@AnimRestartGesture(GESTURE_SLOT_CUSTOM, ACT_GMOD_NOCLIP_LAYER, false)
-				@SetIK(false) if CLIENT
+				AnimRestartGesture(@, GESTURE_SLOT_CUSTOM, ACT_GMOD_NOCLIP_LAYER, false)
+				SetIK(@, false) if CLIENT
 			return ACT_GMOD_NOCLIP_LAYER, 370
 		else
 			if @isPlayingPPM2Anim
 				@isPlayingPPM2Anim = false
-				@AnimResetGestureSlot(GESTURE_SLOT_CUSTOM)
-				@SetIK(true) if CLIENT
+				AnimResetGestureSlot(@, GESTURE_SLOT_CUSTOM)
+				SetIK(@, true) if CLIENT
 
 if SERVER
 	concommand.Add 'ppm2_fly', =>

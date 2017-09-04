@@ -97,6 +97,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
 		ent.__PPM2_PonyData = @
 		@ent = ent
+		@entTable = @ent\GetTable()
 		return unless IsValid(ent)
 		@modelCached = ent\GetModel()
 		@ent = ent
@@ -152,8 +153,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
 	PlayerRespawn: =>
 		return if not IsValid(@ent)
-		@ent.__cachedIsPony = @ent\IsPony()
-		if not @ent.__cachedIsPony
+		@entTable.__cachedIsPony = @ent\IsPony()
+		if not @entTable.__cachedIsPony
 			return if @alreadyCalledRespawn
 			@alreadyCalledRespawn = true
 			@alreadyCalledDeath = true
@@ -174,8 +175,8 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 
 	PlayerDeath: =>
 		return if not IsValid(@ent)
-		@ent.__cachedIsPony = @ent\IsPony()
-		if not @ent.__cachedIsPony
+		@entTable.__cachedIsPony = @ent\IsPony()
+		if not @entTable.__cachedIsPony
 			return if @alreadyCalledDeath
 			@alreadyCalledDeath = true
 		else
@@ -287,12 +288,12 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 		@@NW_Objects[@netID] = nil if @NETWORKED
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
-		@ent.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
+		@entTable.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
 		if CLIENT
 			@GetWeightController()\Remove() if @GetWeightController()
 			@GetRenderController()\Remove() if @GetRenderController()
 			if IsValid(@ent) and @ent.__ppm2_task_hit
-				@ent.__ppm2_task_hit = false
+				@entTable.__ppm2_task_hit = false
 				@ent\SetNoDraw(false)
 		@GetBodygroupController()\Remove() if @GetBodygroupController()
 		@GetSizeController()\Remove() if @GetSizeController()
@@ -328,7 +329,9 @@ else
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
-	if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(@)
-		@__PPM2_PonyData\SetEntity(@)
-		@__PPM2_PonyData\SetupEntity(@) if CLIENT
+	self2 = @
+	self = entMeta.GetTable(@)
+	if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(self2)
+		@__PPM2_PonyData\SetEntity(self2)
+		@__PPM2_PonyData\SetupEntity(self2) if CLIENT
 	return @__PPM2_PonyData
