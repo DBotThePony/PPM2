@@ -227,7 +227,8 @@ class PonyflyController
 
 PPM2.PonyflyController = PonyflyController
 
-import IsPonyCached, GetPonyData, GetTable, AnimRestartGesture, SetIK, IsNewPonyCached from FindMetaTable('Entity')
+import IsPonyCached, GetPonyData, GetTable, SetIK, IsNewPonyCached from FindMetaTable('Entity')
+import AnimRestartGesture, AnimResetGestureSlot from FindMetaTable('Player')
 
 hook.Add 'SetupMove', 'PPM2.Ponyfly', (movedata, cmd) =>
 	return if not IsPonyCached(@)
