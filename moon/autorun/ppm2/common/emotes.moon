@@ -101,6 +101,12 @@ PPM2.AVALIABLE_EMOTES = {
 	}
 
 	{
+		'name': 'Licking'
+		'sequence': 'licking'
+		'time': 6
+	}
+
+	{
 		'name': 'Siggestive Lips lick'
 		'sequence': 'lips_licking_suggestive'
 		'time': 4

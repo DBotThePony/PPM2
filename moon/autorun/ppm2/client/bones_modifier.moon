@@ -167,6 +167,26 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'neck_twitch'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'LrigNeck3'}
+			'func': (delta, timeOfAnim) =>
+				@SetBoneAngles(1, Angle(0, math.cos(RealTime() * 4) * 20, 0))
+		}
+
+		{
+			'name': 'neck_twitch_fast'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'bones': {'LrigNeck3'}
+			'func': (delta, timeOfAnim) =>
+				@SetBoneAngles(1, Angle(0, math.cos(RealTime() * 8) * 20, 0))
+		}
+
+		{
 			'name': 'neck_left'
 			'autostart': false
 			'repeat': false

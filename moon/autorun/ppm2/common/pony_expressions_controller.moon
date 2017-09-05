@@ -383,6 +383,15 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 				@SetControllerModifier('IrisSize', -1)
 				@PlayBonesSequence(math.random(1, 100) > 50 and 'neck_left' or 'neck_right')
 		}
+
+		{
+			'name': 'licking'
+			'bonesSequence': 'neck_twitch_fast'
+			'flexSequence': 'tongue_pullout_twitch_fast'
+			'autostart': false
+			'repeat': false
+			'time': 6
+		}
 	}
 
 	@SequenceObject = ExpressionSequence

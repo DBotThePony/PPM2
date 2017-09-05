@@ -355,6 +355,26 @@ class PonyFlexController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'tongue_pullout_twitch'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 4) * 0.5)
+		}
+
+		{
+			'name': 'tongue_pullout_twitch_fast'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 8) * 0.5)
+		}
+
+		{
 			'name': 'suggestive_open'
 			'autostart': false
 			'repeat': false
