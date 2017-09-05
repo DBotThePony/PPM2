@@ -65,6 +65,12 @@ PPM2.AVALIABLE_EMOTES = {
 	}
 
 	{
+		'name': 'oWo'
+		'sequence': 'owo_alternative'
+		'time': 8
+	}
+
+	{
 		'name': 'Uuugh'
 		'sequence': 'ugh'
 		'time': 5

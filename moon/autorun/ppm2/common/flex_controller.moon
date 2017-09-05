@@ -527,6 +527,17 @@ class PonyFlexController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'owo_alternative'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'o3o', 'JawOpen'}
+			'reset': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, math.Rand(0.8, 1))
+				@SetModifierWeight(2, math.Rand(0.05, 0.1))
+		}
+
+		{
 			'name': 'xd'
 			'autostart': false
 			'repeat': false

@@ -385,6 +385,15 @@ class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
 		}
 
 		{
+			'name': 'owo_alternative'
+			'flexSequence': 'owo_alternative'
+			'autostart': false
+			'repeat': false
+			'time': 8
+			'reset': => @SetControllerModifier('IrisSize', math.Rand(0.3, 0.4))
+		}
+
+		{
 			'name': 'licking'
 			'bonesSequence': 'neck_twitch_fast'
 			'flexSequence': 'tongue_pullout_twitch_fast'
