@@ -331,6 +331,7 @@ entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
 	self2 = @
 	self = entMeta.GetTable(@)
+	return if not @
 	if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(self2)
 		@__PPM2_PonyData\SetEntity(self2)
 		@__PPM2_PonyData\SetupEntity(self2) if CLIENT
