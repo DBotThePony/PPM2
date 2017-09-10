@@ -301,6 +301,10 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 				\ManipulateBoneScale(id, \GetManipulateBoneScale(id) + @[calcScale](@))
 				\ManipulateBoneAngles(id, \GetManipulateBoneAngles(id) + @[calcAngles](@))
 
+	ResetBones: =>
+		return if @pac3Last and @pac3Last > RealTime()
+		resetBones(@ent)
+
 	IsValid: => @isValid and @ent\IsValid()
 	GetEntity: => @ent
 
