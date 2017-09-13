@@ -225,6 +225,8 @@ MODEL_BOX_PANEL = {
 		@controller\GetRenderController()\HideModels(true) if @controller
 		@controller\GetRenderController()\PreDraw(@model) if @controller
 
+		@model\PPMBonesModifier()\ResetBones()
+		@model\PPMBonesModifier()\Think()
 		if data = @model\GetPonyData()
 			if bg = data\GetBodygroupController()
 				bg\ApplyBodygroups()
@@ -232,8 +234,6 @@ MODEL_BOX_PANEL = {
 				size\ModifyNeck()
 				size\ModifyLegs()
 				size\ModifyScale()
-		PPM2.EntityBonesModifier.resetBones(@model)
-		@model.__ppmBonesModifiers\Think() if @model.__ppmBonesModifiers
 		@model\DrawModel()
 		@controller\GetRenderController()\PostDraw(@model) if @controller
 		render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
