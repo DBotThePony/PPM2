@@ -555,6 +555,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 		surface.DisableClipping(false)
 		rt = @currentRT
 		@currentRT = nil
+
+		-- some shitty fixes for source engine
+		cam.Start3D()
+		cam.Start3D2D(Vector(0, 0, 0), Angle(0, 0, 0), 1)
+		cam.End3D2D()
+		cam.End3D()
+
 		return rt
 
 	CheckReflections: (ent = @ent) =>

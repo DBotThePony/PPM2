@@ -211,6 +211,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 			scale\SlowUpdate()
 
 	Think: =>
+	RenderScreenspaceEffects: =>
 		time = RealTime()
 		delta = time - @lastLerpThink
 		@lastLerpThink = time
