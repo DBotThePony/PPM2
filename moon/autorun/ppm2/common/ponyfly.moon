@@ -17,6 +17,7 @@
 
 ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.')
 FORCE_ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight_force', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Ignore PlayerNoClip hook')
+SUPPRESS_CLIENTSIDE_CHECK = CreateConVar('ppm2_sv_flight_nocheck', '0', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Suppress PlayerNoClip clientside check (useful with bad coded addons. known are - ULX, Cinema, FAdmin)')
 FLIGHT_DAMAGE = CreateConVar('ppm2_sv_flightdmg', '1', {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Damage players in flight')
 
 class PonyflyController
@@ -302,12 +303,13 @@ else
 					lastMessage = RealTime() + 1
 					PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
 				return
-			can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
-			if not can
-				if lastMessage2 < RealTime()
-					lastMessage2 = RealTime() + 1
-					PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
-				return
+			if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
+				can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
+				if not can
+					if lastMessage2 < RealTime()
+						lastMessage2 = RealTime() + 1
+						PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
+					return
 			RunConsoleCommand('ppm2_fly')
 			lastDouble = 0
 			return
