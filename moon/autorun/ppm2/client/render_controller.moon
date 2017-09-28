@@ -20,22 +20,13 @@ ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony le
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 
-class PonyRenderController
+class PonyRenderController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-	@__inherited(@)
-	@NEXT_OBJ_ID = 0
 
 	CompileTextures: => @GetTextureController()\CompileTextures() if @GetTextureController and @GetTextureController()
 	new: (data) =>
-		@objID = @@NEXT_OBJ_ID
-		@@NEXT_OBJ_ID += 1
-		@isValid = true
-		@networkedData = data
-		@ent = data.ent
+		super(data)
 		@hideModels = false
 		@modelCached = data\GetModel()
 		@IGNORE_DRAW = false
@@ -45,11 +36,12 @@ class PonyRenderController
 		@socksModel\SetNoDraw(false) if IsValid(@socksModel)
 		@newSocksModel = data\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
-		@CreateFlexController() if @ent
-	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
+		if @ent
+			@CreateFlexController()
+			@CreateEmotesController()
+
 	GetEntity: => @ent
-	GetData: => @networkedData
-	GetModel: => @networkedData\GetModel()
+	GetModel: => @controller\GetModel()
 
 	GetLegs: =>
 		return NULL if not @isValid
@@ -279,10 +271,12 @@ class PonyRenderController
 	IsValid: => IsValid(@ent) and @isValid
 	Reset: =>
 		@flexes\Reset() if @flexes and @flexes.Reset
+		@emotes\Reset() if @emotes and @emotes.Reset
 		@GetTextureController()\Reset() if @GetTextureController and @GetTextureController() and @GetTextureController().Reset
 		@GetTextureController()\ResetTextures() if @GetTextureController and @GetTextureController()
 	Remove: =>
 		@flexes\Remove() if @flexes
+		@emotes\Remove() if @emotes
 		@GetTextureController()\Remove() if @GetTextureController and @GetTextureController()
 		@isValid = false
 
@@ -314,6 +308,7 @@ class PonyRenderController
 				\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel)
 				\UpdateNewSocks(@ent, @newSocksModel) if IsValid(@newSocksModel)
 		@flexes\Think(ent) if @flexes
+		@emotes\Think(ent) if @emotes
 	PostDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
 		@GetTextureController()\PostDraw(ent)
@@ -337,6 +332,7 @@ class PonyRenderController
 		return if not @ent
 		@GetTextureController()\DataChanges(state)
 		@flexes\DataChanges(state) if @flexes
+		@emotes\DataChanges(state) if @emotes
 		switch state\GetKey()
 			when 'Weight'
 				@armsWeightSetup = false
@@ -362,6 +358,7 @@ class PonyRenderController
 			@renderController = cls(@)
 		@renderController.ent = @ent
 		return @renderController
+
 	CreateFlexController: =>
 		return @flexes if not @isValid
 		return if @GetData()\GetNoFlex()
@@ -371,7 +368,18 @@ class PonyRenderController
 			@flexes = cls(@)
 		@flexes.ent = @ent
 		return @flexes
+
+	CreateEmotesController: =>
+		return @emotes if not @isValid
+		if not @emotes
+			cls = PPM2.GetPonyExpressionsController(@modelCached)
+			return if not cls
+			@emotes = cls(@)
+		@emotes.ent = @ent
+		return @emotes
+
 	GetFlexController: => @flexes
+	GetEmotesController: => @emotes
 
 class NewPonyRenderController extends PonyRenderController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
@@ -424,6 +432,11 @@ class NewPonyRenderController extends PonyRenderController
 			textures\UpdateUpperMane(@ent, @upperManeModel) if IsValid(@upperManeModel)
 			textures\UpdateLowerMane(@ent, @lowerManeModel) if IsValid(@lowerManeModel)
 			textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
+
+hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
+	if data = @GetPonyData()
+		if renderer = data\GetRenderController()
+			renderer\HideModels(not should)
 
 PPM2.PonyRenderController = PonyRenderController
 PPM2.NewPonyRenderController = NewPonyRenderController

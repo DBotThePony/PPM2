@@ -45,6 +45,29 @@ do
 		print('PPM2 Error: ' .. err) if not status
 
 do
+	import GetModel, IsDormant, GetPonyData, IsValid, IsPonyCached from FindMetaTable('Entity')
+
+	hook.Add 'Think', 'PPM2.PonyDataThink', ->
+		for ply in *player.GetAll()
+			if not IsDormant(ply) and IsPonyCached(ply)
+				data = GetPonyData(ply)
+				data\Think() if data and data.Think
+		for task in *PPM2.NetworkedPonyData.RenderTasks
+			ply = task.ent
+			if IsValid(ply) and not IsDormant(ply) and IsPonyCached(ply) and task.Think
+				task\Think()
+
+	hook.Add 'RenderScreenspaceEffects', 'PPM2.PonyDataRenderScreenspaceEffects', ->
+		for ply in *player.GetAll()
+			if not IsDormant(ply) and IsPonyCached(ply)
+				data = GetPonyData(ply)
+				data\RenderScreenspaceEffects() if data and data.RenderScreenspaceEffects
+		for task in *PPM2.NetworkedPonyData.RenderTasks
+			ply = task.ent
+			if IsValid(ply) and not IsDormant(ply) and IsPonyCached(ply) and task.RenderScreenspaceEffects
+				task\RenderScreenspaceEffects()
+
+do
 	catchError = (err) ->
 		PPM2.Message 'Slow Update Error: ', err
 		PPM2.Message debug.traceback()

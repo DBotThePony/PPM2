@@ -662,6 +662,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_IRIS
 		max: PPM2.MAX_IRIS
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["eye_derp#{internal}"] = {
@@ -688,6 +689,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_DERP_STRENGTH
 		max: PPM2.MAX_DERP_STRENGTH
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["eye_type#{internal}"] = {
@@ -702,6 +704,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["hole_height#{internal}"] = {
@@ -710,6 +713,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["iris_width#{internal}"] = {
@@ -718,6 +722,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["iris_height#{internal}"] = {
@@ -726,6 +731,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["eye_glossy_reflection#{internal}"] = {
@@ -742,6 +748,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_HOLE_SHIFT
 		max: PPM2.MAX_HOLE_SHIFT
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["hole_shifty#{internal}"] = {
@@ -750,6 +757,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_HOLE_SHIFT
 		max: PPM2.MAX_HOLE_SHIFT
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["eye_hole_size#{internal}"] = {
@@ -758,6 +766,7 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		min: PPM2.MIN_HOLE
 		max: PPM2.MAX_HOLE
 		type: 'FLOAT'
+		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["eye_rotation#{internal}"] = {

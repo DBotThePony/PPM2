@@ -59,8 +59,14 @@
 
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
-class FlexState
+class FlexState extends PPM2.ModifierBase
+	@SetupModifiers: =>
+		@RegisterModifier('Speed', 0)
+		@RegisterModifier('Scale', 0)
+		@RegisterModifier('Weight', 0)
+
 	new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
+		super()
 		@controller = controller
 		@ent = controller.ent
 		@name = flexName
@@ -77,14 +83,8 @@ class FlexState
 		@target = 0
 		@speedModify = 1
 		@scaleModify = 1
-		@speedModifiers = {}
-		@scaleModifiers = {}
 		@modifiers = {}
-		@modifiersSpeeds = {}
-		@modifiersTargets = {}
-		@modifiersNames = {}
 		@useModifiers = useModifiers
-		@nextModifierID = 0
 		@active = active
 		@useLerp = true
 		@lerpMultiplier = 1
@@ -101,42 +101,6 @@ class FlexState
 	GetLerpModify: => @lerpMultiplier
 	LerpModify: => @lerpMultiplier
 
-	GetModifierID: (name = '') =>
-		return @modifiersNames[name] if @modifiersNames[name]
-		@nextModifierID += 1
-		id = @nextModifierID
-		@modifiersNames[name] = id
-		@speedModifiers[id] = 0
-		@scaleModifiers[id] = 0
-		@modifiers[id] = 0
-		@modifiersSpeeds[id] = 1
-		@modifiersTargets[id] = 0
-		return id
-	SetModifierWeight: (modifID, val = 0) =>
-		return if not modifID
-		return if not @modifiersTargets[modifID]
-		@modifiersTargets[modifID] = val
-	SetModifierSpeed: (modifID, val = 0) =>
-		return if not modifID
-		return if not @modifiersSpeeds[modifID]
-		@modifiersSpeeds[modifID] = val
-	SetModifierScale: (modifID, val = 0) =>
-		return if not modifID
-		return if not @scaleModifiers[modifID]
-		@scaleModifiers[modifID] = val
-	SetModifierScale: (modifID, val = 0) =>
-		return if not modifID
-		return if not @speedModifiers[modifID]
-		@speedModifiers[modifID] = val
-	ResetModifiers: (name = '', hard = false) =>
-		return false if not @modifiersNames[name]
-		id = @modifiersNames[name]
-		@speedModifiers[id] = 0
-		@scaleModifiers[id] = 0
-		@modifiers[id] = 0 if hard
-		@modifiersTargets[id] = 0
-		@modifiersSpeeds[id] = 1 if hard
-		return true
 	GetEntity: => @ent
 	GetData: => @controller
 	GetController: => @controller
@@ -172,12 +136,12 @@ class FlexState
 			@scale = @originalscale * @scaleModify
 			@speed = @originalspeed * @speedModify
 
-			for i = 1, #@modifiers
-				@modifiers[i] = Lerp(delta * 10 * @speed * @speedModify * @lerpMultiplier * @modifiersSpeeds[i], @modifiers[i], @modifiersTargets[i])
+			for i = 1, #@WeightModifiers
+				@modifiers[i] = Lerp(delta * 15 * @speed * @speedModify * @lerpMultiplier, @modifiers[i] or 0, @WeightModifiers[i])
 				@current += @modifiers[i]
 
-			@scale += modif for modif in *@scaleModifiers
-			@speed += modif for modif in *@speedModifiers
+			@scale += modif for modif in *@ScaleModifiers
+			@speed += modif for modif in *@SpeedModifiers
 			@current = math.Clamp(@current, @min, @max) * @scale
 
 		if not IsValid(@ent)
@@ -192,11 +156,7 @@ class FlexState
 		@Reset()
 	Reset: (resetVars = true) =>
 		for name, id in pairs @modifiersNames
-			@speedModifiers[id] = 0
-			@scaleModifiers[id] = 0
-			@modifiers[id] = 0
-			@modifiersTargets[id] = 0
-			@modifiersSpeeds[id] = 1
+			@ResetModifiers(name)
 		if resetVars
 			@scaleModify = 1
 			@speedModify = 1
@@ -208,16 +168,11 @@ class FlexState
 
 PPM2.FlexState = FlexState
 
-class FlexSequence
+class FlexSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
+		super(controller, data)
+
 		{
-			'name': @name
-			'repeat': @dorepeat
-			'frames': @frames
-			'time': @time
-			'func': @func
-			'reset': @resetfunc
-			'create': @createfunc
 			'ids': @flexIDsIterable
 			'numid': @numid
 		} = data
@@ -237,105 +192,30 @@ class FlexSequence
 
 		@ent = controller.ent
 		@controller = controller
-		@frame = 0
-		@start = RealTime()
-		@finish = @start + @time
-		@deltaAnim = 1
-		@speed = 1
-		@scale = 1
-		@valid = true
-		@paused = false
-		@pausedSequences = {}
-		@createfunc() if @createfunc
-		@resetfunc() if @resetfunc
-
-	__tostring: => "[#{@@__name}:#{@name}]"
-
-	SetTime: (newTime = @time, refresh = true) =>
-		@frame = 0
-		@start = RealTime() if refresh
-		@time = newTime
-		@finish = @start + @time
-	Reset: =>
-		@frame = 0
-		@start = RealTime()
-		@finish = @start + @time
-		@deltaAnim = 1
-		@resetfunc() if @resetfunc
+		@Launch()
 
 	GetController: => @controller
 	GetEntity: => @ent
-	GetName: => @name
-	GetRepeat: => @dorepeat
-	GetFrames: => @frames
-	GetFrame: => @frames
-	GetTime: => @time
-	GetThinkFunc: => @func
-	GetCreatFunc: => @createfunc
-	GetSpeed: => @speed
-	GetAnimationSpeed: => @speed
-	GetScale: => @scale
 	GetModifierID: (id = '') => @flexIDS[id]
 	GetFlexState: (id = '') => @flexStates[id]
+
+	Think: (delta = 0) =>
+		@ent = @controller.ent
+		return false if not IsValid(@ent)
+		super(delta)
+
+	Stop: =>
+		super()
+		if @parent
+			for id in *@flexIDsIterable
+				@parent\GetFlexState(id)\ResetModifiers(@name)
 
 	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
 	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
 
-	IsValid: => @valid
-	Think: (delta = 0) =>
-		@ent = @controller.ent
-		return false if not IsValid(@ent)
-		if @paused
-			@finish += delta
-			@start += delta
-		else
-			if @HasFinished()
-				@Stop()
-				return false
-
-			@deltaAnim = (@finish - RealTime()) / @time
-			if @deltaAnim < 0
-				@deltaAnim = 1
-				@frame = 0
-				@start = RealTime()
-				@finish = @start + @time
-			@frame += 1
-
-			if @func
-				status = @func(delta, 1 - @deltaAnim)
-				if status == false
-					@Stop()
-					return false
-
-		return true
-	Pause: =>
-		return false if @paused
-		@paused = true
-		return true
-	Resume: =>
-		return false if not @paused
-		@paused = false
-		return true
-	PauseSequence: (id = '') =>
-		@pausedSequences[id] = true
-		@GetController()\PauseSequence(id)
-	ResumeSequence: (id = '') =>
-		@pausedSequences[id] = false
-		@GetController()\ResumeSequence(id)
-	Stop: =>
-		for id in *@flexIDsIterable
-			@GetController()\GetFlexState(id)\ResetModifiers(@name)
-		for id, bool in pairs @pausedSequences
-			@GetController()\ResumeSequence(id) if bool
-		@valid = false
-	Remove: => @Stop()
-	HasFinished: =>
-		return false if @dorepeat
-		return RealTime() > @finish
-
 PPM2.FlexSequence = FlexSequence
 
-class PonyFlexController
+class PonyFlexController extends PPM2.SequenceHolder
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
@@ -374,7 +254,7 @@ class PonyFlexController
 		{flex: 'Fang_Test',         scale: 1, speed: 1, active: false}
 		{flex: 'angry_eyes',        scale: 1, speed: 1, active: true}
 		{flex: 'sad_eyes',          scale: 1, speed: 1, active: true}
-		{flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: false}
+		{flex: 'Eyes_Blink_Lower',  scale: 1, speed: 1, active: true}
 		{flex: 'Male_2',            scale: 1, speed: 1, active: false}
 		{flex: 'Buff_Body',         scale: 1, speed: 1, active: false}
 		{flex: 'Manliest_Chin',     scale: 1, speed: 1, active: false}
@@ -384,7 +264,7 @@ class PonyFlexController
 
 	}
 
-	@FLEX_SEQUENCES = {
+	@SEQUENCES = {
 		{
 			'name': 'anger'
 			'autostart': false
@@ -427,6 +307,110 @@ class PonyFlexController
 		}
 
 		{
+			'name': 'ugh'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'sad_eyes', 'Eyes_Blink_Lower'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.27, 0.34))
+				@SetModifierWeight(2, math.Rand(0.3, 0.35))
+				@PauseSequence('eyes_blink')
+				@PauseSequence('eyes_idle')
+		}
+
+		{
+			'name': 'suggestive_eyes'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'sad_eyes', 'Eyes_Blink_Lower'}
+			'reset': =>
+				@SetModifierWeight(1, 0.28)
+				@SetModifierWeight(2, 0.4)
+				@PauseSequence('eyes_blink')
+				@PauseSequence('eyes_idle')
+		}
+
+		{
+			'name': 'lips_lick'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out', 'Tongue_Up'}
+			'reset': =>
+				@SetModifierWeight(1, 0.9)
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(2, 0.75 + math.sin(RealTime() * 7) * 0.25)
+		}
+
+		{
+			'name': 'tongue_pullout'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.15 + math.sin(RealTime() * 10) * 0.1)
+		}
+
+		{
+			'name': 'tongue_pullout_twitch'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 4) * 0.5)
+		}
+
+		{
+			'name': 'tongue_pullout_twitch_fast'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Tongue_Out'}
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 8) * 0.5)
+		}
+
+		{
+			'name': 'suggestive_open'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Pucker', 'JawOpen', 'Scrunch'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.28, 0.34))
+				@SetModifierWeight(2, math.Rand(0.35, 0.40))
+				@SetModifierWeight(3, math.Rand(0.45, 0.50))
+		}
+
+		{
+			'name': 'suggestive_open_anim'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Pucker', 'JawOpen', 'Scrunch'}
+			'reset': =>
+				@SetModifierWeight(1, math.Rand(0.28, 0.34))
+				@SetModifierWeight(3, math.Rand(0.45, 0.50))
+			'func': (delta, timeOfAnim) =>
+				@SetModifierWeight(2, 0.2 + math.sin(RealTime() * 16) * 0.07)
+		}
+
+		{
+			'name': 'face_smirk'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'Smirk', 'Frown'}
+			'reset': =>
+				@SetModifierWeight(1, 0.78)
+				@SetModifierWeight(2, 0.61)
+		}
+
+		{
 			'name': 'eyes_idle'
 			'autostart': true
 			'repeat': true
@@ -434,11 +418,9 @@ class PonyFlexController
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
 				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-				left, right = @GetModifierID(1), @GetModifierID(2)
-				leftState, rightState = @GetFlexState(1), @GetFlexState(2)
 				value = math.abs(math.sin(RealTime() * .5) * .15)
-				leftState\SetModifierWeight(left, value)
-				rightState\SetModifierWeight(right, value)
+				@SetModifierWeight(1, value)
+				@SetModifierWeight(2, value)
 		}
 
 		{
@@ -542,6 +524,17 @@ class PonyFlexController
 			'ids': {'o3o'}
 			'func': (delta, timeOfAnim) =>
 				@SetModifierWeight(1, 1)
+		}
+
+		{
+			'name': 'owo_alternative'
+			'autostart': false
+			'repeat': false
+			'time': 5
+			'ids': {'o3o', 'JawOpen'}
+			'reset': (delta, timeOfAnim) =>
+				@SetModifierWeight(1, math.Rand(0.8, 1))
+				@SetModifierWeight(2, math.Rand(0.05, 0.1))
 		}
 
 		{
@@ -933,38 +926,20 @@ class PonyFlexController
 		}
 	}
 
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-		for i, flex in pairs child.FLEX_LIST
+	@SetupFlexesTables: =>
+		for i, flex in pairs @FLEX_LIST
 			flex.id = i - 1
 			flex.targetName = "target#{flex.flex}"
-		child.FLEX_IDS = {flex.id, flex for flex in *child.FLEX_LIST}
-		child.FLEX_TABLE = {flex.flex, flex for flex in *child.FLEX_LIST}
-		seq.numid = i for i, seq in pairs child.FLEX_SEQUENCES
-		child.FLEX_SEQUENCES_TABLE = {seq.name, seq for seq in *child.FLEX_SEQUENCES}
-		child.FLEX_SEQUENCES_TABLE[seq.numid] = seq for seq in *child.FLEX_SEQUENCES
-		lastID = child.FLEX_SEQUENCES[#child.FLEX_SEQUENCES].numid + 1
+		@FLEX_IDS = {flex.id, flex for flex in *@FLEX_LIST}
+		@FLEX_TABLE = {flex.flex, flex for flex in *@FLEX_LIST}
 
-		for emote in *PPM2.AVALIABLE_EMOTES
-			getFlex = child.FLEX_SEQUENCES_TABLE[emote.sequence]
-			if getFlex
-				copyFlex = {k, v for k, v in pairs getFlex}
-				copyFlex.repeat = true
-				copyFlex.numid = lastID
-				copyFlex.name ..= '_endless'
-				lastID += 1
-				child.FLEX_SEQUENCES_TABLE[copyFlex.name] = copyFlex
-				child.FLEX_SEQUENCES_TABLE[copyFlex.numid] = copyFlex
-				table.insert(child.FLEX_LIST, copyFlex)
-	@__inherited(@)
+	@SetupFlexesTables()
 
 	@NEXT_HOOK_ID = 0
+	@SequenceObject = FlexSequence
 
 	new: (data) =>
-		@isValid = true
-		@controller = data
-		@ent = data.ent
+		super(data)
 		@states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
 		@statesTable = {state\GetFlexName(), state for state in *@states}
 		@statesTable[state\GetFlexName()\lower()] = state for state in *@states
@@ -973,81 +948,12 @@ class PonyFlexController
 		ponyData = data\GetData()
 		flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
 		flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
-		@hooks = {}
-		@@NEXT_HOOK_ID += 1
-		@fid = @@NEXT_HOOK_ID
-		@hookID = "PPM2.FlexController.#{@@NEXT_HOOK_ID}"
-		@lastThink = RealTime()
-		@currentSequences = {}
-		@currentSequencesIterable = {}
-		@ResetSequences()
-		@Hook('OnPlayerChat', @OnPlayerChat)
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
-		@Hook('PPM2_HurtAnimation', @PPM2_HurtAnimation)
-		@Hook('PPM2_KillAnimation', @PPM2_KillAnimation)
-		@Hook('PPM2_AngerAnimation', @PPM2_AngerAnimation)
-		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
+		@ResetSequences()
 		PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
 
 	IsValid: => @isValid
-	StartSequence: (seqID = '', time) =>
-		return false if not @isValid
-		return @currentSequences[seqID] if @currentSequences[seqID]
-		return if not @@FLEX_SEQUENCES_TABLE[seqID]
-		@currentSequences[seqID] = FlexSequence(@, @@FLEX_SEQUENCES_TABLE[seqID])
-		@currentSequences[seqID]\SetTime(time) if time
-		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-		return @currentSequences[seqID]
-
-	RestartSequence: (seqID = '', time) =>
-		return false if not @isValid
-		if @currentSequences[seqID]
-			@currentSequences[seqID]\Reset()
-			@currentSequences[seqID]\SetTime(time)
-			return @currentSequences[seqID]
-		return @StartSequence(seqID, time)
-
-	PauseSequence: (seqID = '') =>
-		return false if not @isValid
-		return @currentSequences[seqID]\Pause() if @currentSequences[seqID]
-		return false
-
-	ResumeSequence: (seqID = '') =>
-		return false if not @isValid
-		return @currentSequences[seqID]\Resume() if @currentSequences[seqID]
-		return false
-
-	EndSequence: (seqID = '', callStop = true) =>
-		return false if not @isValid
-		return false if not @currentSequences[seqID]
-		@currentSequences[seqID]\Stop() if callStop
-		@currentSequences[seqID] = nil
-		@currentSequencesIterable = [seq for i, seq in pairs @currentSequences]
-		return true
-
-	ResetSequences: =>
-		return false if not @isValid
-		for seq in *@currentSequencesIterable
-			seq\Stop()
-
-		@currentSequences = {}
-		@currentSequencesIterable = {}
-		state\Reset(false) for state in *@statesIterable
-
-		for seq in *@@FLEX_SEQUENCES
-			continue if not seq.autostart
-			@StartSequence(seq.name)
-
-	Reset: => @ResetSequences()
-
-	PlayerRespawn: =>
-		return if not @isValid
-		@ResetSequences()
-
-	HasSequence: (seqID = '') =>
-		return false if not @isValid
-		@currentSequences[seqID] and true or false
 
 	GetFlexState: (name = '') => @statesTable[name]
 	RebuildIterableList: =>
@@ -1064,103 +970,23 @@ class PonyFlexController
 	GetData: => @controller
 	GetController: => @controller
 
-	Hook: (id, func) =>
-		return if not @isValid
-		newFunc = (...) ->
-			if not IsValid(@ent)
-				@ent = @GetData().ent
-			if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
-				@RemoveHooks()
-				return
-			func(@, ...)
-			return nil
-		hook.Add id, @hookID, newFunc
-		table.insert(@hooks, id)
-
-	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
-		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
-		switch text\lower()
-			when 'o', ':o', 'о', 'О', ':о', ':О'
-				@RestartSequence('ooo')
-			when ':3', ':з'
-				@RestartSequence('cat')
-			when ':d'
-				@RestartSequence('big_grin')
-			when 'xd', 'exdi'
-				@RestartSequence('xd')
-			when ':p'
-				@RestartSequence('tongue')
-			when '>:p', '>:р', '>:Р'
-				@RestartSequence('angry_tongue')
-			when ':р', ':Р'
-				@RestartSequence('tongue')
-			when ':c', 'o3o', 'oops', ':С', ':с', '(', ':('
-				@RestartSequence('sad')
-			when 'sorry'
-				@RestartSequence('sorry')
-			when 'okay mate', 'okay, mate'
-				@RestartSequence('wink_left')
-			else
-				if string.find(text, 'hehehe') or string.find(text, 'hahaha')
-					@RestartSequence('greeny')
-				elseif string.find(text, '^pff+')
-					@RestartSequence('pffff')
-				elseif string.find(text, '^blah blah')
-					@RestartSequence('blahblah')
-				else
-					@RestartSequence('talk')
 	PlayerStartVoice: (ply = NULL) =>
 		return if ply\GetEntity() ~= @ent\GetEntity()
 		@StartSequence('talk_endless')
 	PlayerEndVoice: (ply = NULL) =>
 		return if ply\GetEntity() ~= @ent\GetEntity()
 		@EndSequence('talk_endless')
-	PPM2_HurtAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@RestartSequence('hurt')
-		@EndSequence('kill_grin')
-	PPM2_KillAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@RestartSequence('kill_grin')
-		@EndSequence('anger')
-	PPM2_AngerAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		@EndSequence('kill_grin')
-		@RestartSequence('anger')
-	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
-		for {:sequence} in *PPM2.AVALIABLE_EMOTES
-			if shouldStop or sequence ~= emote
-				@EndSequence(sequence)
-				@EndSequence(sequence .. '_endless')
-		if isEndless
-			time = nil
-			emote ..= '_endless'
-		@RestartSequence(emote, time) if not shouldStop
 
-	RemoveHooks: =>
-		for iHook in *@hooks
-			hook.Remove iHook, @hookID
+	ResetSequences: =>
+		super()
+		state\Reset(false) for state in *@statesIterable
 
 	Think: (ent = @ent) =>
 		return if DISABLE_FLEXES\GetBool()
-		return if not @isValid
-		if not IsValid(@ent)
-			@ent = @GetData().ent
-			ent = @ent
-		return if not IsValid(ent) or ent\IsDormant()
-		delta = RealTime() - @lastThink
-		@lastThink = RealTime()
+		delta = super(ent)
+		return if not delta
 		state\Think(ent, delta) for state in *@statesIterable
-		for seq in *@currentSequencesIterable
-			if not seq\IsValid()
-				@EndSequence(seq\GetName(), false)
-				break
-			seq\Think(delta)
-	__tostring: => "[#{@@__name}:#{@fid}:#{#@currentSequencesIterable}|#{@GetData()}]"
-	Remove: =>
-		@isValid = false
-		@RemoveHooks()
+		return delta
 
 do
 	ppm2_disable_flexes = (cvar, oldval, newval) ->

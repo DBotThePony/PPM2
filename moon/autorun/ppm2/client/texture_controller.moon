@@ -68,13 +68,9 @@ hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return 
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
-class PonyTextureController
+class PonyTextureController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
-	@__inherited: (child) =>
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		@AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
-	@__inherited(@)
 
 	@UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.UPPER_MANE_DETAILS}
 	@LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.LOWER_MANE_DETAILS}
@@ -251,8 +247,10 @@ class PonyTextureController
 				elseif @@TAIL_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileEye', true)
-					@DelayCompile('CompileEye', false)
+					--@DelayCompile('CompileEye', true)
+					--@DelayCompile('CompileEye', false)
+					@CompileEye(true)
+					@CompileEye(false)
 				elseif @@BODY_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
@@ -419,8 +417,8 @@ class PonyTextureController
 				table.insert(@HTML_MATERIAL_QUEUE, data)
 
 	new: (controller, compile = true) =>
+		super(controller\GetData())
 		@isValid = true
-		@ent = controller\GetEntity()
 		@cachedENT = controller\GetEntity()
 		@networkedData = controller\GetData()
 		@id = @ent\EntIndex()
@@ -434,8 +432,6 @@ class PonyTextureController
 		@delayCompilation = {}
 		@CompileTextures() if compile
 		PPM2.DebugPrint('Created new texture controller for ', @ent, ' as part of ', controller, '; internal ID is ', @id)
-
-	__tostring: => "[#{@@__name}:#{@id}|#{@GetData()}]"
 
 	Remove: =>
 		@isValid = false
@@ -457,9 +453,6 @@ class PonyTextureController
 		@ent = @networkedData\GetEntity()
 		return @networkedData
 
-	GrabData: (str, ...) => @GetData()['Get' .. str](@GetData(), ...)
-
-	GetEntity: => @ent
 	GetBody: => @BodyMaterial
 	GetBodyName: => @BodyMaterialName
 	GetSocks: => @SocksMaterial
@@ -562,6 +555,13 @@ class PonyTextureController
 		surface.DisableClipping(false)
 		rt = @currentRT
 		@currentRT = nil
+
+		-- some shitty fixes for source engine
+		cam.Start3D()
+		cam.Start3D2D(Vector(0, 0, 0), Angle(0, 0, 0), 1)
+		cam.End3D2D()
+		cam.End3D()
+
 		return rt
 
 	CheckReflections: (ent = @ent) =>

@@ -158,8 +158,8 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 					if IsValid(target)
 						if ponyData = target\GetPonyData()
 							if renderController = ponyData\GetRenderController()
-								if flexController = renderController\GetFlexController()
-									\SetChecked(flexController\HasSequence(sequence .. '_endless'))
+								if emotesController = renderController\CreateEmotesController()
+									\SetChecked(emotesController\HasSequence(sequence) and emotesController\GetSequence(sequence)\GetInfinite())
 				.OnChange = (checkbox3, newVal) ->
 					return if .suppress
 					BUTTON_CLICK_FUNC(btn, true) if newVal

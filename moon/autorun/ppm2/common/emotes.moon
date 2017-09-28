@@ -23,6 +23,12 @@ PPM2.AVALIABLE_EMOTES = {
 	}
 
 	{
+		'name': 'Wild'
+		'sequence': 'wild'
+		'time': 3
+	}
+
+	{
 		'name': 'Grin'
 		'sequence': 'big_grin'
 		'time': 6
@@ -59,6 +65,24 @@ PPM2.AVALIABLE_EMOTES = {
 	}
 
 	{
+		'name': 'oWo'
+		'sequence': 'owo_alternative'
+		'time': 8
+	}
+
+	{
+		'name': 'Uuugh'
+		'sequence': 'ugh'
+		'time': 5
+	}
+
+	{
+		'name': 'Lips lick'
+		'sequence': 'lips_licking'
+		'time': 5
+	}
+
+	{
 		'name': 'Scrunch'
 		'sequence': 'scrunch'
 		'time': 6
@@ -80,6 +104,24 @@ PPM2.AVALIABLE_EMOTES = {
 		'name': 'Right Wink'
 		'sequence': 'wink_right'
 		'time': 2
+	}
+
+	{
+		'name': 'Licking'
+		'sequence': 'licking'
+		'time': 6
+	}
+
+	{
+		'name': 'Siggestive Lips lick'
+		'sequence': 'lips_licking_suggestive'
+		'time': 4
+	}
+
+	{
+		'name': 'Siggestive w/o tongue'
+		'sequence': 'suggestive_wo'
+		'time': 4
 	}
 
 	{
@@ -123,6 +165,13 @@ PPM2.AVALIABLE_EMOTES = {
 		'sequence': 'duck_quack'
 		'time': 4
 	}
+
+	{
+		'name': 'Siggestive w/ tongue'
+		'sequence': 'suggestive'
+		'time': 4
+	}
+
 }
 
 AvaliableFiles = {fil, true for fil in *file.Find('materials/gui/ppm2/emotes/*', 'GAME')} if CLIENT

@@ -31,6 +31,7 @@ class NetworkChangeState
 		@objID = obj.netID
 		@len = len
 		@rlen = len - 24 -- ID - 16 bits, variable id - 8 bits
+		@cantApply = false
 		@networkChange = true
 	GetPlayer: => @ply
 	ChangedByClient: => not @networkChange or IsValid(@ply)
@@ -44,6 +45,8 @@ class NetworkChangeState
 	GetVarInternal: => @key
 	GetNewValue: => @newValue
 	GetValue: => @newValue
+	GetCantApply: => @cantApply
+	SetCantApply: (val) => @cantApply = val
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
@@ -62,10 +65,12 @@ class NetworkChangeState
 	GetRealLength: => @len
 	ChangedByNetwork: => @networkChange
 
-	Revert: => @obj[@key] = @oldValue
-	Apply: => @obj[@key] = @newValue
+	Revert: => @obj[@key] = @oldValue if not @cantApply
+	Apply: => @obj[@key] = @newValue if not @cantApply
 
-class NetworkedObject
+PPM2.NetworkChangeState = NetworkChangeState
+
+class NetworkedObject extends PPM2.ModifierBase
 	@Setup = =>
 		@NW_Vars = {} if @NW_Vars == nil
 		@NW_VarsTable = {}
@@ -245,6 +250,7 @@ class NetworkedObject
 		return output
 
 	new: (netID, localObject = false) =>
+		super()
 		@valid = true
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
