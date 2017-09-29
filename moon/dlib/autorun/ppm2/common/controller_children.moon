@@ -15,10 +15,12 @@
 -- limitations under the License.
 --
 
-class PPM2.ControllerChildren extends PPM2.ModifierBase
+class PPM2.ControllerChildren extends DLib.SequenceHolder
 	--@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {}
 	@__inherited: (child) =>
+		super(child)
+		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
 		child.NEXT_OBJ_ID = 0
 		return if not child.AVALIABLE_CONTROLLERS
 		child.MODELS_HASH = {mod, true for mod in *child.MODELS}

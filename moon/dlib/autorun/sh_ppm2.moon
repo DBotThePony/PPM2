@@ -23,11 +23,7 @@ DLib.manifest({
 	prefix: 'dlib/autorun/ppm2'
 
 	shared: {
-		'common/modifier_base.lua'
 		'common/controller_children.lua'
-		'common/sequence_base.lua'
-		'common/sequence_holder.lua'
-		'common/networked_object.lua'
 		'common/registry.lua'
 		'common/functions.lua'
 		'common/bodygroup_controller.lua'
