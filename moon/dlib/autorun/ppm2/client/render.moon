@@ -189,7 +189,7 @@ do
 		for ent, status in pairs hornGlowStatus
 			if IsValid(ent) and status.frame == frame and IsValid(status.target)
 				additional = math.sin(cTime / 2 + status.haloSeed * 3) * 40
-				newCol = PPM2.AddColor(status.color, Color(additional, additional, additional))
+				newCol = DLib.AddColor(status.color, Color(additional, additional, additional))
 				halo.Add({status.target}, newCol, math.sin(cTime + status.haloSeed) * 4 + 8, math.cos(cTime + status.haloSeed) * 4 + 8, 2)
 
 	hook.Add 'Think', 'PPM2.HornEffects', =>
@@ -279,11 +279,11 @@ do
 
 				if not data\GetSeparateMagicColor()
 					if not data\GetSeparateEyes()
-						.color = PPM2.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
+						.color = DLib.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
 					else
-						lerpLeft = PPM2.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
-						lerpRight = PPM2.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
-						.color = PPM2.LerpColor(0.5, lerpLeft, lerpRight)
+						lerpLeft = DLib.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
+						lerpRight = DLib.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
+						.color = DLib.LerpColor(0.5, lerpLeft, lerpRight)
 		else
 			with hornGlowStatus[@]
 				.frame = FrameNumber()
