@@ -15,6 +15,9 @@
 -- limitations under the License.
 --
 
+file.CreateDir('ppm2')
+file.CreateDir('ppm2/backups')
+
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
 	@DATA_DIR_BACKUP = "ppm2/backups/"

@@ -25,6 +25,11 @@ ents_GetAll = ->
 		TRACKED_ENTS_FRAME = FrameNumber()
 	return TRACKED_ENTS
 
+if CLIENT
+	for ent in *ents.GetAll()
+		if ent.isPonyLegsModel
+			ent\Remove()
+
 PPM2.BODYGROUP_SKELETON = 0
 PPM2.BODYGROUP_GENDER = 1
 PPM2.BODYGROUP_HORN = 2

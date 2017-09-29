@@ -15,6 +15,28 @@
 -- limitations under the License.
 --
 
+PPM2.ALLOW_TO_MODIFY_SCALE = CreateConVar('ppm2_sv_allow_resize', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to resize ponies. Disables resizing completely (visual; mechanical)')
+
+player_manager.AddValidModel('pony', 'models/ppm/player_default_base_new.mdl')
+list.Set('PlayerOptionsModel', 'pony', 'models/ppm/player_default_base_new.mdl')
+
+player_manager.AddValidModel('ponynj', 'models/ppm/player_default_base_new_nj.mdl')
+list.Set('PlayerOptionsModel', 'ponynj', 'models/ppm/player_default_base_new_nj.mdl')
+
+player_manager.AddValidModel('ponynj_old', 'models/ppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ponynj_old', 'models/ppm/player_default_base_nj.mdl')
+
+player_manager.AddValidModel('pony_old', 'models/ppm/player_default_base.mdl')
+list.Set('PlayerOptionsModel', 'pony_old', 'models/ppm/player_default_base.mdl')
+
+player_manager.AddValidModel('pony_cppm', 'models/cppm/player_default_base.mdl')
+list.Set('PlayerOptionsModel', 'pony_cppm', 'models/cppm/player_default_base.mdl')
+
+player_manager.AddValidModel('ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
+list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
+
+player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
+
 PPM2.MIN_WEIGHT = 0.7
 PPM2.MAX_WEIGHT = 1.5
 
