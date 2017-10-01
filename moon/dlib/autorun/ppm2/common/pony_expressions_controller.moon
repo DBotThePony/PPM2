@@ -103,7 +103,7 @@ class ExpressionSequence extends DLib.SequenceBase
 
 PPM2.ExpressionSequence = ExpressionSequence
 
-class PPM2.PonyExpressionsController extends DLib.SequenceHolder
+class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
