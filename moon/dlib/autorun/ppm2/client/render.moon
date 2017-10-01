@@ -164,7 +164,12 @@ PPM2.PrePlayerDraw = =>
 	return if @IsDormant()
 	@__ppm2_last_dead = @__ppm2_last_dead or 0
 	return if @__ppm2_last_dead > RealTime()
+	bones = @PPMBonesModifier()
 	data = @GetPonyData()
+	if data and bones.callFrame ~= FrameNumber() and (not bones.pac3Last or bones.pac3Last < RealTime())
+		bones\ResetBones()
+		hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
+		bones\Think()
 	renderController = data\GetRenderController()
 	status = renderController\PreDraw() if renderController
 
