@@ -215,7 +215,7 @@ class FlexSequence extends DLib.SequenceBase
 
 PPM2.FlexSequence = FlexSequence
 
-class PonyFlexController extends DLib.SequenceHolder
+class PonyFlexController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
