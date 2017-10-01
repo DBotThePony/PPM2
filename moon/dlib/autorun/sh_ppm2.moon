@@ -55,6 +55,7 @@ DLib.manifest({
 	}
 
 	server: {
+		'server/misc.lua'
 		'server/hooks.lua'
 		'server/emotes.lua'
 		'server/hitgroups.lua'
