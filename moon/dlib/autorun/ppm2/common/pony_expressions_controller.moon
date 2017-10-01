@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-class ExpressionSequence extends PPM2.SequenceBase
+class ExpressionSequence extends DLib.SequenceBase
 	new: (controller, data) =>
 		super(controller, data)
 
@@ -103,7 +103,7 @@ class ExpressionSequence extends PPM2.SequenceBase
 
 PPM2.ExpressionSequence = ExpressionSequence
 
-class PPM2.PonyExpressionsController extends PPM2.SequenceHolder
+class PPM2.PonyExpressionsController extends DLib.SequenceHolder
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 

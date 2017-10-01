@@ -43,7 +43,7 @@ wColor = net.WriteColor
 rString = net.ReadString
 wString = net.WriteString
 
-class NetworkedPonyData extends PPM2.NetworkedObject
+class NetworkedPonyData extends DLib.NetworkedData
 	@NW_ClientsideCreation = true
 	@RenderTasks = {}
 
@@ -217,7 +217,7 @@ class NetworkedPonyData extends PPM2.NetworkedObject
 		@lastLerpThink = time
 		if @isValid and IsValid(@ent)
 			for change in *@TriggerLerpAll(delta * 5)
-				state = PPM2.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
+				state = DLib.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
 				state\SetCantApply(true)
 				@GenericDataChange(state)
 

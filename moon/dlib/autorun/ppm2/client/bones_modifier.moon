@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-class BonesSequence extends PPM2.SequenceBase
+class BonesSequence extends DLib.SequenceBase
 	new: (controller, data) =>
 		super(controller, data)
 
@@ -105,7 +105,7 @@ resetBones = (ent) ->
 		ent\ManipulateBoneScale(i, RESET_BONE_SCALE)
 		ent\ManipulateBoneAngles(i, RESET_BONE_ANGLES)
 
-class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
+class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 	@OBJECTS = {}
 	@resetBones = resetBones
 
