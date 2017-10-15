@@ -156,7 +156,7 @@ hook.Add 'PlayerSetModel', 'PPM2.Bots', =>
 	@SetModel('models/ppm/player_default_base_new.mdl')
 	return true
 
-hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
+PlayerSpawnBot = =>
 	return if not BOTS_ARE_PONIES\GetBool()
 	return if not @IsBot()
 	timer.Simple 1, ->
@@ -167,3 +167,6 @@ hook.Add 'PlayerSpawn', 'PPM2.Bots', =>
 			data = PPM2.NetworkedPonyData(nil, @)
 			PPM2.Randomize(data)
 			data\Create()
+
+hook.Add 'PlayerSpawn', 'PPM2.Bots', PlayerSpawnBot
+timer.Simple 0, -> PlayerSpawnBot(ply) for ply in *player.GetAll()

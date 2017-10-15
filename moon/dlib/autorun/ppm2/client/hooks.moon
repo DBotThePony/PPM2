@@ -78,10 +78,15 @@ concommand.Add 'ppm2_reload', ->
 	instance\SetNetworkData(newData)
 	PPM2.Message 'Sending pony data to server...'
 
-hook.Add 'KeyPress', 'PPM2.RequireData', ->
-	hook.Remove 'KeyPress', 'PPM2.RequireData'
-	RunConsoleCommand('ppm2_reload')
-	timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+if not IsValid(LocalPlayer())
+	hook.Add 'KeyPress', 'PPM2.RequireData', ->
+		hook.Remove 'KeyPress', 'PPM2.RequireData'
+		RunConsoleCommand('ppm2_reload')
+		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+else
+	timer.Simple 0, ->
+		RunConsoleCommand('ppm2_reload')
+		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 
 PPM_HINT_COLOR_FIRST = Color(255, 255, 255)
 PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
