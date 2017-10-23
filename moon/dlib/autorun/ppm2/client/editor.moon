@@ -935,14 +935,17 @@ EditorPages = {
 			@ScrollPanel()
 			@ComboBox('Bodysuit', 'Bodysuit')
 			@ColorBox('Body color', 'BodyColor')
+
 			if ADVANCED_MODE\GetBool()
 				@CheckBox('Inherit Lips Color from body', 'LipsColorInherit')
 				@CheckBox('Inherit Nose Color from body', 'NoseColorInherit')
 				@ColorBox('Lips Color', 'LipsColor')
 				@ColorBox('Nose Color', 'NoseColor')
 				doAddPhongData(@, 'Body')
-			@NumSlider('Neck Height', 'NeckSize', 2)
-			@NumSlider('Legs Height', 'LegsSize', 2)
+
+			@NumSlider('Neck height', 'NeckSize', 2)
+			@NumSlider('Legs height', 'LegsSize', 2)
+			@NumSlider('Spine length', 'BackSize', 2)
 
 			@Hr()
 			@CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
@@ -973,8 +976,6 @@ EditorPages = {
 			if ADVANCED_MODE\GetBool()
 				@Label('New Socks URL texture')
 				@URLInput('NewSocksTextureURL')
-
-			if ADVANCED_MODE\GetBool()
 				@Hr()
 				@CheckBox('Separate wings color from body', 'SeparateWings')
 				@CheckBox('Separate horn color from body', 'SeparateHorn')

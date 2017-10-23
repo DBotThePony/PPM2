@@ -118,7 +118,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		return if not @ent\IsPony()
 		for {:id, :scale} in *@@WEIGHT_BONES
 			delta = (@weight - 1) * scale
-			ent\ManipulateBoneScale(id, Vector(1 + delta, 1 + delta, 1 + delta))
+			ent\ManipulateBoneScale(id, Vector(delta, delta, delta) + ent\GetManipulateBoneScale(id))
 	Remove: =>
 		@isValid = false
 

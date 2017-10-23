@@ -128,6 +128,14 @@ PPM2.PonyDataRegistry = {
 		type: 'FLOAT'
 	}
 
+	'spinesize': {
+		default: -> 1
+		getFunc: 'BackSize'
+		min: PPM2.MIN_SPINE
+		max: PPM2.MAX_SPINE
+		type: 'FLOAT'
+	}
+
 	'male_buff': {
 		default: -> PPM2.DEFAULT_MALE_BUFF
 		getFunc: 'MaleBuff'

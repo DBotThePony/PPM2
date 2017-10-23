@@ -354,7 +354,8 @@ class PonySizeController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + (boneAnimTable[@@LEGS_BONE_ROOT] or emptyVector))
+			\ManipulateBonePosition(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + \GetManipulateBonePosition(@@LEGS_BONE_ROOT))
+
 			\ManipulateBonePosition(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_1] or emptyVector))
 			\ManipulateBonePosition(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_2] or emptyVector))
 

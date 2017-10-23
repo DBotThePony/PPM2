@@ -108,6 +108,9 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	@BONE_TAIL_2 = 39
 	@BONE_TAIL_3 = 40
 
+	@BONE_SPINE_ROOT = 0
+	@BONE_SPINE = 2
+
 	new: (controller) =>
 		@isValid = true
 		@ent = controller.ent
@@ -211,39 +214,52 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	ApplyRace: =>
 		return unless @isValid
 		return NULL if not IsValid(@ent)
-		switch @GetData()\GetRace()
-			when PPM2.RACE_EARTH
-				@ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@ent\SetBodygroup(@@BODYGROUP_WINGS, 1)
-			when PPM2.RACE_PEGASUS
-				@ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@ent\SetBodygroup(@@BODYGROUP_WINGS, 0)
-			when PPM2.RACE_UNICORN
-				@ent\SetBodygroup(@@BODYGROUP_HORN, 0)
-				@ent\SetBodygroup(@@BODYGROUP_WINGS, 1)
-			when PPM2.RACE_ALICORN
-				@ent\SetBodygroup(@@BODYGROUP_HORN, 0)
-				@ent\SetBodygroup(@@BODYGROUP_WINGS, 0)
+		with @ent
+			switch @GetData()\GetRace()
+				when PPM2.RACE_EARTH
+					\SetBodygroup(@@BODYGROUP_HORN, 1)
+					\SetBodygroup(@@BODYGROUP_WINGS, 1)
+				when PPM2.RACE_PEGASUS
+					\SetBodygroup(@@BODYGROUP_HORN, 1)
+					\SetBodygroup(@@BODYGROUP_WINGS, 0)
+				when PPM2.RACE_UNICORN
+					\SetBodygroup(@@BODYGROUP_HORN, 0)
+					\SetBodygroup(@@BODYGROUP_WINGS, 1)
+				when PPM2.RACE_ALICORN
+					\SetBodygroup(@@BODYGROUP_HORN, 0)
+					\SetBodygroup(@@BODYGROUP_WINGS, 0)
 
 	ResetTail: =>
 		return if not CLIENT
-		@ent\ManipulateBoneScale(@@BONE_TAIL_1, Vector(1, 1, 1))
-		@ent\ManipulateBoneScale(@@BONE_TAIL_2, Vector(1, 1, 1))
-		@ent\ManipulateBoneScale(@@BONE_TAIL_3, Vector(1, 1, 1))
-		@ent\ManipulateBoneAngles(@@BONE_TAIL_1, Angle(0, 0, 0))
-		@ent\ManipulateBoneAngles(@@BONE_TAIL_2, Angle(0, 0, 0))
-		@ent\ManipulateBoneAngles(@@BONE_TAIL_3, Angle(0, 0, 0))
-		@ent\ManipulateBonePosition(@@BONE_TAIL_1, Vector(0, 0, 0))
-		@ent\ManipulateBonePosition(@@BONE_TAIL_2, Vector(0, 0, 0))
-		@ent\ManipulateBonePosition(@@BONE_TAIL_3, Vector(0, 0, 0))
+		with @ent
+			\ManipulateBoneScale(@@BONE_TAIL_1, Vector(1, 1, 1))
+			\ManipulateBoneScale(@@BONE_TAIL_2, Vector(1, 1, 1))
+			\ManipulateBoneScale(@@BONE_TAIL_3, Vector(1, 1, 1))
+			\ManipulateBoneAngles(@@BONE_TAIL_1, Angle(0, 0, 0))
+			\ManipulateBoneAngles(@@BONE_TAIL_2, Angle(0, 0, 0))
+			\ManipulateBoneAngles(@@BONE_TAIL_3, Angle(0, 0, 0))
+			\ManipulateBonePosition(@@BONE_TAIL_1, Vector(0, 0, 0))
+			\ManipulateBonePosition(@@BONE_TAIL_2, Vector(0, 0, 0))
+			\ManipulateBonePosition(@@BONE_TAIL_3, Vector(0, 0, 0))
+
+	ResetBack: =>
+		return if not CLIENT
+		with @ent
+			\ManipulateBoneScale(@@BONE_SPINE_ROOT, Vector(1, 1, 1))
+			\ManipulateBoneScale(@@BONE_SPINE, Vector(1, 1, 1))
+			\ManipulateBoneAngles(@@BONE_SPINE_ROOT, Angle(0, 0, 0))
+			\ManipulateBoneAngles(@@BONE_SPINE, Angle(0, 0, 0))
+			\ManipulateBonePosition(@@BONE_SPINE_ROOT, Vector(0, 0, 0))
+			\ManipulateBonePosition(@@BONE_SPINE, Vector(0, 0, 0))
 
 	ResetMane: =>
 		return if not CLIENT
 		vec1, ang, vec2 = Vector(1, 1, 1), Angle(0, 0, 0), Vector(0, 0, 0)
-		for i = 1, 7
-			@ent\ManipulateBoneScale(@@['BONE_MANE_' .. i], vec1)
-			@ent\ManipulateBoneAngles(@@['BONE_MANE_' .. i], ang)
-			@ent\ManipulateBonePosition(@@['BONE_MANE_' .. i], vec2)
+		with @ent
+			for i = 1, 7
+				\ManipulateBoneScale(@@['BONE_MANE_' .. i], vec1)
+				\ManipulateBoneAngles(@@['BONE_MANE_' .. i], ang)
+				\ManipulateBonePosition(@@['BONE_MANE_' .. i], vec2)
 
 	ResetBodygroups: =>
 		return unless @isValid
@@ -254,6 +270,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		if @lastPAC3BoneReset < RealTime()
 			@ResetTail()
 			@ResetMane()
+			@ResetBack()
+
 	Reset: => @ResetBodygroups()
 	RemoveModels: =>
 		@socksModel\Remove() if IsValid(@socksModel)
@@ -307,6 +325,20 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			\ManipulateBonePosition(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_6] or emptyVector))
 			\ManipulateBonePosition(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_7] or emptyVector))
 
+	UpdateBack: (ent = @ent) =>
+		return if not CLIENT
+		return if ent\IsRagdoll()
+		return if ent\IsNJPony()
+		vecModify = Vector(-(@GetData()\GetBackSize() - 1) * 2, 0, 0)
+		vecModify2 = Vector((@GetData()\GetBackSize() - 1) * 5, 0, 0)
+
+		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
+		emptyVector = Vector(0, 0, 0)
+
+		with ent
+			\ManipulateBonePosition(@@BONE_SPINE_ROOT, vecModify + (boneAnimTable[@@BONE_SPINE_ROOT] or emptyVector))
+			\ManipulateBonePosition(@@BONE_SPINE, vecModify2 + (boneAnimTable[@@BONE_SPINE] or emptyVector))
+
 	SlowUpdate: (createModels = CLIENT, ent = @ent, force = false) =>
 		return if not IsValid(ent)
 		return if not ent\IsPony()
@@ -316,13 +348,17 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			\SetBodygroup(@@BODYGROUP_TAIL, @GetData()\GetTailType())
 			\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
 			\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
+
 		if @lastPAC3BoneReset < RealTime()
 			@UpdateTailSize()
 			@UpdateManeSize()
+			@UpdateBack()
+
 		@ApplyRace()
 		if createModels
 			@CreateSocksModelIfNotExists(force) if @GetData()\GetSocksAsModel()
 			@CreateNewSocksModelIfNotExists(force) if @GetData()\GetSocksAsNewModel()
+
 	ApplyBodygroups: (createModels = CLIENT, force = false) =>
 		return unless @isValid
 		return if not IsValid(@ent)
@@ -465,6 +501,8 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	@WING_OPEN_LEFT = 50
 	@WING_OPEN_RIGHT = 51
+
+	@BONE_SPINE = 11
 
 	@BONE_MANE_1 = 40
 	@BONE_MANE_2 = 33
@@ -753,6 +791,7 @@ class NewBodygroupController extends DefaultBodygroupController
 			@ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
 
 		if @lastPAC3BoneReset < RealTime()
+			@UpdateBack()
 			@UpdateTailSize()
 			@UpdateManeSize()
 			@UpdateWings()
@@ -881,6 +920,7 @@ if CLIENT
 	hook.Add 'PPM2.SetupBones', 'PPM2.Bodygroups', (ent, data) ->
 		if bodygroup = data\GetBodygroupController()
 			bodygroup.ent = ent
+			bodygroup\UpdateBack()
 			bodygroup\UpdateTailSize()
 			bodygroup\UpdateManeSize()
 			bodygroup\UpdateWings() if bodygroup.UpdateWings
@@ -893,6 +933,7 @@ if CLIENT
 				if bodygroup = data\GetBodygroupController()
 					bodygroup\ResetTail()
 					bodygroup\ResetMane()
+					bodygroup\ResetBack()
 
 	cvars.AddChangeCallback 'ppm2_sv_allow_resize', ppm2_sv_allow_resize, 'PPM2.Bodygroups'
 else
