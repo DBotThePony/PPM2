@@ -109,8 +109,8 @@ class PonySizeController extends PPM2.ControllerChildren
 	IsNetworked: => @controller\IsNetworked()
 	AllowResize: => not @controller\IsNetworked() or ALLOW_TO_MODIFY_SCALE\GetBool()
 
-	@STEP_SIZE = 18
-	@PONY_HULL = 19
+	@STEP_SIZE = 20
+	@PONY_HULL = 17
 	@HULL_MINS = Vector(-@PONY_HULL, -@PONY_HULL, 0)
 	@HULL_MAXS = Vector(@PONY_HULL, @PONY_HULL, 72 * PPM2.PONY_HEIGHT_MODIFIER)
 	@HULL_MAXS_DUCK = Vector(@PONY_HULL, @PONY_HULL, 36 * PPM2.PONY_HEIGHT_MODIFIER_DUCK_HULL)
