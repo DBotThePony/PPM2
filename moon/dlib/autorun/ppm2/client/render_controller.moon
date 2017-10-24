@@ -207,7 +207,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@legsModel\DrawModel()
 		@GetTextureController()\PostDrawLegs(@legsModel)
 
-		if LEGS_RENDER_TYPE\GetBool() and NABLE_FLASHLIGHT_PASS\GetBool()
+		if LEGS_RENDER_TYPE\GetBool() and ENABLE_FLASHLIGHT_PASS\GetBool()
 			render.PushFlashlightMode(true)
 			@GetTextureController()\PreDrawLegs(@legsModel)
 			if sizes = @GetData()\GetSizeController()

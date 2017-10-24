@@ -848,7 +848,7 @@ PANEL_SETTINGS_BASE = {
 						return if not IsValid(textInput)
 						.OnEnter()
 				table.insert @updateFuncs, -> \SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
-		return textInput
+				return textInput
 	ScrollPanel: =>
 		return @scroll if IsValid(@scroll)
 		@createdPanels += 1

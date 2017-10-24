@@ -182,7 +182,7 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 						.Think = HOVERED_IMAGE_PANEL_THINK
 						.parent = image
 					.OnRemove = -> .hoverPnl\Remove() if IsValid(.hoverPnl)
-		btn
+			btn
 	@scroll\AddItem(btn) for btn in *@buttons
 	@SetVisible(false)
 	@SetMouseInputEnabled(false)
