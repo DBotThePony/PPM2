@@ -1088,6 +1088,12 @@ EditorPages = {
 		'func': (sheet) =>
 			@ScrollPanel()
 			@ComboBox('Eyelashes', 'EyelashType')
+			@ColorBox('Eyelashes Color', 'EyelashesColor')
+
+			if ADVANCED_MODE\GetBool()
+				@CheckBox('Separate Eyelashes Phong', 'SeparateEyelashesPhong')
+				doAddPhongData(@, 'Eyelashes')
+
 			if IS_USING_NEW(@IsNewEditor())
 				@CheckBox('Bat pony ears', 'BatPonyEars')
 				@NumSlider('Bat pony ears', 'BatPonyEarsStrength', 2) if ADVANCED_MODE\GetBool()

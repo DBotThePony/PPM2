@@ -226,6 +226,18 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
+	'eyelash_color': {
+		default: -> Color(0, 0, 0)
+		getFunc: 'EyelashesColor'
+		type: 'COLOR'
+	}
+
+	'eyelashes_phong_separate': {
+		default: -> false
+		getFunc: 'SeparateEyelashesPhong'
+		type: 'BOOLEAN'
+	}
+
 	'fangs': {
 		default: -> false
 		getFunc: 'Fangs'
@@ -1050,7 +1062,7 @@ for i = 1, PPM2.MAX_TATTOOS
 		type: 'COLOR'
 	}
 
-for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes'}
+for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
 	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
 		default: -> 3
 		getFunc: ttype .. 'PhongExponent'

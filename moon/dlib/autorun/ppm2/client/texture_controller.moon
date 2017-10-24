@@ -119,7 +119,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		'SeparateTailPhong': true
 	}
 
-	for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane'}
+	for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
@@ -229,6 +229,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@DelayCompile('CompileBody')
 				@DelayCompile('CompileWings')
 				@DelayCompile('CompileHorn')
+			when 'EyelashesColor'
+				@DelayCompile('CompileEyelashes')
 			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit'
 				@DelayCompile('CompileBody')
 			when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
@@ -528,6 +530,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CompileCMark()
 		@CompileSocks()
 		@CompileNewSocks()
+		@CompileEyelashes()
 		@CompileEye(false)
 		@CompileEye(true)
 		@compiled = true
@@ -590,7 +593,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR1, @GetTailName(1))
 			ent\SetSubMaterial(@@MAT_INDEX_TAIL_COLOR2, @GetTailName(2))
 			ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
-			ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+			ent\SetSubMaterial(@@MAT_INDEX_EYELASHES, @EyelashesName)
 
 		if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
 			render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
@@ -603,7 +606,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR1, @GetTail(1))
 			render.MaterialOverrideByIndex(@@MAT_INDEX_TAIL_COLOR2, @GetTail(2))
 			render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
-			render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+			render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES, @Eyelashes)
 
 	PostDraw: (ent = @ent, drawingNewTask = false) =>
 		return unless @compiled
@@ -764,6 +767,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		table.insert(output, {@BodyMaterial, false, false}) if @BodyMaterial
 		table.insert(output, {@HornMaterial, false, true}) if @HornMaterial and not @GrabData('SeparateHornPhong')
 		table.insert(output, {@WingsMaterial, false, false}) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
+		table.insert(output, {@Eyelashes, false, false}) if @Eyelashes and not @GrabData('SeparateEyelashesPhong')
 		if not @GrabData('SeparateManePhong')
 			table.insert(output, {@HairColor1Material, false, false}) if @HairColor1Material
 			table.insert(output, {@HairColor2Material, false, false}) if @HairColor2Material
@@ -779,6 +783,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		if @GrabData('SeparateHornPhong') and @HornMaterial
 			@ApplyPhongData(@HornMaterial, 'Horn', false, true)
+
+		if @GrabData('SeparateEyelashesPhong') and @Eyelashes
+			@ApplyPhongData(@Eyelashes, 'Eyelashes', false, true)
 
 		if @GrabData('SeparateWingsPhong') and @WingsMaterial
 			@ApplyPhongData(@WingsMaterial, 'Wings')
@@ -1102,6 +1109,46 @@ class PonyTextureController extends PPM2.ControllerChildren
 					tex\SetTexture('$basetexture', texture)
 
 		return @NewSocksColor1, @NewSocksColor2, @NewSocksBase
+
+	CompileEyelashes: =>
+		return unless @isValid
+
+		textureData = {
+			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eyelashes"
+			'shader': 'VertexLitGeneric'
+			'data': {
+				'$basetexture': 'models/debug/debugwhite'
+
+				'$model': '1'
+				'$ambientocclusion': '1'
+				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$phong': '1'
+				'$phongexponent': '6'
+				'$phongboost': '0.1'
+				'$phongalbedotint': '1'
+				'$phongtint': '[1 .95 .95]'
+				'$phongfresnelranges': '[1 5 10]'
+				'$rimlight': '1'
+				'$rimlightexponent': '4.0'
+				'$rimlightboost': '2'
+				'$color': '[1 1 1]'
+				'$color2': '[1 1 1]'
+				'$cloakPassEnabled': '1'
+			}
+		}
+
+		@EyelashesName = '!' .. textureData.name\lower()
+		@Eyelashes = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+
+		@UpdatePhongData()
+
+		{:r, :g, :b} = @GrabData('EyelashesColor')
+		@Eyelashes\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+		@Eyelashes\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+		PPM2.DebugPrint('Compiled new eyelashes texture for ', @ent, ' as part of ', @)
+
+		return @Eyelashes
 
 	CompileSocks: =>
 		return unless @isValid

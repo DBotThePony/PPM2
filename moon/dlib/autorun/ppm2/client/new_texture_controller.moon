@@ -483,7 +483,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			ent\SetSubMaterial(@@MAT_INDEX_HORN, @GetHornName())
 			ent\SetSubMaterial(@@MAT_INDEX_WINGS, @GetWingsName())
 			ent\SetSubMaterial(@@MAT_INDEX_CMARK, @GetCMarkName())
-			ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
+			ent\SetSubMaterial(@@MAT_INDEX_EYELASHES, @EyelashesName)
 			ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
 			ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
 
@@ -497,7 +497,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS, @GetWings())
 			render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
-			render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES)
+			render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES, @Eyelashes)
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT, @GetBatWings())
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
 
