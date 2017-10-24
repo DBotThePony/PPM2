@@ -224,6 +224,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 		return if not @ent
 		key = state\GetKey()
+
+		if key\find('Separate') and key\find('Phong')
+			@UpdatePhongData()
+			return
+
 		switch key
 			when 'BodyColor'
 				@DelayCompile('CompileBody')
