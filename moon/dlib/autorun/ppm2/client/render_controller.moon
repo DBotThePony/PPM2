@@ -293,6 +293,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 	DrawModels: =>
 		@socksModel\DrawModel() if IsValid(@socksModel)
 		@newSocksModel\DrawModel() if IsValid(@newSocksModel)
+
 	HideModels: (status = true) =>
 		return if @hideModels == status
 		@socksModel\SetNoDraw(status) if IsValid(@socksModel)
@@ -416,6 +417,7 @@ class NewPonyRenderController extends PonyRenderController
 		@lowerManeModel\DrawModel() if IsValid(@lowerManeModel)
 		@tailModel\DrawModel() if IsValid(@tailModel)
 		super()
+
 	HideModels: (status = true) =>
 		return if @hideModels == status
 		@upperManeModel\SetNoDraw(status) if IsValid(@upperManeModel)

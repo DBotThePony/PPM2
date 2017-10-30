@@ -221,21 +221,24 @@ MODEL_BOX_PANEL = {
 			render.SetColorModulation(1, 1, 1)
 
 		@buildingModel\DrawModel()
-		@controller\GetRenderController()\DrawModels()
-		@controller\GetRenderController()\HideModels(true) if @controller
-		@controller\GetRenderController()\PreDraw(@model) if @controller
+		ctrl = @controller\GetRenderController()
 
-		@model\PPMBonesModifier()\ResetBones()
-		@model\PPMBonesModifier()\Think()
-		if data = @model\GetPonyData()
-			if bg = data\GetBodygroupController()
-				bg\ApplyBodygroups()
-			if size = data\GetSizeController()
-				size\ModifyNeck()
-				size\ModifyLegs()
-				size\ModifyScale()
+		if bg = @controller\GetBodygroupController()
+			bg\ApplyBodygroups()
+
+		with @model\PPMBonesModifier()
+			\ResetBones()
+			hook.Call('PPM2.SetupBones', nil, @model, @controller)
+			\Think(true)
+
+		with ctrl
+			\DrawModels()
+			\HideModels(true)
+			\PreDraw(@model)
+
 		@model\DrawModel()
-		@controller\GetRenderController()\PostDraw(@model) if @controller
+		ctrl\PostDraw(@model)
+
 		render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
 
 		cam.End3D()
@@ -301,11 +304,16 @@ CALC_VIEW_PANEL = {
 		return hook.Remove('PrePlayerDraw', @) if not @IsValid()
 		return if not @IsVisible()
 		return if ply ~= LocalPlayer()
+
 		if data = ply\GetPonyData()
 			if bg = data\GetBodygroupController()
 				bg\ApplyBodygroups()
-		ply\PPMBonesModifier()\ResetBones()
-		ply\PPMBonesModifier()\Think(true)
+
+			with ply\PPMBonesModifier()
+				\ResetBones()
+				hook.Call('PPM2.SetupBones', nil, StrongEntity(ply), data)
+				\Think(true)
+
 		return
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
@@ -1574,7 +1582,7 @@ createTopButtons = (isNewEditor = false) =>
 
 				confirm = ->
 					@Close()
-					timer.Simple 0.1, PPM2.OpenEditor
+					timer.Simple 0.1, PPM2.OpenOldEditor
 				Derma_Query(
 					'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
 					'Editor restart required',
