@@ -91,17 +91,23 @@ class PonyRenderController extends PPM2.ControllerChildren
 		ctime = CurTime()
 		ply = @ent
 		seq = ply\GetSequence()
-
-		if seq ~= @legSeq
-			@legSeq = seq
-			@legsModel\ResetSequence(seq)
-
-		if @legBGSetup < ctime
-			@legBGSetup = ctime + 1
-			for group in *ply\GetBodyGroups()
-				@legsModel\SetBodygroup(group.id, ply\GetBodygroup(group.id))
+		legsModel = @legsModel
 
 		with @legsModel
+			for boneid = 0, ply\GetBoneCount() - 1
+				\ManipulateBonePosition(0, ply\GetManipulateBonePosition(0))
+				\ManipulateBoneAngles(0, ply\GetManipulateBoneAngles(0))
+				\ManipulateBoneScale(0, ply\GetManipulateBoneScale(0))
+
+			if seq ~= @legSeq
+				@legSeq = seq
+				\ResetSequence(seq)
+
+			if @legBGSetup < ctime
+				@legBGSetup = ctime + 1
+				for group in *ply\GetBodyGroups()
+					\SetBodygroup(group.id, ply\GetBodygroup(group.id))
+
 			\FrameAdvance(ctime - @lastLegUpdate)
 			\SetPlaybackRate(@@LEG_ANIM_SPEED_CONST * ply\GetPlaybackRate())
 			@lastLegUpdate = ctime
@@ -200,10 +206,6 @@ class PonyRenderController extends PPM2.ControllerChildren
 		cam.Start3D() if start3D
 
 		@GetTextureController()\PreDrawLegs(@legsModel)
-		if sizes = @GetData()\GetSizeController()
-			sizes\ModifyNeck(@legsModel)
-			sizes\ModifyLegs(@legsModel)
-			sizes\ModifyScale(@legsModel)
 		@legsModel\DrawModel()
 		@GetTextureController()\PostDrawLegs(@legsModel)
 
@@ -234,10 +236,6 @@ class PonyRenderController extends PPM2.ControllerChildren
 		render.PushCustomClipPlane(@legsClipPlane, @legClipDot)
 
 		@GetTextureController()\PreDrawLegs(@legsModel)
-		if sizes = @GetData()\GetSizeController()
-			sizes\ModifyNeck(@legsModel)
-			sizes\ModifyLegs(@legsModel)
-			sizes\ModifyScale(@legsModel)
 		@legsModel\DrawModel()
 		@GetTextureController()\PostDrawLegs(@legsModel)
 
