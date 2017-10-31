@@ -57,7 +57,7 @@
 -- 39	Tail02
 -- 40	Tail03
 
-USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
+USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
 ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 
 class PonySizeController extends PPM2.ControllerChildren

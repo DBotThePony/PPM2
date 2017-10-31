@@ -27,5 +27,5 @@ util.AddNetworkString('PPM2.RagdollEdit')
 util.AddNetworkString('PPM2.RagdollEditFlex')
 util.AddNetworkString('PPM2.RagdollEditEmote')
 
-CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
+CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
 resource.AddWorkshop('933203381')

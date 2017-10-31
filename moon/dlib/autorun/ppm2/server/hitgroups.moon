@@ -15,14 +15,14 @@
 -- limitations under the License.
 --
 
-ENABLE_SCAILING = CreateConVar('ppm2_sv_dmg', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Enable hitbox damage scailing')
-HEAD = CreateConVar('ppm2_sv_dmg_head', '2', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in head')
-CHEST = CreateConVar('ppm2_sv_dmg_chest', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in chest')
-STOMACH = CreateConVar('ppm2_sv_dmg_stomach', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in stomach')
-LEFTARM = CreateConVar('ppm2_sv_dmg_lfhoof', '0.75', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in left-forward hoof')
-RIGHTARM = CreateConVar('ppm2_sv_dmg_rfhoof', '0.75', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in right-forward hoof')
-LEFTLEG = CreateConVar('ppm2_sv_dmg_lbhoof', '0.75', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in back-forward hoof')
-RIGHTLEG = CreateConVar('ppm2_sv_dmg_rbhoof', '0.75', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in back-forward hoof')
+ENABLE_SCAILING = CreateConVar('ppm2_sv_dmg', '1', {FCVAR_NOTIFY}, 'Enable hitbox damage scailing')
+HEAD = CreateConVar('ppm2_sv_dmg_head', '2', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in head')
+CHEST = CreateConVar('ppm2_sv_dmg_chest', '1', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in chest')
+STOMACH = CreateConVar('ppm2_sv_dmg_stomach', '1', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in stomach')
+LEFTARM = CreateConVar('ppm2_sv_dmg_lfhoof', '0.75', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in left-forward hoof')
+RIGHTARM = CreateConVar('ppm2_sv_dmg_rfhoof', '0.75', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in right-forward hoof')
+LEFTLEG = CreateConVar('ppm2_sv_dmg_lbhoof', '0.75', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in back-forward hoof')
+RIGHTLEG = CreateConVar('ppm2_sv_dmg_rbhoof', '0.75', {FCVAR_NOTIFY}, 'Damage scale when pony-player got shot in back-forward hoof')
 
 sk_player_head = GetConVar('sk_player_head')
 sk_player_chest = GetConVar('sk_player_chest')

@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-PPM2.ALLOW_TO_MODIFY_SCALE = CreateConVar('ppm2_sv_allow_resize', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to resize ponies. Disables resizing completely (visual; mechanical)')
+PPM2.ALLOW_TO_MODIFY_SCALE = CreateConVar('ppm2_sv_allow_resize', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to resize ponies. Disables resizing completely (visual; mechanical)')
 
 player_manager.AddValidModel('pony', 'models/ppm/player_default_base_new.mdl')
 list.Set('PlayerOptionsModel', 'pony', 'models/ppm/player_default_base_new.mdl')

@@ -77,7 +77,7 @@ net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
 	return if not IsValid(ply)
 	ply\SetNWBool('PPM2.InEditor', net.ReadBool())
 
-ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
 
 createPlayerRagdoll = =>
 	@__ppm2_ragdoll\Remove() if IsValid(@__ppm2_ragdoll)
