@@ -236,7 +236,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@DelayCompile('CompileHorn')
 			when 'EyelashesColor'
 				@DelayCompile('CompileEyelashes')
-			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor'
+			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor', 'GlowingEyebrows', 'EyebrowsGlowStrength'
 				@DelayCompile('CompileBody')
 			when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
 				@DelayCompile('CompileCMark')
@@ -914,6 +914,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			@StartRT("Body_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize)
 			surface.SetDrawColor(255, 255, 255)
+
+			if @GrabData('GlowingEyebrows')
+				surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyebrowsGlowStrength'))
+				surface.SetMaterial(_M.EYEBROWS)
+				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
 			for i = 1, PPM2.MAX_TATTOOS
 				if not @GrabData("TattooOverDetail#{i}")

@@ -1100,6 +1100,9 @@ EditorPages = {
 			@ColorBox('Eyebrows Color', 'EyebrowsColor')
 
 			if ADVANCED_MODE\GetBool()
+				@CheckBox('Glowing eyebrows', 'GlowingEyebrows')
+				@NumSlider('Glow strength', 'EyebrowsGlowStrength', 2)
+
 				@CheckBox('Separate Eyelashes Phong', 'SeparateEyelashesPhong')
 				doAddPhongData(@, 'Eyelashes')
 

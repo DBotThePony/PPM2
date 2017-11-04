@@ -280,6 +280,20 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
+	'eyebrows_glow': {
+		default: -> false
+		getFunc: 'GlowingEyebrows'
+		type: 'BOOLEAN'
+	}
+
+	'eyebrows_glow_strength': {
+		default: -> 1
+		getFunc: 'EyebrowsGlowStrength'
+		type: 'FLOAT'
+		min: 0
+		max: 1
+	}
+
 	'horn_color': {
 		default: -> Color(255, 255, 255)
 		getFunc: 'HornColor'
