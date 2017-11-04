@@ -236,7 +236,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@DelayCompile('CompileHorn')
 			when 'EyelashesColor'
 				@DelayCompile('CompileEyelashes')
-			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit'
+			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor'
 				@DelayCompile('CompileBody')
 			when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
 				@DelayCompile('CompileCMark')
@@ -857,7 +857,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('BodyColor')
 			@StartRT("Body_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, r, g, b)
 
-			surface.SetMaterial(@@BODY_MATERIAL)
+			surface.DrawRect(0, 0, bodysize, bodysize)
+
+			surface.SetDrawColor(@GrabData('EyebrowsColor'))
+			surface.SetMaterial(_M.EYEBROWS)
 			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
 			if not @GrabData('LipsColorInherit')

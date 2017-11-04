@@ -1097,6 +1097,7 @@ EditorPages = {
 			@ScrollPanel()
 			@ComboBox('Eyelashes', 'EyelashType')
 			@ColorBox('Eyelashes Color', 'EyelashesColor')
+			@ColorBox('Eyebrows Color', 'EyebrowsColor')
 
 			if ADVANCED_MODE\GetBool()
 				@CheckBox('Separate Eyelashes Phong', 'SeparateEyelashesPhong')

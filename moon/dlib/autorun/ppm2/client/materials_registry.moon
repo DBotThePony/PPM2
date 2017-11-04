@@ -238,6 +238,7 @@ module.EYE_LINE_L_1 = Material('models/ppm/partrender/eye_line_l1.png')
 module.EYE_LINE_R_1 = Material('models/ppm/partrender/eye_line_r1.png')
 module.EYE_LINE_L_2 = Material('models/ppm/partrender/eye_line_l2.png')
 module.EYE_LINE_R_2 = Material('models/ppm/partrender/eye_line_r2.png')
+module.EYEBROWS = Material('models/ppm/partrender/eyebrows.png')
 module.PONY_SOCKS = Material('models/ppm/texclothes/pony_socks.png')
 
 module.LIPS = Material('models/ppm/partrender/lips.png')

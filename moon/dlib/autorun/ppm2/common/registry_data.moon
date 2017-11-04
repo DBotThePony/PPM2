@@ -274,6 +274,12 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
+	'eyebrows': {
+		default: -> Color(0, 0, 0)
+		getFunc: 'EyebrowsColor'
+		type: 'COLOR'
+	}
+
 	'horn_color': {
 		default: -> Color(255, 255, 255)
 		getFunc: 'HornColor'
