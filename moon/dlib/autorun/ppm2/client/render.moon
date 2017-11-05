@@ -68,12 +68,15 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
 		for ply in *player.GetAll()
 			if not IsDormant(ply)
-				data = GetPonyData(ply)
-				if data
-					renderController = data\GetRenderController()
-					if renderController
-						renderController\PreDraw()
-						table.insert(MARKED_FOR_DRAW, renderController)
+				p = IsPony(ply)
+				ply.__cachedIsPony = p
+				if p
+					data = GetPonyData(ply)
+					if data
+						renderController = data\GetRenderController()
+						if renderController
+							renderController\PreDraw()
+							table.insert(MARKED_FOR_DRAW, renderController)
 
 	if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
 		with LocalPlayer()
