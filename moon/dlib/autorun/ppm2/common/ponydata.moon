@@ -101,6 +101,7 @@ class NetworkedPonyData extends DLib.NetworkedData
 		return unless IsValid(ent)
 		@modelCached = ent\GetModel()
 		@ent = ent
+		ent\PPMBonesModifier()
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
 		@lastLerpThink = RealTime()
