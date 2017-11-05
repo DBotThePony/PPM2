@@ -131,6 +131,11 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
 	if ENABLE_NEW_RAGDOLLS\GetBool() and @IsPony()
 		createPlayerRagdoll(@)
 
+hook.Add 'PlayerDeath', 'PPM2.Hooks', =>
+	return if not @GetPonyData()
+	if ENABLE_NEW_RAGDOLLS\GetBool() and @IsPony()
+		createPlayerRagdoll(@)
+
 hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
 	return if @IsPlayer()
 	return if not @GetPonyData()
