@@ -15,6 +15,10 @@
 -- limitations under the License.
 --
 
+import FrameNumber, RealTime, StrongEntity, PPM2 from _G
+import ALTERNATIVE_RENDER from PPM2
+import GetPonyData, IsDormant, PPMBonesModifier, IsPony from FindMetaTable('Entity')
+
 RENDER_HORN_GLOW = CreateConVar('ppm2_horn_glow', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn glow when player uses physgun')
 HORN_PARTICLES = CreateConVar('ppm2_horn_particles', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn particles when player uses physgun')
 HORN_FP = CreateConVar('ppm2_horn_firstperson', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn effetcs in first person')
@@ -54,10 +58,23 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 	arms.__ppm2_draw = false
 
 IN_DRAW = false
+MARKED_FOR_DRAW = {}
 
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
-	return if IN_DRAW
-	return if PPM2.__RENDERING_REFLECTIONS
+	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
+
+	MARKED_FOR_DRAW = {}
+
+	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
+		for ply in *player.GetAll()
+			if not IsDormant(ply)
+				data = GetPonyData(ply)
+				if data
+					renderController = data\GetRenderController()
+					if renderController
+						renderController\PreDraw()
+						table.insert(MARKED_FOR_DRAW, renderController)
+
 	if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
 		with LocalPlayer()
 			if .__cachedIsPony and \Alive()
@@ -76,29 +93,14 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					data\GetRenderController()\DrawLegs()
 					IN_DRAW = false
 
-Think = ->
-	if TASK_RENDER_TYPE\GetBool()
-		for task in *PPM2.NetworkedPonyData.RenderTasks
-			ent = task.ent
-			if IsValid(ent) and ent.__cachedIsPony
-				if ent.__ppm2_task_hit
-					ent.__ppm2_task_hit = false
-					ent\SetNoDraw(false)
-
-				if not ent.__ppm2RenderOverride
-					ent = ent\GetEntity()
-					ent.__ppm2_oldRenderOverride = ent.RenderOverride
-					ent.__ppm2RenderOverride = ->
-						renderController = task\GetRenderController()
-						renderController\PreDraw(ent, true)
-						ent\DrawModel()
-						renderController\PostDraw(ent, true)
-						ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
-					ent.RenderOverride = ent.__ppm2RenderOverride
+PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
+	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
+		for draw in *MARKED_FOR_DRAW
+			draw\PostDraw()
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
-	return if IN_DRAW
-	return if PPM2.__RENDERING_REFLECTIONS
+	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
+
 	if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
 		with LocalPlayer()
 			if .__cachedIsPony and \Alive()
@@ -154,32 +156,52 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					data\GetRenderController()\DrawLegs()
 					IN_DRAW = false
 
+Think = ->
+	if TASK_RENDER_TYPE\GetBool()
+		for task in *PPM2.NetworkedPonyData.RenderTasks
+			ent = task.ent
+			if IsValid(ent) and ent.__cachedIsPony
+				if ent.__ppm2_task_hit
+					ent.__ppm2_task_hit = false
+					ent\SetNoDraw(false)
+
+				if not ent.__ppm2RenderOverride
+					ent = ent\GetEntity()
+					ent.__ppm2_oldRenderOverride = ent.RenderOverride
+					ent.__ppm2RenderOverride = ->
+						renderController = task\GetRenderController()
+						renderController\PreDraw(ent, true)
+						ent\DrawModel()
+						renderController\PostDraw(ent, true)
+						ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
+					ent.RenderOverride = ent.__ppm2RenderOverride
+
 PPM2.PrePlayerDraw = =>
-	return if PPM2.__RENDERING_REFLECTIONS
-	return unless @GetPonyData()
-	@__cachedIsPony = @IsPony()
-	return if not @__cachedIsPony
-	return if @__ppm2_last_draw == FrameNumber()
-	@__ppm2_last_draw = FrameNumber()
-	return if @IsDormant()
-	@__ppm2_last_dead = @__ppm2_last_dead or 0
-	return if @__ppm2_last_dead > RealTime()
-	bones = @PPMBonesModifier()
-	data = @GetPonyData()
-	if data and bones.callFrame ~= FrameNumber() and (not bones.pac3Last or bones.pac3Last < RealTime())
-		bones\ResetBones()
-		hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-		bones\Think()
-	renderController = data\GetRenderController()
-	status = renderController\PreDraw() if renderController
+	return if not ALTERNATIVE_RENDER\GetBool() or PPM2.__RENDERING_REFLECTIONS
+	with data = GetPonyData(@)
+		return if not data
+		@__cachedIsPony = IsPony(@)
+		return if not @__cachedIsPony
+		f = FrameNumber()
+		return if @__ppm2_last_draw == f
+		@__ppm2_last_draw = f
+		return if IsDormant(@)
+		@__ppm2_last_dead = @__ppm2_last_dead or 0
+		return if @__ppm2_last_dead > RealTime()
+		bones = PPMBonesModifier(@)
+		if data and bones.callFrame ~= FrameNumber() and (not bones.pac3Last or bones.pac3Last < RealTime())
+			bones\ResetBones()
+			hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
+			bones\Think()
+		renderController = data\GetRenderController()
+		status = renderController\PreDraw() if renderController
 
 PPM2.PostPlayerDraw = =>
-	return if PPM2.__RENDERING_REFLECTIONS
-	return unless @GetPonyData()
-	return unless @__cachedIsPony
-	data = @GetPonyData()
-	renderController = data\GetRenderController()
-	renderController\PostDraw() if renderController
+	return if not ALTERNATIVE_RENDER\GetBool() or PPM2.__RENDERING_REFLECTIONS
+	with data = GetPonyData(@)
+		return if not data or not @__cachedIsPony
+		renderController = data\GetRenderController()
+		renderController\PostDraw() if renderController
 
 do
 	hornGlowStatus = {}
@@ -310,3 +332,4 @@ hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
 hook.Add 'Think', 'PPM2.UpdateRenderTasks', Think, 2
 hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, 2
+hook.Add 'PostDrawTranslucentRenderables', 'PPM2.PostDrawTranslucentRenderables', PPM2.PostDrawTranslucentRenderables, 2

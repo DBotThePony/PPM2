@@ -44,7 +44,6 @@ DLib.manifest({
 		'client/materials_registry.lua'
 		'client/texture_controller.lua'
 		'client/new_texture_controller.lua'
-		'client/render.lua'
 		'client/hooks.lua'
 		'client/functions.lua'
 		'client/render_controller.lua'
@@ -52,6 +51,7 @@ DLib.manifest({
 		'client/player_menu.lua'
 		'client/editor.lua'
 		'client/rag_edit.lua'
+		'client/render.lua'
 	}
 
 	server: {

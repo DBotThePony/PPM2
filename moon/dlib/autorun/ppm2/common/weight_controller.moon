@@ -17,6 +17,9 @@
 
 -- it is defined shared, but used clientside only
 
+import PPM2 from _G
+import ManipulateBoneScale, GetManipulateBoneScale from FindMetaTable('Entity')
+
 -- 0	LrigPelvis
 -- 1	LrigSpine1
 -- 2	LrigSpine2
@@ -95,9 +98,8 @@ class PonyWeightController extends PPM2.ControllerChildren
 	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
 
 	DataChanges: (state) =>
-		return if not IsValid(@ent)
+		return if not IsValid(ent) or not @isValid
 		return if state\GetKey() ~= 'Weight'
-		return if not @isValid
 		@SetWeight(state\GetValue())
 		@UpdateWeight()
 
@@ -106,19 +108,19 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
 	ResetBones: (ent = @ent) =>
-		return if not IsValid(ent)
-		return if not @isValid
+		return if not IsValid(ent) or not @isValid
+		ent = ent\GetEntity()
 		for {:id} in *@@WEIGHT_BONES
-			ent\ManipulateBoneScale(id, @@DEFAULT_BONE_SIZE)
+			ManipulateBoneScale(ent, id, @@DEFAULT_BONE_SIZE)
 	Reset: => @ResetBones()
 	UpdateWeight: (ent = @ent) =>
-		return if not IsValid(ent)
-		return if not @isValid
+		return if not IsValid(ent) or not @isValid
+		ent = ent\GetEntity()
 		@ResetBones(ent)
 		return if not @ent\IsPony()
 		for {:id, :scale} in *@@WEIGHT_BONES
 			delta = (@weight - 1) * scale
-			ent\ManipulateBoneScale(id, Vector(delta, delta, delta) + ent\GetManipulateBoneScale(id))
+			ManipulateBoneScale(ent, id, Vector(delta, delta, delta) + GetManipulateBoneScale(ent, id))
 	Remove: =>
 		@isValid = false
 
