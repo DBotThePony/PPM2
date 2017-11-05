@@ -235,11 +235,11 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 			if not obj\IsValid()
 				oldObjects = @OBJECTS
 				@OBJECTS = {}
-				for obj in *oldObjects
-					if obj\IsValid()
-						table.insert(@OBJECTS, obj)
+				for obj2 in *oldObjects
+					if obj2\IsValid()
+						table.insert(@OBJECTS, obj2)
 					else
-						lent = obj.ent
+						lent = obj2.ent
 						if IsValid(lent)
 							lent.__ppmBonesModifiers = nil
 				return

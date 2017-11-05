@@ -351,11 +351,6 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			\SetBodygroup(@@BODYGROUP_EYELASH, @GetData()\GetEyelashType())
 			\SetBodygroup(@@BODYGROUP_GENDER, @GetData()\GetGender())
 
-		if @lastPAC3BoneReset < RealTime()
-			@UpdateTailSize()
-			@UpdateManeSize()
-			@UpdateBack()
-
 		@ApplyRace()
 		if createModels
 			@CreateSocksModelIfNotExists(force) if @GetData()\GetSocksAsModel()
@@ -791,13 +786,6 @@ class NewBodygroupController extends DefaultBodygroupController
 		else
 			@ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
 			@ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
-
-		if @lastPAC3BoneReset < RealTime()
-			@UpdateBack()
-			@UpdateTailSize()
-			@UpdateManeSize()
-			@UpdateWings()
-			@UpdateEars()
 
 		@ApplyRace()
 		if createModels
