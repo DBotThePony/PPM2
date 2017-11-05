@@ -233,8 +233,17 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 		rtime = RealTime()
 		for obj in *@OBJECTS
 			if not obj\IsValid()
-				@OBJECTS = [obj for obj in *@OBJECTS when obj\IsValid()]
+				oldObjects = @OBJECTS
+				@OBJECTS = {}
+				for obj in *oldObjects
+					if obj\IsValid()
+						table.insert(@OBJECTS, obj)
+					else
+						lent = obj.ent
+						if IsValid(lent)
+							lent.__ppmBonesModifiers = nil
 				return
+
 			if obj.callFrame ~= frame and (not obj.pac3Last or obj.pac3Last < rtime) and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
 				resetBones(obj.ent)
 				data = obj.ent\GetPonyData()
