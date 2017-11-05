@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+import PPM2, ents, LocalPlayer, SERVER, NULL, CLIENT from _G
+
 ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 
 TRACKED_ENTS = {}
