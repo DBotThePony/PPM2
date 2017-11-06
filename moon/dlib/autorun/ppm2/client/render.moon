@@ -65,7 +65,7 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 	MARKED_FOR_DRAW = {}
 
-	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
+	if not ALTERNATIVE_RENDER\GetBool()
 		for ply in *player.GetAll()
 			if not IsDormant(ply)
 				p = IsPony(ply)
@@ -330,9 +330,9 @@ do
 					.maxs = center + (maxs - center) * 1.2
 		return false if HORN_HIDE_BEAM\GetBool() and IsValid(target)
 
-hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, 2
-hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, 2
-hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, 2
-hook.Add 'Think', 'PPM2.UpdateRenderTasks', Think, 2
-hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, 2
-hook.Add 'PostDrawTranslucentRenderables', 'PPM2.PostDrawTranslucentRenderables', PPM2.PostDrawTranslucentRenderables, 2
+hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, -2
+hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, -2
+hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, -2
+hook.Add 'Think', 'PPM2.UpdateRenderTasks', Think, -2
+hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, -2
+hook.Add 'PostDrawTranslucentRenderables', 'PPM2.PostDrawTranslucentRenderables', PPM2.PostDrawTranslucentRenderables, -2
