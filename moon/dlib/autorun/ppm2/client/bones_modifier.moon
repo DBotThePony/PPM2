@@ -231,7 +231,6 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 	@SequenceObject = BonesSequence
 
 	PreDrawOpaqueRenderables = (a, b) ->
-		--return if a or b
 		frame = FrameNumber()
 		rtime = RealTime()
 		for obj in *@OBJECTS
