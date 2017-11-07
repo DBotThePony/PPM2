@@ -105,6 +105,9 @@ resetBones = (ent) ->
 		ent\ManipulateBoneScale(i, RESET_BONE_SCALE)
 		ent\ManipulateBoneAngles(i, RESET_BONE_ANGLES)
 
+for ent in *ents.GetAll()
+	ent.__ppmBonesModifiers = nil
+
 class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 	@OBJECTS = {}
 	@resetBones = resetBones
@@ -228,7 +231,7 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 	@SequenceObject = BonesSequence
 
 	PreDrawOpaqueRenderables = (a, b) ->
-		return if a or b
+		--return if a or b
 		frame = FrameNumber()
 		rtime = RealTime()
 		for obj in *@OBJECTS
@@ -321,11 +324,13 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 
 with FindMetaTable('Entity')
 	.PPMBonesModifier = =>
-		return @__ppmBonesModifiers if IsValid(@__ppmBonesModifiers)
-		@__ppmBonesModifiers = PPM2.EntityBonesModifier(@)
-		@__ppmBonesModifiers.ent = @
-		@__ppmBonesModifiers\Setup(@) if @__ppmBonesModifiers.lastModel ~= @GetModel()
-		return @__ppmBonesModifiers
+		with t = .GetTable(@)
+			return if not t
+			return .__ppmBonesModifiers if IsValid(.__ppmBonesModifiers)
+			.__ppmBonesModifiers = PPM2.EntityBonesModifier(@)
+			.__ppmBonesModifiers.ent = @
+			.__ppmBonesModifiers\Setup(@) if .__ppmBonesModifiers.lastModel ~= @GetModel()
+			return .__ppmBonesModifiers
 
 hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 	data = @GetPonyData()
