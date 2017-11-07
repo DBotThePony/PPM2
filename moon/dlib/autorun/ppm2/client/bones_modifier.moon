@@ -227,7 +227,7 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 
 	@SequenceObject = BonesSequence
 
-	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', (a, b) ->
+	PreDrawOpaqueRenderables = (a, b) ->
 		return if a or b
 		frame = FrameNumber()
 		rtime = RealTime()
@@ -249,6 +249,8 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 				data = obj.ent\GetPonyData()
 				hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
 				obj\Think()
+
+	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -2
 
 	new: (ent = NULL) =>
 		super()
