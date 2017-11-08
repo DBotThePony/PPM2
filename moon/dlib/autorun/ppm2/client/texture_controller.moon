@@ -57,14 +57,36 @@ hook.Add 'DrawOverlay', 'PPM2.ReflectionsUpdate', (a, b) ->
 	PPM2.__RENDERING_REFLECTIONS = false
 	reflectTasks = {}
 
-hook.Add 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PreDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PostDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
-hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -1
+hook.Add 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PreDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PostDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+
+mat_picmip = GetConVar('mat_picmip')
+
+PPM2.GetTextureQuality = ->
+	mult = 1
+
+	switch math.Clamp(mat_picmip\GetInt(), -2, 2)
+		when -2
+			mult *= 2
+		when -1
+			mult *= 1
+		when 0
+			mult *= 0.75
+		when 1
+			mult *= 0.5
+		when 2
+			mult *= 0.25
+
+	if USE_HIGHRES_TEXTURES\GetBool()
+		mult *= 2
+
+	return mult
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
@@ -545,7 +567,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
 		--render.SetViewPort(0, 0, texSize, texSize)
-		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{name}", texSize, texSize, false)
+		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, false)
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
@@ -675,39 +697,18 @@ class PonyTextureController extends PPM2.ControllerChildren
 		socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
 	@QUAD_SIZE_EYES = 256
-	@QUAD_SIZE_EYES_HIRES = 1024
-
 	@QUAD_SIZE_SOCKS = 512
-	@QUAD_SIZE_SOCKS_HIRES = 1024
-
 	@QUAD_SIZE_CMARK = 256
-	@QUAD_SIZE_CMARK_HIRES = 1024
-
 	@QUAD_SIZE_WING = 128
-	@QUAD_SIZE_WING_HIRES = 256
-
 	@QUAD_SIZE_HORN = 256
-	@QUAD_SIZE_HORN_HIRES = 512
-
 	@QUAD_SIZE_HAIR = 256
-	@QUAD_SIZE_HAIR_HIRES = 512
-
 	@QUAD_SIZE_TAIL = 256
-	@QUAD_SIZE_TAIL_HIRES = 512
-
 	@QUAD_SIZE_CONST = 512
-	@QUAD_SIZE_CONST_HIRES = 1024
-
 	@QUAD_SIZE_BODY = 1024
-	@QUAD_SIZE_BODY_HIRES = 2048
-	@QUAD_SIZE_BODY_HIRES2 = 4096
-
 	@TATTOO_DEF_SIZE = 128
-	@TATTOO_MEDIUM_SIZE = 256
-	@TATTOO_BIG_SIZE = 512
 
-	@GetTextureSize = => USE_HIGHRES_TEXTURES\GetBool() and @QUAD_SIZE_CONST_HIRES or @QUAD_SIZE_CONST
-	@GetBodySize = => USE_HIGHRES_BODY\GetBool() and @QUAD_SIZE_BODY_HIRES2 or USE_HIGHRES_TEXTURES\GetBool() and @QUAD_SIZE_BODY_HIRES or @QUAD_SIZE_BODY
+	@GetTextureSize = => @QUAD_SIZE_CONST * PPM2.GetTextureQuality()
+	@GetBodySize = => @QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1) * PPM2.GetTextureQuality()
 
 	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@GetBodySize()) =>
 		mat = _M.TATTOOS[@GrabData("TattooType#{index}")]
@@ -725,7 +726,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			else
 				surface.SetDrawColor(0, 0, 0)
 		surface.SetMaterial(mat)
-		tSize = USE_HIGHRES_BODY\GetBool() and @@TATTOO_BIG_SIZE or USE_HIGHRES_TEXTURES\GetBool() and @@TATTOO_MEDIUM_SIZE or @@TATTOO_DEF_SIZE
+		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1) * PPM2.GetTextureQuality()
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
@@ -855,7 +856,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		continueCompilation = ->
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('BodyColor')
-			@StartRT("Body_rt_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize, r, g, b)
+			@StartRT("Body_rt", bodysize, r, g, b)
 
 			surface.DrawRect(0, 0, bodysize, bodysize)
 
@@ -986,7 +987,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HORN_HIRES or @@QUAD_SIZE_HORN
+		texSize = @@QUAD_SIZE_HORN * PPM2.GetTextureQuality()
 		urlTextures = {}
 		left = 0
 
@@ -1192,7 +1193,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@SocksMaterialName = "!#{textureData.name\lower()}"
 		@SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_SOCKS_HIRES or @@QUAD_SIZE_SOCKS
+		texSize = @@QUAD_SIZE_SOCKS * PPM2.GetTextureQuality()
 
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
@@ -1251,7 +1252,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_WING_HIRES or @@QUAD_SIZE_WING
+		texSize = @@QUAD_SIZE_WING * PPM2.GetTextureQuality()
 
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
@@ -1330,7 +1331,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_HAIR_HIRES or @@QUAD_SIZE_HAIR
+		texSize = @@QUAD_SIZE_HAIR * PPM2.GetTextureQuality()
 
 		urlTextures = {}
 		left = 0
@@ -1434,7 +1435,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_TAIL_HIRES or @@QUAD_SIZE_TAIL
+		texSize = @@QUAD_SIZE_TAIL * PPM2.GetTextureQuality()
 
 		urlTextures = {}
 		left = 0
@@ -1576,7 +1577,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		oldW, oldH = ScrW(), ScrH()
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
+		texSize = @@QUAD_SIZE_EYES * PPM2.GetTextureQuality()
 		render.SetViewPort(0, 0, texSize, texSize)
 
 		surface.DisableClipping(true)
@@ -1665,7 +1666,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_EYES_HIRES or @@QUAD_SIZE_EYES
+		texSize = @@QUAD_SIZE_EYES * PPM2.GetTextureQuality()
 
 		shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
 		shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
@@ -1818,7 +1819,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
 
-		texSize = USE_HIGHRES_TEXTURES\GetBool() and @@QUAD_SIZE_CMARK_HIRES or @@QUAD_SIZE_CMARK
+		texSize = @@QUAD_SIZE_CMARK * PPM2.GetTextureQuality()
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
