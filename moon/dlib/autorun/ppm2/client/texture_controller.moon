@@ -562,19 +562,31 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CompileEye(true)
 		@compiled = true
 
+	@RT_SIZES = [math.pow(2, i) for i = 1, 24]
+
 	StartRT: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
-		--render.SetViewPort(0, 0, texSize, texSize)
-		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, false)
+
+		delta = 9999
+		nsize = texSize
+
+		for size in *@@RT_SIZES
+			ndelta = math.abs(size - texSize)
+			if ndelta < delta
+				delta = ndelta
+				nsize = size
+
+		--render.SetViewPort(0, 0, nsize, nsize)
+		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", nsize, nsize, false)
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
 		cam.Start2D()
 		surface.SetDrawColor(r, g, b, a)
-		surface.DrawRect(0, 0, texSize, texSize)
+		surface.DrawRect(0, 0, nsize, nsize)
 		@currentRT = rt
 		return rt
 
