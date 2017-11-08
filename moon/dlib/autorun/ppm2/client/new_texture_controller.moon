@@ -134,7 +134,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_HAIR * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
 
 		urlTextures = {}
 		left = 0
@@ -248,7 +248,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_WING * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
@@ -310,7 +310,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_WING * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')

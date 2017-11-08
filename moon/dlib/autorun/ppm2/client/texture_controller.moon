@@ -67,6 +67,7 @@ hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return f
 hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
 
 mat_picmip = GetConVar('mat_picmip')
+RT_SIZES = [math.pow(2, i) for i = 1, 24]
 
 PPM2.GetTextureQuality = ->
 	mult = 1
@@ -74,8 +75,6 @@ PPM2.GetTextureQuality = ->
 	switch math.Clamp(mat_picmip\GetInt(), -2, 2)
 		when -2
 			mult *= 2
-		when -1
-			mult *= 1
 		when 0
 			mult *= 0.75
 		when 1
@@ -87,6 +86,19 @@ PPM2.GetTextureQuality = ->
 		mult *= 2
 
 	return mult
+
+PPM2.GetTextureSize = (texSize) ->
+	texSize *= PPM2.GetTextureQuality(texSize)
+	delta = 9999
+	nsize = texSize
+
+	for size in *RT_SIZES
+		ndelta = math.abs(size - texSize)
+		if ndelta < delta
+			delta = ndelta
+			nsize = size
+
+	return nsize
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
@@ -289,7 +301,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@URL_MATERIAL_CACHE = {}
 	@ALREADY_DOWNLOADING = {}
 	@FAILED_TO_DOWNLOAD = {}
-	@LoadURL: (url, width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST, callback = (->)) =>
+	@LoadURL: (url, width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST), callback = (->)) =>
 		error('Must specify URL') if not url or url == ''
 		@URL_MATERIAL_CACHE[width] = @URL_MATERIAL_CACHE[width] or {}
 		@URL_MATERIAL_CACHE[width][height] = @URL_MATERIAL_CACHE[width][height] or {}
@@ -312,7 +324,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@ALREADY_DOWNLOADING[width][height][url] = true
 		table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}, timeouts: 0})
 		--PPM2.Message 'Queuing to download ', url
-	@BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = @QUAD_SIZE_CONST, height = @QUAD_SIZE_CONST) =>
+	@BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST)) =>
 		url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
 		return "<html>
 					<head>
@@ -562,31 +574,31 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CompileEye(true)
 		@compiled = true
 
-	@RT_SIZES = [math.pow(2, i) for i = 1, 24]
+	--@RT_SIZES = [math.pow(2, i) for i = 1, 24]
 
 	StartRT: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
 
-		delta = 9999
-		nsize = texSize
+		--delta = 9999
+		--nsize = texSize
 
-		for size in *@@RT_SIZES
-			ndelta = math.abs(size - texSize)
-			if ndelta < delta
-				delta = ndelta
-				nsize = size
+		--for size in *@@RT_SIZES
+		--	ndelta = math.abs(size - texSize)
+		--	if ndelta < delta
+		--		delta = ndelta
+		--		nsize = size
 
-		--render.SetViewPort(0, 0, nsize, nsize)
-		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", nsize, nsize, false)
+		--render.SetViewPort(0, 0, texSize, texSize)
+		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, false)
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
 		cam.Start2D()
 		surface.SetDrawColor(r, g, b, a)
-		surface.DrawRect(0, 0, nsize, nsize)
+		surface.DrawRect(0, 0, texSize, texSize)
 		@currentRT = rt
 		return rt
 
@@ -711,6 +723,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_EYES = 512
 	@QUAD_SIZE_SOCKS = 256
 	@QUAD_SIZE_CMARK = 512
+	@QUAD_SIZE_CONST = 512
 	@QUAD_SIZE_WING = 64
 	@QUAD_SIZE_HORN = 128
 	@QUAD_SIZE_HAIR = 256
@@ -718,7 +731,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_BODY = 1024
 	@TATTOO_DEF_SIZE = 128
 
-	@GetBodySize = => @QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1) * PPM2.GetTextureQuality()
+	@GetBodySize = => PPM2.GetTextureSize(@QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1))
 
 	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@GetBodySize()) =>
 		mat = _M.TATTOOS[@GrabData("TattooType#{index}")]
@@ -997,7 +1010,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = @@QUAD_SIZE_HORN * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HORN)
 		urlTextures = {}
 		left = 0
 
@@ -1203,7 +1216,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@SocksMaterialName = "!#{textureData.name\lower()}"
 		@SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_SOCKS * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_SOCKS)
 
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
@@ -1262,7 +1275,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
-		texSize = @@QUAD_SIZE_WING * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
@@ -1341,7 +1354,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_HAIR * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
 
 		urlTextures = {}
 		left = 0
@@ -1445,7 +1458,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_TAIL * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_TAIL)
 
 		urlTextures = {}
 		left = 0
@@ -1587,7 +1600,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		oldW, oldH = ScrW(), ScrH()
 
-		texSize = @@QUAD_SIZE_EYES * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
 		render.SetViewPort(0, 0, texSize, texSize)
 
 		surface.DisableClipping(true)
@@ -1676,7 +1689,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1 if IsValid(@ent) and @ent\IsRagdoll()
 
-		texSize = @@QUAD_SIZE_EYES * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
 
 		shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
 		shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
@@ -1829,7 +1842,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
 
-		texSize = @@QUAD_SIZE_CMARK * PPM2.GetTextureQuality()
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_CMARK)
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
