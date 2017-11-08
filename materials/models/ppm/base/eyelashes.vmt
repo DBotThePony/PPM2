@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/ppm2/base/eyelashes"
+	"$basetexture" "models/ppm/base/eyelashes" 
 
 	"$model" "1"
 	"$phong" "1"

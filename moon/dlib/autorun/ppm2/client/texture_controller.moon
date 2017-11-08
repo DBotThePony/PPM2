@@ -16,17 +16,17 @@
 --
 
 -- Texture indexes (-1)
--- 1    =   models/ppm/base/eye_l
--- 2    =   models/ppm/base/eye_r
--- 3    =   models/ppm/base/body
--- 4    =   models/ppm/base/horn
--- 5    =   models/ppm/base/wings
--- 6    =   models/ppm/base/hair_color_1
--- 7    =   models/ppm/base/hair_color_2
--- 8    =   models/ppm/base/tail_color_1
--- 9    =   models/ppm/base/tail_color_2
--- 10   =   models/ppm/base/cmark
--- 11   =   models/ppm/base/eyelashes
+-- 1    =   models/ppm2/base/eye_l
+-- 2    =   models/ppm2/base/eye_r
+-- 3    =   models/ppm2/base/body
+-- 4    =   models/ppm2/base/horn
+-- 5    =   models/ppm2/base/wings
+-- 6    =   models/ppm2/base/hair_color_1
+-- 7    =   models/ppm2/base/hair_color_2
+-- 8    =   models/ppm2/base/tail_color_1
+-- 9    =   models/ppm2/base/tail_color_2
+-- 10   =   models/ppm2/base/cmark
+-- 11   =   models/ppm2/base/eyelashes
 
 _M = PPM2.MaterialsRegistry
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
@@ -423,7 +423,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			panel\Remove()
 			if data.timeouts >= 4
 				newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
-					'$basetexture': 'models/ppm/partrender/null'
+					'$basetexture': 'models/ppm2/partrender/null'
 					'$ignorez': 1
 					'$vertexcolor': 1
 					'$vertexalpha': 1
@@ -836,11 +836,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body"
 			'shader': 'VertexLitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm/base/body'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$basetexture': 'models/ppm2/base/body'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$selfillum': '1'
-				'$selfillummask': 'models/ppm/partrender/null'
+				'$selfillummask': 'models/ppm2/partrender/null'
 
 				'$color': '{255 255 255}'
 				'$color2': '{255 255 255}'
@@ -979,10 +979,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn"
 			'shader': 'VertexLitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm/base/horn'
-				'$bumpmap': 'models/ppm/base/horn_normal'
+				'$basetexture': 'models/ppm2/base/horn'
+				'$bumpmap': 'models/ppm2/base/horn_normal'
 				'$selfillum': '1'
-				'$selfillummask': 'models/ppm/partrender/null'
+				'$selfillummask': 'models/ppm2/partrender/null'
 
 				'$model': '1'
 				'$phong': '1'
@@ -1067,7 +1067,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			'$model': '1'
 			'$ambientocclusion': '1'
-			'$lightwarptexture': 'models/ppm/base/lightwrap'
+			'$lightwarptexture': 'models/ppm2/base/lightwrap'
 			'$phong': '1'
 			'$phongexponent': '6'
 			'$phongboost': '0.1'
@@ -1145,7 +1145,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 				'$model': '1'
 				'$ambientocclusion': '1'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.1'
@@ -1184,7 +1184,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 				'$model': '1'
 				'$ambientocclusion': '1'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.1'
@@ -1311,7 +1311,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
@@ -1415,7 +1415,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
@@ -1686,13 +1686,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
 			'shader': EyeRefract and 'EyeRefract' or 'Eyes'
 			'data': {
-				'$iris': 'models/ppm/base/face/p_base'
+				'$iris': 'models/ppm2/base/face/p_base'
 				'$irisframe': '0'
 
-				'$ambientoccltexture': 'models/ppm/eyes/eye_extra'
-				'$envmap': 'models/ppm/eyes/eye_reflection'
-				'$corneatexture': 'models/ppm/eyes/eye_cornea_oval'
-				'$lightwarptexture': 'models/ppm/clothes/lightwarp'
+				'$ambientoccltexture': 'models/ppm2/eyes/eye_extra'
+				'$envmap': 'models/ppm2/eyes/eye_reflection'
+				'$corneatexture': 'models/ppm2/eyes/eye_cornea_oval'
+				'$lightwarptexture': 'models/ppm2/clothes/lightwarp'
 
 				'$eyeballradius': '3.7'
 				'$ambientocclcolor': '[0.3 0.3 0.3]'
@@ -1798,9 +1798,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
 			'shader': 'VertexLitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm/partrender/null'
+				'$basetexture': 'models/ppm2/partrender/null'
 				'$translucent': '1'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 			}
 		}
@@ -1809,9 +1809,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI"
 			'shader': 'UnlitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm/partrender/null'
+				'$basetexture': 'models/ppm2/partrender/null'
 				'$translucent': '1'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 			}
 		}
@@ -1822,8 +1822,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
 		unless @GrabData('CMark')
-			@CMarkTexture\SetTexture('$basetexture', 'models/ppm/partrender/null')
-			@CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm/partrender/null')
+			@CMarkTexture\SetTexture('$basetexture', 'models/ppm2/partrender/null')
+			@CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm2/partrender/null')
 			return @CMarkTexture, @CMarkTextureGUI
 
 		URL = @GrabData('CMarkURL')

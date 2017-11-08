@@ -1,14 +1,14 @@
 "eyes"
-{
- "$Iris"               "models/ppm2/base/face/p_luna"     // Iris color in RGB with cornea noise in A
+{ 
+ "$Iris"               "models/ppm/base/face/p_luna"     // Iris color in RGB with cornea noise in A
  "$Irisframe" "0"    // Frame for the iris texture, 0 being the default frame
-
- "$AmbientOcclTexture" "models/ppm2/base/face/black"      // Ambient occlusion in RGB, A unused // default texture eyeball_l_ambient
- "$Envmap"             "models/ppm2/base/face/black"    // Reflection environment map static
- //"$Envmap"             "models/ppm2/base/face/white"    // Reflection environment map
- "$CorneaTexture"      "models/ppm2/base/face/white"                 // Special texture that has 2D cornea normal in RG and other data in BA
- "$lightwarptexture" "models/ppm2/clothes/lightwarp"  // 1D ramp texture for tinting scalar diffuse term
-
+ 
+ "$AmbientOcclTexture" "models/ppm/base/face/black"      // Ambient occlusion in RGB, A unused // default texture eyeball_l_ambient 
+ "$Envmap"             "models/ppm/base/face/black"    // Reflection environment map static
+ //"$Envmap"             "models/ppm/base/face/white"    // Reflection environment map
+ "$CorneaTexture"      "models/ppm/base/face/white"                 // Special texture that has 2D cornea normal in RG and other data in BA
+ "$lightwarptexture" "models/ppm/clothes/lightwarp"  // 1D ramp texture for tinting scalar diffuse term
+ 
  "$EyeballRadius" "3.7"    // Default 0.5
  "$AmbientOcclColor" "[0.3 0.3 0.3]" // Default 0.33, 0.33, 0.33
  "$Dilation" "0.5"     // Default 0.5
@@ -25,12 +25,12 @@
 
 
  //Unknown Parameters
-
+ 
 
  "$eyeorigin" "[0 0 0]" // Origin for the eyes
  "$irisu" "[0 1 0 0]"
  "$irisv" "[0 0 1 0]"
- "$Entityorigin" "4.0"
+ "$Entityorigin" "4.0" 
 
 
-}
+} 

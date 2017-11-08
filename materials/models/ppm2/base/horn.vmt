@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/ppm/base/horn" 
+	"$basetexture" "models/ppm2/base/horn"
 
 	"$model" "1"
 	"$phong" "1"

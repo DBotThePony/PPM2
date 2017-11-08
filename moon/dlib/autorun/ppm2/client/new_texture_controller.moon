@@ -18,16 +18,16 @@
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
--- [ 1] = "models/ppm/base/cmark"
--- [ 2] = "models/ppm/base/eyelashes"
--- [ 3] = "models/ppm/base/tongue"
--- [ 4] = "models/ppm/base/body"
--- [ 5] = "models/ppm/base/teeth"
--- [ 6] = "models/ppm/base/eye_l"
--- [ 7] = "models/ppm/base/eye_r"
--- [ 8] = "models/ppm/base/mouth"
--- [ 9] = "models/ppm/base/horn"
--- [10] = "models/ppm/base/wings"
+-- [ 1] = "models/ppm2/base/cmark"
+-- [ 2] = "models/ppm2/base/eyelashes"
+-- [ 3] = "models/ppm2/base/tongue"
+-- [ 4] = "models/ppm2/base/body"
+-- [ 5] = "models/ppm2/base/teeth"
+-- [ 6] = "models/ppm2/base/eye_l"
+-- [ 7] = "models/ppm2/base/eye_r"
+-- [ 8] = "models/ppm2/base/mouth"
+-- [ 9] = "models/ppm2/base/horn"
+-- [10] = "models/ppm2/base/wings"
 
 class NewPonyTextureController extends PPM2.PonyTextureController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
@@ -104,7 +104,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
@@ -227,7 +227,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 
 				'$model': '1'
@@ -289,7 +289,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$lightwarptexture': 'models/ppm/base/lightwrap'
+				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 
 				'$model': '1'
@@ -358,7 +358,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 	CompileMouth: =>
 		textureData = {
 			'$basetexture': 'models/debug/debugwhite'
-			'$lightwarptexture': 'models/ppm/base/lightwrap'
+			'$lightwarptexture': 'models/ppm2/base/lightwrap'
 			'$halflambert': '1'
 			'$phong': '1'
 			'$phongexponent': '20'

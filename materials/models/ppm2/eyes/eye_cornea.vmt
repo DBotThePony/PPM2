@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
-	"$basetexture" "models/ppm/eyes/eye_cornea"
+	"$basetexture" "models/ppm2/eyes/eye_cornea"
 	"$ignorez"  1
 	"$vertexcolor"  1
 	"$vertexalpha"  1
