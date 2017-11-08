@@ -696,18 +696,16 @@ class PonyTextureController extends PPM2.ControllerChildren
 		socksEnt\SetSubMaterial(1, @NewSocksColor1Name)
 		socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
-	@QUAD_SIZE_EYES = 256
-	@QUAD_SIZE_SOCKS = 512
-	@QUAD_SIZE_CMARK = 256
-	@QUAD_SIZE_WING = 128
-	@QUAD_SIZE_HORN = 256
+	@QUAD_SIZE_EYES = 512
+	@QUAD_SIZE_SOCKS = 256
+	@QUAD_SIZE_CMARK = 512
+	@QUAD_SIZE_WING = 64
+	@QUAD_SIZE_HORN = 128
 	@QUAD_SIZE_HAIR = 256
 	@QUAD_SIZE_TAIL = 256
-	@QUAD_SIZE_CONST = 512
 	@QUAD_SIZE_BODY = 1024
 	@TATTOO_DEF_SIZE = 128
 
-	@GetTextureSize = => @QUAD_SIZE_CONST * PPM2.GetTextureQuality()
 	@GetBodySize = => @QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1) * PPM2.GetTextureQuality()
 
 	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@GetBodySize()) =>

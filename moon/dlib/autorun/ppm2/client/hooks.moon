@@ -116,3 +116,26 @@ timer.Create 'PPM2.ModelCleanup', 60, 0, ->
 	for ent in *ents.GetAll()
 		if ent.isPonyPropModel and not IsValid(ent.manePlayer)
 			ent\Remove()
+
+cvars.AddChangeCallback('mat_picmip', (->
+	timer.Simple 0, (->
+		RunConsoleCommand('ppm2_require')
+		RunConsoleCommand('ppm2_reload')
+	)
+), 'ppm2')
+
+cvars.AddChangeCallback('ppm2_cl_hires_generic', (->
+	timer.Simple 0, (->
+		RunConsoleCommand('ppm2_require')
+		RunConsoleCommand('ppm2_reload')
+	)
+), 'ppm2')
+
+cvars.AddChangeCallback('ppm2_cl_hires_body', (->
+	timer.Simple 0, (->
+		RunConsoleCommand('ppm2_require')
+		RunConsoleCommand('ppm2_reload')
+	)
+), 'ppm2')
+
+return
