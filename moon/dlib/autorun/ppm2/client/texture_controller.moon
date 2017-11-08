@@ -1121,6 +1121,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@NewSocksColor2 = CreateMaterial(textureColor2.name, textureColor2.shader, textureColor2.data)
 		@NewSocksBase = CreateMaterial(textureBase.name, textureBase.shader, textureBase.data)
 
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_SOCKS)
+
 		@UpdatePhongData()
 
 		url = @GrabData('NewSocksTextureURL')
