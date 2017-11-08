@@ -8,6 +8,7 @@
         "*.vcproj",
         "*.svn*",
         "*.git*",
+        "*.xcf",
         ".gitlab-ci.yml",
         "moon*",
         "build.sh",

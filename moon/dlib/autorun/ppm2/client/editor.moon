@@ -1862,7 +1862,7 @@ concommand.Add 'ppm2_editor_reload', ->
 
 IconData =
 	title: 'PPM/2 Editor',
-	icon: 'gui/pped_icon.png',
+	icon: 'gui/ppm2_icon.png',
 	width: 960,
 	height: 700,
 	onewindow: true,
@@ -1872,7 +1872,7 @@ IconData =
 
 IconDataOld =
 	title: 'PPM/2 Old Editor',
-	icon: 'gui/pped_icon.png',
+	icon: 'gui/ppm2_icon.png',
 	width: 960,
 	height: 700,
 	onewindow: true,
