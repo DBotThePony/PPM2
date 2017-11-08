@@ -208,7 +208,7 @@ PPM2.PostPlayerDraw = =>
 
 do
 	hornGlowStatus = {}
-	smokeMaterial = 'ppm/hornsmoke'
+	smokeMaterial = 'ppm2/hornsmoke'
 	fireMat = 'particle/fire'
 	hornShift = Vector(1, 0.15, 14.5)
 
