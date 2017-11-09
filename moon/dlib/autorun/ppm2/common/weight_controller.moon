@@ -18,7 +18,6 @@
 -- it is defined shared, but used clientside only
 
 import PPM2 from _G
-import ManipulateBoneScale, GetManipulateBoneScale from FindMetaTable('Entity')
 
 -- 0	LrigPelvis
 -- 1	LrigSpine1
@@ -68,6 +67,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	@HARD_LIMIT_MINIMAL = 0.1
 	@HARD_LIMIT_MAXIMAL = 3
 
+	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
 	@NEXT_OBJ_ID = 0
 
 	new: (data, applyWeight = true) =>
@@ -89,7 +89,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	GetModel: => @networkedData\GetModel()
 
 	@WEIGHT_BONES = {
-		{id: 0, scale: 0.7}
+		{id: 0, scale: 1.1}
 		{id: 1, scale: 0.7}
 		{id: 2, scale: 0.7}
 		{id: 3, scale: 0.7}
@@ -104,32 +104,34 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@UpdateWeight()
 
 	SetWeight: (weight = 1) => @weight = math.Clamp(weight, @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
-	SlowUpdate: => @UpdateWeight() if @lastPAC3BoneReset < RealTime()
+	SlowUpdate: =>
 
-	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
 	ResetBones: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
-		ent = ent\GetEntity()
 		for {:id} in *@@WEIGHT_BONES
-			ManipulateBoneScale(ent, id, @@DEFAULT_BONE_SIZE)
+			ent\ManipulateBoneScale(id, @@DEFAULT_BONE_SIZE)
+
 	Reset: => @ResetBones()
+
 	UpdateWeight: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
-		ent = ent\GetEntity()
-		@ResetBones(ent)
 		return if not @ent\IsPony()
+
 		for {:id, :scale} in *@@WEIGHT_BONES
-			delta = (@weight - 1) * scale
-			ManipulateBoneScale(ent, id, Vector(delta, delta, delta) + GetManipulateBoneScale(ent, id))
+			delta = 1 + (@weight - 1) * scale
+			ent\ManipulateBoneScale(id, Vector(delta, delta, delta))
+
 	Remove: =>
 		@isValid = false
 
 if CLIENT
-	hook.Add 'PPM2.SetupBones', 'PPM2.Weight', (ent, data) ->
+	reset = (ent, data) ->
 		if weight = data\GetWeightController()
 			weight.ent = ent
-			weight.lastPAC3BoneReset = RealTime() + 1
 			weight\UpdateWeight()
+
+	hook.Add 'PPM2.SetupBones', 'PPM2.Weight', reset, -2
+
 --
 -- 0	LrigPelvis
 -- 1	Lrig_LEG_BL_Femur
@@ -183,7 +185,7 @@ class NewPonyWeightController extends PonyWeightController
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
 	@WEIGHT_BONES = {
-		{id: 0, scale: 0.7}
+		{id: 0, scale: 1.1}
 		{id: 1, scale: 0.7}
 		{id: 6, scale: 0.7}
 		{id: 11, scale: 0.7}
@@ -191,6 +193,11 @@ class NewPonyWeightController extends PonyWeightController
 		{id: 13, scale: 0.7}
 		{id: 14, scale: 0.7}
 		{id: 20, scale: 0.7}
+
+		{id: 5, scale: 0.9}
+		{id: 10, scale: 0.9}
+		{id: 19, scale: 0.9}
+		{id: 25, scale: 0.9}
 	}
 
 	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 1, 10
