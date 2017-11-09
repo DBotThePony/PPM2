@@ -749,7 +749,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			else
 				surface.SetDrawColor(0, 0, 0)
 		surface.SetMaterial(mat)
-		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1) * PPM2.GetTextureQuality()
+		tSize = PPM2.GetTextureQuality(@@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1))
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
