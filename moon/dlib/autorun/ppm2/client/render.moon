@@ -284,7 +284,7 @@ do
 								\SetCollide(false)
 
 	hook.Add 'DrawPhysgunBeam', 'PPM2.HornEffects', (physgun = NULL, isEnabled = false, target = NULL, bone = 0, hitPos = Vector()) =>
-		return if not HORN_FP\GetBool() and @ == LocalPlayer() and not @ShouldDrawLocalPlayer()
+		return if not @IsPony() or not HORN_FP\GetBool() and @ == LocalPlayer() and not @ShouldDrawLocalPlayer()
 		data = @GetPonyData()
 		return if not data
 		return if data\GetRace() ~= PPM2.RACE_UNICORN and data\GetRace() ~= PPM2.RACE_ALICORN
