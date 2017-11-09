@@ -98,7 +98,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
 
 	DataChanges: (state) =>
-		return if not IsValid(ent) or not @isValid
+		return if not IsValid(@ent) or not @isValid
 		return if state\GetKey() ~= 'Weight'
 		@SetWeight(state\GetValue())
 		@UpdateWeight()
