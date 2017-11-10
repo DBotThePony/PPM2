@@ -77,6 +77,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
+		@scale = 1
 		@SetWeight(data\GetWeight())
 		@UpdateWeight() if IsValid(@ent) and applyWeight
 		PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
@@ -99,11 +100,15 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	DataChanges: (state) =>
 		return if not IsValid(@ent) or not @isValid
-		return if state\GetKey() ~= 'Weight'
-		@SetWeight(state\GetValue())
-		@UpdateWeight()
+
+		if state\GetKey() == 'Weight'
+			@SetWeight(state\GetValue())
+
+		if state\GetKey() == 'PonySize'
+			@SetSize(state\GetValue())
 
 	SetWeight: (weight = 1) => @weight = math.Clamp(weight, @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
+	SetSize: (scale = 1) => @scale = math.Clamp(math.sqrt(scale), @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
 	SlowUpdate: =>
 
 	ResetBones: (ent = @ent) =>
@@ -118,7 +123,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		return if not @ent\IsPony()
 
 		for {:id, :scale} in *@@WEIGHT_BONES
-			delta = 1 + (@weight - 1) * scale
+			delta = 1 + (@weight * @scale - 1) * scale
 			ent\ManipulateBoneScale(id, Vector(delta, delta, delta))
 
 	Remove: =>
