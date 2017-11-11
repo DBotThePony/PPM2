@@ -280,12 +280,6 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
-	'hide_manes': {
-		default: -> true
-		getFunc: 'HideManes'
-		type: 'BOOLEAN'
-	}
-
 	'eyebrows_glow': {
 		default: -> false
 		getFunc: 'GlowingEyebrows'
@@ -298,6 +292,30 @@ PPM2.PonyDataRegistry = {
 		type: 'FLOAT'
 		min: 0
 		max: 1
+	}
+
+	'hide_manes': {
+		default: -> true
+		getFunc: 'HideManes'
+		type: 'BOOLEAN'
+	}
+
+	'hide_manes_socks': {
+		default: -> true
+		getFunc: 'HideManesSocks'
+		type: 'BOOLEAN'
+	}
+
+	'hide_manes_mane': {
+		default: -> true
+		getFunc: 'HideManesMane'
+		type: 'BOOLEAN'
+	}
+
+	'hide_manes_tail': {
+		default: -> true
+		getFunc: 'HideManesTail'
+		type: 'BOOLEAN'
 	}
 
 	'horn_color': {

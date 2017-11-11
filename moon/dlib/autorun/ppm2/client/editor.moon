@@ -1039,6 +1039,9 @@ EditorPages = {
 			@ComboBox('Lower Mane type', 'ManeTypeLower')
 			@ComboBox('Tail type', 'TailType')
 
+			@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
+			@CheckBox('Hide socks when using PAC3 entity', 'HideManesSocks')
+
 			@NumSlider('Tail size', 'TailSize', 2)
 
 			@Hr()
@@ -1059,7 +1062,11 @@ EditorPages = {
 			@ComboBox('Mane type', 'ManeTypeNew')
 			@ComboBox('Lower Mane type', 'ManeTypeLowerNew')
 			@ComboBox('Tail type', 'TailTypeNew')
-			@CheckBox('Hide Manes when using PAC3 entity', 'HideManes')
+
+			@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
+			@CheckBox('Hide socks when using PAC3 entity', 'HideManesSocks')
+			@CheckBox('Hide mane when using PAC3 entity', 'HideManesMane')
+			@CheckBox('Hide tail when using PAC3 entity', 'HideManesTail')
 
 			@NumSlider('Tail size', 'TailSize', 2)
 

@@ -314,14 +314,12 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes
 
-		if ent.RenderOverride and @GrabData('HideManes')
+		if ent.RenderOverride and @GrabData('HideManes') and @GrabData('HideManesSocks')
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
-			@hiddenPAC3 = true
-		elseif @hiddenPAC3
+		else
 			@socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
-			@hiddenPAC3 = false
 
 	PostDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
@@ -450,15 +448,13 @@ class NewPonyRenderController extends PonyRenderController
 			textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
 
 		if ent.RenderOverride and @GrabData('HideManes')
-			@upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
-			@lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
-			@tailModel\SetNoDraw(true) if IsValid(@tailModel)
-			@hiddenPAC32 = true
-		elseif @hiddenPAC32
+			@upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel) and @GrabData('HideManesMane')
+			@lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel) and @GrabData('HideManesMane')
+			@tailModel\SetNoDraw(true) if IsValid(@tailModel) and @GrabData('HideManesTail')
+		else
 			@upperManeModel\SetNoDraw(@hideModels) if IsValid(@upperManeModel)
 			@lowerManeModel\SetNoDraw(@hideModels) if IsValid(@lowerManeModel)
 			@tailModel\SetNoDraw(@hideModels) if IsValid(@tailModel)
-			@hiddenPAC32 = false
 
 hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
 	if data = @GetPonyData()
