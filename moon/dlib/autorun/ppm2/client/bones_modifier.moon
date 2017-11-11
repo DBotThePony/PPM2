@@ -252,7 +252,7 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 				hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
 				obj\Think()
 
-	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -2
+	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -5
 
 	new: (ent = NULL) =>
 		super()
