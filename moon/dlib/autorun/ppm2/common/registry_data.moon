@@ -280,6 +280,12 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
+	'hide_manes': {
+		default: -> true
+		getFunc: 'HideManes'
+		type: 'BOOLEAN'
+	}
+
 	'eyebrows_glow': {
 		default: -> false
 		getFunc: 'GlowingEyebrows'

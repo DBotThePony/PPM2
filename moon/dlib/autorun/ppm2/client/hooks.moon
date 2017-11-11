@@ -27,7 +27,7 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
 			ponydata = ply\GetPonyData()
 
 			if ply.__cachedIsPony
-				if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply)
+				if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply) and not ply.RenderOverride
 					for wep in *ply\GetWeapons()
 						if wep
 							if not hook.Run('ShouldDrawPonyWeapon', ply, wep) and (not wep.ShouldPonyDraw or not wep\ShouldPonyDraw(ply))

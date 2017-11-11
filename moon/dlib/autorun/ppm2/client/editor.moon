@@ -1059,6 +1059,7 @@ EditorPages = {
 			@ComboBox('Mane type', 'ManeTypeNew')
 			@ComboBox('Lower Mane type', 'ManeTypeLowerNew')
 			@ComboBox('Tail type', 'TailTypeNew')
+			@CheckBox('Hide Manes when using PAC3 entity', 'HideManes')
 
 			@NumSlider('Tail size', 'TailSize', 2)
 

@@ -304,13 +304,25 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	PreDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
+
 		with @GetTextureController()
 			\PreDraw(ent, drawingNewTask)
 			if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
 				\UpdateSocks(@ent, @socksModel) if IsValid(@socksModel)
 				\UpdateNewSocks(@ent, @newSocksModel) if IsValid(@newSocksModel)
+
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes
+
+		if ent.RenderOverride and @GrabData('HideManes')
+			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
+			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
+			@hiddenPAC3 = true
+		elseif @hiddenPAC3
+			@socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
+			@newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
+			@hiddenPAC3 = false
+
 	PostDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
 		@GetTextureController()\PostDraw(ent)
@@ -429,12 +441,24 @@ class NewPonyRenderController extends PonyRenderController
 
 	PreDraw: (ent = @ent, drawingNewTask = false) =>
 		super(ent, drawingNewTask)
+
 		if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
 			textures = @GetTextureController()
 			return if not textures
 			textures\UpdateUpperMane(@ent, @upperManeModel) if IsValid(@upperManeModel)
 			textures\UpdateLowerMane(@ent, @lowerManeModel) if IsValid(@lowerManeModel)
 			textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
+
+		if ent.RenderOverride and @GrabData('HideManes')
+			@upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel)
+			@lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel)
+			@tailModel\SetNoDraw(true) if IsValid(@tailModel)
+			@hiddenPAC32 = true
+		elseif @hiddenPAC32
+			@upperManeModel\SetNoDraw(@hideModels) if IsValid(@upperManeModel)
+			@lowerManeModel\SetNoDraw(@hideModels) if IsValid(@lowerManeModel)
+			@tailModel\SetNoDraw(@hideModels) if IsValid(@tailModel)
+			@hiddenPAC32 = false
 
 hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
 	if data = @GetPonyData()
