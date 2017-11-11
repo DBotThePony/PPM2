@@ -314,7 +314,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes
 
-		if ent.RenderOverride and @GrabData('HideManes') and @GrabData('HideManesSocks')
+		if ent.RenderOverride and not ent.__ppm2RenderOverride and @GrabData('HideManes') and @GrabData('HideManesSocks')
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
 		else
@@ -447,7 +447,7 @@ class NewPonyRenderController extends PonyRenderController
 			textures\UpdateLowerMane(@ent, @lowerManeModel) if IsValid(@lowerManeModel)
 			textures\UpdateTail(@ent, @tailModel) if IsValid(@tailModel)
 
-		if ent.RenderOverride and @GrabData('HideManes')
+		if ent.RenderOverride and not ent.__ppm2RenderOverride and @GrabData('HideManes')
 			@upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel) and @GrabData('HideManesMane')
 			@lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel) and @GrabData('HideManesMane')
 			@tailModel\SetNoDraw(true) if IsValid(@tailModel) and @GrabData('HideManesTail')
