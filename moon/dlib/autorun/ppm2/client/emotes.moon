@@ -82,13 +82,6 @@ CONSOLE_EMOTES_AUTOCOMPLETE = (cmd = '', args = '') ->
 
 concommand.Add 'ppm2_emote', CONSOLE_EMOTES_COMMAND, CONSOLE_EMOTES_AUTOCOMPLETE
 
-BUTTON_DRAW_FUNC = (w = 0, h = 0) =>
-	@hoverDelta = math.Clamp(@hoverDelta + (@IsHovered() and FrameTime() or -FrameTime()) * 5, 0, 1)
-	col = @hoverDelta * 150
-	col = 200 if @IsDown()
-	surface.SetDrawColor(col, col, col, 150)
-	surface.DrawRect(0, 0, w, h)
-
 BUTTON_CLICK_FUNC = (isEndless = false, shouldStop = false) =>
 	if @sendToServer
 		net.Start('PPM2.PlayEmote')
@@ -124,6 +117,7 @@ HOVERED_IMAGE_PANEL_THINK = =>
 
 PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) ->
 	self = vgui.Create('DPanel', parent)
+	self\SetSkin('DLib_Black')
 	@SetSize(200, 300)
 	@Paint = (w = 0, h = 0) =>
 		surface.SetDrawColor(0, 0, 0, 150)
@@ -131,17 +125,15 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 	@scroll = vgui.Create('DScrollPanel', @)
 	with @scroll
 		\Dock(FILL)
+		\SetSkin('DLib_Black')
 		\SetSize(200, 300)
 		.Paint = ->
 		\SetMouseInputEnabled(true)
 	@buttons = for {:name, :id, :sequence, :time, :fexists, :filecrop} in *PPM2.AVALIABLE_EMOTES
 		with btn = vgui.Create('DButton', @scroll)
-			\SetTextColor(BUTTON_TEXT_COLOR)
-			.Paint = BUTTON_DRAW_FUNC
 			.id = id
 			.time = time
 			.sequence = sequence
-			.hoverDelta = 0
 			.sendToServer = sendToServer
 			.target = target
 			.DoClick = BUTTON_CLICK_FUNC
