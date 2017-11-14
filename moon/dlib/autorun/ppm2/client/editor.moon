@@ -1656,6 +1656,7 @@ PPM2.OpenNewEditor = ->
 		return
 
 	PPM2.EditorTopFrame = vgui.Create('EditablePanel')
+	PPM2.EditorTopFrame\SetSkin('DLib_Black')
 	self = PPM2.EditorTopFrame
 	topframe = PPM2.EditorTopFrame
 	@SetPos(0, 0)
@@ -1707,6 +1708,7 @@ PPM2.OpenNewEditor = ->
 	@calcPanel\SetSize(ScrW() - 350, ScrH() - topSize)
 	@calcPanel\SetRealSize(ScrW() - 350, ScrH() - topSize)
 	@calcPanel\MakePopup()
+	@calcPanel\SetSkin('DLib_Black')
 	@MakePopup()
 
 	@leftPanel = vgui.Create('EditablePanel')
@@ -1715,6 +1717,7 @@ PPM2.OpenNewEditor = ->
 	@leftPanel\SetMouseInputEnabled(true)
 	@leftPanel\SetKeyboardInputEnabled(true)
 	@leftPanel\MakePopup()
+	@leftPanel\SetSkin('DLib_Black')
 
 	@menus = vgui.Create('DPropertySheet', @leftPanel)
 	@menus\Dock(FILL)
@@ -1776,6 +1779,7 @@ PPM2.OpenOldEditor = ->
 
 	sysTime = SysTime()
 	frame = vgui.Create('DFrame')
+	frame\SetSkin('DLib_Black')
 	self = frame
 	W, H = ScrW() - 25, ScrH() - 25
 	@SetSize(W, H)
