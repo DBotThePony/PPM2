@@ -1,0 +1,17 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/ppm2/base/tongue"
+
+	"$phong" "1"
+	"$phongexponent" "20"
+	"$phongboost" ".1"
+	"$phongfresnelranges"	"[.3 1 8]"
+	"$halflambert" "0"
+	"$basemapalphaphongmask" "1"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "4"
+	"$rimlightboost" "2"
+
+	"$ambientocclusion" "1"
+}
