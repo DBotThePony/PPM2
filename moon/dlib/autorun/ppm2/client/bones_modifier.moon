@@ -242,6 +242,7 @@ class PPM2.EntityBonesModifier extends DLib.SequenceHolder
 						table.insert(@OBJECTS, obj2)
 					else
 						lent = obj2.ent
+						obj2.invalidate = true
 						if IsValid(lent)
 							lent.__ppmBonesModifiers = nil
 				return
@@ -325,7 +326,7 @@ with FindMetaTable('Entity')
 	.PPMBonesModifier = =>
 		with t = .GetTable(@)
 			return if not t
-			return .__ppmBonesModifiers if IsValid(.__ppmBonesModifiers)
+			return .__ppmBonesModifiers if IsValid(.__ppmBonesModifiers) and not .__ppmBonesModifiers.invalidate
 			.__ppmBonesModifiers = PPM2.EntityBonesModifier(@)
 			.__ppmBonesModifiers.ent = @
 			.__ppmBonesModifiers\Setup(@) if .__ppmBonesModifiers.lastModel ~= @GetModel()
