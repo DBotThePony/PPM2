@@ -1179,6 +1179,8 @@ for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
 		type: 'BOOLEAN'
 	}
 
+testMinimalBits = 0
+
 for key, value in pairs PPM2.PonyDataRegistry
 	if value.enum
 		value.min = 0
@@ -1191,16 +1193,13 @@ for key, value in pairs PPM2.PonyDataRegistry
 			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
 			value.fix = INT_FIXER(value.default, value.min, value.max)
 			if value.min >= 0
-				selectBits = 16
-				while 2 ^ (selectBits - 1) > value.max
-					selectBits -= 1
+				selectBits = net.ChooseOptimalBits(value.max - value.min)
+				testMinimalBits += selectBits
 				value.read = rUInt(selectBits, value.min, value.max)
 				value.write = wUInt(value.default(), selectBits)
 			else
-				delta = math.max(value.max, -value.min)
-				selectBits = 16
-				while 2 ^ (selectBits - 1) > delta
-					selectBits -= 1
+				selectBits = net.ChooseOptimalBits(math.max(math.abs(value.max), math.abs(value.min)))
+				testMinimalBits += selectBits
 				value.read = rInt(selectBits, value.min, value.max)
 				value.write = wInt(value.default(), selectBits)
 		when 'FLOAT'
@@ -1209,21 +1208,28 @@ for key, value in pairs PPM2.PonyDataRegistry
 			value.fix = FLOAT_FIXER(value.default, value.min, value.max)
 			value.read = rFloat(value.min, value.max)
 			value.write = (arg = value.default()) -> wFloat(arg)
+			testMinimalBits += 32
 		when 'URL'
 			value.fix = URL_FIXER
 			value.read = rURL
 			value.write = wString
+			testMinimalBits += 8
 		when 'BOOLEAN'
 			value.fix = (arg = value.default()) -> tobool(arg)
 			value.read = rBool
 			value.write = wBool
+			testMinimalBits += 1
 		when 'COLOR'
 			{:r, :g, :b, :a} = value.default()
 			value.fix = COLOR_FIXER(r, g, b, a)
 			value.read = rColor
 			value.write = wColor
+			testMinimalBits += 32
 		else
 			error("Unknown variable type - #{value.type} for #{key}")
+
+-- print('Minimal required bits - ' .. testMinimalBits)
+PPM2.testMinimalBits = testMinimalBits
 
 for key, value in pairs PPM2.PonyDataRegistry
 	error("Data has no fix function: #{key}") if not value.fix
