@@ -79,10 +79,16 @@ concommand.Add 'ppm2_reload', ->
 	PPM2.Message 'Sending pony data to server...'
 
 if not IsValid(LocalPlayer())
-	hook.Add 'KeyPress', 'PPM2.RequireData', ->
-		hook.Remove 'KeyPress', 'PPM2.RequireData'
-		RunConsoleCommand('ppm2_reload')
-		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+	times = 0
+	hook.Add 'Think', 'PPM2.RequireData', ->
+		times += 1
+
+		return if times < 200
+		hook.Remove 'Think', 'PPM2.RequireData'
+		hook.Add 'KeyPress', 'PPM2.RequireData', ->
+			hook.Remove 'KeyPress', 'PPM2.RequireData'
+			RunConsoleCommand('ppm2_reload')
+			timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 else
 	timer.Simple 0, ->
 		RunConsoleCommand('ppm2_reload')
