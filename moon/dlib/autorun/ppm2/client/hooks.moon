@@ -56,10 +56,6 @@ PlayerDeath = ->
 
 lastDataSend = 0
 lastDataReceived = 0
-net.Receive 'PPM2.RequestPonyData', ->
-	return if lastDataReceived > RealTime()
-	lastDataReceived = RealTime() + 10
-	RunConsoleCommand('ppm2_reload')
 
 net.Receive 'PPM2.PlayerRespawn', PlayerRespawn
 net.Receive 'PPM2.PlayerDeath', PlayerDeath
@@ -81,7 +77,9 @@ concommand.Add 'ppm2_reload', ->
 if not IsValid(LocalPlayer())
 	times = 0
 	hook.Add 'Think', 'PPM2.RequireData', ->
-		times += 1
+		ply = LocalPlayer()
+		return if not IsValid(ply)
+		times += 1 if ply\GetVelocity()\Length() > 5
 
 		return if times < 200
 		hook.Remove 'Think', 'PPM2.RequireData'

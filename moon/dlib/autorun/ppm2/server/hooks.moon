@@ -27,21 +27,6 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
 			net.WriteEntity(@)
 			net.Broadcast()
 
-		if @IsPony()
-			return if @GetPonyData()
-			timer.Simple 0.5, ->
-				net.Start('PPM2.RequestPonyData')
-				net.Send(@)
-
-hook.Add 'PlayerInitialSpawn', 'PPM2.Hooks', =>
-	timer.Simple 0, ->
-		return unless @IsValid()
-		return unless @IsPony()
-
-		timer.Simple 10, ->
-			net.Start('PPM2.RequestPonyData')
-			net.Send(@)
-
 do
 	REQUIRE_CLIENTS = {}
 
