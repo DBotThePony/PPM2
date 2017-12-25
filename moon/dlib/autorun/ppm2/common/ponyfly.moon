@@ -173,12 +173,14 @@ class PonyflyController
 				return false if nativeEntity == ent
 				return true if not IsValid(ent)
 				collision = ent\GetCollisionGroup()
-				return false if collision == COLLISION_GROUP_WORLD
-				return false if collision == COLLISION_GROUP_DEBRIS
-				return false if collision == COLLISION_GROUP_DEBRIS_TRIGGER
-				return false if collision == COLLISION_GROUP_WEAPON
-				return false if collision == COLLISION_GROUP_PASSABLE_DOOR
-				return true
+				return collision ~= COLLISION_GROUP_WORLD and
+					collision ~= COLLISION_GROUP_DEBRIS_TRIGGER and
+					collision ~= COLLISION_GROUP_WEAPON and
+					collision ~= COLLISION_GROUP_PASSABLE_DOOR and
+					collision ~= COLLISION_GROUP_DEBRIS and
+					ent\GetOwner() ~= nativeEntity and
+					ent\GetParent() ~= nativeEntity and
+					ent\IsSolid()
 			mins: @obbMins
 			maxs: @obbMaxs
 			start: rpos
