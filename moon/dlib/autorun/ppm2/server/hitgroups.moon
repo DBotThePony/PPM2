@@ -32,23 +32,32 @@ sk_player_leg = GetConVar('sk_player_leg')
 
 hook.Add 'ScalePlayerDamage', 'PPM2.PlayerDamage', (group = HITGROUP_GENERIC, dmg) =>
 	return if not @IsPonyCached()
+	return if not ENABLE_SCAILING\GetBool()
 
 	-- Reset damage to its original value
 	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L180-L184
 	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/player.cpp#L923-L946
+
+	--switch group
+	--	when HITGROUP_HEAD
+	--		dmg\ScaleDamage(1 / sk_player_head\GetFloat())
+	--	when HITGROUP_CHEST
+	--		dmg\ScaleDamage(1 / sk_player_chest\GetFloat())
+	--	when HITGROUP_STOMACH
+	--		dmg\ScaleDamage(1 / sk_player_stomach\GetFloat())
+	--	when HITGROUP_RIGHTARM
+	--		dmg\ScaleDamage(1 / sk_player_arm\GetFloat())
+	--	when HITGROUP_RIGHTLEG
+	--		dmg\ScaleDamage(1 / sk_player_leg\GetFloat())
+
+	-- but fuck gmod
+	-- https://github.com/Facepunch/garrysmod/blob/cf725f3f66072c83e4d96674814670c97eebb43d/garrysmod/gamemodes/base/gamemode/player.lua#L510
+
 	switch group
 		when HITGROUP_HEAD
-			dmg\ScaleDamage(1 / sk_player_head\GetFloat())
-		when HITGROUP_CHEST
-			dmg\ScaleDamage(1 / sk_player_chest\GetFloat())
-		when HITGROUP_STOMACH
-			dmg\ScaleDamage(1 / sk_player_stomach\GetFloat())
-		when HITGROUP_RIGHTARM
-			dmg\ScaleDamage(1 / sk_player_arm\GetFloat())
-		when HITGROUP_RIGHTLEG
-			dmg\ScaleDamage(1 / sk_player_leg\GetFloat())
-
-	return if not ENABLE_SCAILING\GetBool()
+			dmg\ScaleDamage(0.5)
+		when HITGROUP_LEFTARM, HITGROUP_RIGHTARM, HITGROUP_LEFTLEG, HITGROUP_RIGHTLEG, HITGROUP_GEAR
+			dmg\ScaleDamage(4)
 
 	switch group
 		when HITGROUP_HEAD
