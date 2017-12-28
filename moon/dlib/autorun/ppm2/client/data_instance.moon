@@ -17,6 +17,7 @@
 
 file.CreateDir('ppm2')
 file.CreateDir('ppm2/backups')
+file.CreateDir('ppm2/thumbnails')
 
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
@@ -174,7 +175,7 @@ class PonyDataInstance
 		@filename = filename
 		@filenameFull = "#{filename}.txt"
 		@fpath = "#{@@DATA_DIR}#{filename}.txt"
-		@preview = "#{@@DATA_DIR}#{filename}.png"
+		@preview = "#{@@DATA_DIR}thumbnails/#{filename}.png"
 		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.txt"
 		@fpathFull = "data/#{@@DATA_DIR}#{filename}.txt"
 		@isOpen = @filename ~= nil

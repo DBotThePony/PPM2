@@ -1427,8 +1427,8 @@ EditorPages = {
 						line = list\AddLine(fil2)
 						line.file = fil
 
-						if file.Exists('ppm2/' .. fil2 .. '.png', 'DATA')
-							line.png = Material('data/ppm2/' .. fil2 .. '.png')
+						if file.Exists('ppm2/thumbnails/' .. fil2 .. '.png', 'DATA')
+							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
 							line.png\Recompute()
 							line.png\GetTexture('$basetexture')\Download()
 
@@ -1446,7 +1446,7 @@ EditorPages = {
 									PPM2.PonyDataInstance(fil2)\SavePreview()
 									@genPreview = true
 									timer.Simple 1, ->
-										@png = Material('data/ppm2/' .. fil2 .. '.png')
+										@png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
 										@png\Recompute()
 										@png\GetTexture('$basetexture')\Download()
 
@@ -1498,8 +1498,8 @@ EditorPages = {
 					line = list\AddLine(fil2)
 					line.file = fil
 
-					if file.Exists('ppm2/' .. fil2 .. '_imported.png', 'DATA')
-						line.png = Material('data/ppm2/' .. fil2 .. '_imported.png')
+					if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
+						line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
 						line.png\Recompute()
 						line.png\GetTexture('$basetexture')\Download()
 
@@ -1517,7 +1517,7 @@ EditorPages = {
 								PPM2.ReadFromOldData(fil2)\SavePreview()
 								@genPreview = true
 								timer.Simple 1, ->
-									@png = Material('data/ppm2/' .. fil2 .. '_imported.png')
+									@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
 									@png\Recompute()
 									@png\GetTexture('$basetexture')\Download()
 
