@@ -1836,13 +1836,11 @@ PPM2.OpenOldEditor = ->
 		return
 
 	sysTime = SysTime()
-	frame = vgui.Create('DFrame')
-	frame\SetSkin('DLib_Black')
+	frame = vgui.Create('DLib_Window')
 	self = frame
 	W, H = ScrW() - 25, ScrH() - 25
 	@SetSize(W, H)
 	@Center()
-	@MakePopup()
 	@SetTitle('PPM2 Pony Editor')
 	@SetDeleteOnClose(false)
 	PPM2.OldEditorFrame = @
