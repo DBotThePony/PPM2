@@ -1423,11 +1423,12 @@ EditorPages = {
 				matchBak = '.bak.txt'
 				for fil in *files
 					if fil\sub(-#matchBak) ~= matchBak
-						line = list\AddLine(fil\sub(1, #fil - 4))
+						fil2 = fil\sub(1, #fil - 4)
+						line = list\AddLine(fil2)
 						line.file = fil
 
-						if file.Exists('ppm2/' .. fil\sub(1, #fil - 4) .. '.png', 'DATA')
-							line.png = Material('data/ppm2/' .. fil\sub(1, #fil - 4) .. '.png')
+						if file.Exists('ppm2/' .. fil2 .. '.png', 'DATA')
+							line.png = Material('data/ppm2/' .. fil2 .. '.png')
 							line.png\Recompute()
 							line.png\GetTexture('$basetexture')\Download()
 
@@ -1442,10 +1443,10 @@ EditorPages = {
 								surface.DrawTexturedRect(x, y, 512, 512)
 							else
 								if not @genPreview
-									PPM2.PonyDataInstance(fil\sub(1, #fil - 4))\SavePreview()
+									PPM2.PonyDataInstance(fil2)\SavePreview()
 									@genPreview = true
 									timer.Simple 1, ->
-										@png = Material('data/ppm2/' .. fil\sub(1, #fil - 4) .. '.png')
+										@png = Material('data/ppm2/' .. fil2 .. '.png')
 										@png\Recompute()
 										@png\GetTexture('$basetexture')\Download()
 
@@ -1492,7 +1493,37 @@ EditorPages = {
 			@rebuildFileList = ->
 				list\Clear()
 				files, dirs = file.Find('ppm/*', 'DATA')
-				list\AddLine(fil\sub(1, #fil - 4)) for fil in *files
+				for fil in *files
+					fil2 = fil\sub(1, #fil - 4)
+					line = list\AddLine(fil2)
+					line.file = fil
+
+					if file.Exists('ppm2/' .. fil2 .. '_imported.png', 'DATA')
+						line.png = Material('data/ppm2/' .. fil2 .. '_imported.png')
+						line.png\Recompute()
+						line.png\GetTexture('$basetexture')\Download()
+
+					hook.Add 'PostRenderVGUI', line, =>
+						return if not @IsVisible() or not @IsHovered()
+						parent = @GetParent()
+						x, y = parent\LocalToScreen(parent\GetWide(), 0)
+
+						if @png
+							surface.SetMaterial(@png)
+							surface.SetDrawColor(255, 255, 255)
+							surface.DrawTexturedRect(x, y, 512, 512)
+						else
+							if not @genPreview
+								PPM2.ReadFromOldData(fil2)\SavePreview()
+								@genPreview = true
+								timer.Simple 1, ->
+									@png = Material('data/ppm2/' .. fil2 .. '_imported.png')
+									@png\Recompute()
+									@png\GetTexture('$basetexture')\Download()
+
+							surface.SetDrawColor(0, 0, 0)
+							surface.DrawRect(x, y, 512, 512)
+							DLib.HUDCommons.WordBox('Generating preview', 'Trebuchet24', x + 240, y + 256, color_white, Color(150, 150, 150), true)
 			@rebuildFileList()
 	}
 
