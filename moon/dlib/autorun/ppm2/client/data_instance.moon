@@ -94,14 +94,15 @@ class PonyDataInstance
 						copyOfData[key] = Color(r, g, b)
 		newData = @@(fileName, copyOfData, false)
 		return newData
-	CreateCustomNetworkObject: (ply = LocalPlayer(), ...) =>
+	CreateCustomNetworkObject: (goingToNetwork = false, ply = LocalPlayer(), ...) =>
 		newData = PPM2.NetworkedPonyData(nil, ply)
+		newData\SetIsGoingToNetwork(goingToNetwork)
 		newData\SetEntity(ply)
 		@ApplyDataToObject(newData, ...)
 		return newData
-	CreateNetworkObject: (gointToNetwork = true, ...) =>
+	CreateNetworkObject: (goingToNetwork = true, ...) =>
 		newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
-		newData\SetIsGoingToNetwork(gointToNetwork)
+		newData\SetIsGoingToNetwork(goingToNetwork)
 		newData\SetEntity(LocalPlayer())
 		@ApplyDataToObject(newData, ...)
 		return newData
@@ -173,6 +174,7 @@ class PonyDataInstance
 		@filename = filename
 		@filenameFull = "#{filename}.txt"
 		@fpath = "#{@@DATA_DIR}#{filename}.txt"
+		@preview = "#{@@DATA_DIR}#{filename}.png"
 		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.txt"
 		@fpathFull = "data/#{@@DATA_DIR}#{filename}.txt"
 		@isOpen = @filename ~= nil
@@ -234,14 +236,89 @@ class PonyDataInstance
 		readTable = util.JSONToTable(fRead)
 		return @@ERR_FILE_CORRUPT unless readTable
 		return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
+
 	SaveAs: (path = @fpath) =>
 		fCreate = @Serealize()
 		file.Write(path, fCreate)
-	Save: (doBackup = true) =>
+
+	SavePreview: (path = @preview) =>
+		buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
+		buildingModel\SetNoDraw(true)
+		buildingModel\SetModelScale(0.9)
+		model = ClientsideModel('models/ppm/player_default_base_new_nj.mdl')
+
+		with model
+			\SetNoDraw(true)
+			data = @CreateCustomController(model)
+			.__PPM2_PonyData = data
+			ctrl = data\GetRenderController()
+
+			if bg = data\GetBodygroupController()
+				bg\ApplyBodygroups()
+
+			with model\PPMBonesModifier()
+				\ResetBones()
+				hook.Call('PPM2.SetupBones', nil, model, data)
+				\Think(true)
+
+			\SetSequence(22)
+			\FrameAdvance(0)
+
+		timer.Simple 0.5, ->
+			renderTarget = GetRenderTarget('ppm2_save_preview_generate2', 1024, 1024, false)
+			renderTarget\Download()
+			render.PushRenderTarget(renderTarget)
+			--render.SuppressEngineLighting(true)
+			render.Clear(0, 0, 0, 255, true, true)
+			cam.Start3D(Vector(49.373046875, -35.021484375, 58.332901000977), Angle(0, 141, 0), 90, 0, 0, 1024, 1024)
+
+			buildingModel\DrawModel()
+
+			with model
+				data = .__PPM2_PonyData
+				ctrl = data\GetRenderController()
+
+				if bg = data\GetBodygroupController()
+					bg\ApplyBodygroups()
+
+				with model\PPMBonesModifier()
+					\ResetBones()
+					hook.Call('PPM2.SetupBones', nil, model, data)
+					\Think(true)
+
+				with ctrl
+					\DrawModels()
+					\HideModels(true)
+					\PreDraw(model, true)
+
+				\DrawModel()
+				ctrl\PostDraw(model, true)
+
+			cam.End3D()
+
+			data = render.Capture({
+				format: 'png'
+				x: 0
+				y: 0
+				w: 1024
+				h: 1024
+				alpha: false
+			})
+
+			model\Remove()
+			buildingModel\Remove()
+
+			file.Write(path, data)
+
+			--render.SuppressEngineLighting(false)
+			render.PopRenderTarget()
+
+	Save: (doBackup = true, preview = true) =>
 		if doBackup and @exists
 			fRead = file.Read(@fpath, 'DATA')
 			file.Write(@fpathBackup, fRead)
 		@SaveAs(@fpath)
+		@SavePreview(@preview) if preview
 		@exists = true
 
 PPM2.PonyDataInstance = PonyDataInstance

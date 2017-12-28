@@ -150,12 +150,11 @@ MODEL_BOX_PANEL = {
 
 	ResetModel: (ponydata, model = 'models/ppm/player_default_base.mdl') =>
 		@model\Remove() if IsValid(@model)
-		@model = ClientsideModel(model)
-		with @model
+		with @model = ClientsideModel(model)
 			\SetNoDraw(true)
 			.__PPM2_PonyData = ponydata
-		@model\SetSequence(@seq)
-		@model\FrameAdvance(0)
+			\SetSequence(@seq)
+			\FrameAdvance(0)
 		@emotesPanel\Remove() if IsValid(@emotesPanel)
 		if IS_USING_NEW()
 			@emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
