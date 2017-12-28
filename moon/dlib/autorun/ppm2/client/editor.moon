@@ -1419,11 +1419,39 @@ EditorPages = {
 			list\AddColumn('Filename')
 			@rebuildFileList = ->
 				list\Clear()
-				files, dirs = file.Find('ppm2/*', 'DATA')
+				files, dirs = file.Find('ppm2/*.txt', 'DATA')
+				matchBak = '.bak.txt'
 				for fil in *files
-					matchBak = '.bak.txt'
-					continue if fil\sub(-#matchBak) == matchBak
-					list\AddLine(fil\sub(1, #fil - 4))
+					if fil\sub(-#matchBak) ~= matchBak
+						line = list\AddLine(fil\sub(1, #fil - 4))
+						line.file = fil
+
+						if file.Exists('ppm2/' .. fil\sub(1, #fil - 4) .. '.png', 'DATA')
+							line.png = Material('data/ppm2/' .. fil\sub(1, #fil - 4) .. '.png')
+							line.png\Recompute()
+							line.png\GetTexture('$basetexture')\Download()
+
+						hook.Add 'PostRenderVGUI', line, =>
+							return if not @IsVisible() or not @IsHovered()
+							parent = @GetParent()
+							x, y = parent\LocalToScreen(parent\GetWide(), 0)
+
+							if @png
+								surface.SetMaterial(@png)
+								surface.SetDrawColor(255, 255, 255)
+								surface.DrawTexturedRect(x, y, 512, 512)
+							else
+								if not @genPreview
+									PPM2.PonyDataInstance(fil\sub(1, #fil - 4))\SavePreview()
+									@genPreview = true
+									timer.Simple 1, ->
+										@png = Material('data/ppm2/' .. fil\sub(1, #fil - 4) .. '.png')
+										@png\Recompute()
+										@png\GetTexture('$basetexture')\Download()
+
+								surface.SetDrawColor(0, 0, 0)
+								surface.DrawRect(x, y, 512, 512)
+								DLib.HUDCommons.WordBox('Generating preview', 'Trebuchet24', x + 240, y + 256, color_white, Color(150, 150, 150), true)
 			@rebuildFileList()
 	}
 
