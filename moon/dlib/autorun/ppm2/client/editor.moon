@@ -1434,7 +1434,7 @@ EditorPages = {
 
 						hook.Add 'PostRenderVGUI', line, =>
 							return if not @IsVisible() or not @IsHovered()
-							parent = @GetParent()
+							parent = @GetParent()\GetParent()
 							x, y = parent\LocalToScreen(parent\GetWide(), 0)
 
 							if @png
@@ -1505,7 +1505,7 @@ EditorPages = {
 
 					hook.Add 'PostRenderVGUI', line, =>
 						return if not @IsVisible() or not @IsHovered()
-						parent = @GetParent()
+						parent = @GetParent()\GetParent()
 						x, y = parent\LocalToScreen(parent\GetWide(), 0)
 
 						if @png
