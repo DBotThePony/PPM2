@@ -1,4 +1,7 @@
+
 ppm2:
+  stage: build
+  when: always
   script:
     - rm -rf ./lua
     - mkdir lua
@@ -11,6 +14,8 @@ test:moonlint:
   script:
     - moonc -l moon/*
 
-test:linter:
+linter:
+  dependencies:
+    - ppm2
   script:
     - sh luacheck.sh
