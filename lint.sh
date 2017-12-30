@@ -1,1 +1,0 @@
-moonc -l moon/* &> lint.txt

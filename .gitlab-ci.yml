@@ -1,7 +1,16 @@
-buildmod:
-   script:
-     - mkdir lua
-     - sh build.sh
-   artifacts:
-      paths:
-        - lua/*
+ppm2:
+  script:
+    - rm -rf ./lua
+    - mkdir lua
+    - sh build.sh
+  artifacts:
+    paths:
+      - lua/*
+
+test:moonlint:
+  script:
+    - moonc -l moon/*
+
+test:linter:
+  script:
+    - sh luacheck.sh
