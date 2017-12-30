@@ -10,11 +10,13 @@ ppm2:
     paths:
       - lua/*
 
-test:moonlint:
+moonlint:
+  allow_failure: yes
   script:
     - moonc -l moon/*
 
 linter:
+  allow_failure: yes
   dependencies:
     - ppm2
   script:
