@@ -127,6 +127,8 @@ class PonyDataInstance
 			@SetupData(data, true)
 		elseif @exists and readIfExists
 			@ReadFromDisk(force, doBackup)
+		elseif @existsJSON and readIfExists
+			@ReadFromDiskJSON(force, doBackup)
 
 	Reset: => @['Reset' .. getFunc](@) for k, {:getFunc} in pairs @@PONY_DATA
 
@@ -136,6 +138,7 @@ class PonyDataInstance
 	GetSaveOnChange: => @saveOnChange
 	SaveOnChange: => @saveOnChange
 	SetSaveOnChange: (val = true) => @saveOnChange = val
+
 	SetupData: (data, force = false, doBackup = false) =>
 		if doBackup or not force
 			makeBackup = false
@@ -166,21 +169,28 @@ class PonyDataInstance
 				@dataTable[key] = mapData.fix(mapData.enumMappingBackward[value\upper()])
 			else
 				@dataTable[key] = mapData.fix(value)
+
 	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
 		if @nwObj and @updateNWObject
 			{:getFunc} = @@PONY_DATA[key]
 			@nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
 		@Save() if saveNow
+
 	SetFilename: (filename) =>
 		@filename = filename
-		@filenameFull = "#{filename}.txt"
-		@fpath = "#{@@DATA_DIR}#{filename}.txt"
+		@filenameFull = "#{filename}.dat"
+		@fpath = "#{@@DATA_DIR}#{filename}.dat"
+		@fpathJSON = "#{@@DATA_DIR}#{filename}.txt"
 		@preview = "#{@@DATA_DIR}thumbnails/#{filename}.png"
-		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.txt"
-		@fpathFull = "data/#{@@DATA_DIR}#{filename}.txt"
+		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.dat"
+		@fpathBackupJSON = "#{@@DATA_DIR}#{filename}.bak.txt"
+		@fpathFull = "data/#{@@DATA_DIR}#{filename}.dat"
+		@fpathFullJSON = "data/#{@@DATA_DIR}#{filename}.txt"
 		@isOpen = @filename ~= nil
 		@exists = file.Exists(@fpath, 'DATA')
+		@existsJSON = file.Exists(@fpathJSON, 'DATA')
 		return @exists
+
 	SetNetworkData: (nwObj) => @nwObj = nwObj
 	SetPonyData: (nwObj) => @nwObj = nwObj
 	SetPonyDataController: (nwObj) => @nwObj = nwObj
@@ -203,14 +213,19 @@ class PonyDataInstance
 
 	IsValid: => @valid
 	Exists: => @exists
+	ExistsJSON: => @existsJSON
 	FileExists: => @exists
+	FileExistsJSON: => @existsJSON
 	IsExists: => @exists
+	IsExistsJSON: => @existsJSON
 	GetFileName: => @filename
 	GetFilename: => @filename
-	GetFileNameFull: => @filenameFull
+	GetFileNameFullJSON: => @filenameFullJSON
 	GetFilenameFull: => @filenameFull
 	GetFilePath: => @fpath
+	GetFilePathJSON: => @fpathJSON
 	GetFullFilePath: => @fpathFull
+
 	SerealizeValue: (valID = '') =>
 		map = @@PONY_DATA[valID]
 		return unless map
@@ -221,22 +236,91 @@ class PonyDataInstance
 			return map.serealize(val)
 		else
 			return val
-	Serealize: (prettyPrint = true) =>
+
+	SerealizeJSON: (prettyPrint = true) =>
 		serTab = {key, @SerealizeValue(key) for key, val in pairs @dataTable}
 		util.TableToJSON(serTab, prettyPrint)
+
+	@SAVE_IDENTIFY = {137, 64, 80, 80, 77, 50, 64, 83, 65, 86, 69, 64, 68, 65, 84, 65, 64, 0, 0, 10}
+	@EOF_STRING = tonumber(util.CRC('\x70EOF\x70'))
+
+	Serealize: =>
+		buffer = DLib.BytesBuffer()
+		buffer\WriteUByte(byte) for byte in *@@SAVE_IDENTIFY
+
+		for valID, val in pairs @dataTable
+			dataTable = @@PONY_DATA[valID]
+			prewrite = buffer.pointer
+			buffer\WriteUInt32(dataTable.crcn)
+			valSerealize = @SerealizeValue(valID)
+			pointer = buffer.pointer
+			buffer\WriteUInt16(0)
+			pointer2 = buffer.pointer
+
+			if val ~= valSerealize
+				buffer\WriteString(valSerealize)
+			elseif dataTable.byteswrite
+				dataTable.byteswrite(buffer, val)
+			else
+				strout = tostring(val)
+				buffer\WriteString(strout)
+
+			npointer = buffer.pointer
+			buffer\Seek(pointer)
+			buffer\WriteUInt16(npointer - pointer2)
+			buffer\Seek(npointer)
+
+		buffer\WriteUInt32(@@EOF_STRING)
+		return buffer\ToString()
+
 	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
 
 	@READ_SUCCESS = 0
 	@ERR_FILE_NOT_EXISTS = 1
 	@ERR_FILE_EMPTY = 2
 	@ERR_FILE_CORRUPT = 3
+
 	ReadFromDisk: (force = false, doBackup = true) =>
 		return @@ERR_FILE_NOT_EXISTS unless @exists
 		fRead = file.Read(@fpath, 'DATA')
 		return @@ERR_FILE_EMPTY if not fRead or fRead == ''
+		buffer = DLib.BytesBuffer(fRead)
+
+		readTable = {}
+
+		status = ProtectedCall ->
+			error('PPM/2 save header is corrupted. File is not a PPM/2 save?') for byte in *@@SAVE_IDENTIFY when byte ~= buffer\ReadUByte()
+
+			for i = 1, 4000
+				readCRC = buffer\ReadUInt32()
+				break if readCRC == @@EOF_STRING
+				fieldLength = buffer\ReadUInt16()
+				dataTable = PPM2.PonyDataRegistryCRC[readCRC]
+
+				if dataTable
+					if dataTable.enum
+						value = buffer\ReadString()
+						readTable[dataTable.key] = value
+					else
+						value = dataTable.bytesread(buffer)
+						readTable[dataTable.key] = value
+				else
+					buffer\Walk(fieldLength)
+
+		return @@ERR_FILE_CORRUPT unless status
+		return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
+
+	ReadFromDiskJSON: (force = false, doBackup = true) =>
+		return @@ERR_FILE_NOT_EXISTS unless @existsJSON
+		fRead = file.Read(@fpathJSON, 'DATA')
+		return @@ERR_FILE_EMPTY if not fRead or fRead == ''
 		readTable = util.JSONToTable(fRead)
 		return @@ERR_FILE_CORRUPT unless readTable
 		return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
+
+	SaveAsJSON: (path = @fpathJSON) =>
+		fCreate = @SerealizeJSON()
+		file.Write(path, fCreate)
 
 	SaveAs: (path = @fpath) =>
 		fCreate = @Serealize()
@@ -313,6 +397,14 @@ class PonyDataInstance
 
 			--render.SuppressEngineLighting(false)
 			render.PopRenderTarget()
+
+	SaveJSON: (doBackup = true, preview = true) =>
+		if doBackup and @exists
+			fRead = file.Read(@fpathJSON, 'DATA')
+			file.Write(@fpathBackupJSON, fRead)
+		@SaveAsJSON(@fpathJSON)
+		@SavePreview(@preview) if preview
+		@existsJSON = true
 
 	Save: (doBackup = true, preview = true) =>
 		if doBackup and @exists

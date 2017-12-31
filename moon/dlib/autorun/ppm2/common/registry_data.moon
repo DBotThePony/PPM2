@@ -1181,6 +1181,16 @@ for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
 
 testMinimalBits = 0
 
+PPM2.PonyDataRegistryCRC = {}
+
+for k, v in pairs PPM2.PonyDataRegistry
+	crc = util.CRC(k)
+	PPM2.PonyDataRegistryCRC[crc] = v
+	PPM2.PonyDataRegistryCRC[tonumber(crc)] = v
+	v.crc = crc
+	v.crcn = tonumber(crc)
+	v.key = k
+
 for key, value in pairs PPM2.PonyDataRegistry
 	if value.enum
 		value.min = 0
@@ -1192,6 +1202,8 @@ for key, value in pairs PPM2.PonyDataRegistry
 			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
 			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
 			value.fix = INT_FIXER(value.default, value.min, value.max)
+			value.byteswrite = (buffer, value) -> buffer\WriteInt32(value)
+			value.bytesread = (buffer) -> buffer\ReadInt32()
 			if value.min >= 0
 				selectBits = net.ChooseOptimalBits(value.max - value.min)
 				testMinimalBits += selectBits
@@ -1206,20 +1218,32 @@ for key, value in pairs PPM2.PonyDataRegistry
 			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
 			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
 			value.fix = FLOAT_FIXER(value.default, value.min, value.max)
+			value.byteswrite = (buffer, value) -> buffer\WriteDouble(value)
+			value.bytesread = (buffer) -> buffer\ReadDouble()
 			value.read = rFloat(value.min, value.max)
 			value.write = (arg = value.default()) -> wFloat(arg)
 			testMinimalBits += 32
 		when 'URL'
+			value.byteswrite = (buffer, value) -> buffer\WriteString(value)
+			value.bytesread = (buffer) -> buffer\ReadString()
 			value.fix = URL_FIXER
 			value.read = rURL
 			value.write = wString
 			testMinimalBits += 8
 		when 'BOOLEAN'
+			value.byteswrite = (buffer, value) -> buffer\WriteUByte(value and 1 or 0)
+			value.bytesread = (buffer, value) -> buffer\ReadUByte() == 1
 			value.fix = (arg = value.default()) -> tobool(arg)
 			value.read = rBool
 			value.write = wBool
 			testMinimalBits += 1
 		when 'COLOR'
+			value.byteswrite = (buffer, value) ->
+				buffer\WriteUByte(value.r)
+				buffer\WriteUByte(value.g)
+				buffer\WriteUByte(value.b)
+				buffer\WriteUByte(value.a)
+			value.bytesread = (buffer) -> Color(buffer\ReadUByte(), buffer\ReadUByte(), buffer\ReadUByte(), buffer\ReadUByte())
 			{:r, :g, :b, :a} = value.default()
 			value.fix = COLOR_FIXER(r, g, b, a)
 			value.read = rColor
