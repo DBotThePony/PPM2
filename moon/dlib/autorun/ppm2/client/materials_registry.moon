@@ -29,7 +29,10 @@ concommand.Add 'ppm2_reload_materials', ->
 			texture\Download()
 		mat\Recompute()
 	PPM2.PonyTextureController.URL_MATERIAL_CACHE = {}
-	PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds. Do not forget to ppm2_reload and ppm2_require now!')
+	PPM2.PonyTextureController.SessionID = math.random(1, 1000)
+	PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds.')
+	RunConsoleCommand('ppm2_reload')
+	RunConsoleCommand('ppm2_require')
 
 _Material = Material
 _CreateMaterial = CreateMaterial
