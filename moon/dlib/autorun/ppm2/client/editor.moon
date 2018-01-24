@@ -256,14 +256,8 @@ CALC_VIEW_PANEL = {
 		@SetMouseInputEnabled(true)
 		@SetKeyboardInputEnabled(true)
 		ply = LocalPlayer()
-		eyeang = ply\EyeAngles()
-		eyepos = ply\EyePos()
-		eyeang.p = 0
-		eyeang.r = 0
-		@drawPos = eyeang\Forward() * 100
-		@drawPos.z += 70
-		eyeang.y -= 180
-		@drawAngle = eyeang
+		@drawPos = Vector(100, 0, 70)
+		@drawAngle = Angle(0, 180, 0)
 		@fov = 90
 		@lastTick = RealTime()
 		hook.Add('CalcView', @, @CalcView)
@@ -294,8 +288,7 @@ CALC_VIEW_PANEL = {
 	CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
 		return hook.Remove('CalcView', @) if not @IsValid()
 		return if not @IsVisible()
-		origin = LocalPlayer()\GetPos() + @drawPos
-		angles = @drawAngle
+		origin, angles = LocalToWorld(@drawPos, @drawAngle, LocalPlayer()\GetPos(), Angle(0, LocalPlayer()\EyeAngles().y, 0))
 		newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
 		return newData
 
