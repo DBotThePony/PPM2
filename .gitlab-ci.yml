@@ -1,4 +1,9 @@
 
+before_script:
+  - apt update
+  - apt install luarocks -y
+  - luarocks install moonscript
+
 ppm2:
   stage: build
   when: always
@@ -9,15 +14,3 @@ ppm2:
   artifacts:
     paths:
       - lua/*
-
-moonlint:
-  allow_failure: yes
-  script:
-    - moonc -l moon/*
-
-linter:
-  allow_failure: yes
-  dependencies:
-    - ppm2
-  script:
-    - sh luacheck.sh
