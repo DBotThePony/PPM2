@@ -45,7 +45,7 @@ class PonyflyController
 
 	Switch: (status = false) =>
 		@ent = @controller.ent
-		return if not IsValid(@ent)
+		return if not IsValid(@ent) or not @ent\IsPlayer()
 		return if @lastState == status
 		@lastState = status
 		if not status
