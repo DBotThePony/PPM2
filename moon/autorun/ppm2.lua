@@ -1,4 +1,3 @@
-
 -- Copyright (C) 2017-2018 DBot
 
 -- Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +26,13 @@ timer.Simple(0, function()
 					'Open Workshop',
 					function() gui.OpenURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1153306104') end,
 					'Open GitLab',
-					function() gui.OpenURL('http://git.dbot.serealia.ca/dbot/DLib') end
+					function() gui.OpenURL('https://gitlab.com/DBotThePony/DLib') end
 				)
 			else
 				MsgC('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
 				MsgC(ADDON .. ' requires DLib to Run! Without DLib, ' .. ADDON .. ' would not do anything!\nGet it on workshop (or gitlab)\n')
 				MsgC('https://steamcommunity.com/sharedfiles/filedetails/?id=1153306104\n')
-				MsgC('http://git.dbot.serealia.ca/dbot/DLib\n')
+				MsgC('https://gitlab.com/DBotThePony/DLib\n')
 				MsgC('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
 			end
 		end)
