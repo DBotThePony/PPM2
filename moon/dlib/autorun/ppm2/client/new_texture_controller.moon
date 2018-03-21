@@ -40,6 +40,18 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 	@LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @LOWER_MANE_MATERIALS}
 	@TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @TAIL_DETAIL_MATERIALS}
 
+	@PHONG_UPDATE_TRIGGER = {k, v for k, v in pairs PPM2.PonyTextureController.PHONG_UPDATE_TRIGGER}
+
+	for ttype in *{'Mouth', 'Teeth', 'Tongue'}
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongFront'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongMiddle'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongSliding'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'Lightwarp'] = true
+		@PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
+
 	@MAT_INDEX_CMARK = 0
 	@MAT_INDEX_EYELASHES = 1
 	@MAT_INDEX_TONGUE = 2
@@ -224,6 +236,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			@ApplyPhongData(@LowerManeColor1, 'LowerMane')
 			@ApplyPhongData(@LowerManeColor2, 'LowerMane')
 
+		@ApplyPhongData(@TeethMaterial, 'Teeth') if @TeethMaterial
+		@ApplyPhongData(@MouthMaterial, 'Mouth') if @MouthMaterial
+		@ApplyPhongData(@TongueMaterial, 'Tongue') if @TongueMaterial
+
 	CompileBatWings: =>
 		return unless @isValid
 		textureData = {
@@ -398,6 +414,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
+		@UpdatePhongData()
 		PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
 
 		return @TeethMaterial, @MouthMaterial, @TongueMaterial

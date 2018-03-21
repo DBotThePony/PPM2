@@ -1106,7 +1106,7 @@ for i = 1, PPM2.MAX_TATTOOS
 		type: 'COLOR'
 	}
 
-for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
+for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes', 'Mouth', 'Teeth', 'Tongue'}
 	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
 		default: -> 3
 		getFunc: ttype .. 'PhongExponent'

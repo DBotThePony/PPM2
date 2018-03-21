@@ -1120,6 +1120,9 @@ EditorPages = {
 					@ColorBox('Teeth color', 'TeethColor')
 					@ColorBox('Mouth color', 'MouthColor')
 					@ColorBox('Tongue color', 'TongueColor')
+					doAddPhongData(@, 'Teeth')
+					doAddPhongData(@, 'Mouth')
+					doAddPhongData(@, 'Tongue')
 	}
 
 	{
