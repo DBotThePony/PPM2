@@ -22,6 +22,7 @@ ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIV
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
+ENABLE_STARE = CreateConVar('ppm2_render_stare', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Make eyes follow players and move when idling')
 
 class PonyRenderController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
@@ -39,6 +40,12 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@socksModel\SetNoDraw(false) if IsValid(@socksModel)
 		@newSocksModel = data\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
+		@lastStareUpdate = 0
+		@staringAt = NULL
+		@rotatedHeadTarget = false
+		@idleEyes = true
+		@idleEyesActive = false
+		@nextRollEyes = 0
 		if @ent
 			@CreateFlexController()
 			@CreateEmotesController()
@@ -51,6 +58,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return NULL if @ent ~= LocalPlayer()
 		@CreateLegs() if not IsValid()
 		return @legsModel
+
 	CreateLegs: =>
 		return NULL if not @isValid
 		return NULL if @ent ~= LocalPlayer()
@@ -270,11 +278,13 @@ class PonyRenderController extends PPM2.ControllerChildren
 		render.EnableClipping(oldClip)
 
 	IsValid: => IsValid(@ent) and @isValid
+
 	Reset: =>
 		@flexes\Reset() if @flexes and @flexes.Reset
 		@emotes\Reset() if @emotes and @emotes.Reset
 		@GetTextureController()\Reset() if @GetTextureController and @GetTextureController() and @GetTextureController().Reset
 		@GetTextureController()\ResetTextures() if @GetTextureController and @GetTextureController()
+
 	Remove: =>
 		@flexes\Remove() if @flexes
 		@emotes\Remove() if @emotes
@@ -302,6 +312,68 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
 		@hideModels = status
 
+	CheckTarget: (epos, pos) =>
+		return not util.TraceLine({
+			start: epos,
+			endpos: pos,
+			filter: @ent\GetEntity(),
+			mask: MASK_BLOCKLOS
+		}).Hit
+
+	UpdateStare: =>
+		ctime = RealTime()
+		return if @lastStareUpdate > ctime
+
+		if (not @idleEyes or not ENABLE_STARE\GetBool()) and @idleEyesActive
+			@staringAt = NULL
+			@ent\SetEyeTarget(Vector())
+			@idleEyesActive = false
+			return
+
+		return if not @idleEyes or not ENABLE_STARE\GetBool()
+		@idleEyesActive = true
+		@lastStareUpdate = ctime + 0.2
+		lpos = @ent\EyePos()
+
+		if IsValid(@staringAt)
+			epos = @staringAt\EyePos()
+			if epos\Distance(lpos) < 300 and DLib.combat.inPVS(@ent, @staringAt) and @CheckTarget(lpos, epos)
+				@ent\SetEyeTarget(epos)
+				return
+			@staringAt = NULL
+			@ent\SetEyeTarget(Vector())
+
+		if player.GetCount() ~= 1
+			local last
+			max = 300
+			local lastpos
+			for ply in *player.GetAll()
+				if @ent ~= ply
+					epos = ply\EyePos()
+					dist = epos\Distance(lpos)
+					if dist < max and DLib.combat.inPVS(@ent, ply) and @CheckTarget(lpos, epos)
+						max = dist
+						last = ply
+						lastpos = epos
+			if last
+				@ent\SetEyeTarget(lastpos)
+				@staringAt = last
+				return
+
+		return if @nextRollEyes > ctime
+		@nextRollEyes = ctime + math.random(4, 16) / 6
+		ang = @ent\EyeAngles()
+		@eyeRollTargetPos = Vector(math.random(200, 400), math.random(-80, 80), math.random(-20, 20))
+		@prevRollTargetPos = @prevRollTargetPos or @eyeRollTargetPos
+		-- @ent\SetEyeTarget(@prevRollTargetPos)
+
+	UpdateEyeRoll: =>
+		return if not ENABLE_STARE\GetBool() or not @idleEyes or not @eyeRollTargetPos or IsValid(@staringAt)
+		@prevRollTargetPos = LerpVector(FrameTime() * 6, @prevRollTargetPos, @eyeRollTargetPos)
+		roll = Vector(@prevRollTargetPos)
+		roll\Rotate(@ent\EyeAngles())
+		@ent\SetEyeTarget(@ent\EyePos() + roll)
+
 	PreDraw: (ent = @ent, drawingNewTask = false) =>
 		return if not @isValid
 
@@ -313,6 +385,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes
+		if @ent\IsPlayer()
+			@UpdateStare()
+			@UpdateEyeRoll()
 
 		if ent.RenderOverride and not ent.__ppm2RenderOverride and @GrabData('HideManes') and @GrabData('HideManesSocks')
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
