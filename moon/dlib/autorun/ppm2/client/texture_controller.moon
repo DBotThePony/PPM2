@@ -710,7 +710,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
 	@QUAD_SIZE_EYES = 512
-	@QUAD_SIZE_SOCKS = 256
+	@QUAD_SIZE_SOCKS = 512
 	@QUAD_SIZE_CMARK = 512
 	@QUAD_SIZE_CONST = 512
 	@QUAD_SIZE_WING = 64
