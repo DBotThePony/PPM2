@@ -21,26 +21,28 @@ file.CreateDir('ppm2/thumbnails')
 
 for ffind in *file.Find('ppm2/*.txt', 'DATA')
 	fTarget = ffind\sub(1, -5)
-	fRead = file.Read('ppm2/' .. ffind, 'DATA')
-	json = util.JSONToTable(fRead)
-	if json
-		TagCompound = DLib.NBT.TagCompound()
-		for key, value in pairs json
-			switch type(value)
-				when 'string'
-					TagCompound\AddString(key, value)
-				when 'number'
-					TagCompound\AddFloat(key, value)
-				when 'boolean'
-					TagCompound\AddByte(key, value and 1 or 0)
-				when 'table'
-					-- assume color
-					TagCompound\AddByteArray(key, {value.r - 128, value.g - 128, value.b - 128, value.a - 128}) if value.r and value.g and value.b and value.a
-				else
-					error(type(value))
-		buf = DLib.BytesBuffer()
-		TagCompound\WriteFile(buf)
-		file.Write('ppm2/' .. fTarget .. '.dat', buf\ToString())
+	-- maybe joined server with old ppm2 and new clear _current was generated
+	if not file.Exists('ppm2/' .. fTarget .. '.dat', 'DATA')
+		fRead = file.Read('ppm2/' .. ffind, 'DATA')
+		json = util.JSONToTable(fRead)
+		if json
+			TagCompound = DLib.NBT.TagCompound()
+			for key, value in pairs json
+				switch type(value)
+					when 'string'
+						TagCompound\AddString(key, value)
+					when 'number'
+						TagCompound\AddFloat(key, value)
+					when 'boolean'
+						TagCompound\AddByte(key, value and 1 or 0)
+					when 'table'
+						-- assume color
+						TagCompound\AddByteArray(key, {value.r - 128, value.g - 128, value.b - 128, value.a - 128}) if value.r and value.g and value.b and value.a
+					else
+						error(type(value))
+			buf = DLib.BytesBuffer()
+			TagCompound\WriteFile(buf)
+			file.Write('ppm2/' .. fTarget .. '.dat', buf\ToString())
 	file.Delete('ppm2/' .. ffind)
 
 class PonyDataInstance
