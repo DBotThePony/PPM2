@@ -336,6 +336,15 @@ class PonyRenderController extends PPM2.ControllerChildren
 		lpos = @ent\EyePos()
 
 		if IsValid(@staringAt)
+			trNew = util.TraceLine({
+				start: lpos,
+				endpos: lpos + @ent\EyeAngles()\Forward() * 270,
+				filter: @ent,
+			})
+
+			if trNew.Entity\IsValid() and trNew.Entity\IsPlayer()
+				@staringAt = trNew.Entity
+
 			epos = @staringAt\EyePos()
 			if epos\Distance(lpos) < 300 and DLib.combat.inPVS(@ent, @staringAt) and @CheckTarget(lpos, epos)
 				@ent\SetEyeTarget(epos)
