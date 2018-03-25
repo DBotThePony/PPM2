@@ -268,7 +268,7 @@ class PonyDataInstance
 				when 'URL'
 					return DLib.NBT.TagString(val)
 				when 'BOOLEAN'
-					return DLib.NBT.TagByte(tonumber(val))
+					return DLib.NBT.TagByte(val and 1 or 0)
 				when 'COLOR'
 					return DLib.NBT.TagByteArray({val.r - 128, val.g - 128, val.b - 128, val.a - 128})
 	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
