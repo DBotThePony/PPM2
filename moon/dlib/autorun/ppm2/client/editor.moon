@@ -1400,7 +1400,7 @@ EditorPages = {
 				menu\AddOption('Open', -> openFile(fil))\SetIcon('icon16/accept.png')
 				menu\AddOption('Delete', ->
 					confirm = ->
-						file.Delete("ppm2/#{fil}.txt")
+						file.Delete("ppm2/#{fil}.dat")
 						@rebuildFileList()
 					Derma_Query(
 						"Do you really want to delete #{fil}?\nIt will be gone forever!\n(a long time!)",
@@ -1414,8 +1414,8 @@ EditorPages = {
 			list\AddColumn('Filename')
 			@rebuildFileList = ->
 				list\Clear()
-				files, dirs = file.Find('ppm2/*.txt', 'DATA')
-				matchBak = '.bak.txt'
+				files, dirs = file.Find('ppm2/*.dat', 'DATA')
+				matchBak = '.bak.dat'
 				for fil in *files
 					if fil\sub(-#matchBak) ~= matchBak
 						fil2 = fil\sub(1, #fil - 4)
@@ -1602,7 +1602,7 @@ createTopButtons = (isNewEditor = false) =>
 			@SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 			@panels.saves.rebuildFileList() if @panels.saves and @panels.saves.rebuildFileList
 			callback(txt)
-		Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .txt\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
+		Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .dat\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
 
 	@saveButton = vgui.Create('DButton', @)
 	with @saveButton
