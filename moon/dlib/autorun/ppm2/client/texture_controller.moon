@@ -243,6 +243,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 	DelayCompile: (func = '', ...) =>
 		return if not @[func]
 		args = {...}
+		for i, val in ipairs(@@COMPILE_QUEUE)
+			if val.func == func and val.self == @ and (#val.args == 0 or #args == 0)
+				val.args = args
+				return
 		table.insert(@@COMPILE_QUEUE, {self: @, :func, :args, run: @[func]})
 
 	DataChanges: (state) =>
@@ -569,18 +573,32 @@ class PonyTextureController extends PPM2.ControllerChildren
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
-
-		--delta = 9999
-		--nsize = texSize
-
-		--for size in *@@RT_SIZES
-		--	ndelta = math.abs(size - texSize)
-		--	if ndelta < delta
-		--		delta = ndelta
-		--		nsize = size
-
-		--render.SetViewPort(0, 0, texSize, texSize)
 		rt = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, false)
+		rt\Download()
+		render.PushRenderTarget(rt)
+		render.Clear(r, g, b, a, true, true)
+		surface.DisableClipping(true)
+		cam.Start2D()
+		surface.SetDrawColor(r, g, b, a)
+		surface.DrawRect(0, 0, texSize, texSize)
+		@currentRT = rt
+		return rt
+
+	StartRTOpaque: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
+		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
+		@currentRTTrace = debug.traceback()
+		@oldW, @oldH = ScrW(), ScrH()
+
+		textureFlags = 0
+		-- textureFlags = textureFlags + 16 -- anisotropic
+		textureFlags = textureFlags + 256 -- no mipmaps
+		textureFlags = textureFlags + 2048 -- Texture is procedural
+		textureFlags = textureFlags + 4096
+		-- textureFlags = textureFlags + 8388608
+		textureFlags = textureFlags + 32768 -- Texture is a render target
+		-- textureFlags = textureFlags + 67108864 -- Usable as a vertex texture
+
+		rt = GetRenderTargetEx("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_NONE, textureFlags, 4, IMAGE_FORMAT_RGB565)
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
@@ -868,7 +886,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		continueCompilation = ->
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('BodyColor')
-			@StartRT("Body_rt", bodysize, r, g, b)
+			@StartRTOpaque("Body_rt", bodysize, r, g, b)
 
 			surface.DrawRect(0, 0, bodysize, bodysize)
 
@@ -925,7 +943,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			@BodyMaterial\SetTexture('$basetexture', @EndRT())
 
-			@StartRT("Body_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize)
+			@StartRTOpaque("Body_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize)
 			surface.SetDrawColor(255, 255, 255)
 
 			if @GrabData('GlowingEyebrows')
@@ -1010,7 +1028,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
-			@StartRT('Horn', texSize, r, g, b)
+			@StartRTOpaque('Horn', texSize, r, g, b)
 
 			surface.SetDrawColor(@GrabData('HornDetailColor'))
 			surface.SetMaterial(@@HORN_DETAIL_COLOR)
@@ -1024,7 +1042,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			@HornMaterial\SetTexture('$basetexture', @EndRT())
 
-			@StartRT('Horn_illum', texSize)
+			@StartRTOpaque('Horn_illum', texSize)
 
 			if @GrabData('HornGlow')
 				surface.SetDrawColor(255, 255, 255, @GrabData('HornGlowSrength') * 255)
@@ -1034,7 +1052,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@HornMaterial\SetTexture('$selfillummask', @EndRT())
 
 			{:r, :g, :b} = @@BUMP_COLOR
-			@StartRT('Horn_bump', texSize, r, g, b)
+			@StartRTOpaque('Horn_bump', texSize, r, g, b)
 			alpha = 255
 			alpha = @GrabData('HornDetailColor').a
 			surface.SetDrawColor(255, 255, 255, alpha)
@@ -1216,7 +1234,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		if url == '' or not url\find('^https?://')
 			@SocksMaterial\SetVector('$color', Vector(1, 1, 1))
 			@SocksMaterial\SetVector('$color2', Vector(1, 1, 1))
-			@StartRT('Socks', texSize, r, g, b)
+			@StartRTOpaque('Socks', texSize, r, g, b)
 
 			socksType = @GrabData('SocksTexture') + 1
 			surface.SetMaterial(_M.SOCKS_MATERIALS[socksType] or _M.SOCKS_MATERIALS[1])
@@ -1271,7 +1289,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
-			rt = @StartRT('Wings_rt', texSize, r, g, b)
+			rt = @StartRTOpaque('Wings_rt', texSize, r, g, b)
 
 			surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
@@ -1353,7 +1371,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		continueCompilation = ->
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('ManeColor1')
-			@StartRT('Mane_1', texSize, r, g, b)
+			@StartRTOpaque('Mane_1', texSize, r, g, b)
 
 			maneTypeUpper = @GetManeType()
 			if @@UPPER_MANE_MATERIALS[maneTypeUpper]
@@ -1375,7 +1393,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			-- Second mane pass
 			{:r, :g, :b} = @GrabData('ManeColor2')
-			@StartRT('Mane_2', texSize, r, g, b)
+			@StartRTOpaque('Mane_2', texSize, r, g, b)
 
 			maneTypeLower = @GetManeTypeLower()
 			if @@LOWER_MANE_MATERIALS[maneTypeLower]
@@ -1459,7 +1477,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('TailColor1')
 
 			-- First tail pass
-			@StartRT('Tail_1', texSize, r, g, b)
+			@StartRTOpaque('Tail_1', texSize, r, g, b)
 
 			tailType = @GetTailType()
 			if @@TAIL_DETAIL_MATERIALS[tailType]
@@ -1480,7 +1498,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			-- Second tail pass
 			{:r, :g, :b} = @GrabData('TailColor2')
-			@StartRT('Tail_2', texSize, r, g, b)
+			@StartRTOpaque('Tail_2', texSize, r, g, b)
 
 			if @@TAIL_DETAIL_MATERIALS[tailType]
 				i = 1
@@ -1744,7 +1762,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		if EyeURL == '' or not EyeURL\find('^https?://')
 			{:r, :g, :b, :a} = EyeBackground
-			rt = @StartRT("#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, r, g, b)
+			rt = @StartRTOpaque("#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, r, g, b)
 			@["EyeTexture#{prefixUpper}"] = rt
 
 			drawMat = CreateMaterial("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_RenderMat_#{prefix}", 'UnlitGeneric', {

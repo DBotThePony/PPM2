@@ -158,7 +158,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		continueCompilation = ->
 			return unless @isValid
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
-			@StartRT("Mane_rt_1_#{prefix}", texSize, r, g, b)
+			@StartRTOpaque("Mane_rt_1_#{prefix}", texSize, r, g, b)
 
 			maneTypeUpper = @GetManeType()
 			if @@UPPER_MANE_MATERIALS[maneTypeUpper]
@@ -180,7 +180,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 			-- Second mane pass
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
-			@StartRT("Mane_rt_2_#{prefix}", texSize, r, g, b)
+			@StartRTOpaque("Mane_rt_2_#{prefix}", texSize, r, g, b)
 
 			maneTypeLower = @GetManeTypeLower()
 			if @@LOWER_MANE_MATERIALS[maneTypeLower]
@@ -273,7 +273,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
-			@StartRT('BatWings_rt', texSize, r, g, b)
+			@StartRTOpaque('BatWings_rt', texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
@@ -335,7 +335,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		continueCompilation = ->
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
-			@StartRT('BatWingsSkin_rt', texSize, r, g, b)
+			@StartRTOpaque('BatWingsSkin_rt', texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
