@@ -297,6 +297,14 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 		}
 
 		{
+			'name': 'talk'
+			'flexSequence': 'talk'
+			'autostart': false
+			'repeat': false
+			'time': 1.25
+		}
+
+		{
 			'name': 'ooo'
 			'flexSequence': 'ooo'
 			'bonesSequence': 'neck_flopping_backward'
@@ -433,7 +441,8 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 
 	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
 		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
-		switch text\lower()
+		text = text\lower()
+		switch text
 			when 'o', ':o', 'о', 'О', ':о', ':О'
 				@RestartSequence('ooo')
 			when ':3', ':з'
@@ -455,11 +464,11 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			when 'okay mate', 'okay, mate'
 				@RestartSequence('wink_left')
 			else
-				if string.find(text, 'hehehe') or string.find(text, 'hahaha')
+				if text\find('hehehe') or text\find('hahaha')
 					@RestartSequence('greeny')
-				elseif string.find(text, '^pff+')
+				elseif text\find('^pff+')
 					@RestartSequence('pffff')
-				elseif string.find(text, '^blah blah')
+				elseif text\find('^blah blah')
 					@RestartSequence('blahblah')
 				else
 					@RestartSequence('talk')
