@@ -43,7 +43,7 @@ for ffind in *file.Find('ppm2/*.txt', 'DATA')
 			buf = DLib.BytesBuffer()
 			TagCompound\WriteFile(buf)
 			file.Write('ppm2/' .. fTarget .. '.dat', buf\ToString())
-	file.Delete('ppm2/' .. ffind)
+	--file.Delete('ppm2/' .. ffind)
 
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
