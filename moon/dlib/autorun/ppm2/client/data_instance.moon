@@ -19,6 +19,30 @@ file.CreateDir('ppm2')
 file.CreateDir('ppm2/backups')
 file.CreateDir('ppm2/thumbnails')
 
+for ffind in *file.Find('ppm2/*.txt', 'DATA')
+	fTarget = ffind\sub(1, -5)
+	fRead = file.Read('ppm2/' .. ffind, 'DATA')
+	json = util.JSONToTable(fRead)
+	if json
+		TagCompound = DLib.NBT.TagCompound()
+		for key, value in pairs json
+			switch type(value)
+				when 'string'
+					TagCompound\AddString(key, value)
+				when 'number'
+					TagCompound\AddFloat(key, value)
+				when 'boolean'
+					TagCompound\AddByte(key, value and 1 or 0)
+				when 'table'
+					-- assume color
+					TagCompound\AddByteArray(key, {value.r - 128, value.g - 128, value.b - 128, value.a - 128}) if value.r and value.g and value.b and value.a
+				else
+					error(type(value))
+		buf = DLib.BytesBuffer()
+		TagCompound\WriteFile(buf)
+		file.Write('ppm2/' .. fTarget .. '.dat', buf\ToString())
+	file.Delete('ppm2/' .. ffind)
+
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
 	@DATA_DIR_BACKUP = "ppm2/backups/"
@@ -117,6 +141,7 @@ class PonyDataInstance
 
 	new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
 		@SetFilename(filename)
+		@NBTTagCompound = DLib.NBT.TagCompound()
 		@updateNWObject = true
 		@networkNWObject = true
 		@valid = @isOpen
@@ -136,36 +161,49 @@ class PonyDataInstance
 	GetSaveOnChange: => @saveOnChange
 	SaveOnChange: => @saveOnChange
 	SetSaveOnChange: (val = true) => @saveOnChange = val
-	SetupData: (data, force = false, doBackup = false) =>
+	GetValueFromNBT: (mapData, value) =>
+		if mapData.enum and type(value) == 'string'
+			mapData.fix(mapData.enumMappingBackward[value\upper()])
+		elseif mapData.type == 'COLOR'
+			if value.r and value.g and value.b and value.a
+				mapData.fix(Color(value))
+			else
+				mapData.fix(Color(value[1] + 128, value[2] + 128, value[3] + 128, value[4] + 128))
+		elseif mapData.type == 'BOOLEAN'
+			if type(value) == 'boolean'
+				mapData.fix(value)
+			else
+				mapData.fix(value == 1)
+		else
+			mapData.fix(value)
+
+	SetupData: (data = @NBTTagCompound, force = false, doBackup = false) =>
+		if type(data) == 'NBTCompound'
+			data = data\GetValue()
 		if doBackup or not force
 			makeBackup = false
-			for key, value in pairs data
+			for key, value2 in pairs(data)
 				key = key\lower()
 				map = @@PONY_DATA_MAPPING[key]
-				if not map
-					return @@ERR_MISSING_PARAMETER if not force
-					makeBackup = true
-					break
-				mapData = @@PONY_DATA[map]
-				if mapData.enum
-					if type(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or type(value) == 'number' and not mapData.enumMapping[value]
-						return @@ERR_MISSING_CONTENT if not force
-						makeBackup = true
-						break
+				if map
+					mapData = @@PONY_DATA[map]
+					value = @GetValueFromNBT(mapData, value2)
+					if mapData.enum
+						if type(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or type(value) == 'number' and not mapData.enumMapping[value]
+							return @@ERR_MISSING_CONTENT if not force
+							makeBackup = true
+							break
 			if doBackup and makeBackup and @exists
-				bkName = "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.txt"
+				bkName = "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
 				fRead = file.Read(@fpath, 'DATA')
 				file.Write(bkName, fRead)
 
-		for key, value in pairs data
+		for key, value2 in pairs(data)
 			key = key\lower()
 			map = @@PONY_DATA_MAPPING[key]
 			continue unless map
 			mapData = @@PONY_DATA[map]
-			if mapData.enum and type(value) == 'string'
-				@dataTable[key] = mapData.fix(mapData.enumMappingBackward[value\upper()])
-			else
-				@dataTable[key] = mapData.fix(value)
+			@dataTable[key] = @GetValueFromNBT(mapData, value2)
 	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
 		if @nwObj and @updateNWObject
 			{:getFunc} = @@PONY_DATA[key]
@@ -173,11 +211,11 @@ class PonyDataInstance
 		@Save() if saveNow
 	SetFilename: (filename) =>
 		@filename = filename
-		@filenameFull = "#{filename}.txt"
-		@fpath = "#{@@DATA_DIR}#{filename}.txt"
+		@filenameFull = "#{filename}.dat"
+		@fpath = "#{@@DATA_DIR}#{filename}.dat"
 		@preview = "#{@@DATA_DIR}thumbnails/#{filename}.png"
-		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.txt"
-		@fpathFull = "data/#{@@DATA_DIR}#{filename}.txt"
+		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.dat"
+		@fpathFull = "data/#{@@DATA_DIR}#{filename}.dat"
 		@isOpen = @filename ~= nil
 		@exists = file.Exists(@fpath, 'DATA')
 		return @exists
@@ -216,14 +254,21 @@ class PonyDataInstance
 		return unless map
 		val = @dataTable[valID]
 		if map.enum
-			return map.enumMapping[val] or map.enumMapping[map.default()]
+			return DLib.NBT.TagString(map.enumMapping[val] or map.enumMapping[map.default()])
 		elseif map.serealize
 			return map.serealize(val)
 		else
-			return val
-	Serealize: (prettyPrint = true) =>
-		serTab = {key, @SerealizeValue(key) for key, val in pairs @dataTable}
-		util.TableToJSON(serTab, prettyPrint)
+			switch map.type
+				when 'INT'
+					return DLib.NBT.TagInt(val)
+				when 'FLOAT'
+					return DLib.NBT.TagFloat(val)
+				when 'URL'
+					return DLib.NBT.TagString(val)
+				when 'BOOLEAN'
+					return DLib.NBT.TagByte(tonumber(val))
+				when 'COLOR'
+					return DLib.NBT.TagByteArray({val.r - 128, val.g - 128, val.b - 128, val.a - 128})
 	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
 
 	@READ_SUCCESS = 0
@@ -234,13 +279,15 @@ class PonyDataInstance
 		return @@ERR_FILE_NOT_EXISTS unless @exists
 		fRead = file.Read(@fpath, 'DATA')
 		return @@ERR_FILE_EMPTY if not fRead or fRead == ''
-		readTable = util.JSONToTable(fRead)
-		return @@ERR_FILE_CORRUPT unless readTable
-		return @SetupData(readTable, force, doBackup) or @@READ_SUCCESS
+		@NBTTagCompound\ReadFile(DLib.BytesBuffer(fRead))
+		return @SetupData(@NBTTagCompound, force, doBackup) or @@READ_SUCCESS
 
 	SaveAs: (path = @fpath) =>
-		fCreate = @Serealize()
-		file.Write(path, fCreate)
+		@NBTTagCompound\AddTag(key, @SerealizeValue(key)) for key, val in pairs @dataTable
+		buf = DLib.BytesBuffer()
+		@NBTTagCompound\WriteFile(buf)
+		file.Write(path, buf\ToString())
+		return buf
 
 	SavePreview: (path = @preview) =>
 		buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
@@ -318,9 +365,10 @@ class PonyDataInstance
 		if doBackup and @exists
 			fRead = file.Read(@fpath, 'DATA')
 			file.Write(@fpathBackup, fRead)
-		@SaveAs(@fpath)
+		buf = @SaveAs(@fpath)
 		@SavePreview(@preview) if preview
 		@exists = true
+		return buf
 
 PPM2.PonyDataInstance = PonyDataInstance
 
