@@ -229,30 +229,21 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
+	@COMPILE_QUEUE = {}
+	@COMPILE_TEXTURES = ->
+		return if #@COMPILE_QUEUE == 0
+		for data in *@COMPILE_QUEUE
+			if data.self\IsValid()
+				data.run(data.self, unpack(data.args))
+				data.self.lastMaterialUpdate = 0
+		@COMPILE_QUEUE = {}
+
+	hook.Add 'RenderScene', 'PPM2.CompileTextures', @COMPILE_TEXTURES, -1
+
 	DelayCompile: (func = '', ...) =>
 		return if not @[func]
 		args = {...}
-		for data in *@delayCompilation
-			if data.func == func and #args == #data.args
-				hit = false
-				for i = 1, #args
-					if args[i] ~= data.args[i]
-						hit = true
-						break
-				for i = 1, #data.args
-					if args[i] ~= data.args[i]
-						hit = true
-						break
-				return if not hit
-
-		table.insert(@delayCompilation, {:func, :args})
-		timer.Create "#{@}_DelayCompile", 0, 1, ->
-			return if not @IsValid()
-			return if not IsValid(@ent)
-			for data in *@delayCompilation
-				@[data.func](@, unpack(data.args))
-			@lastMaterialUpdate = 0
-			@delayCompilation = {}
+		table.insert(@@COMPILE_QUEUE, {self: @, :func, :args, run: @[func]})
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -288,10 +279,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				elseif @@TAIL_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					--@DelayCompile('CompileEye', true)
-					--@DelayCompile('CompileEye', false)
-					@CompileEye(true)
-					@CompileEye(false)
+					@DelayCompile('CompileEye', true)
+					@DelayCompile('CompileEye', false)
 				elseif @@BODY_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
