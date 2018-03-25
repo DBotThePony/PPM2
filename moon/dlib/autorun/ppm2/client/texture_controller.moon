@@ -585,6 +585,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return rt
 
 	StartRTOpaque: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
+		if @@RT_BUFFER_BROKEN
+			return @StartRT(name, texSize, r, g, b, a)
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
@@ -594,11 +596,16 @@ class PonyTextureController extends PPM2.ControllerChildren
 		textureFlags = textureFlags + 256 -- no mipmaps
 		textureFlags = textureFlags + 2048 -- Texture is procedural
 		textureFlags = textureFlags + 4096
-		-- textureFlags = textureFlags + 8388608
+		textureFlags = textureFlags + 8388608
 		textureFlags = textureFlags + 32768 -- Texture is a render target
 		-- textureFlags = textureFlags + 67108864 -- Usable as a vertex texture
 
-		rt = GetRenderTargetEx("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}", texSize, texSize, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_NONE, textureFlags, 4, IMAGE_FORMAT_RGB565)
+		rt = GetRenderTargetEx("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}_op", texSize, texSize, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_NONE, textureFlags, 0, IMAGE_FORMAT_RGB565)
+		if texSize ~= rt\Width() or texSize ~= rt\Height()
+			PPM2.Message('Your videocard is garbage... I cant even save extra memory for you!')
+			PPM2.Message('Switching to fat ass render targets with full buffer')
+			@@RT_BUFFER_BROKEN = true
+			return @StartRT(name, texSize, r, g, b, a)
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
