@@ -42,7 +42,10 @@ for ffind in *file.Find('ppm2/*.txt', 'DATA')
 						error(type(value))
 			buf = DLib.BytesBuffer()
 			TagCompound\WriteFile(buf)
-			file.Write('ppm2/' .. fTarget .. '.dat', buf\ToString())
+			stream = file.Open('ppm2/' .. fTarget .. '.dat', 'wb', 'DATA')
+			buf\ToFileStream(stream)
+			stream\Flush()
+			stream\Close()
 	--file.Delete('ppm2/' .. ffind)
 
 class PonyDataInstance
@@ -288,7 +291,10 @@ class PonyDataInstance
 		@NBTTagCompound\AddTag(key, @SerealizeValue(key)) for key, val in pairs @dataTable
 		buf = DLib.BytesBuffer()
 		@NBTTagCompound\WriteFile(buf)
-		file.Write(path, buf\ToString())
+		stream = file.Open(path, 'wb', 'DATA')
+		buf\ToFileStream(stream)
+		stream\Flush()
+		stream\Close()
 		return buf
 
 	SavePreview: (path = @preview) =>
