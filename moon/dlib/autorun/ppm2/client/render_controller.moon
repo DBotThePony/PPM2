@@ -338,7 +338,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if IsValid(@staringAt)
 			trNew = util.TraceLine({
 				start: lpos,
-				endpos: lpos + @ent\EyeAngles()\Forward() * 270,
+				endpos: lpos + @ent\EyeAnglesFixed()\Forward() * 270,
 				filter: @ent,
 			})
 
@@ -371,7 +371,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		return if @nextRollEyes > ctime
 		@nextRollEyes = ctime + math.random(4, 16) / 6
-		ang = @ent\EyeAngles()
+		ang = @ent\EyeAnglesFixed()
 		@eyeRollTargetPos = Vector(math.random(200, 400), math.random(-80, 80), math.random(-20, 20))
 		@prevRollTargetPos = @prevRollTargetPos or @eyeRollTargetPos
 		-- @ent\SetEyeTarget(@prevRollTargetPos)
@@ -380,7 +380,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not ENABLE_STARE\GetBool() or not @idleEyes or not @eyeRollTargetPos or IsValid(@staringAt)
 		@prevRollTargetPos = LerpVector(FrameTime() * 6, @prevRollTargetPos, @eyeRollTargetPos)
 		roll = Vector(@prevRollTargetPos)
-		roll\Rotate(@ent\EyeAngles())
+		roll\Rotate(@ent\EyeAnglesFixed())
 		@ent\SetEyeTarget(@ent\EyePos() + roll)
 
 	PreDraw: (ent = @ent, drawingNewTask = false) =>
