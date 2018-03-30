@@ -59,7 +59,7 @@
 
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
-class FlexState extends DLib.ModifierBase
+class FlexState extends PPM2.ModifierBase
 	@SetupModifiers: =>
 		@RegisterModifier('Speed', 0)
 		@RegisterModifier('Scale', 0)
@@ -168,7 +168,7 @@ class FlexState extends DLib.ModifierBase
 
 PPM2.FlexState = FlexState
 
-class FlexSequence extends DLib.SequenceBase
+class FlexSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
 		super(controller, data)
 

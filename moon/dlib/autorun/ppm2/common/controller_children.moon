@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-class PPM2.ControllerChildren extends DLib.SequenceHolder
+class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	--@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {}
 	@__inherited: (child) =>

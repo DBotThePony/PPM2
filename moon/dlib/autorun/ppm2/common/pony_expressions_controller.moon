@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-class ExpressionSequence extends DLib.SequenceBase
+class ExpressionSequence extends PPM2.SequenceBase
 	new: (controller, data) =>
 		super(controller, data)
 
