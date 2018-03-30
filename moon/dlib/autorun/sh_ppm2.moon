@@ -23,6 +23,10 @@ DLib.manifest({
 	prefix: 'ppm2'
 
 	shared: {
+		'common/modifier_base.lua'
+		'common/sequence_base.lua'
+		'common/sequence_holder.lua'
+		'common/networked_data.lua'
 		'common/controller_children.lua'
 		'common/registry.lua'
 		'common/functions.lua'
