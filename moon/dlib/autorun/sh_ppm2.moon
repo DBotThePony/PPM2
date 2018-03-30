@@ -20,7 +20,7 @@ PPM2 = PPM2 or {}
 
 DLib.manifest({
 	name: 'PPM/2'
-	prefix: 'dlib/autorun/ppm2'
+	prefix: 'ppm2'
 
 	shared: {
 		'common/controller_children.lua'
