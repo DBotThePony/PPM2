@@ -34,7 +34,7 @@ class PPM2.SequenceBase
 		@speed = 1
 		@scale = 1
 		@frame = 0
-		@start = RealTimeLL()
+		@start = RealTimeL()
 		@finish = @start + @time
 		@parent = parent
 
@@ -47,7 +47,7 @@ class PPM2.SequenceBase
 
 	SetTime: (newTime = @time, refresh = true) =>
 		@frame = 0
-		@start = RealTimeLL() if refresh
+		@start = RealTimeL() if refresh
 		@time = newTime
 		@finish = @start + @time
 
@@ -58,7 +58,7 @@ class PPM2.SequenceBase
 
 	Reset: =>
 		@frame = 0
-		@start = RealTimeLL()
+		@start = RealTimeL()
 		@finish = @start + @time
 		@deltaAnim = 1
 		@resetfunc() if @resetfunc
@@ -84,11 +84,11 @@ class PPM2.SequenceBase
 				@Stop()
 				return false
 
-			@deltaAnim = (@finish - RealTimeLL()) / @time
+			@deltaAnim = (@finish - RealTimeL()) / @time
 			if @deltaAnim < 0
 				@deltaAnim = 1
 				@frame = 0
-				@start = RealTimeLL()
+				@start = RealTimeL()
 				@finish = @start + @time
 			@frame += 1
 
@@ -127,4 +127,4 @@ class PPM2.SequenceBase
 
 	HasFinished: =>
 		return false if @dorepeat
-		return RealTimeLL() > @finish
+		return RealTimeL() > @finish

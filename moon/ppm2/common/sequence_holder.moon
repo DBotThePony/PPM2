@@ -32,7 +32,7 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 		@@NEXT_HOOK_ID += 1
 		@fid = @@NEXT_HOOK_ID
 		@hookID = "PPM2.#{@@__name}.#{@@NEXT_HOOK_ID}"
-		@lastThink = RealTimeLL()
+		@lastThink = RealTimeL()
 		@lastThinkDelta = 0
 		@currentSequences = {}
 		@currentSequencesIterable = {}
@@ -114,8 +114,8 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 
 	Think: (ent = @ent) =>
 		return if not @IsValid()
-		delta = RealTimeLL() - @lastThink
-		@lastThink = RealTimeLL()
+		delta = RealTimeL() - @lastThink
+		@lastThink = RealTimeL()
 		@lastThinkDelta = delta
 		if @nwController and not IsValid(@ent)
 			@ent = @nwController.ent

@@ -24,8 +24,8 @@ class PPM2.NetworkChangeState
 		@oldValue = obj[key]
 		@newValue = newValue
 		@ply = ply
-		@time = CurTimeLL()
-		@rtime = RealTimeLL()
+		@time = CurTimeL()
+		@rtime = RealTimeL()
 		@stime = SysTime()
 		@obj = obj
 		@objID = obj.netID
@@ -50,12 +50,12 @@ class PPM2.NetworkChangeState
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
-	CurTimeLL: => @time
-	GetCurTimeLL: => @time
+	CurTime: => @time
+	GetCurTime: => @time
 	GetReceiveTime: => @time
 	GetReceiveStamp: => @time
-	RealTimeLL: => @rtime
-	GetRealTimeLL: => @rtime
+	RealTimeL: => @rtime
+	GetRealTimeL: => @rtime
 	SysTime: => @stime
 	GetSysTime: => @stime
 	GetObject: => @obj
@@ -143,17 +143,17 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
 			ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
 
-			if ply[@NW_CooldownTimer] < RealTimeLL()
+			if ply[@NW_CooldownTimer] < RealTimeL()
 				ply[@NW_CooldownTimerCount] = 1
-				ply[@NW_CooldownTimer] = RealTimeLL() + 10
+				ply[@NW_CooldownTimer] = RealTimeL() + 10
 			else
 				ply[@NW_CooldownTimerCount] += 1
 
 			if ply[@NW_CooldownTimerCount] >= 3
 				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
-				if ply[@NW_CooldownMessage] < RealTimeLL()
+				if ply[@NW_CooldownMessage] < RealTimeL()
 					PPM2.Message 'Player ', ply, " is creating #{@__name} too quickly!"
-					ply[@NW_CooldownMessage] = RealTimeLL() + 1
+					ply[@NW_CooldownMessage] = RealTimeL() + 1
 				return
 
 			waitID = net.ReadUInt(16)
@@ -270,8 +270,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		netID = net.ReadUInt(16)
 		obj = @NW_Objects[netID]
 		return unless obj
-		return if obj.__LastReject and obj.__LastReject > RealTimeLL()
-		obj.__LastReject = RealTimeLL() + 3
+		return if obj.__LastReject and obj.__LastReject > RealTimeL()
+		obj.__LastReject = RealTimeL() + 3
 		obj.NETWORKED = false
 		obj\Create()
 	net.Receive @NW_Broadcast, (len = 0, ply = NULL) ->

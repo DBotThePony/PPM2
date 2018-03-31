@@ -248,11 +248,16 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 							lent.__ppmBonesModifiers = nil
 				return
 
-			if obj.callFrame ~= frame and (not obj.pac3Last or obj.pac3Last < rtime) and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+			if obj.ent\IsPony()
+				if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+					resetBones(obj.ent)
+					data = obj.ent\GetPonyData()
+					hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
+					obj\Think()
+					obj.ent.__ppmBonesModified = true
+			elseif obj.ent.__ppmBonesModified
 				resetBones(obj.ent)
-				data = obj.ent\GetPonyData()
-				hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
-				obj\Think()
+				obj.ent.__ppmBonesModified = false
 
 	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -5
 
@@ -302,6 +307,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			--@RegisterModifier(name .. 'Jiggle', 0)
 			{i, name, 'Calculate' .. name .. 'Position', 'Calculate' .. name .. 'Scale', 'Calculate' .. name .. 'Angles'}
 
+	CanThink: => @callFrame ~= FrameNumberL()
 	Think: (force = false) =>
 		return if not super() or not force and @callFrame == FrameNumberL()
 		@callFrame = FrameNumberL()
@@ -334,10 +340,9 @@ with FindMetaTable('Entity')
 			return .__ppmBonesModifiers
 
 hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
+	return if not @IsPony()
 	data = @GetPonyData()
 	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-	if @__ppmBonesModifiers
-		@__ppmBonesModifiers\Think()
-		@__ppmBonesModifiers.pac3Last = RealTimeL() + 0.2
+	@__ppmBonesModifiers\Think(true) if @__ppmBonesModifiers
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()
