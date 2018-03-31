@@ -274,8 +274,8 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetTime(math.random(15, 45) / 10)
 				@lastStrengthUpdate = @lastStrengthUpdate or 0
-				if @lastStrengthUpdate < RealTime()
-					@lastStrengthUpdate = RealTime() + 2
+				if @lastStrengthUpdate < RealTimeL()
+					@lastStrengthUpdate = RealTimeL() + 2
 					@frownStrength = math.random(40, 100) / 100
 					@grinStrength = math.random(15, 40) / 100
 					@angryStrength = math.random(30, 80) / 100
@@ -295,8 +295,8 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetTime(math.random(15, 45) / 10)
 				@lastStrengthUpdate = @lastStrengthUpdate or 0
-				if @lastStrengthUpdate < RealTime()
-					@lastStrengthUpdate = RealTime() + 2
+				if @lastStrengthUpdate < RealTimeL()
+					@lastStrengthUpdate = RealTimeL() + 2
 					@frownStrength = math.random(40, 100) / 100
 					@grinStrength = math.random(15, 40) / 100
 					@angryStrength = math.random(30, 80) / 100
@@ -341,7 +341,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetModifierWeight(1, 0.9)
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(2, 0.75 + math.sin(RealTime() * 7) * 0.25)
+				@SetModifierWeight(2, 0.75 + math.sin(RealTimeL() * 7) * 0.25)
 		}
 
 		{
@@ -351,7 +351,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.15 + math.sin(RealTime() * 10) * 0.1)
+				@SetModifierWeight(1, 0.15 + math.sin(RealTimeL() * 10) * 0.1)
 		}
 
 		{
@@ -361,7 +361,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 4) * 0.5)
+				@SetModifierWeight(1, 0.5 + math.sin(RealTimeL() * 4) * 0.5)
 		}
 
 		{
@@ -371,7 +371,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.5 + math.sin(RealTime() * 8) * 0.5)
+				@SetModifierWeight(1, 0.5 + math.sin(RealTimeL() * 8) * 0.5)
 		}
 
 		{
@@ -396,7 +396,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@SetModifierWeight(1, math.Rand(0.28, 0.34))
 				@SetModifierWeight(3, math.Rand(0.45, 0.50))
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(2, 0.2 + math.sin(RealTime() * 16) * 0.07)
+				@SetModifierWeight(2, 0.2 + math.sin(RealTimeL() * 16) * 0.07)
 		}
 
 		{
@@ -418,7 +418,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
 				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-				value = math.abs(math.sin(RealTime() * .5) * .15)
+				value = math.abs(math.sin(RealTimeL() * .5) * .15)
 				@SetModifierWeight(1, value)
 				@SetModifierWeight(2, value)
 		}
@@ -481,7 +481,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				JawOpenState = @GetFlexState(6)
 
 				if strength > .75
-					JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTime() * strength * 3) * .1)
+					JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTimeL() * strength * 3) * .1)
 				else
 					JawOpenState\SetModifierWeight(JawOpen, 0)
 
@@ -500,7 +500,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'func': (delta, timeOfAnim) =>
 				Grin = @GetModifierID(1)
 				GrinState = @GetFlexState(1)
-				strength = .5 + math.sin(RealTime() * 2) * .25
+				strength = .5 + math.sin(RealTimeL() * 2) * .25
 				GrinState\SetModifierWeight(Grin, strength)
 		}
 
@@ -602,7 +602,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@SetModifierWeight(5, math.random(10, 15) / 100)
 				@SetModifierWeight(6, math.random(80, 100) / 100)
 			'func': (delta, timeOfAnim) =>
-				val = math.sin(RealTime() * 8) * .6
+				val = math.sin(RealTimeL() * 8) * .6
 				if val > 0
 					@SetModifierWeight(7, val)
 					@SetModifierWeight(8, 0)

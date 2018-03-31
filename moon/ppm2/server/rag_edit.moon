@@ -73,8 +73,8 @@ net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
 	emoteID = net.ReadUInt(8)
 	return if not PPM2.AVALIABLE_EMOTES[emoteID]
 	@__ppm2_last_played_emote = @__ppm2_last_played_emote or 0
-	return if @__ppm2_last_played_emote > RealTime()
-	@__ppm2_last_played_emote = RealTime() + 1
+	return if @__ppm2_last_played_emote > RealTimeL()
+	@__ppm2_last_played_emote = RealTimeL() + 1
 	net.Start('PPM2.PlayEmote')
 	net.WriteUInt(emoteID, 8)
 	net.WriteEntity(ent)

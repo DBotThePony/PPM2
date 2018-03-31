@@ -49,8 +49,8 @@ lastReflectionFrame = 0
 
 hook.Add 'DrawOverlay', 'PPM2.ReflectionsUpdate', (a, b) ->
 	return if PPM2.__RENDERING_REFLECTIONS
-	return if lastReflectionFrame == FrameNumber()
-	lastReflectionFrame = FrameNumber()
+	return if lastReflectionFrame == FrameNumberL()
+	lastReflectionFrame = FrameNumberL()
 	PPM2.__RENDERING_REFLECTIONS = true
 	for task in *reflectTasks
 		pcall task.ctrl.UpdateEyeReflections, task.ctrl, task.ent
@@ -634,10 +634,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	CheckReflections: (ent = @ent) =>
 		if REAL_TIME_EYE_REFLECTIONS\GetBool()
-			@isInRealTimeReflections = true
+			@isInRealTimeLReflections = true
 			table.insert(reflectTasks, {ctrl: @, ent: ent})
-		elseif @isInRealTimeReflections
-			@isInRealTimeReflections = false
+		elseif @isInRealTimeLReflections
+			@isInRealTimeLReflections = false
 			@ResetEyeReflections()
 
 	PreDraw: (ent = @ent, drawingNewTask = false) =>
@@ -645,9 +645,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 		@CheckReflections(ent)
 
-		if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
+		if @lastMaterialUpdate < RealTimeL() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
 			@lastMaterialUpdateEnt = ent
-			@lastMaterialUpdate = RealTime() + 1
+			@lastMaterialUpdate = RealTimeL() + 1
 			ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
 			ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT, @GetEyeName(false))
 			ent\SetSubMaterial(@@MAT_INDEX_BODY, @GetBodyName())

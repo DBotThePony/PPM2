@@ -25,8 +25,8 @@ hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
 		self = ent
 		if @GetPonyData()
 			@__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
-			if @__ppm2_last_hurt_anim < CurTime()
-				@__ppm2_last_hurt_anim = CurTime() + 1
+			if @__ppm2_last_hurt_anim < CurTimeL()
+				@__ppm2_last_hurt_anim = CurTimeL() + 1
 				net.Start('PPM2.DamageAnimation', true)
 				net.WriteEntity(@)
 				net.Broadcast()
@@ -34,8 +34,8 @@ hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
 		self = dmg\GetAttacker()
 		if @GetPonyData() and IsValid(ent) and (ent\IsNPC() or ent\IsPlayer() or ent.Type == 'nextbot')
 			@__ppm2_last_anger_anim = @__ppm2_last_anger_anim or 0
-			if @__ppm2_last_anger_anim < CurTime()
-				@__ppm2_last_anger_anim = CurTime() + 1
+			if @__ppm2_last_anger_anim < CurTimeL()
+				@__ppm2_last_anger_anim = CurTimeL() + 1
 				net.Start('PPM2.AngerAnimation', true)
 				net.WriteEntity(@)
 				net.Broadcast()
@@ -44,8 +44,8 @@ killGrin = =>
 	return if not IsValid(@)
 	return if not @GetPonyData()
 	@__ppm2_grin_hurt_anim = @__ppm2_grin_hurt_anim or 0
-	return if @__ppm2_grin_hurt_anim > CurTime()
-	@__ppm2_grin_hurt_anim = CurTime() + 1
+	return if @__ppm2_grin_hurt_anim > CurTimeL()
+	@__ppm2_grin_hurt_anim = CurTimeL() + 1
 	net.Start('PPM2.KillAnimation', true)
 	net.WriteEntity(@)
 	net.Broadcast()
@@ -61,8 +61,8 @@ net.Receive 'PPM2.PlayEmote', (len = 0, ply = NULL) ->
 	shouldStop = net.ReadBool()
 	return if not PPM2.AVALIABLE_EMOTES[emoteID]
 	@__ppm2_last_played_emote = @__ppm2_last_played_emote or 0
-	return if @__ppm2_last_played_emote > RealTime()
-	@__ppm2_last_played_emote = RealTime() + 1
+	return if @__ppm2_last_played_emote > RealTimeL()
+	@__ppm2_last_played_emote = RealTimeL() + 1
 	net.Start('PPM2.PlayEmote')
 	net.WriteUInt(emoteID, 8)
 	net.WriteEntity(ply)

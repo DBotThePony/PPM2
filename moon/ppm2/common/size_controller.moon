@@ -323,7 +323,7 @@ class PonySizeController extends PPM2.ControllerChildren
 
 		@ModifyViewOffset(ent)
 		@ModifyDrawMatrix(ent)
-		if @lastPAC3BoneReset < RealTime()
+		if @lastPAC3BoneReset < RealTimeL()
 			@ModifyNeck(ent)
 			@ModifyLegs(ent)
 
@@ -457,7 +457,7 @@ if CLIENT
 			sizes.ent = ent
 			sizes\ModifyNeck()
 			sizes\ModifyLegs()
-			sizes.lastPAC3BoneReset = RealTime() + 1
+			sizes.lastPAC3BoneReset = RealTimeL() + 1
 
 ppm2_sv_allow_resize = ->
 	for ply in *player.GetAll()

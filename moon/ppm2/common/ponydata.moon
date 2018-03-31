@@ -24,8 +24,8 @@ class PPM2.NetworkChangeState
 		@oldValue = obj[key]
 		@newValue = newValue
 		@ply = ply
-		@time = CurTimeL()
-		@rtime = RealTimeL()
+		@time = CurTimeLL()
+		@rtime = RealTimeLL()
 		@stime = SysTime()
 		@obj = obj
 		@objID = obj.netID
@@ -50,12 +50,12 @@ class PPM2.NetworkChangeState
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
-	CurTimeL: => @time
-	GetCurTimeL: => @time
+	CurTimeLL: => @time
+	GetCurTimeLL: => @time
 	GetReceiveTime: => @time
 	GetReceiveStamp: => @time
-	RealTimeL: => @rtime
-	GetRealTimeL: => @rtime
+	RealTimeLL: => @rtime
+	GetRealTimeLL: => @rtime
 	SysTime: => @stime
 	GetSysTime: => @stime
 	GetObject: => @obj
@@ -143,17 +143,17 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
 			ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
 
-			if ply[@NW_CooldownTimer] < RealTimeL()
+			if ply[@NW_CooldownTimer] < RealTimeLL()
 				ply[@NW_CooldownTimerCount] = 1
-				ply[@NW_CooldownTimer] = RealTimeL() + 10
+				ply[@NW_CooldownTimer] = RealTimeLL() + 10
 			else
 				ply[@NW_CooldownTimerCount] += 1
 
 			if ply[@NW_CooldownTimerCount] >= 3
 				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
-				if ply[@NW_CooldownMessage] < RealTimeL()
+				if ply[@NW_CooldownMessage] < RealTimeLL()
 					PPM2.Message 'Player ', ply, " is creating #{@__name} too quickly!"
-					ply[@NW_CooldownMessage] = RealTimeL() + 1
+					ply[@NW_CooldownMessage] = RealTimeLL() + 1
 				return
 
 			waitID = net.ReadUInt(16)
@@ -270,8 +270,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		netID = net.ReadUInt(16)
 		obj = @NW_Objects[netID]
 		return unless obj
-		return if obj.__LastReject and obj.__LastReject > RealTimeL()
-		obj.__LastReject = RealTimeL() + 3
+		return if obj.__LastReject and obj.__LastReject > RealTimeLL()
+		obj.__LastReject = RealTimeLL() + 3
 		obj.NETWORKED = false
 		obj\Create()
 	net.Receive @NW_Broadcast, (len = 0, ply = NULL) ->
@@ -355,7 +355,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		ent\PPMBonesModifier() if CLIENT
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
-		@lastLerpThink = RealTime()
+		@lastLerpThink = RealTimeL()
 		@ModelChanges(@modelCached, @modelCached)
 		@Reset()
 		timer.Simple(0, -> @GetRenderController()\CompileTextures() if @GetRenderController()) if CLIENT
@@ -464,7 +464,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	Think: =>
 	RenderScreenspaceEffects: =>
-		time = RealTime()
+		time = RealTimeL()
 		delta = time - @lastLerpThink
 		@lastLerpThink = time
 		if @isValid and IsValid(@ent)

@@ -92,7 +92,7 @@ MODEL_BOX_PANEL = {
 		@SetMouseInputEnabled(true)
 		@editorSeq = 1
 		@playing = true
-		@lastTick = RealTime()
+		@lastTick = RealTimeL()
 		@SetCursor('none')
 
 		@buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
@@ -119,7 +119,7 @@ MODEL_BOX_PANEL = {
 		return if code ~= MOUSE_LEFT
 		@hold = true
 		@SetCursor('sizeall')
-		@holdLast = RealTime() + .1
+		@holdLast = RealTimeL() + .1
 		@mouseX, @mouseY = gui.MousePos()
 
 	OnMouseReleased: (code = MOUSE_LEFT) =>
@@ -162,7 +162,7 @@ MODEL_BOX_PANEL = {
 			@emotesPanel\SetVisible(true)
 		return @model
 	Think: =>
-		rtime = RealTime()
+		rtime = RealTimeL()
 		delta = rtime - @lastTick
 		@lastTick = rtime
 		if IsValid(@model)
@@ -258,7 +258,7 @@ CALC_VIEW_PANEL = {
 		@drawPos = Vector(100, 0, 70)
 		@drawAngle = Angle(0, 180, 0)
 		@fov = 90
-		@lastTick = RealTime()
+		@lastTick = RealTimeL()
 		hook.Add('CalcView', @, @CalcView)
 		hook.Add('PrePlayerDraw', @, @PrePlayerDraw)
 
@@ -353,7 +353,7 @@ CALC_VIEW_PANEL = {
 		@SetCursor('hand')
 
 	Think: =>
-		rtime = RealTime()
+		rtime = RealTimeL()
 		delta = rtime - @lastTick
 		@lastTick = rtime
 
@@ -438,7 +438,7 @@ TATTOO_INPUT_GRABBER = {
 		@SetPos(ScrW() / 2 - 200, ScrH() * .2)
 		@SetMouseInputEnabled(false)
 		@SetKeyboardInputEnabled(true)
-		@ignoreFocus = RealTime() + 1
+		@ignoreFocus = RealTimeL() + 1
 		@scaleUp = false
 		@scaleDown = false
 		@scaleLeft = false
@@ -474,53 +474,53 @@ To rotate left/right use Q/E")
 	HandleKey: (code = KEY_NONE, status = false) =>
 		switch code
 			when KEY_W
-				@moveUpTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
+				@moveUpTime = RealTimeL() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
 				@moveUp = status
 				@DataAdd('TattooPosY', @DEFAULT_STEP) if status
 				@TriggerUpdate()
 			when KEY_S
-				@moveDownTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
+				@moveDownTime = RealTimeL() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
 				@moveDown = status
 				@DataAdd('TattooPosY', -@DEFAULT_STEP) if status
 				@TriggerUpdate()
 			when KEY_A
-				@moveLeftTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
+				@moveLeftTime = RealTimeL() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
 				@moveLeft = status
 				@DataAdd('TattooPosX', -@DEFAULT_STEP) if status
 				@TriggerUpdate()
 			when KEY_D
-				@moveRightTime = RealTime() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
+				@moveRightTime = RealTimeL() + @BUTTONS_DELAY if not @moveDown and not @moveUp and not @moveLeft and not @moveRight
 				@moveRight = status
 				@DataAdd('TattooPosX', @DEFAULT_STEP) if status
 				@TriggerUpdate()
 			when KEY_UP
 				@scaleUp = status
-				@scaleUpTime = RealTime() + @BUTTONS_DELAY
+				@scaleUpTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooScaleY', @SCALE_STEP) if status
 				@TriggerUpdate()
 			when KEY_DOWN
 				@scaleDown = status
-				@scaleDownTime = RealTime() + @BUTTONS_DELAY
+				@scaleDownTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooScaleY', -@SCALE_STEP) if status
 				@TriggerUpdate()
 			when KEY_LEFT
 				@scaleLeft = status
-				@scaleLeftTime = RealTime() + @BUTTONS_DELAY
+				@scaleLeftTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooScaleX', -@SCALE_STEP) if status
 				@TriggerUpdate()
 			when KEY_RIGHT
 				@scaleRight = status
-				@scaleRightTime = RealTime() + @BUTTONS_DELAY
+				@scaleRightTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooScaleX', @SCALE_STEP) if status
 				@TriggerUpdate()
 			when KEY_Q
 				@rotateLeft = status
-				@rotateLeftTime = RealTime() + @BUTTONS_DELAY
+				@rotateLeftTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooRotate', -@ROTATE_STEP) if status
 				@TriggerUpdate()
 			when KEY_E
 				@rotateRight = status
-				@rotateRightTime = RealTime() + @BUTTONS_DELAY
+				@rotateRightTime = RealTimeL() + @BUTTONS_DELAY
 				@DataAdd('TattooRotate', @ROTATE_STEP) if status
 				@TriggerUpdate()
 			when KEY_ESCAPE
@@ -530,36 +530,36 @@ To rotate left/right use Q/E")
 	OnKeyCodeReleased: (code = KEY_NONE) =>
 		@HandleKey(code, false)
 	Think: =>
-		return @Remove() if not @HasFocus() and @ignoreFocus < RealTime()
+		return @Remove() if not @HasFocus() and @ignoreFocus < RealTimeL()
 		ftime = FrameTime()
-		if @moveUp and @moveUpTime < RealTime()
+		if @moveUp and @moveUpTime < RealTimeL()
 			@DataAdd('TattooPosY', @CONTINIOUS_STEP_MULTIPLIER * ftime)
 			@TriggerUpdate()
-		if @moveDown and @moveDownTime < RealTime()
+		if @moveDown and @moveDownTime < RealTimeL()
 			@DataAdd('TattooPosY', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
 			@TriggerUpdate()
-		if @moveRight and @moveRightTime < RealTime()
+		if @moveRight and @moveRightTime < RealTimeL()
 			@DataAdd('TattooPosX', @CONTINIOUS_STEP_MULTIPLIER * ftime)
 			@TriggerUpdate()
-		if @moveLeft and @moveLeftTime < RealTime()
+		if @moveLeft and @moveLeftTime < RealTimeL()
 			@DataAdd('TattooPosX', -@CONTINIOUS_STEP_MULTIPLIER * ftime)
 			@TriggerUpdate()
-		if @scaleUp and @scaleUpTime < RealTime()
+		if @scaleUp and @scaleUpTime < RealTimeL()
 			@DataAdd('TattooScaleY', @CONTINIOUS_SCALE_STEP * ftime)
 			@TriggerUpdate()
-		if @scaleDown and @scaleDownTime < RealTime()
+		if @scaleDown and @scaleDownTime < RealTimeL()
 			@DataAdd('TattooScaleY', -@CONTINIOUS_SCALE_STEP * ftime)
 			@TriggerUpdate()
-		if @scaleLeft and @scaleLeftTime < RealTime()
+		if @scaleLeft and @scaleLeftTime < RealTimeL()
 			@DataAdd('TattooScaleX', -@CONTINIOUS_SCALE_STEP * ftime)
 			@TriggerUpdate()
-		if @scaleRight and @scaleRightTime < RealTime()
+		if @scaleRight and @scaleRightTime < RealTimeL()
 			@DataAdd('TattooScaleX', @CONTINIOUS_SCALE_STEP * ftime)
 			@TriggerUpdate()
-		if @rotateLeft and @rotateLeftTime < RealTime()
+		if @rotateLeft and @rotateLeftTime < RealTimeL()
 			@DataAdd('TattooRotate', -@CONTINIOUS_ROTATE_STEP * ftime)
 			@TriggerUpdate()
-		if @rotateRight and @rotateRightTime < RealTime()
+		if @rotateRight and @rotateRightTime < RealTimeL()
 			@DataAdd('TattooRotate', @CONTINIOUS_ROTATE_STEP * ftime)
 			@TriggerUpdate()
 
@@ -1618,8 +1618,8 @@ createTopButtons = (isNewEditor = false) =>
 		\SetSize(140, 20)
 		lastWear = 0
 		.DoClick = ->
-			return if RealTime() < lastWear
-			lastWear = RealTime() + 5
+			return if RealTimeL() < lastWear
+			lastWear = RealTimeL() + 5
 			mainData = PPM2.GetMainData()
 			nwdata = LocalPlayer()\GetPonyData()
 			if nwdata

@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-import FrameNumber, RealTime, StrongEntity, PPM2 from _G
+import FrameNumberL, RealTimeL, StrongEntity, PPM2 from _G
 import ALTERNATIVE_RENDER from PPM2
 import GetPonyData, IsDormant, PPMBonesModifier, IsPony from FindMetaTable('Entity')
 
@@ -136,7 +136,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	if not ENABLE_NEW_RAGDOLLS\GetBool()
 		for ply in *player.GetAll()
 			alive = ply\Alive()
-			ply.__ppm2_last_dead = RealTime() + 2 if not alive
+			ply.__ppm2_last_dead = RealTimeL() + 2 if not alive
 			if ply.__cachedIsPony
 				if ply\GetPonyData() and not alive
 					data = ply\GetPonyData()
@@ -185,14 +185,14 @@ PPM2.PrePlayerDraw = =>
 		return if not data
 		@__cachedIsPony = IsPony(@)
 		return if not @__cachedIsPony
-		f = FrameNumber()
+		f = FrameNumberL()
 		return if @__ppm2_last_draw == f
 		@__ppm2_last_draw = f
 		return if IsDormant(@)
 		@__ppm2_last_dead = @__ppm2_last_dead or 0
-		return if @__ppm2_last_dead > RealTime()
+		return if @__ppm2_last_dead > RealTimeL()
 		bones = PPMBonesModifier(@)
-		if data and bones.callFrame ~= FrameNumber() and (not bones.pac3Last or bones.pac3Last < RealTime())
+		if data and bones.callFrame ~= FrameNumberL() and (not bones.pac3Last or bones.pac3Last < RealTimeL())
 			bones\ResetBones()
 			hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
 			bones\Think()
@@ -214,8 +214,8 @@ do
 
 	hook.Add 'PreDrawHalos', 'PPM2.HornEffects', =>
 		return if not HORN_HIDE_BEAM\GetBool()
-		frame = FrameNumber()
-		cTime = (RealTime() % 20) * 4
+		frame = FrameNumberL()
+		cTime = (RealTimeL() % 20) * 4
 		for ent, status in pairs hornGlowStatus
 			if IsValid(ent) and status.frame == frame and IsValid(status.target)
 				additional = math.sin(cTime / 2 + status.haloSeed * 3) * 40
@@ -223,7 +223,7 @@ do
 				halo.Add({status.target}, newCol, math.sin(cTime + status.haloSeed) * 4 + 8, math.cos(cTime + status.haloSeed) * 4 + 8, 2)
 
 	hook.Add 'Think', 'PPM2.HornEffects', =>
-		frame = FrameNumber()
+		frame = FrameNumberL()
 		for ent, status in pairs hornGlowStatus
 			if not IsValid(ent)
 				status.emmiter\Finish() if IsValid(status.emmiter)
@@ -241,8 +241,8 @@ do
 					grabHornPos = Vector(hornShift) * status.data\GetPonySize()
 					{:Pos, :Ang} = ent\GetAttachment(status.attach)
 					grabHornPos\Rotate(Ang)
-					if status.isEnabled and IsValid(status.emmiter) and status.nextSmokeParticle < RealTime()
-						status.nextSmokeParticle = RealTime() + math.Rand(0.1, 0.2)
+					if status.isEnabled and IsValid(status.emmiter) and status.nextSmokeParticle < RealTimeL()
+						status.nextSmokeParticle = RealTimeL() + math.Rand(0.1, 0.2)
 						for i = 1, math.random(1, 4)
 							vec = VectorRand()
 							calcPos = Pos + grabHornPos + vec
@@ -263,8 +263,8 @@ do
 								vecRand.z *= 2
 								\SetVelocity(ent\GetVelocity() + vecRand * status.data\GetPonySize() * 2)
 								\SetCollide(false)
-					if status.isEnabled and IsValid(status.emmiterProp) and status.nextGrabParticle < RealTime() and status.mins and status.maxs
-						status.nextGrabParticle = RealTime() + math.Rand(0.05, 0.3)
+					if status.isEnabled and IsValid(status.emmiterProp) and status.nextGrabParticle < RealTimeL() and status.mins and status.maxs
+						status.nextGrabParticle = RealTimeL() + math.Rand(0.05, 0.3)
 						status.emmiterProp\SetPos(status.tpos)
 						for i = 1, math.random(2, 6)
 							calcPos = Vector(math.Rand(status.mins.x, status.maxs.x), math.Rand(status.mins.y, status.maxs.y), math.Rand(status.mins.z, status.maxs.z))
@@ -290,7 +290,7 @@ do
 		return if data\GetRace() ~= PPM2.RACE_UNICORN and data\GetRace() ~= PPM2.RACE_ALICORN
 		if not hornGlowStatus[@]
 			hornGlowStatus[@] = {
-				frame: FrameNumber()
+				frame: FrameNumberL()
 				prevStatus: data\GetHornGlow()
 				:data, :isEnabled, :hitPos, :target, :bone
 				tpos: @GetPos()
@@ -316,7 +316,7 @@ do
 						.color = DLib.LerpColor(0.5, lerpLeft, lerpRight)
 		else
 			with hornGlowStatus[@]
-				.frame = FrameNumber()
+				.frame = FrameNumberL()
 				.isEnabled = isEnabled
 				.target = target
 				.bone = bone

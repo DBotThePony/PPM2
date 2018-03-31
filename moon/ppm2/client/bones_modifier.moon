@@ -157,7 +157,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'bones': {'LrigNeck3'}
 			'reset': =>
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, -12 * timeOfAnim, math.sin(RealTime() * 4) * 20))
+				@SetBoneAngles(1, Angle(0, -12 * timeOfAnim, math.sin(RealTimeL() * 4) * 20))
 		}
 
 		{
@@ -176,7 +176,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'time': 5
 			'bones': {'LrigNeck3'}
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, math.cos(RealTime() * 4) * 20, 0))
+				@SetBoneAngles(1, Angle(0, math.cos(RealTimeL() * 4) * 20, 0))
 		}
 
 		{
@@ -186,7 +186,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'time': 5
 			'bones': {'LrigNeck3'}
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, math.cos(RealTime() * 8) * 20, 0))
+				@SetBoneAngles(1, Angle(0, math.cos(RealTimeL() * 8) * 20, 0))
 		}
 
 		{
@@ -231,8 +231,9 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	@SequenceObject = BonesSequence
 
 	PreDrawOpaqueRenderables = (a, b) ->
-		frame = FrameNumber()
-		rtime = RealTime()
+		frame = FrameNumberL()
+		rtime = RealTimeL()
+
 		for obj in *@OBJECTS
 			if not obj\IsValid()
 				oldObjects = @OBJECTS
@@ -267,7 +268,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 		@boneCount = 0
 		@isValid = false
 		table.insert(@@OBJECTS, @)
-		@lastCall = RealTime()
+		@lastCall = RealTimeL()
 		@Setup() if IsValid(ent)
 
 	Setup: (ent = @ent) =>
@@ -302,8 +303,8 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			{i, name, 'Calculate' .. name .. 'Position', 'Calculate' .. name .. 'Scale', 'Calculate' .. name .. 'Angles'}
 
 	Think: (force = false) =>
-		return if not super() or not force and @callFrame == FrameNumber()
-		@callFrame = FrameNumber()
+		return if not super() or not force and @callFrame == FrameNumberL()
+		@callFrame = FrameNumberL()
 		for data in *@bonesIterable
 			id = data[1]
 			name = data[2]
@@ -316,7 +317,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 				\ManipulateBoneAngles(id, \GetManipulateBoneAngles(id) + @[calcAngles](@))
 
 	ResetBones: =>
-		return if @pac3Last and @pac3Last > RealTime()
+		return if @pac3Last and @pac3Last > RealTimeL()
 		resetBones(@ent)
 
 	IsValid: => @isValid and @ent\IsValid()
@@ -337,6 +338,6 @@ hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
 	if @__ppmBonesModifiers
 		@__ppmBonesModifiers\Think()
-		@__ppmBonesModifiers.pac3Last = RealTime() + 0.2
+		@__ppmBonesModifiers.pac3Last = RealTimeL() + 0.2
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()

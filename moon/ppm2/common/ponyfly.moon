@@ -139,7 +139,7 @@ class PonyflyController
 			@roll = Lerp(lerpMult, @roll, roll)
 			p += @pitch
 			y += @yaw
-			r = @roll + math.sin(RealTime()) * 2
+			r = @roll + math.sin(RealTimeL()) * 2
 			newAng = Angle(p, y, r)
 			@ent\SetEyeAngles(newAng)
 
@@ -149,7 +149,7 @@ class PonyflyController
 
 		if not hitLift
 			velocity.z *= dragCalc
-			velocity.z += math.sin(RealTime() * 2) * .01
+			velocity.z += math.sin(RealTimeL() * 2) * .01
 
 		pos += velocity
 
@@ -296,23 +296,23 @@ else
 		return if not ALLOW_FLIGHT\GetBool()
 		return if not pressed
 		return if bind ~= '+jump' and bind ~= 'jump'
-		if lastDouble > RealTime()
+		if lastDouble > RealTimeL()
 			return if not @IsPonyCached()
 			data = @GetPonyData()
 			return if not data
 			if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
-				if lastMessage < RealTime()
-					lastMessage = RealTime() + 1
+				if lastMessage < RealTimeL()
+					lastMessage = RealTimeL() + 1
 					PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
 				return
 			if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
 				can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
 				if not can
-					if lastMessage2 < RealTime()
-						lastMessage2 = RealTime() + 1
+					if lastMessage2 < RealTimeL()
+						lastMessage2 = RealTimeL() + 1
 						PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
 					return
 			RunConsoleCommand('ppm2_fly')
 			lastDouble = 0
 			return
-		lastDouble = RealTime() + 0.2
+		lastDouble = RealTimeL() + 0.2

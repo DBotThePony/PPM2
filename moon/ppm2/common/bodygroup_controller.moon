@@ -22,9 +22,9 @@ ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
 TRACKED_ENTS = {}
 TRACKED_ENTS_FRAME = 0
 ents_GetAll = ->
-	if TRACKED_ENTS_FRAME ~= FrameNumber()
+	if TRACKED_ENTS_FRAME ~= FrameNumberL()
 		TRACKED_ENTS = ents.GetAll()
-		TRACKED_ENTS_FRAME = FrameNumber()
+		TRACKED_ENTS_FRAME = FrameNumberL()
 	return TRACKED_ENTS
 
 if CLIENT
@@ -269,7 +269,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return unless @ent\GetBodyGroups()
 		for grp in *@ent\GetBodyGroups()
 			@ent\SetBodygroup(grp.id, 0)
-		if @lastPAC3BoneReset < RealTime()
+		if @lastPAC3BoneReset < RealTimeL()
 			@ResetTail()
 			@ResetMane()
 			@ResetBack()
@@ -915,7 +915,7 @@ if CLIENT
 			bodygroup\UpdateManeSize()
 			bodygroup\UpdateWings() if bodygroup.UpdateWings
 			bodygroup\UpdateEars() if bodygroup.UpdateEars
-			bodygroup.lastPAC3BoneReset = RealTime() + 1
+			bodygroup.lastPAC3BoneReset = RealTimeL() + 1
 
 	ppm2_sv_allow_resize = ->
 		for ply in *player.GetAll()

@@ -492,9 +492,9 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 		@CheckReflections(ent)
 
-		if @lastMaterialUpdate < RealTime() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
+		if @lastMaterialUpdate < RealTimeL() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
 			@lastMaterialUpdateEnt = ent
-			@lastMaterialUpdate = RealTime() + 1
+			@lastMaterialUpdate = RealTimeL() + 1
 			ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
 			ent\SetSubMaterial(@@MAT_INDEX_EYE_RIGHT, @GetEyeName(false))
 			ent\SetSubMaterial(@@MAT_INDEX_TONGUE, @GetTongueName())

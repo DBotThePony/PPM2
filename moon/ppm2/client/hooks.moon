@@ -66,8 +66,8 @@ concommand.Add 'ppm2_require', ->
 	PPM2.Message 'Requesting pony data...'
 
 concommand.Add 'ppm2_reload', ->
-	return if lastDataSend > RealTime()
-	lastDataSend = RealTime() + 10
+	return if lastDataSend > RealTimeL()
+	lastDataSend = RealTimeL() + 10
 	instance = PPM2.GetMainData()
 	newData = instance\CreateNetworkObject()
 	newData\Create()

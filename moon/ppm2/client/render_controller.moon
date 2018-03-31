@@ -74,9 +74,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		@GetData()\GetWeightController()\UpdateWeight(@legsModel)
 
-		@lastLegUpdate = CurTime()
+		@lastLegUpdate = CurTimeL()
 		@legClipPlanePos = Vector(0, 0, 0)
-		@legBGSetup = CurTime()
+		@legBGSetup = CurTimeL()
 		@legUpdateFrame = 0
 		@legClipDot = 0
 		@duckOffsetHack = @@LEG_CLIP_OFFSET_STAND
@@ -96,9 +96,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
 		return unless IsValid(@legsModel)
-		return if @legUpdateFrame == FrameNumber()
-		@legUpdateFrame = FrameNumber()
-		ctime = CurTime()
+		return if @legUpdateFrame == FrameNumberL()
+		@legUpdateFrame = FrameNumberL()
+		ctime = CurTimeL()
 		ply = @ent
 		seq = ply\GetSequence()
 		legsModel = @legsModel
@@ -199,7 +199,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if (@ent\GetPos() + @ent\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
 		if USE_RENDER_OVERRIDE\GetBool()
 			@legsModel\SetNoDraw(false)
-			rTime = RealTime()
+			rTime = RealTimeL()
 			if @legsModel.lastRedrawFix < rTime
 				@legsModel\DrawModel()
 				@legsModel.lastRedrawFix = rTime + 5
@@ -321,7 +321,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		}).Hit
 
 	UpdateStare: =>
-		ctime = RealTime()
+		ctime = RealTimeL()
 		return if @lastStareUpdate > ctime
 
 		if (not @idleEyes or not ENABLE_STARE\GetBool()) and @idleEyesActive

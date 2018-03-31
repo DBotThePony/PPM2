@@ -96,7 +96,7 @@ BUTTON_CLICK_FUNC = (isEndless = false, shouldStop = false) =>
 BUTTON_TEXT_COLOR = Color(255, 255, 255)
 
 IMAGE_PANEL_THINK = =>
-	@lastThink = RealTime() + .4
+	@lastThink = RealTimeL() + .4
 	if @IsHovered()
 		if not @oldHover
 			@oldHover = true
@@ -112,7 +112,7 @@ HOVERED_IMAGE_PANEL_THINK = =>
 	if not @parent\IsValid()
 		@Remove()
 		return
-	if @parent.lastThink < RealTime()
+	if @parent.lastThink < RealTimeL()
 		@SetVisible(false)
 
 PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) ->
