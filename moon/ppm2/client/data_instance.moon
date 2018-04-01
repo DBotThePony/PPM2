@@ -46,7 +46,7 @@ for ffind in *file.Find('ppm2/*.txt', 'DATA')
 			buf\ToFileStream(stream)
 			stream\Flush()
 			stream\Close()
-	--file.Delete('ppm2/' .. ffind)
+	file.Delete('ppm2/' .. ffind)
 
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
