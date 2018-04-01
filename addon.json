@@ -14,6 +14,7 @@
         "build.sh",
         "README.md",
         "lint.sh",
+        "luacheck.sh",
         "cmark_resizer.html",
         ".vscode*",
         "socks_src/*",

@@ -238,7 +238,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				data.self.lastMaterialUpdate = 0
 		@COMPILE_QUEUE = {}
 
-	hook.Add 'RenderScene', 'PPM2.CompileTextures', @COMPILE_TEXTURES, -1
+	hook.Add 'PreRender', 'PPM2.CompileTextures', @COMPILE_TEXTURES, -1
 
 	DelayCompile: (func = '', ...) =>
 		return if not @[func]
@@ -579,14 +579,14 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
 		cam.Start2D()
+		cam.PushModelMatrix(Matrix())
 		surface.SetDrawColor(r, g, b, a)
 		surface.DrawRect(0, 0, texSize, texSize)
 		@currentRT = rt
 		return rt
 
 	StartRTOpaque: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
-		if @@RT_BUFFER_BROKEN
-			return @StartRT(name, texSize, r, g, b, a)
+		return @StartRT(name, texSize, r, g, b, a) if @@RT_BUFFER_BROKEN
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
 		@currentRTTrace = debug.traceback()
 		@oldW, @oldH = ScrW(), ScrH()
@@ -600,7 +600,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		textureFlags = textureFlags + 32768 -- Texture is a render target
 		-- textureFlags = textureFlags + 67108864 -- Usable as a vertex texture
 
-		rt = GetRenderTargetEx("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}_op", texSize, texSize, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_NONE, textureFlags, 0, IMAGE_FORMAT_RGB565)
+		rt = GetRenderTargetEx("PPM2_#{@@SessionID}_#{@GetID()}_#{name}_#{texSize}_op", texSize, texSize, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_NONE, textureFlags, 0, IMAGE_FORMAT_RGB888)
 		if texSize ~= rt\Width() or texSize ~= rt\Height()
 			PPM2.Message('Your videocard is garbage... I cant even save extra memory for you!')
 			PPM2.Message('Switching to fat ass render targets with full buffer')
@@ -611,12 +611,14 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
 		cam.Start2D()
+		cam.PushModelMatrix(Matrix())
 		surface.SetDrawColor(r, g, b, a)
 		surface.DrawRect(0, 0, texSize, texSize)
 		@currentRT = rt
 		return rt
 
 	EndRT: =>
+		cam.PopModelMatrix()
 		cam.End2D()
 		--render.SetViewPort(0, 0, @oldW, @oldH)
 		render.PopRenderTarget()
