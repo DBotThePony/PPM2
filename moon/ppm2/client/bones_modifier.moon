@@ -231,9 +231,6 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	@SequenceObject = BonesSequence
 
 	PreDrawOpaqueRenderables = (a, b) ->
-		frame = FrameNumberL()
-		rtime = RealTimeL()
-
 		for obj in *@OBJECTS
 			if not obj\IsValid()
 				oldObjects = @OBJECTS
@@ -307,7 +304,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			--@RegisterModifier(name .. 'Jiggle', 0)
 			{i, name, 'Calculate' .. name .. 'Position', 'Calculate' .. name .. 'Scale', 'Calculate' .. name .. 'Angles'}
 
-	CanThink: => @callFrame ~= FrameNumberL()
+	CanThink: => @callFrame ~= FrameNumberL() and (not @defferReset or @defferReset < RealTimeL())
 	Think: (force = false) =>
 		return if not super() or not force and @callFrame == FrameNumberL()
 		@callFrame = FrameNumberL()
@@ -323,7 +320,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 				\ManipulateBoneAngles(id, \GetManipulateBoneAngles(id) + @[calcAngles](@))
 
 	ResetBones: =>
-		return if @pac3Last and @pac3Last > RealTimeL()
+		return if @defferReset and @defferReset > RealTimeL()
 		resetBones(@ent)
 
 	IsValid: => @isValid and @ent\IsValid()
@@ -343,6 +340,8 @@ hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 	return if not @IsPony()
 	data = @GetPonyData()
 	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-	@__ppmBonesModifiers\Think(true) if @__ppmBonesModifiers
+	if @__ppmBonesModifiers
+		@__ppmBonesModifiers\Think(true)
+		@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()

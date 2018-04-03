@@ -192,7 +192,7 @@ PPM2.PrePlayerDraw = =>
 		@__ppm2_last_dead = @__ppm2_last_dead or 0
 		return if @__ppm2_last_dead > RealTimeL()
 		bones = PPMBonesModifier(@)
-		if data and bones.callFrame ~= FrameNumberL() and (not bones.pac3Last or bones.pac3Last < RealTimeL())
+		if data and bones\CanThink()
 			bones\ResetBones()
 			hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
 			bones\Think()
