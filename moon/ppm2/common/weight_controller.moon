@@ -114,7 +114,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	ResetBones: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
 		for {:id} in *@@WEIGHT_BONES
-			ent\ManipulateBoneScale(id, @@DEFAULT_BONE_SIZE)
+			ent\ManipulateBoneScale2Safe(id, @@DEFAULT_BONE_SIZE)
 
 	Reset: => @ResetBones()
 
@@ -124,7 +124,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 		for {:id, :scale} in *@@WEIGHT_BONES
 			delta = 1 + (@weight * @scale - 1) * scale
-			ent\ManipulateBoneScale(id, Vector(delta, delta, delta))
+			ent\ManipulateBoneScale2Safe(id, Vector(delta, delta, delta))
 
 	Remove: =>
 		@isValid = false

@@ -105,9 +105,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		with @legsModel
 			for boneid = 0, ply\GetBoneCount() - 1
-				\ManipulateBonePosition(0, ply\GetManipulateBonePosition(0))
-				\ManipulateBoneAngles(0, ply\GetManipulateBoneAngles(0))
-				\ManipulateBoneScale(0, ply\GetManipulateBoneScale(0))
+				\ManipulateBonePosition2Safe(0, ply\GetManipulateBonePosition2Safe(0))
+				\ManipulateBoneAngles2Safe(0, ply\GetManipulateBoneAngles2Safe(0))
+				\ManipulateBoneScale2Safe(0, ply\GetManipulateBoneScale2Safe(0))
 
 			if seq ~= @legSeq
 				@legSeq = seq
@@ -416,8 +416,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@armsWeightSetup = true
 			weight = @GetData()\GetWeight()
 			vec = Vector(weight, weight, weight)
-			for i = 1, 13
-				ent\ManipulateBoneScale(i, vec)
+			ent\ManipulateBoneScale2Safe(i, vec) for i = 1, 13
 		render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
 	PostDrawArms: (ent) =>
 		return if not @isValid

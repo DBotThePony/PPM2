@@ -101,9 +101,9 @@ RESET_BONE_ANGLES = Angle(0, 0, 0)
 RESET_BONE_SCALE = Vector(1, 1, 1)
 resetBones = (ent) ->
 	for i = 0, ent\GetBoneCount() - 1
-		ent\ManipulateBonePosition(i, RESET_BONE_POS)
-		ent\ManipulateBoneScale(i, RESET_BONE_SCALE)
-		ent\ManipulateBoneAngles(i, RESET_BONE_ANGLES)
+		ent\ManipulateBonePosition2Safe(i, RESET_BONE_POS)
+		ent\ManipulateBoneScale2Safe(i, RESET_BONE_SCALE)
+		ent\ManipulateBoneAngles2Safe(i, RESET_BONE_ANGLES)
 
 for ent in *ents.GetAll()
 	ent.__ppmBonesModifiers = nil
@@ -247,11 +247,13 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 
 			if obj.ent\IsPony()
 				if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+					obj.ent\ResetBoneManipCache()
 					resetBones(obj.ent)
 					data = obj.ent\GetPonyData()
 					hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
 					obj\Think()
 					obj.ent.__ppmBonesModified = true
+					obj.ent\ApplyBoneManipulations()
 			elseif obj.ent.__ppmBonesModified
 				resetBones(obj.ent)
 				obj.ent.__ppmBonesModified = false
@@ -315,9 +317,9 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			calcScale = data[4]
 			calcAngles = data[5]
 			with @ent
-				\ManipulateBonePosition(id, \GetManipulateBonePosition(id) + @[calc](@))
-				\ManipulateBoneScale(id, \GetManipulateBoneScale(id) + @[calcScale](@))
-				\ManipulateBoneAngles(id, \GetManipulateBoneAngles(id) + @[calcAngles](@))
+				\ManipulateBonePosition2Safe(id, \GetManipulateBonePosition2Safe(id) + @[calc](@))
+				\ManipulateBoneScale2Safe(id, \GetManipulateBoneScale2Safe(id) + @[calcScale](@))
+				\ManipulateBoneAngles2Safe(id, \GetManipulateBoneAngles2Safe(id) + @[calcAngles](@))
 
 	ResetBones: =>
 		return if @defferReset and @defferReset > RealTimeL()
@@ -339,9 +341,11 @@ with FindMetaTable('Entity')
 hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 	return if not @IsPony()
 	data = @GetPonyData()
+	@ResetBoneManipCache()
 	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
 	if @__ppmBonesModifiers
 		@__ppmBonesModifiers\Think(true)
 		@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
+	@ApplyBoneManipulations()
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()
