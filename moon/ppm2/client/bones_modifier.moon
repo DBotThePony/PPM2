@@ -310,16 +310,31 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	Think: (force = false) =>
 		return if not super() or not force and @callFrame == FrameNumberL()
 		@callFrame = FrameNumberL()
-		for data in *@bonesIterable
-			id = data[1]
-			name = data[2]
-			calc = data[3]
-			calcScale = data[4]
-			calcAngles = data[5]
-			with @ent
-				\ManipulateBonePosition2Safe(id, \GetManipulateBonePosition2Safe(id) + @[calc](@))
-				\ManipulateBoneScale2Safe(id, \GetManipulateBoneScale2Safe(id) + @[calcScale](@))
-				\ManipulateBoneAngles2Safe(id, \GetManipulateBoneAngles2Safe(id) + @[calcAngles](@))
+
+		with @ent
+			calcBonesPos = {}
+			calcBonesAngles = {}
+			calcBonesScale = {}
+
+			for id = 0, @boneCount - 1
+				calcBonesPos[id] = \GetManipulateBonePosition2Safe(id)
+				calcBonesAngles[id] = \GetManipulateBoneAngles2Safe(id)
+				calcBonesScale[id] = \GetManipulateBoneScale2Safe(id)
+
+			for data in *@bonesIterable
+				id = data[1]
+				name = data[2]
+				calc = data[3]
+				calcScale = data[4]
+				calcAngles = data[5]
+				calcBonesPos[id] += @[calc](@)
+				calcBonesAngles[id] += @[calcAngles](@)
+				calcBonesScale[id] += @[calcScale](@)
+
+			for id = 0, @boneCount - 1
+				\ManipulateBonePosition2Safe(id, calcBonesPos[id])
+				\ManipulateBoneScale2Safe(id, calcBonesScale[id])
+				\ManipulateBoneAngles2Safe(id, calcBonesAngles[id])
 
 	ResetBones: =>
 		return if @defferReset and @defferReset > RealTimeL()
