@@ -578,6 +578,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		cam.Start2D()
 		cam.PushModelMatrix(Matrix())
 		surface.SetDrawColor(r, g, b, a)
@@ -610,6 +612,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
 		surface.DisableClipping(true)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		cam.Start2D()
 		cam.PushModelMatrix(Matrix())
 		surface.SetDrawColor(r, g, b, a)
@@ -619,6 +623,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	EndRT: =>
 		cam.PopModelMatrix()
+		render.PopFilterMin()
+		render.PopFilterMag()
 		cam.End2D()
 		--render.SetViewPort(0, 0, @oldW, @oldH)
 		render.PopRenderTarget()
