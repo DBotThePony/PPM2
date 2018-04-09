@@ -127,7 +127,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@EYE_LINE_R_2 = _M.EYE_LINE_R_2
 	@PONY_SOCKS = _M.PONY_SOCKS
 
-	@SessionID = math.random(1, 1000)
+	--@SessionID = math.random(1, 1000)
+	@SessionID = 1
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
