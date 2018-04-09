@@ -53,6 +53,7 @@ DLib.manifest({
 		'client/emotes.lua'
 		'client/player_menu.lua'
 		'client/editor.lua'
+		'client/editor3.lua'
 		'client/rag_edit.lua'
 		'client/render.lua'
 	}
