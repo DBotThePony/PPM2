@@ -42,8 +42,16 @@ MODEL_BOX_PANEL = {
 		@mouseX, @mouseY = 0, 0
 
 		@angle = Angle(0, 0, 0)
-		@distToPony = 100
-		@vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
+		@distToPony = 90
+		@trackBone = -1
+		@trackBoneName = ''
+		@trackAttach = -1
+		@trackAttachName = 'eyes'
+		@shouldAutoTrack = true
+		@autoTrackPos = Vector(0, 0, 0)
+		@fixedDistanceToPony = 100
+
+		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
 		@targetPos = Vector(0, 0, @PONY_VEC_Z * .7)
 
 		@SetCursor('none')
@@ -64,14 +72,16 @@ MODEL_BOX_PANEL = {
 			\SetMouseInputEnabled(true)
 			\SetVisible(true)
 
-	ResetPosition: =>
-		@angle = Angle(0, 0, 0)
-		@distToPony = 100
-		@vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
+	UpdateAttachsIDs: =>
+		@trackBone = @model\LookupBone(@trackBoneName) or -1
+		@trackAttach = @model\LookupAttachment(@trackAttachName) or -1
+	GetTrackedPosition: =>
+		return @autoTrackPos if @shouldAutoTrack
+		return @targetPos
 
 	PerformLayout: (w = 0, h = 0) =>
 		@seqButton\SetPos(10, 10)
-		@emotesPanel\SetPos(10, 40) if IsValid(@emotesPanel)
+		@emotesPanel\SetPos(10, 40)
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		return if code ~= MOUSE_LEFT
@@ -95,14 +105,8 @@ MODEL_BOX_PANEL = {
 
 	GetModel: => @model
 	GetSequence: => @seq
-	GetSeq: => @seq
 	GetAnimRate: => @animRate
 	SetAnimRate: (val = 1) => @animRate = val
-
-	SetSeq: (val = @SEQUENCE_STAND) =>
-		@seq = val
-		@model\SetSequence(@seq) if IsValid(@model)
-
 	SetSequence: (val = @SEQUENCE_STAND) =>
 		@seq = val
 		@model\SetSequence(@seq) if IsValid(@model)
@@ -118,7 +122,9 @@ MODEL_BOX_PANEL = {
 			.__PPM2_PonyData = ponydata
 			\SetSequence(@seq)
 			\FrameAdvance(0)
+			\SetPos(Vector())
 
+		@UpdateAttachsIDs()
 		return @model
 
 	Think: =>
@@ -131,6 +137,15 @@ MODEL_BOX_PANEL = {
 			@model\SetPlaybackRate(1)
 			@model\SetPoseParameter('move_x', 1)
 
+			if @shouldAutoTrack
+				if @trackAttach ~= -1
+					{:Ang, :Pos} = @model\GetAttachment(@trackAttach)
+					@autoTrackPos = Pos
+				elseif @trackBone ~= -1
+					@autoTrackPos = @model\GetBonePosition(@trackBone)
+				else
+					@shouldAutoTrack = false
+
 		@hold = @IsHovered() if @hold
 
 		if @hold
@@ -139,12 +154,12 @@ MODEL_BOX_PANEL = {
 			@mouseX, @mouseY = x, y
 			{:pitch, :yaw, :roll} = @angle
 			yaw -= deltaX * .5
-			pitch = math.clamp(pitch - deltaY * .5, -40, 10)
-			@angle = Angle(pitch, yaw, roll)
+			pitch = math.clamp(pitch - deltaY * .5, -45, 45)
+			@angle = Angle(pitch, yaw % 360, roll)
 
-		@vectorPos = Vector(@distToPony, 0, @PONY_VEC_Z)
+		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
 		@vectorPos\Rotate(@angle)
-		@drawAngle = (@targetPos - @vectorPos)\Angle()
+		@drawAngle = Angle(-@angle.p, @angle.y - 180)
 
 	FLOOR_VECTOR: Vector(0, 0, -30)
 	FLOOR_ANGLE: Vector(0, 0, 1)
@@ -168,7 +183,7 @@ MODEL_BOX_PANEL = {
 		surface.DrawRect(0, 0, w, h)
 		return if not IsValid(@model)
 		x, y = @LocalToScreen(0, 0)
-		cam.Start3D(@vectorPos, @drawAngle, 90, x, y, w, h)
+		cam.Start3D(@vectorPos + @GetTrackedPosition(), @drawAngle, @distToPony, x, y, w, h)
 
 		render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
 
@@ -180,7 +195,7 @@ MODEL_BOX_PANEL = {
 			render.ResetModelLighting(1, 1, 1)
 			render.SetColorModulation(1, 1, 1)
 
-		--@buildingModel\DrawModel()
+		@buildingModel\DrawModel()
 		ctrl = @controller\GetRenderController()
 
 		if bg = @controller\GetBodygroupController()
