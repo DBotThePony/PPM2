@@ -45,9 +45,9 @@ MODEL_BOX_PANEL = {
 		@angle = Angle(0, 0, 0)
 		@distToPony = 90
 		@trackBone = -1
-		@trackBoneName = ''
+		@trackBoneName = 'LrigSpine2'
 		@trackAttach = -1
-		@trackAttachName = 'eyes'
+		@trackAttachName = ''
 		@shouldAutoTrack = true
 		@autoTrackPos = Vector(0, 0, 0)
 		@fixedDistanceToPony = 100
@@ -74,8 +74,8 @@ MODEL_BOX_PANEL = {
 			\SetVisible(true)
 
 	UpdateAttachsIDs: =>
-		@trackBone = @model\LookupBone(@trackBoneName) or -1
-		@trackAttach = @model\LookupAttachment(@trackAttachName) or -1
+		@trackBone = @model\LookupBone(@trackBoneName) or -1 if @trackBoneName ~= ''
+		@trackAttach = @model\LookupAttachment(@trackAttachName) or -1 if @trackAttachName ~= ''
 	GetTrackedPosition: =>
 		return @autoTrackPos if @shouldAutoTrack
 		return @targetPos
@@ -126,6 +126,7 @@ MODEL_BOX_PANEL = {
 			\SetSequence(@seq)
 			\FrameAdvance(0)
 			\SetPos(Vector())
+			\InvalidateBoneCache()
 
 		@UpdateAttachsIDs()
 		return @model
@@ -143,9 +144,9 @@ MODEL_BOX_PANEL = {
 			if @shouldAutoTrack
 				if @trackAttach ~= -1
 					{:Ang, :Pos} = @model\GetAttachment(@trackAttach)
-					@autoTrackPos = Pos
+					@autoTrackPos = Pos or Vector()
 				elseif @trackBone ~= -1
-					@autoTrackPos = @model\GetBonePosition(@trackBone)
+					@autoTrackPos = @model\GetBonePosition(@trackBone) or Vector()
 				else
 					@shouldAutoTrack = false
 
