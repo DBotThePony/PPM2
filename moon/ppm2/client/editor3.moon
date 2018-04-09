@@ -175,9 +175,6 @@ MODEL_BOX_PANEL = {
 		{Vector(0, 0, 900), Vector(0, 0, -1), 8000, 8000}
 	}
 
-	--WALL_COLOR: Color(98, 189, 176)
-	--FLOOR_COLOR: Color(53, 150, 84)
-
 	WALL_COLOR: Color() - 255
 	FLOOR_COLOR: Color() - 255
 	EMPTY_VECTOR: Vector()
