@@ -35,6 +35,7 @@ MODEL_BOX_PANEL = {
 		@animRate = 1
 		@seq = @SEQUENCE_STAND
 		@hold = false
+		@holdRightClick = false
 		@canHold = true
 		@lastTick = RealTimeL()
 
@@ -84,18 +85,20 @@ MODEL_BOX_PANEL = {
 		@emotesPanel\SetPos(10, 40)
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
-		return if code ~= MOUSE_LEFT
-		if @canHold
+		if code == MOUSE_LEFT and @canHold
 			@hold = true
 			@SetCursor('sizeall')
 			@holdLast = RealTimeL() + .1
 			@mouseX, @mouseY = gui.MousePos()
+		elseif code == MOUSE_RIGHT
+			@holdRightClick = true
 
 	OnMouseReleased: (code = MOUSE_LEFT) =>
-		return if code ~= MOUSE_LEFT
-		if @canHold
+		if code == MOUSE_LEFT and @canHold
 			@hold = false
 			@SetCursor('none')
+		elseif code == MOUSE_RIGHT
+			@holdRightClick = false
 
 	SetController: (val) => @controller = val
 
@@ -177,13 +180,20 @@ MODEL_BOX_PANEL = {
 
 	WALL_COLOR: Color() - 255
 	FLOOR_COLOR: Color() - 255
+	EMPTY_VECTOR: Vector()
 
 	Paint: (w = 0, h = 0) =>
 		surface.SetDrawColor(0, 0, 0)
 		surface.DrawRect(0, 0, w, h)
 		return if not IsValid(@model)
 		x, y = @LocalToScreen(0, 0)
-		cam.Start3D(@vectorPos + @GetTrackedPosition(), @drawAngle, @distToPony, x, y, w, h)
+		drawpos = @vectorPos + @GetTrackedPosition()
+		cam.Start3D(drawpos, @drawAngle, @distToPony, x, y, w, h)
+
+		if @holdRightClick
+			@model\SetEyeTarget(drawpos)
+		else
+			@model\SetEyeTarget(@EMPTY_VECTOR)
 
 		render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
 
