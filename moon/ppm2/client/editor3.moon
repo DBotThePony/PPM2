@@ -40,6 +40,7 @@ MODEL_BOX_PANEL = {
 		@animRate = 1
 		@seq = @SEQUENCE_STAND
 		@hold = false
+		@holdOnPoint = false
 		@holdRightClick = false
 		@canHold = true
 		@lastTick = RealTimeL()
@@ -91,17 +92,26 @@ MODEL_BOX_PANEL = {
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
-			@hold = true
-			@SetCursor('sizeall')
-			@holdLast = RealTimeL() + .1
-			@mouseX, @mouseY = gui.MousePos()
+			if not @selectPoint
+				@hold = true
+				@SetCursor('sizeall')
+				@holdLast = RealTimeL() + .1
+				@mouseX, @mouseY = gui.MousePos()
+			else
+				@holdOnPoint = true
+				@SetCursor('crosshair')
 		elseif code == MOUSE_RIGHT
 			@holdRightClick = true
 
 	OnMouseReleased: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
-			@hold = false
-			@SetCursor('none')
+			@holdOnPoint = false
+
+			if not @selectPoint
+				@hold = false
+				@SetCursor('none')
+			else
+				@PushMenu(@selectPoint)
 		elseif code == MOUSE_RIGHT
 			@holdRightClick = false
 
@@ -304,11 +314,13 @@ MODEL_BOX_PANEL = {
 				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
 				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
 
-			if not @hold
+			if not @hold and not @holdOnPoint
 				if drawnSelected
 					@SetCursor('hand')
 				else
 					@SetCursor('none')
+		else
+			@selectPoint = false
 
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
