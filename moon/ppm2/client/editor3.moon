@@ -207,8 +207,28 @@ MODEL_BOX_PANEL = {
 
 		if @holdRightClick
 			@model\SetEyeTarget(drawpos)
+			turnpitch, turnyaw = DLib.combat.turnAngle(@EMPTY_VECTOR, drawpos, Angle())
+
+			if not inRadius(turnyaw, -20, 20)
+				if turnyaw < 0
+					@model\SetPoseParameter('head_yaw', turnyaw + 20)
+				else
+					@model\SetPoseParameter('head_yaw', turnyaw - 20)
+			else
+				@model\SetPoseParameter('head_yaw', 0)
+
+			turnpitch = turnpitch + 20
+			if not inRadius(turnpitch, -10, 0)
+				if turnpitch < 0
+					@model\SetPoseParameter('head_pitch', turnpitch + 10)
+				else
+					@model\SetPoseParameter('head_pitch', turnpitch)
+			else
+				@model\SetPoseParameter('head_pitch', 0)
 		else
 			@model\SetEyeTarget(@EMPTY_VECTOR)
+			@model\SetPoseParameter('head_yaw', 0)
+			@model\SetPoseParameter('head_pitch', 0)
 
 		render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
 
