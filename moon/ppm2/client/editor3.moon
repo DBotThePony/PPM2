@@ -20,6 +20,13 @@ local EDIT_TREE
 inRadius = (val, min, max) -> val >= min and val <= max
 inBox = (pointX, pointY, x, y, w, h) -> inRadius(pointX, x - w, x + w) and inRadius(pointY, y - h, y + h)
 
+-- loal
+surface.CreateFont('PPM2BackButton', {
+	font: 'Roboto'
+	size: ScreenScale(24)\floor()
+	weight: 600
+})
+
 MODEL_BOX_PANEL = {
 	SEQUENCE_STAND: 22
 	PONY_VEC_Z: 64 * .7
@@ -106,12 +113,13 @@ MODEL_BOX_PANEL = {
 	OnMouseReleased: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
 			@holdOnPoint = false
+			@SetCursor('none')
 
 			if not @selectPoint
 				@hold = false
-				@SetCursor('none')
 			else
-				@PushMenu(@selectPoint)
+				@PushMenu(@selectPoint.linkTable)
+
 		elseif code == MOUSE_RIGHT
 			@holdRightClick = false
 
@@ -132,17 +140,45 @@ MODEL_BOX_PANEL = {
 	ResetSequence: => @SetSequence(@SEQUENCE_STAND)
 	ResetSeq: => @SetSequence(@SEQUENCE_STAND)
 
+	GetParentTarget: => @parentTarget
+	SetParentTarget: (val) => @parentTarget = val
+
 	PushMenu: (menu) =>
 		table.insert(@stack, menu)
+		if not IsValid(@backButton)
+			with @backButton = vgui.Create('DButton', @)
+				x, y = @GetPos()
+				w, h = @GetSize()
+				\SetText('↩')
+				\SetFont('PPM2BackButton')
+				\SizeToContents()
+				W, H = \GetSize()
+				W += ScreenScale(8)
+				\SetSize(W, H)
+				\SetPos(w - ScreenScale(6) - W, ScreenScale(4))
+				.DoClick = -> @PopMenu()
+		if @InMenu()
+			x, y = @GetPos()
+			frame = @GetParentTarget() or @GetParent() or @
+			W, H = @GetSize()
+			width = ScreenScale(120)
+			with @settingsPanel = vgui.Create('PPM2SettingsBase', frame)
+				\SetPos(x, y)
+				\SetSize(width, H)
+				menu.populate(@settingsPanel)
 		return @
 
 	PopMenu: =>
 		assert(#@stack > 1, 'invalid stack size to pop from')
+		@settingsPanel\Remove() if @InMenu() and IsValid(@settingsPanel)
 		table.remove(@stack)
+		@backButton\Remove() if #@stack == 1 and IsValid(@backButton)
 		return @
 
 	CurrentMenu: => @stack[#@stack]
 	InRoot: => #@stack == 1
+	InSelection: => @CurrentMenu().type == 'level'
+	InMenu: => @CurrentMenu().type == 'menu'
 
 	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new.mdl') =>
 		@model\Remove() if IsValid(@model)
@@ -273,6 +309,7 @@ MODEL_BOX_PANEL = {
 
 		menu = @CurrentMenu()
 		@drawPoints = false
+		lx, ly = x, y
 
 		if type(menu.points) == 'table'
 			@drawPoints = true
@@ -280,11 +317,13 @@ MODEL_BOX_PANEL = {
 				vecpos = point.getpos(@model)
 				position = vecpos\ToScreen()
 				{position, point, vecpos\Distance(drawpos)}
+		elseif @InMenu() and menu.getpos
+			{:x, :y} = menu.getpos(@model)\ToScreen(drawpos)
+			x, y = x - lx, y - ly
 
 		cam.End3D()
 
 		if @drawPoints
-			lx, ly = x, y
 			mx, my = gui.MousePos()
 			mx, my = mx - lx, my - ly
 			radius = ScreenScale(10)
@@ -321,6 +360,11 @@ MODEL_BOX_PANEL = {
 					@SetCursor('none')
 		else
 			@selectPoint = false
+			if @InMenu() and menu.getpos
+				radius = ScreenScale(10)
+				surface.SetDrawColor(255, 255, 255)
+				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
+				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
 
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
@@ -422,8 +466,7 @@ patchSubtree = (node) ->
 	if type(node.points) == 'table'
 		for point in *node.points
 			point.addvector = point.addvector or Vector()
-			if type(node.children) == 'table'
-				point.linkTable = node.children[point.link]
+
 			switch point.type
 				when 'point'
 					point.getpos = => Vector(point.target)
@@ -446,6 +489,11 @@ patchSubtree = (node) ->
 						else
 							{:Pos, :Ang} = @GetAttachment(point.targetID)
 							return Pos and (Pos + point.addvector) or Vector(point.addvector)
+
+			if type(node.children) == 'table'
+				point.linkTable = node.children[point.link]
+				if type(point.linkTable) == 'table' and point.linkTable.type == 'menu'
+					point.linkTable.getpos = point.getpos
 
 EDIT_TREE.id = 'root'
 patchSubtree(EDIT_TREE)
@@ -481,5 +529,6 @@ ppm2_editor3 = ->
 	controller\SetDisableTask(true)
 
 	@modelPanel.stack = {EDIT_TREE}
+	@modelPanel\SetParentTarget(@)
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
