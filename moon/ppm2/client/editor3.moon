@@ -81,6 +81,7 @@ MODEL_BOX_PANEL = {
 
 		@angle = Angle(0, 0, 0)
 		@distToPony = 90
+		@ldistToPony = 90
 		@trackBone = -1
 		@trackBoneName = 'LrigSpine2'
 		@trackAttach = -1
@@ -88,9 +89,12 @@ MODEL_BOX_PANEL = {
 		@shouldAutoTrack = true
 		@autoTrackPos = Vector(0, 0, 0)
 		@fixedDistanceToPony = 100
+		@lfixedDistanceToPony = 100
 
 		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
+		@lvectorPos = Vector(@fixedDistanceToPony, 0, 0)
 		@targetPos = Vector(0, 0, @PONY_VEC_Z * .7)
+		@ldrawAngle = Angle()
 
 		@SetCursor('none')
 		@SetMouseInputEnabled(true)
@@ -250,7 +254,9 @@ MODEL_BOX_PANEL = {
 
 		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
 		@vectorPos\Rotate(@angle)
+		@lvectorPos = LerpVector(RealFrameTime() * 15, @lvectorPos, @vectorPos)
 		@drawAngle = Angle(-@angle.p, @angle.y - 180)
+		@ldrawAngle = LerpAngle(RealFrameTime() * 15, @ldrawAngle, @drawAngle)
 
 	FLOOR_VECTOR: Vector(0, 0, -30)
 	FLOOR_ANGLE: Vector(0, 0, 1)
@@ -272,8 +278,8 @@ MODEL_BOX_PANEL = {
 		surface.DrawRect(0, 0, w, h)
 		return if not IsValid(@model)
 		x, y = @LocalToScreen(0, 0)
-		drawpos = @vectorPos + @GetTrackedPosition()
-		cam.Start3D(drawpos, @drawAngle, @distToPony, x, y, w, h)
+		drawpos = @lvectorPos + @GetTrackedPosition()
+		cam.Start3D(drawpos, @ldrawAngle, @distToPony, x, y, w, h)
 
 		if @holdRightClick
 			@model\SetEyeTarget(drawpos)
@@ -395,6 +401,8 @@ vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
 EDIT_TREE = {
 	type: 'level'
 	name: 'Pony overview'
+	dist: 100
+	defpos: Vector(100, 0, 0)
 
 	points: {
 		{
@@ -480,6 +488,8 @@ patchSubtree = (node) ->
 	if type(node.children) == 'table'
 		for childID, child in pairs node.children
 			child.id = childID
+			child.defpos = child.defpos or Vector(node.defpos)
+			child.dist = child.dist or node.dist
 			patchSubtree(child)
 
 	if type(node.points) == 'table'
