@@ -27,6 +27,21 @@ surface.CreateFont('PPM2BackButton', {
 	weight: 600
 })
 
+import HUDCommons from DLib
+drawCrosshair = (x, y, radius = ScreenScale(10), arcColor = Color(255, 255, 255), boxesColor = Color(200, 200, 200)) ->
+	x -= radius / 2
+	y -= radius / 2
+
+	HUDCommons.DrawCircleHollow(x, y, radius, radius * 2, radius * 0.2, arcColor)
+	h = radius * 0.1
+	w = radius * 0.6
+	surface.SetDrawColor(boxesColor)
+	surface.DrawRect(x - w / 2, y + radius / 2 - h / 2, w, h)
+	surface.DrawRect(x + radius / 2 + w / 2, y + radius / 2 - h / 2, w, h)
+
+	surface.DrawRect(x + radius / 2 - h / 2, y - w / 2, h, w)
+	surface.DrawRect(x + radius / 2 - h / 2, y + radius / 2 + w / 3, h, w)
+
 MODEL_BOX_PANEL = {
 	SEQUENCE_STAND: 22
 	PONY_VEC_Z: 64 * .7
@@ -54,6 +69,15 @@ MODEL_BOX_PANEL = {
 
 		@holdLast = 0
 		@mouseX, @mouseY = 0, 0
+
+		@crosshairCircleInactive = Color(150, 150, 150)
+		@crosshairBoxInactive = Color(100, 100, 100)
+
+		@crosshairCircleHovered = Color(137, 195, 196)
+		@crosshairBoxHovered = Color(200, 200, 200)
+
+		@crosshairCircleSelected = Color(0, 0, 0, 0)
+		@crosshairBoxSelected = Color(211, 255, 192)
 
 		@angle = Angle(0, 0, 0)
 		@distToPony = 90
@@ -326,7 +350,7 @@ MODEL_BOX_PANEL = {
 		if @drawPoints
 			mx, my = gui.MousePos()
 			mx, my = mx - lx, my - ly
-			radius = ScreenScale(10)
+			radius = ScreenScale(20)
 			local drawnSelected
 			min = 9999
 
@@ -346,12 +370,9 @@ MODEL_BOX_PANEL = {
 				{:x, :y} = pointdata[1]
 
 				if pointdata == drawnSelected
-					surface.SetDrawColor(255, 255, 255)
+					drawCrosshair(x, y, radius, @crosshairCircleHovered, @crosshairBoxHovered)
 				else
-					surface.SetDrawColor(100, 100, 100)
-
-				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
-				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
+					drawCrosshair(x, y, radius, @crosshairCircleInactive, @crosshairBoxInactive)
 
 			if not @hold and not @holdOnPoint
 				if drawnSelected
@@ -361,10 +382,8 @@ MODEL_BOX_PANEL = {
 		else
 			@selectPoint = false
 			if @InMenu() and menu.getpos
-				radius = ScreenScale(10)
-				surface.SetDrawColor(255, 255, 255)
-				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
-				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
+				radius = ScreenScale(20)
+				drawCrosshair(x, y, radius, @crosshairCircleSelected, @crosshairBoxSelected)
 
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
