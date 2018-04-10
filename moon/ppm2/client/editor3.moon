@@ -15,6 +15,11 @@
 
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
 
+local EDIT_TREE
+
+inRadius = (val, min, max) -> val >= min and val <= max
+inBox = (pointX, pointY, x, y, w, h) -> inRadius(pointX, x - w, x + w) and inRadius(pointY, y - h, y + h)
+
 MODEL_BOX_PANEL = {
 	SEQUENCE_STAND: 22
 	PONY_VEC_Z: 64 * .7
@@ -116,6 +121,18 @@ MODEL_BOX_PANEL = {
 
 	ResetSequence: => @SetSequence(@SEQUENCE_STAND)
 	ResetSeq: => @SetSequence(@SEQUENCE_STAND)
+
+	PushMenu: (menu) =>
+		table.insert(@stack, menu)
+		return @
+
+	PopMenu: =>
+		assert(#@stack > 1, 'invalid stack size to pop from')
+		table.remove(@stack)
+		return @
+
+	CurrentMenu: => @stack[#@stack]
+	InRoot: => #@stack == 1
 
 	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new.mdl') =>
 		@model\Remove() if IsValid(@model)
@@ -224,7 +241,30 @@ MODEL_BOX_PANEL = {
 
 		render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
 
+		menu = @CurrentMenu()
+		local positions
+
+		if type(menu.points) == 'table'
+			positions = [point.getpos(@model)\ToScreen() for point in *menu.points]
+
 		cam.End3D()
+
+		if positions
+			lx, ly = x, y
+			mx, my = gui.MousePos()
+			mx, my = mx - lx, my - ly
+			radius = ScreenScale(10)
+
+			for {:x, :y} in *positions
+				x, y = x - lx, y - ly
+
+				if inBox(mx, my, x, y, radius, radius)
+					surface.SetDrawColor(255, 255, 255)
+				else
+					surface.SetDrawColor(100, 100, 100)
+
+				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
+				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
 
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
@@ -232,6 +272,127 @@ MODEL_BOX_PANEL = {
 }
 
 vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
+
+EDIT_TREE = {
+	type: 'level'
+	name: 'Pony overview'
+
+	points: {
+		{
+			type: 'bone'
+			target: 'LrigScull'
+			link: 'head_submenu'
+		}
+
+		{
+			type: 'bone'
+			target: 'LrigSpine1'
+			link: 'spine_length'
+		}
+
+		{
+			type: 'bone'
+			target: 'Tail01'
+			link: 'tail'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_FL_Metacarpus'
+			link: 'legs_submenu'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_FR_Metacarpus'
+			link: 'legs_submenu'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_BR_LargeCannon'
+			link: 'legs_submenu'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_BL_LargeCannon'
+			link: 'legs_submenu'
+		}
+	}
+
+	children: {
+		head_submenu: {
+			type: 'level'
+			name: 'Head anatomy'
+
+			points: {
+				{
+					type: 'attach'
+					target: 'eyes'
+					link: 'eyes'
+				}
+			}
+
+			children: {
+				eyes: {
+					type: 'menu'
+					populate: =>
+				}
+			}
+		}
+
+		legs_submenu: {
+			type: 'level'
+			name: 'Hooves anatomy'
+
+			points: {
+
+			}
+
+			children: {
+
+			}
+		}
+	}
+}
+
+patchSubtree = (node) ->
+	if type(node.children) == 'table'
+		for childID, child in pairs node.children
+			child.id = childID
+			patchSubtree(child)
+
+	if type(node.points) == 'table'
+		for point in *node.points
+			point.addvector = point.addvector or Vector()
+			if type(node.children) == 'table'
+				point.linkTable = node.children[point.link]
+			switch point.type
+				when 'point'
+					point.getpos = => Vector(point.target)
+				when 'bone'
+					point.getpos = =>
+						if not point.targetID or point.targetID == -1
+							point.targetID = @LookupBone(point.target) or -1
+
+						if point.targetID == -1
+							return Vector(point.addvector)
+						else
+							return @GetBonePosition(point.targetID) + point.addvector
+				when 'attach'
+					point.getpos = =>
+						if not point.targetID or point.targetID == -1
+							point.targetID = @LookupAttachment(point.target) or -1
+
+						if point.targetID == -1
+							return Vector(point.addvector)
+						else
+							{:Pos, :Ang} = @GetAttachment(point.targetID)
+							return Pos and (Pos + point.addvector) or Vector(point.addvector)
+
+EDIT_TREE.id = 'root'
+patchSubtree(EDIT_TREE)
 
 ppm2_editor3 = ->
 	if IsValid(PPM2.EDITOR3)
@@ -244,10 +405,12 @@ ppm2_editor3 = ->
 	@SetPos(0, 0)
 	@MakePopup()
 	@SetTitle('PPM/2 Editor/3')
+	@SetDraggable(false)
+	@RemoveResize()
 
 	with @modelPanel = vgui.Create('PPM2Model2Panel', @)
 		\Dock(FILL)
-		\DockMargin(10, 10, 10, 10)
+		\DockMargin(3, 3, 3, 3)
 
 	copy = PPM2.GetMainData()\Copy()
 	ply = LocalPlayer()
@@ -260,5 +423,7 @@ ppm2_editor3 = ->
 	@modelPanel\SetController(controller)
 	controller\SetupEntity(ent)
 	controller\SetDisableTask(true)
+
+	@modelPanel.stack = {EDIT_TREE}
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
