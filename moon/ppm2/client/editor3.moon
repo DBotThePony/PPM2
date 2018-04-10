@@ -291,17 +291,24 @@ MODEL_BOX_PANEL = {
 						drawnSelected = pointdata
 						min = pointdata[3]
 
+			@selectPoint = drawnSelected and drawnSelected[2] or false
+
 			for pointdata in *@pointsData
 				{:x, :y} = pointdata[1]
 
 				if pointdata == drawnSelected
 					surface.SetDrawColor(255, 255, 255)
-					@selectPoint = pointdata[2]
 				else
 					surface.SetDrawColor(100, 100, 100)
 
 				surface.DrawLine(x - radius, y - radius, x + radius, y + radius)
 				surface.DrawLine(x + radius, y - radius, x - radius, y + radius)
+
+			if not @hold
+				if drawnSelected
+					@SetCursor('hand')
+				else
+					@SetCursor('none')
 
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
