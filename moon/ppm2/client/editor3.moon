@@ -88,6 +88,7 @@ MODEL_BOX_PANEL = {
 		@trackAttachName = ''
 		@shouldAutoTrack = true
 		@autoTrackPos = Vector(0, 0, 0)
+		@lautoTrackPos = Vector(0, 0, 0)
 		@fixedDistanceToPony = 100
 		@lfixedDistanceToPony = 100
 
@@ -118,7 +119,7 @@ MODEL_BOX_PANEL = {
 		@trackBone = @model\LookupBone(@trackBoneName) or -1 if @trackBoneName ~= ''
 		@trackAttach = @model\LookupAttachment(@trackAttachName) or -1 if @trackAttachName ~= ''
 	GetTrackedPosition: =>
-		return @autoTrackPos if @shouldAutoTrack
+		return @lautoTrackPos if @shouldAutoTrack
 		return @targetPos
 
 	PerformLayout: (w = 0, h = 0) =>
@@ -194,6 +195,10 @@ MODEL_BOX_PANEL = {
 				\SetPos(x, y)
 				\SetSize(width, H)
 				menu.populate(@settingsPanel)
+
+		@fixedDistanceToPony = menu.dist
+		@angle = Angle(menu.defang)
+		@distToPony = 90
 		return @
 
 	PopMenu: =>
@@ -201,6 +206,10 @@ MODEL_BOX_PANEL = {
 		@settingsPanel\Remove() if @InMenu() and IsValid(@settingsPanel)
 		table.remove(@stack)
 		@backButton\Remove() if #@stack == 1 and IsValid(@backButton)
+		menu = @stack[#@stack]
+		@fixedDistanceToPony = menu.dist
+		@angle = Angle(menu.defang)
+		@distToPony = 90
 		return @
 
 	CurrentMenu: => @stack[#@stack]
@@ -226,6 +235,7 @@ MODEL_BOX_PANEL = {
 		rtime = RealTimeL()
 		delta = rtime - @lastTick
 		@lastTick = rtime
+		lerp = delta * 15
 
 		if IsValid(@model)
 			@model\FrameAdvance(delta * @animRate)
@@ -233,11 +243,17 @@ MODEL_BOX_PANEL = {
 			@model\SetPoseParameter('move_x', 1)
 
 			if @shouldAutoTrack
-				if @trackAttach ~= -1
+				menu = @CurrentMenu()
+				if menu.getpos
+					@autoTrackPos = menu.getpos(@model)
+					@lautoTrackPos = LerpVector(lerp, @lautoTrackPos, @autoTrackPos)
+				elseif @trackAttach ~= -1
 					{:Ang, :Pos} = @model\GetAttachment(@trackAttach)
 					@autoTrackPos = Pos or Vector()
+					@lautoTrackPos = LerpVector(lerp, @lautoTrackPos, @autoTrackPos)
 				elseif @trackBone ~= -1
 					@autoTrackPos = @model\GetBonePosition(@trackBone) or Vector()
+					@lautoTrackPos = LerpVector(lerp, @lautoTrackPos, @autoTrackPos)
 				else
 					@shouldAutoTrack = false
 
@@ -252,11 +268,13 @@ MODEL_BOX_PANEL = {
 			pitch = math.clamp(pitch - deltaY * .5, -45, 45)
 			@angle = Angle(pitch, yaw % 360, roll)
 
-		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
+		@lfixedDistanceToPony = Lerp(lerp, @lfixedDistanceToPony, @fixedDistanceToPony)
+		@ldistToPony = Lerp(lerp, @ldistToPony, @distToPony)
+		@vectorPos = Vector(@lfixedDistanceToPony, 0, 0)
 		@vectorPos\Rotate(@angle)
-		@lvectorPos = LerpVector(RealFrameTime() * 15, @lvectorPos, @vectorPos)
+		@lvectorPos = LerpVector(lerp, @lvectorPos, @vectorPos)
 		@drawAngle = Angle(-@angle.p, @angle.y - 180)
-		@ldrawAngle = LerpAngle(RealFrameTime() * 15, @ldrawAngle, @drawAngle)
+		@ldrawAngle = LerpAngle(lerp, @ldrawAngle, @drawAngle)
 
 	FLOOR_VECTOR: Vector(0, 0, -30)
 	FLOOR_ANGLE: Vector(0, 0, 1)
@@ -279,7 +297,7 @@ MODEL_BOX_PANEL = {
 		return if not IsValid(@model)
 		x, y = @LocalToScreen(0, 0)
 		drawpos = @lvectorPos + @GetTrackedPosition()
-		cam.Start3D(drawpos, @ldrawAngle, @distToPony, x, y, w, h)
+		cam.Start3D(drawpos, @ldrawAngle, @ldistToPony, x, y, w, h)
 
 		if @holdRightClick
 			@model\SetEyeTarget(drawpos)
@@ -402,7 +420,7 @@ EDIT_TREE = {
 	type: 'level'
 	name: 'Pony overview'
 	dist: 100
-	defpos: Vector(100, 0, 0)
+	defang: Angle(0, 0, 0)
 
 	points: {
 		{
@@ -452,6 +470,8 @@ EDIT_TREE = {
 		head_submenu: {
 			type: 'level'
 			name: 'Head anatomy'
+			dist: 40
+			defang: Angle(-7, -30, 0)
 
 			points: {
 				{
@@ -488,7 +508,7 @@ patchSubtree = (node) ->
 	if type(node.children) == 'table'
 		for childID, child in pairs node.children
 			child.id = childID
-			child.defpos = child.defpos or Vector(node.defpos)
+			child.defang = child.defang or Angle(node.defang)
 			child.dist = child.dist or node.dist
 			patchSubtree(child)
 
@@ -521,7 +541,7 @@ patchSubtree = (node) ->
 
 			if type(node.children) == 'table'
 				point.linkTable = node.children[point.link]
-				if type(point.linkTable) == 'table' and point.linkTable.type == 'menu'
+				if type(point.linkTable) == 'table'
 					point.linkTable.getpos = point.getpos
 
 EDIT_TREE.id = 'root'
