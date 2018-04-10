@@ -242,23 +242,39 @@ MODEL_BOX_PANEL = {
 		render.SuppressEngineLighting(false) if ENABLE_FULLBRIGHT\GetBool()
 
 		menu = @CurrentMenu()
-		local positions
+		drawPoints = false
 
 		if type(menu.points) == 'table'
-			positions = [point.getpos(@model)\ToScreen() for point in *menu.points]
+			drawPoints = true
+			@pointsData = for point in *menu.points
+				vecpos = point.getpos(@model)
+				position = vecpos\ToScreen()
+				{position, point, vecpos\Distance(drawpos)}
 
 		cam.End3D()
 
-		if positions
+		if drawPoints
 			lx, ly = x, y
 			mx, my = gui.MousePos()
 			mx, my = mx - lx, my - ly
 			radius = ScreenScale(10)
+			local drawnSelected
+			min = 9999
 
-			for {:x, :y} in *positions
+			for pointdata in *@pointsData
+				{:x, :y} = pointdata[1]
 				x, y = x - lx, y - ly
+				pointdata[1].x, pointdata[1].y = x, y
 
 				if inBox(mx, my, x, y, radius, radius)
+					if min > pointdata[3]
+						drawnSelected = pointdata
+						min = pointdata[3]
+
+			for pointdata in *@pointsData
+				{:x, :y} = pointdata[1]
+
+				if pointdata == drawnSelected
 					surface.SetDrawColor(255, 255, 255)
 				else
 					surface.SetDrawColor(100, 100, 100)
