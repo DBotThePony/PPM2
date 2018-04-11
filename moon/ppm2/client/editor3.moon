@@ -15,8 +15,6 @@
 
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
 
-local EDIT_TREE
-
 inRadius = (val, min, max) -> val >= min and val <= max
 inBox = (pointX, pointY, x, y, w, h) -> inRadius(pointX, x - w, x + w) and inRadius(pointY, y - h, y + h)
 
@@ -79,7 +77,7 @@ MODEL_BOX_PANEL = {
 		@crosshairCircleSelected = Color(0, 0, 0, 0)
 		@crosshairBoxSelected = Color(211, 255, 192)
 
-		@angle = Angle(0, 0, 0)
+		@angle = Angle(-10, -30, 0)
 		@distToPony = 90
 		@ldistToPony = 90
 		@trackBone = -1
@@ -110,11 +108,6 @@ MODEL_BOX_PANEL = {
 			\AddChoice(choice, num) for choice, num in pairs @SEQUENCES
 			.OnSelect = (pnl = box, index = 1, value = '', data = value) -> @SetSequence(data)
 
-		with @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
-			\SetPos(10, 40)
-			\SetMouseInputEnabled(true)
-			\SetVisible(true)
-
 	UpdateAttachsIDs: =>
 		@trackBone = @model\LookupBone(@trackBoneName) or -1 if @trackBoneName ~= ''
 		@trackAttach = @model\LookupAttachment(@trackAttachName) or -1 if @trackAttachName ~= ''
@@ -123,8 +116,17 @@ MODEL_BOX_PANEL = {
 		return @targetPos
 
 	PerformLayout: (w = 0, h = 0) =>
-		@seqButton\SetPos(10, 10)
-		@emotesPanel\SetPos(10, 40)
+		if @InMenu()
+			bX, bY = @backButton\GetPos()
+			bW, bH = @backButton\GetSize()
+			w, h = @GetSize()
+			W, H = @seqButton\GetSize()
+			@seqButton\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8))
+			W, H = @emotesPanel\GetSize()
+			@emotesPanel\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8) + 30)
+		else
+			@seqButton\SetPos(10, 10)
+			@emotesPanel\SetPos(10, 40)
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
@@ -174,6 +176,7 @@ MODEL_BOX_PANEL = {
 
 	PushMenu: (menu) =>
 		table.insert(@stack, menu)
+
 		if not IsValid(@backButton)
 			with @backButton = vgui.Create('DButton', @)
 				x, y = @GetPos()
@@ -186,15 +189,38 @@ MODEL_BOX_PANEL = {
 				\SetSize(W, H)
 				\SetPos(w - ScreenScale(6) - W, ScreenScale(4))
 				.DoClick = -> @PopMenu()
+
 		if @InMenu()
 			x, y = @GetPos()
 			frame = @GetParentTarget() or @GetParent() or @
 			W, H = @GetSize()
 			width = ScreenScale(120)
-			with @settingsPanel = vgui.Create('PPM2SettingsBase', frame)
-				\SetPos(x, y)
-				\SetSize(width, H)
-				menu.populate(@settingsPanel)
+
+			if menu.menus
+				@settingsPanel = vgui.Create('DPropertySheet', frame)
+				@settingsPanel\SetPos(x, y)
+				@settingsPanel\SetSize(width, H)
+
+				for menuName, menuPopulate in pairs menu.menus
+					with menuPanel = vgui.Create('PPM2SettingsBase', @settingsPanel)
+						@settingsPanel\AddSheet(menuName, menuPanel)
+						\SetTargetData(@controller)
+						\Dock(FILL)
+						menuPopulate(menuPanel)
+			else
+				with @settingsPanel = vgui.Create('PPM2SettingsBase', frame)
+					\SetPos(x, y)
+					\SetSize(width, H)
+					\SetTargetData(@controller)
+					menu.populate(@settingsPanel)
+
+			bX, bY = @backButton\GetPos()
+			bW, bH = @backButton\GetSize()
+			w, h = @GetSize()
+			W, H = @seqButton\GetSize()
+			@seqButton\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8))
+			W, H = @seqButton\GetSize()
+			@emotesPanel\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8) + 30)
 
 		@fixedDistanceToPony = menu.dist
 		@angle = Angle(menu.defang)
@@ -203,7 +229,10 @@ MODEL_BOX_PANEL = {
 
 	PopMenu: =>
 		assert(#@stack > 1, 'invalid stack size to pop from')
-		@settingsPanel\Remove() if @InMenu() and IsValid(@settingsPanel)
+		if @InMenu() and IsValid(@settingsPanel)
+			@settingsPanel\Remove()
+			@seqButton\SetPos(10, 10)
+			@emotesPanel\SetPos(10, 40)
 		table.remove(@stack)
 		@backButton\Remove() if #@stack == 1 and IsValid(@backButton)
 		menu = @stack[#@stack]
@@ -217,7 +246,7 @@ MODEL_BOX_PANEL = {
 	InSelection: => @CurrentMenu().type == 'level'
 	InMenu: => @CurrentMenu().type == 'menu'
 
-	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new.mdl') =>
+	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new_nj.mdl') =>
 		@model\Remove() if IsValid(@model)
 
 		with @model = ClientsideModel(model)
@@ -227,6 +256,12 @@ MODEL_BOX_PANEL = {
 			\FrameAdvance(0)
 			\SetPos(Vector())
 			\InvalidateBoneCache()
+
+		@emotesPanel\Remove() if IsValid(@emotesPanel)
+		with @emotesPanel = PPM2.CreateEmotesPanel(@, @model, false)
+			\SetPos(10, 40)
+			\SetMouseInputEnabled(true)
+			\SetVisible(true)
 
 		@UpdateAttachsIDs()
 		return @model
@@ -311,7 +346,7 @@ MODEL_BOX_PANEL = {
 			else
 				@model\SetPoseParameter('head_yaw', 0)
 
-			turnpitch = turnpitch + 20
+			turnpitch = turnpitch + 2000 / @lfixedDistanceToPony
 			if not inRadius(turnpitch, -10, 0)
 				if turnpitch < 0
 					@model\SetPoseParameter('head_pitch', turnpitch + 10)
@@ -358,6 +393,8 @@ MODEL_BOX_PANEL = {
 		menu = @CurrentMenu()
 		@drawPoints = false
 		lx, ly = x, y
+
+		@model\InvalidateBoneCache()
 
 		if type(menu.points) == 'table'
 			@drawPoints = true
@@ -416,11 +453,64 @@ MODEL_BOX_PANEL = {
 
 vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
 
+-- 0 LrigPelvis
+-- 1 Lrig_LEG_BL_Femur
+-- 2 Lrig_LEG_BL_Tibia
+-- 3 Lrig_LEG_BL_LargeCannon
+-- 4 Lrig_LEG_BL_PhalanxPrima
+-- 5 Lrig_LEG_BL_RearHoof
+-- 6 Lrig_LEG_BR_Femur
+-- 7 Lrig_LEG_BR_Tibia
+-- 8 Lrig_LEG_BR_LargeCannon
+-- 9 Lrig_LEG_BR_PhalanxPrima
+-- 10 Lrig_LEG_BR_RearHoof
+-- 11 LrigSpine1
+-- 12 LrigSpine2
+-- 13 LrigRibcage
+-- 14 Lrig_LEG_FL_Scapula
+-- 15 Lrig_LEG_FL_Humerus
+-- 16 Lrig_LEG_FL_Radius
+-- 17 Lrig_LEG_FL_Metacarpus
+-- 18 Lrig_LEG_FL_PhalangesManus
+-- 19 Lrig_LEG_FL_FrontHoof
+-- 20 Lrig_LEG_FR_Scapula
+-- 21 Lrig_LEG_FR_Humerus
+-- 22 Lrig_LEG_FR_Radius
+-- 23 Lrig_LEG_FR_Metacarpus
+-- 24 Lrig_LEG_FR_PhalangesManus
+-- 25 Lrig_LEG_FR_FrontHoof
+-- 26 LrigNeck1
+-- 27 LrigNeck2
+-- 28 LrigNeck3
+-- 29 LrigScull
+-- 30 Jaw
+-- 31 Ear_L
+-- 32 Ear_R
+-- 33 Mane02
+-- 34 Mane03
+-- 35 Mane03_tip
+-- 36 Mane04
+-- 37 Mane05
+-- 38 Mane06
+-- 39 Mane07
+-- 40 Mane01
+-- 41 Lrigweaponbone
+-- 42 right_hand
+-- 43 Tail01
+-- 44 Tail02
+-- 45 Tail03
+-- 46 wing_l
+-- 47 wing_r
+-- 48 wing_l_bat
+-- 49 wing_r_bat
+-- 50 wing_open_l
+-- 51 wing_open_r
+
 EDIT_TREE = {
 	type: 'level'
 	name: 'Pony overview'
 	dist: 100
-	defang: Angle(0, 0, 0)
+	defang: Angle(-10, -30, 0)
 
 	points: {
 		{
@@ -432,12 +522,12 @@ EDIT_TREE = {
 		{
 			type: 'bone'
 			target: 'LrigSpine1'
-			link: 'spine_length'
+			link: 'spine'
 		}
 
 		{
 			type: 'bone'
-			target: 'Tail01'
+			target: 'Tail03'
 			link: 'tail'
 		}
 
@@ -479,26 +569,258 @@ EDIT_TREE = {
 					target: 'eyes'
 					link: 'eyes'
 				}
+
+				{
+					type: 'attach'
+					target: 'eyes'
+					link: 'eyel'
+					addvector: Vector(-5, 5, 2)
+				}
+
+				{
+					type: 'attach'
+					target: 'eyes'
+					link: 'mane_horn'
+					addvector: Vector(-5, 0, 13)
+				}
+
+				{
+					type: 'attach'
+					target: 'eyes'
+					link: 'eyer'
+					addvector: Vector(-5, -5, 2)
+				}
 			}
 
 			children: {
 				eyes: {
 					type: 'menu'
+					dist: 30
+					defang: Angle(-10, 0, 0)
+
+					menus: {
+						'Eyes': =>
+
+						'Face': =>
+					}
+				}
+
+				eyel: {
+					type: 'menu'
+					dist: 20
+					defang: Angle(-7, 30, 0)
 					populate: =>
 				}
+
+				eyer: {
+					type: 'menu'
+					dist: 20
+					populate: =>
+				}
+
+				mane_horn: {
+					type: 'level'
+					name: 'Mane and Horn'
+					dist: 50
+					defang: Angle(-25, -120, 0)
+
+					points: {
+						{
+							type: 'attach'
+							target: 'eyes'
+							link: 'mane'
+							addvector: Vector(-15, 0, 14)
+						}
+
+						{
+							type: 'attach'
+							target: 'eyes'
+							link: 'horn'
+							addvector: Vector(-2, 0, 14)
+						}
+
+						{
+							type: 'attach'
+							target: 'eyes'
+							link: 'ears'
+							addvector: Vector(-16, -8, 8)
+						}
+
+						{
+							type: 'attach'
+							target: 'eyes'
+							link: 'ears'
+							addvector: Vector(-16, 8, 8)
+						}
+					}
+
+					children: {
+						mane: {
+							type: 'menu'
+							defang: Angle(-7, -120, 0)
+							populate: =>
+						}
+
+						ears: {
+							type: 'menu'
+							defang: Angle(-12, -110, 0)
+							populate: =>
+						}
+
+						horn: {
+							type: 'menu'
+							dist: 30
+							defang: Angle(-13, -20, 0)
+							populate: =>
+						}
+					}
+				}
+			}
+		}
+
+		spine: {
+			type: 'level'
+			name: 'Back'
+			dist: 80
+			defang: Angle(-30, -90, 0)
+
+			points: {
+				{
+					type: 'bone'
+					target: 'LrigSpine1'
+					link: 'overall_body'
+				}
+
+				{
+					type: 'bone'
+					target: 'LrigNeck2'
+					link: 'neck'
+				}
+
+				{
+					type: 'bone'
+					target: 'wing_l'
+					link: 'wings'
+				}
+
+				{
+					type: 'bone'
+					target: 'wing_r'
+					link: 'wings'
+				}
+			}
+
+			children: {
+				wings: {
+					type: 'menu'
+					name: 'Wings'
+					dist: 40
+					defang: Angle(-12, -30, 0)
+					populate: =>
+				}
+
+				neck: {
+					type: 'menu'
+					name: 'Neck'
+					dist: 40
+					defang: Angle(-7, -15, 0)
+					populate: =>
+				}
+
+				overall_body: {
+					type: 'menu'
+					name: 'Pony Body'
+					dist: 90
+					defang: Angle(-3, -90, 0)
+					populate: =>
+				}
+			}
+		}
+
+		tail: {
+			type: 'menu'
+			name: 'Tail'
+			dist: 50
+			defang: Angle(-10, -90, 0)
+
+			menus: {
+				'Main': =>
+				'Details': =>
 			}
 		}
 
 		legs_submenu: {
 			type: 'level'
 			name: 'Hooves anatomy'
+			dist: 50
+			defang: Angle(-10, -50, 0)
 
 			points: {
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_BR_RearHoof'
+					link: 'bottom_hoof'
+				}
 
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_BL_RearHoof'
+					link: 'bottom_hoof'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_FL_FrontHoof'
+					link: 'bottom_hoof'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_FR_FrontHoof'
+					link: 'bottom_hoof'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_FL_Metacarpus'
+					link: 'legs_length'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_FR_Metacarpus'
+					link: 'legs_length'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_BR_LargeCannon'
+					link: 'legs_length'
+				}
+
+				{
+					type: 'bone'
+					target: 'Lrig_LEG_BL_LargeCannon'
+					link: 'legs_length'
+				}
 			}
 
 			children: {
+				bottom_hoof: {
+					type: 'menu'
+					name: 'Buttom Hoof'
+					dist: 30
+					defang: Angle(0, -90, 0)
+					populate: =>
+				}
 
+				legs_length: {
+					type: 'menu'
+					name: 'Buttom Hoof'
+					dist: 30
+					defang: Angle(0, -90, 0)
+					populate: =>
+				}
 			}
 		}
 	}
@@ -527,6 +849,8 @@ patchSubtree = (node) ->
 						if point.targetID == -1
 							return Vector(point.addvector)
 						else
+							--bonepos = @GetBonePosition(point.targetID)
+							--print(point.target, bonepos) if bonepos == Vector()
 							return @GetBonePosition(point.targetID) + point.addvector
 				when 'attach'
 					point.getpos = =>
@@ -540,9 +864,11 @@ patchSubtree = (node) ->
 							return Pos and (Pos + point.addvector) or Vector(point.addvector)
 
 			if type(node.children) == 'table'
-				point.linkTable = node.children[point.link]
+				point.linkTable = table.Copy(node.children[point.link])
 				if type(point.linkTable) == 'table'
 					point.linkTable.getpos = point.getpos
+				else
+					PPM2.Message('Editor3: Missing submenu ' .. point.link .. ' of ' .. node.id .. '!')
 
 EDIT_TREE.id = 'root'
 patchSubtree(EDIT_TREE)
