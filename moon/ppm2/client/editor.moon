@@ -594,6 +594,7 @@ PANEL_SETTINGS_BASE = {
 	SetIsNewEditor: (val) => @isNewEditor = val
 	ValueChanges: (valID, newVal, pnl) =>
 		@unsavedChanges = true
+		return if not @frame
 		@frame.unsavedChanges = true
 		@frame\SetTitle("#{@GetTargetData() and @GetTargetData()\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor; *Unsaved changes*")
 	GetFrame: => @frame
