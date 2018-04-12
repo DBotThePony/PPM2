@@ -459,7 +459,7 @@ MODEL_BOX_PANEL = {
 		if @drawPoints
 			mx, my = gui.MousePos()
 			mx, my = mx - lx, my - ly
-			radius = ScreenScale(20)
+			radius = ScreenScale(10)
 			local drawnSelected
 			min = 9999
 
@@ -491,7 +491,7 @@ MODEL_BOX_PANEL = {
 		else
 			@selectPoint = false
 			if @InMenu() and menu.getpos
-				radius = ScreenScale(20)
+				radius = ScreenScale(10)
 				drawCrosshair(x, y, radius, @crosshairCircleSelected, @crosshairBoxSelected)
 
 	OnRemove: =>
