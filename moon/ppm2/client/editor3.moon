@@ -287,7 +287,7 @@ MODEL_BOX_PANEL = {
 		rtime = RealTimeL()
 		delta = rtime - @lastTick
 		@lastTick = rtime
-		lerp = delta * 15
+		lerp = (delta * 15)\min(1)
 
 		if IsValid(@model)
 			@model\FrameAdvance(delta * @animRate)
