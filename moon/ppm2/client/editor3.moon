@@ -124,10 +124,16 @@ MODEL_BOX_PANEL = {
 		return @lautoTrackPos if @shouldAutoTrack
 		return @targetPos
 
-	PerformLayout: (w = 0, h = 0) =>
-		if @InMenu()
-			bX, bY = @backButton\GetPos()
-			bW, bH = @backButton\GetSize()
+	UpdateSeqButtonsPos: (inMenus = @InMenu()) =>
+		if inMenus
+			bX, bY = @GetSize()
+			bW, bH = 0, 0
+			bX -= ScreenScale(6)
+			bY = ScreenScale(4)
+
+			bX, bY = @backButton\GetPos() if IsValid(@backButton)
+			bW, bH = @backButton\GetSize() if IsValid(@backButton)
+
 			w, h = @GetSize()
 			W, H = @seqButton\GetSize()
 			@seqButton\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8))
@@ -136,6 +142,19 @@ MODEL_BOX_PANEL = {
 		else
 			@seqButton\SetPos(10, 10)
 			@emotesPanel\SetPos(10, 40)
+
+	PerformLayout: (w = 0, h = 0) =>
+		if IsValid(@lastVisibleMenu) and @lastVisibleMenu\IsVisible()
+			@UpdateSeqButtonsPos(true)
+			x, y = @GetPos()
+			W, H = @GetSize()
+			width = ScreenScale(120)
+
+			with @lastVisibleMenu
+				\SetPos(x, y)
+				\SetSize(width, H)
+		else
+			@UpdateSeqButtonsPos(@InMenu())
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
@@ -183,23 +202,8 @@ MODEL_BOX_PANEL = {
 	GetParentTarget: => @parentTarget
 	SetParentTarget: (val) => @parentTarget = val
 
-	PushMenu: (menu) =>
-		table.insert(@stack, menu)
-
-		if not IsValid(@backButton)
-			with @backButton = vgui.Create('DButton', @)
-				x, y = @GetPos()
-				w, h = @GetSize()
-				\SetText('↩')
-				\SetFont('PPM2BackButton')
-				\SizeToContents()
-				W, H = \GetSize()
-				W += ScreenScale(8)
-				\SetSize(W, H)
-				\SetPos(w - ScreenScale(6) - W, ScreenScale(4))
-				.DoClick = -> @PopMenu()
-
-		if @InMenu()
+	UpdateMenu: (menu, goingToDelete = false) =>
+		if @InMenu2() and not goingToDelete
 			x, y = @GetPos()
 			frame = @GetParentTarget() or @GetParent() or @
 			W, H = @GetSize()
@@ -241,13 +245,30 @@ MODEL_BOX_PANEL = {
 				\SetPos(x, y)
 				\SetSize(width, H)
 
-			bX, bY = @backButton\GetPos()
-			bW, bH = @backButton\GetSize()
-			w, h = @GetSize()
-			W, H = @seqButton\GetSize()
-			@seqButton\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8))
-			W, H = @seqButton\GetSize()
-			@emotesPanel\SetPos(w - ScreenScale(6) - W, bY + bH + ScreenScale(8) + 30)
+			@lastVisibleMenu = @menuPanelsCache[menu.id]
+		elseif IsValid(@menuPanelsCache[menu.id])
+			@menuPanelsCache[menu.id]\SetVisible(false)
+			@seqButton\SetPos(10, 10)
+			@emotesPanel\SetPos(10, 40)
+
+	PushMenu: (menu) =>
+		@UpdateMenu(@stack[#@stack], true)
+		table.insert(@stack, menu)
+
+		if not IsValid(@backButton)
+			with @backButton = vgui.Create('DButton', @)
+				x, y = @GetPos()
+				w, h = @GetSize()
+				\SetText('↩')
+				\SetFont('PPM2BackButton')
+				\SizeToContents()
+				W, H = \GetSize()
+				W += ScreenScale(8)
+				\SetSize(W, H)
+				\SetPos(w - ScreenScale(6) - W, ScreenScale(4))
+				.DoClick = -> @PopMenu()
+
+		@UpdateMenu(menu)
 
 		@fixedDistanceToPony = menu.dist
 		@angle = Angle(menu.defang)
@@ -257,15 +278,11 @@ MODEL_BOX_PANEL = {
 	PopMenu: =>
 		assert(#@stack > 1, 'invalid stack size to pop from')
 		_menu = @stack[#@stack]
-
-		if @InMenu() and IsValid(@menuPanelsCache[_menu.id])
-			@menuPanelsCache[_menu.id]\SetVisible(false)
-			@seqButton\SetPos(10, 10)
-			@emotesPanel\SetPos(10, 40)
-
 		table.remove(@stack)
+		@UpdateMenu(_menu, true)
 		@backButton\Remove() if #@stack == 1 and IsValid(@backButton)
 		menu = @stack[#@stack]
+		@UpdateMenu(menu)
 		@fixedDistanceToPony = menu.dist
 		@angle = Angle(menu.defang)
 		@distToPony = 90
@@ -275,6 +292,7 @@ MODEL_BOX_PANEL = {
 	InRoot: => #@stack == 1
 	InSelection: => @CurrentMenu().type == 'level'
 	InMenu: => @CurrentMenu().type == 'menu'
+	InMenu2: => @CurrentMenu().type == 'menu' or @CurrentMenu().populate
 
 	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new_nj.mdl') =>
 		@model\Remove() if IsValid(@model)
@@ -537,6 +555,28 @@ vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
 -- 50 wing_open_l
 -- 51 wing_open_r
 
+doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
+	spoiler = @Spoiler(spoilerName)
+	@URLLabel('More info about Phong on wiki', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
+	@Label('Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin', spoiler)
+	@NumSlider('Phong Exponent', ttype .. 'PhongExponent', 3, spoiler)
+	@Label('Phong Boost - multiplies specular map reflections', spoiler)
+	@NumSlider('Phong Boost', ttype .. 'PhongBoost', 3, spoiler)
+	@Label('Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)', spoiler)
+	picker, pickerSpoiler = @ColorBox('Phong Tint', ttype .. 'PhongTint', spoiler)
+	pickerSpoiler\SetExpanded(true)
+	@Label('Phong Front - Fresnel 0 degree reflection angle multiplier', spoiler)
+	@NumSlider('Phong Front', ttype .. 'PhongFront', 2, spoiler)
+	@Label('Phong Middle - Fresnel 45 degree reflection angle multiplier', spoiler)
+	@NumSlider('Phong Middle', ttype .. 'PhongMiddle', 2, spoiler)
+	@Label('Phong Sliding - Fresnel 90 degree reflection angle multiplier', spoiler)
+	@NumSlider('Phong Sliding', ttype .. 'PhongSliding', 2, spoiler)
+	@ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
+	@Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
+	@URLInput(ttype .. 'LightwarpURL', spoiler)
+	@Label('Bumpmap input URL', spoiler)
+	@URLInput(ttype .. 'BumpmapURL', spoiler)
+
 genEyeMenu = (publicName) ->
 	return =>
 		@ScrollPanel()
@@ -599,6 +639,42 @@ EDIT_TREE = {
 	name: 'Pony overview'
 	dist: 100
 	defang: Angle(-10, -30, 0)
+
+	populate: =>
+		@Button 'New File', ->
+			data = @GetTargetData()
+			return if not data
+			confirmed = ->
+				data\SetFilename("new_pony-#{math.random(1, 100000)}")
+				data\Reset()
+				@ValueChanges()
+			Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
+
+		@Button 'Randomize!', ->
+			data = @GetTargetData()
+			return if not data
+			confirmed = ->
+				PPM2.Randomize(data, false)
+				@ValueChanges()
+			Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
+
+		@ComboBox('Race', 'Race')
+		@ComboBox('Wings Type', 'WingsType')
+		@CheckBox('Gender', 'Gender')
+		@NumSlider('Male chest buff', 'MaleBuff', 2)
+		@NumSlider('Weight', 'Weight', 2)
+		@NumSlider('Pony Size', 'PonySize', 2)
+
+		return if not ADVANCED_MODE\GetBool()
+
+		@CheckBox('Should hide weapons', 'HideWeapons')
+		@Hr()
+		@CheckBox('No flexes on new model', 'NoFlex')
+		@Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+		flexes = @Spoiler('Flexes controls')
+		for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+			@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+		flexes\SizeToContents()
 
 	points: {
 		{
@@ -690,6 +766,41 @@ EDIT_TREE = {
 					menus: {
 						'Eyes': genEyeMenu('')
 						'Face': =>
+							@ScrollPanel()
+							@ComboBox('Eyelashes', 'EyelashType')
+							@ColorBox('Eyelashes Color', 'EyelashesColor')
+							@ColorBox('Eyebrows Color', 'EyebrowsColor')
+
+							@CheckBox('Use new muzzle for male model', 'NewMuzzle')
+
+							if ADVANCED_MODE\GetBool()
+								@Hr()
+								@CheckBox('Inherit Lips Color from body', 'LipsColorInherit')
+								@CheckBox('Inherit Nose Color from body', 'NoseColorInherit')
+								@ColorBox('Lips Color', 'LipsColor')
+								@ColorBox('Nose Color', 'NoseColor')
+								@Hr()
+								@CheckBox('Glowing eyebrows', 'GlowingEyebrows')
+								@NumSlider('Glow strength', 'EyebrowsGlowStrength', 2)
+
+								@CheckBox('Separate Eyelashes Phong', 'SeparateEyelashesPhong')
+								doAddPhongData(@, 'Eyelashes')
+
+						'Mouth': =>
+							@CheckBox('Fangs', 'Fangs')
+							@CheckBox('Alternative Fangs', 'AlternativeFangs')
+							@NumSlider('Fangs', 'FangsStrength', 2) if ADVANCED_MODE\GetBool()
+							@CheckBox('Claw teeth', 'ClawTeeth')
+							@NumSlider('Claw teeth', 'ClawTeethStrength', 2) if ADVANCED_MODE\GetBool()
+
+							@Hr()
+
+							@ColorBox('Teeth color', 'TeethColor')
+							@ColorBox('Mouth color', 'MouthColor')
+							@ColorBox('Tongue color', 'TongueColor')
+							doAddPhongData(@, 'Teeth')
+							doAddPhongData(@, 'Mouth')
+							doAddPhongData(@, 'Tongue')
 					}
 				}
 
@@ -747,21 +858,91 @@ EDIT_TREE = {
 					children: {
 						mane: {
 							type: 'menu'
+							name: 'Mane'
 							defang: Angle(-7, -120, 0)
-							populate: =>
+							menus: {
+								'Main': =>
+									@ComboBox('Mane type', 'ManeTypeNew')
+									@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
+									@CheckBox('Hide mane when using PAC3 entity', 'HideManesMane')
+
+									@Hr()
+									@CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
+									doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
+									@ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
+
+									@Hr()
+									@ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+
+								'Details': =>
+									@CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+									doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings') if ADVANCED_MODE\GetBool()
+									doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings') if ADVANCED_MODE\GetBool()
+
+									@Hr()
+									@ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
+									@ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}") for i = 1, 2
+
+									@Hr()
+									@ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+									@ColorBox("Lower Mane detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+
+								'URL Details': =>
+									for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+										@Label("Mane URL Detail #{i} input field")
+										@URLInput("ManeURL#{i}")
+										@ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
+										@Hr()
+
+								'URL Separated Details': =>
+									for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+										@Hr()
+										@Label("Upper mane URL Detail #{i} input field")
+										@URLInput("UpperManeURL#{i}")
+										@ColorBox("Upper Mane URL detail color #{i}", "UpperManeURLColor#{i}")
+
+									for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+										@Hr()
+										@Label("Lower mane URL Detail #{i} input field")
+										@URLInput("LowerManeURL#{i}")
+										@ColorBox("Lower Mane URL detail color #{i}", "LowerManeURLColor#{i}")
+							}
 						}
 
 						ears: {
 							type: 'menu'
+							name: 'Ears'
 							defang: Angle(-12, -110, 0)
 							populate: =>
+								@CheckBox('Bat pony ears', 'BatPonyEars')
+								@NumSlider('Bat pony ears', 'BatPonyEarsStrength', 2) if ADVANCED_MODE\GetBool()
+
+								if ADVANCED_MODE\GetBool()
+									@NumSlider('Ears Size', 'EarsSize', 2)
 						}
 
 						horn: {
 							type: 'menu'
+							name: 'Horn'
 							dist: 30
 							defang: Angle(-13, -20, 0)
-							populate: =>
+							menus: {
+								'Main': =>
+									@ColorBox('Horn Detail Color', 'HornDetailColor')
+									@CheckBox('Glowing Horn Detail', 'HornGlow')
+									@NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
+									@ColorBox('Horn color', 'HornColor')
+									@ColorBox('Horn magic color', 'HornMagicColor')
+									doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
+
+								'Details': =>
+									for i = 1, 3
+										@Label("Horn URL detail #{i}")
+										@URLInput("HornURL#{i}")
+										@ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+										@Hr()
+
+							}
 						}
 					}
 				}
@@ -806,7 +987,60 @@ EDIT_TREE = {
 					name: 'Wings'
 					dist: 40
 					defang: Angle(-12, -30, 0)
-					populate: =>
+
+					menus: {
+						'Main': =>
+							@ColorBox('Wings color', 'WingsColor')
+							@CheckBox('Separate wings color from body', 'SeparateWings')
+							@CheckBox('Separate wings phong settings from body', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
+							@CheckBox('Separate horn color from body', 'SeparateHorn')
+							@CheckBox('Separate horn phong settings from body', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
+							@CheckBox('Separate magic color from eye color', 'SeparateMagicColor')
+							@Hr()
+							@ColorBox('Bat Wings color', 'BatWingColor')
+							@ColorBox('Bat Wings skin color', 'BatWingSkinColor')
+							doAddPhongData(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
+
+						'Left': =>
+							@NumSlider('Left Wing Size', 'LWingSize', 2)
+							@NumSlider('Left Wing Forward', 'LWingX', 2)
+							@NumSlider('Left Wing Up', 'LWingY', 2)
+							@NumSlider('Left Wing Inside', 'LWingZ', 2)
+
+						'Right': =>
+							@NumSlider('Right Wing Size', 'RWingSize', 2)
+							@NumSlider('Right Wing Forward', 'RWingX', 2)
+							@NumSlider('Right Wing Up', 'RWingY', 2)
+							@NumSlider('Right Wing Inside', 'RWingZ', 2)
+
+						'Details': =>
+							@Label('Normal wings')
+							@Hr()
+
+							for i = 1, 3
+								@Label("Wings URL detail #{i}")
+								@URLInput("WingsURL#{i}")
+								@ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+								@Hr()
+
+							@Label('Bat wings')
+							@Hr()
+
+							for i = 1, 3
+								@Label("Bat Wings URL detail #{i}")
+								@URLInput("BatWingURL#{i}")
+								@ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
+								@Hr()
+
+							@Label('Bat wings skin')
+							@Hr()
+
+							for i = 1, 3
+								@Label("Bat Wings skin URL detail #{i}")
+								@URLInput("BatWingSkinURL#{i}")
+								@ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
+								@Hr()
+					}
 				}
 
 				neck: {
@@ -815,6 +1049,7 @@ EDIT_TREE = {
 					dist: 40
 					defang: Angle(-7, -15, 0)
 					populate: =>
+						@NumSlider('Neck height', 'NeckSize', 2)
 				}
 
 				overall_body: {
@@ -822,7 +1057,32 @@ EDIT_TREE = {
 					name: 'Pony Body'
 					dist: 90
 					defang: Angle(-3, -90, 0)
-					populate: =>
+					menus: {
+						'Main': =>
+							@ComboBox('Bodysuit', 'Bodysuit')
+							@ColorBox('Body color', 'BodyColor')
+
+						'Back': =>
+							@NumSlider('Spine length', 'BackSize', 2)
+
+						'Details': =>
+							for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
+								@ComboBox("Detail #{i}", "BodyDetail#{i}")
+								@ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+								if ADVANCED_MODE\GetBool()
+									@CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
+									@NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
+								@Hr()
+
+							@Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+							@Hr()
+
+							for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
+								@Label("Body detail #{i}")
+								@URLInput("BodyDetailURL#{i}")
+								@ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+								@Hr()
+					}
 				}
 			}
 		}
@@ -835,7 +1095,24 @@ EDIT_TREE = {
 
 			menus: {
 				'Main': =>
+					@ComboBox('Tail type', 'TailTypeNew')
+
+					@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
+					@CheckBox('Hide tail when using PAC3 entity', 'HideManesTail')
+
+					@NumSlider('Tail size', 'TailSize', 2)
+
+					@Hr()
+					@CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
+					doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
+					@ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+
 				'Details': =>
+					for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+						@Hr()
+						@Label("Tail URL Detail #{i} input field")
+						@URLInput("TailURL#{i}")
+						@ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
 			}
 		}
 
@@ -873,43 +1150,85 @@ EDIT_TREE = {
 				{
 					type: 'bone'
 					target: 'Lrig_LEG_FL_Metacarpus'
-					link: 'legs_length'
+					link: 'legs_generic'
 				}
 
 				{
 					type: 'bone'
 					target: 'Lrig_LEG_FR_Metacarpus'
-					link: 'legs_length'
+					link: 'legs_generic'
 				}
 
 				{
 					type: 'bone'
 					target: 'Lrig_LEG_BR_LargeCannon'
-					link: 'legs_length'
+					link: 'legs_generic'
 				}
 
 				{
 					type: 'bone'
 					target: 'Lrig_LEG_BL_LargeCannon'
-					link: 'legs_length'
+					link: 'legs_generic'
 				}
 			}
 
 			children: {
 				bottom_hoof: {
 					type: 'menu'
-					name: 'Buttom Hoof'
+					name: 'Bottom Hoof'
 					dist: 30
 					defang: Angle(0, -90, 0)
 					populate: =>
+						@CheckBox('Hoof Fluffers', 'HoofFluffers')
+						@NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
 				}
 
-				legs_length: {
+				legs_generic: {
 					type: 'menu'
-					name: 'Buttom Hoof'
+					name: 'Legs'
 					dist: 30
 					defang: Angle(0, -90, 0)
-					populate: =>
+
+					menus: {
+						'General': =>
+							@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
+							@CheckBox('Hide socks when using PAC3 entity', 'HideManesSocks')
+							@NumSlider('Legs height', 'LegsSize', 2)
+
+						'Socks': =>
+							@CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
+							@CheckBox('Socks (as model)', 'SocksAsModel')
+							@ColorBox('Socks model color', 'SocksColor')
+
+							if ADVANCED_MODE\GetBool()
+								@Hr()
+								doAddPhongData(@, 'Socks')
+								@ComboBox('Socks Texture', 'SocksTexture')
+								@Label('Socks URL texture')
+								@URLInput('SocksTextureURL')
+
+								@Hr()
+								@CheckBox('Hoof Fluffers', 'HoofFluffers')
+								@NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+
+								@Hr()
+								@ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+
+						'New Socks': =>
+							@CheckBox('Socks (as new model)', 'SocksAsNewModel')
+							@ColorBox('New Socks color 1', 'NewSocksColor1')
+							@ColorBox('New Socks color 2', 'NewSocksColor2')
+							@ColorBox('New Socks color 3', 'NewSocksColor3')
+
+							if ADVANCED_MODE\GetBool()
+								@Label('New Socks URL texture')
+								@URLInput('NewSocksTextureURL')
+								@Hr()
+								@CheckBox('Separate wings color from body', 'SeparateWings')
+								@CheckBox('Separate horn color from body', 'SeparateHorn')
+								@ColorBox('Wings color', 'WingsColor')
+								@ColorBox('Horn color', 'HornColor')
+					}
 				}
 			}
 		}
@@ -996,5 +1315,6 @@ ppm2_editor3 = ->
 	@modelPanel.stack = {EDIT_TREE}
 	@modelPanel\SetParentTarget(@)
 	@modelPanel.controllerData = copy
+	@modelPanel\UpdateMenu(@modelPanel\CurrentMenu())
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
