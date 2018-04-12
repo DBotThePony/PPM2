@@ -14,6 +14,7 @@
 -- limitations under the License.
 
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
+ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options. Keep in mind Editor3 acts different with this option.')
 
 inRadius = (val, min, max) -> val >= min and val <= max
 inBox = (pointX, pointY, x, y, w, h) -> inRadius(pointX, x - w, x + w) and inRadius(pointY, y - h, y + h)
@@ -22,6 +23,12 @@ inBox = (pointX, pointY, x, y, w, h) -> inRadius(pointX, x - w, x + w) and inRad
 surface.CreateFont('PPM2BackButton', {
 	font: 'Roboto'
 	size: ScreenScale(24)\floor()
+	weight: 600
+})
+
+surface.CreateFont('PPM2EditorPanelHeaderText', {
+	font: 'PT Serif'
+	size: ScreenScale(16)\floor()
 	weight: 600
 })
 
@@ -203,15 +210,25 @@ MODEL_BOX_PANEL = {
 
 				for menuName, menuPopulate in pairs menu.menus
 					with menuPanel = vgui.Create('PPM2SettingsBase', @settingsPanel)
+						with vgui.Create('DLabel', menuPanel)
+							\Dock(TOP)
+							\SetFont('PPM2EditorPanelHeaderText')
+							\SetText(menuName)
+							\SizeToContents()
 						@settingsPanel\AddSheet(menuName, menuPanel)
-						\SetTargetData(@controller)
+						\SetTargetData(@controllerData)
 						\Dock(FILL)
 						menuPopulate(menuPanel)
 			else
 				with @settingsPanel = vgui.Create('PPM2SettingsBase', frame)
+					with vgui.Create('DLabel', @settingsPanel)
+						\Dock(TOP)
+						\SetFont('PPM2EditorPanelHeaderText')
+						\SetText(menu.name or menu.id or '<unknown>')
+						\SizeToContents()
 					\SetPos(x, y)
 					\SetSize(width, H)
-					\SetTargetData(@controller)
+					\SetTargetData(@controllerData)
 					menu.populate(@settingsPanel)
 
 			bX, bY = @backButton\GetPos()
@@ -506,6 +523,63 @@ vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
 -- 50 wing_open_l
 -- 51 wing_open_r
 
+genEyeMenu = (publicName) ->
+	return =>
+		@ScrollPanel()
+		@CheckBox('Use separated settings for eyes', 'SeparateEyes')
+
+		@Hr()
+		prefix = ''
+		if publicName ~= ''
+			prefix = publicName .. ' '
+			@Label("'#{publicName}' Eye settings")
+
+		@Label('Eye URL texture')
+		@URLInput("EyeURL#{publicName}")
+
+		if ADVANCED_MODE\GetBool()
+			@Label('Lightwarp has effect only on EyeRefract eyes')
+			ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'
+			@CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
+			@CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
+			@ComboBox('Lightwarp', ttype .. 'Lightwarp')
+			@Label('Lightwarp texture URL input\nIt must be 256x16!')
+			@URLInput(ttype .. 'LightwarpURL')
+			@Label('Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror')
+			@NumSlider('Glossiness' .. publicName, 'EyeGlossyStrength' .. publicName, 2)
+
+		@Label('When uring eye URL texture; options below have no effect')
+
+		@ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
+		@CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
+		@CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
+		@NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
+		@NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
+
+		if ADVANCED_MODE\GetBool()
+			@CheckBox("#{prefix}Eye lines points inside", "EyeLineDirection#{publicName}")
+			@NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
+			@NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
+
+		@NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
+		@NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
+		@NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
+
+		if ADVANCED_MODE\GetBool()
+			@NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
+			@NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
+			@NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
+
+		@Hr()
+		@ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
+		@ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
+		@ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
+		@ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
+		@ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")
+		@ColorBox("#{prefix}Eye line 2", "EyeIrisLine2#{publicName}")
+		@ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
+		@ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
+
 EDIT_TREE = {
 	type: 'level'
 	name: 'Pony overview'
@@ -595,27 +669,29 @@ EDIT_TREE = {
 			children: {
 				eyes: {
 					type: 'menu'
+					name: 'Eyes'
 					dist: 30
 					defang: Angle(-10, 0, 0)
 
 					menus: {
-						'Eyes': =>
-
+						'Eyes': genEyeMenu('')
 						'Face': =>
 					}
 				}
 
 				eyel: {
 					type: 'menu'
+					name: 'Left Eye'
 					dist: 20
 					defang: Angle(-7, 30, 0)
-					populate: =>
+					populate: genEyeMenu('Left')
 				}
 
 				eyer: {
 					type: 'menu'
+					name: 'Right Eye'
 					dist: 20
-					populate: =>
+					populate: genEyeMenu('Right')
 				}
 
 				mane_horn: {
@@ -905,5 +981,6 @@ ppm2_editor3 = ->
 
 	@modelPanel.stack = {EDIT_TREE}
 	@modelPanel\SetParentTarget(@)
+	@modelPanel.controllerData = copy
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
