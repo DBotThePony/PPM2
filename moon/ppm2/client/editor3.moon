@@ -72,6 +72,8 @@ MODEL_BOX_PANEL = {
 		@canHold = true
 		@lastTick = RealTimeL()
 
+		@menuPanelsCache = {}
+
 		@holdLast = 0
 		@mouseX, @mouseY = 0, 0
 
@@ -203,33 +205,41 @@ MODEL_BOX_PANEL = {
 			W, H = @GetSize()
 			width = ScreenScale(120)
 
-			if menu.menus
-				@settingsPanel = vgui.Create('DPropertySheet', frame)
-				@settingsPanel\SetPos(x, y)
-				@settingsPanel\SetSize(width, H)
+			if not @menuPanelsCache[menu.id]
+				if menu.menus
+					with settingsPanel = vgui.Create('DPropertySheet', frame)
+						\SetPos(x, y)
+						\SetSize(width, H)
+						@menuPanelsCache[menu.id] = settingsPanel
 
-				for menuName, menuPopulate in pairs menu.menus
-					with menuPanel = vgui.Create('PPM2SettingsBase', @settingsPanel)
-						with vgui.Create('DLabel', menuPanel)
+						for menuName, menuPopulate in pairs menu.menus
+							with menuPanel = vgui.Create('PPM2SettingsBase', settingsPanel)
+								with vgui.Create('DLabel', menuPanel)
+									\Dock(TOP)
+									\SetFont('PPM2EditorPanelHeaderText')
+									\SetText(menuName)
+									\SizeToContents()
+								settingsPanel\AddSheet(menuName, menuPanel)
+								\SetTargetData(@controllerData)
+								\Dock(FILL)
+								menuPopulate(menuPanel)
+				else
+					with settingsPanel = vgui.Create('PPM2SettingsBase', frame)
+						@menuPanelsCache[menu.id] = settingsPanel
+						with vgui.Create('DLabel', settingsPanel)
 							\Dock(TOP)
 							\SetFont('PPM2EditorPanelHeaderText')
-							\SetText(menuName)
+							\SetText(menu.name or '<unknown>')
 							\SizeToContents()
-						@settingsPanel\AddSheet(menuName, menuPanel)
+						\SetPos(x, y)
+						\SetSize(width, H)
 						\SetTargetData(@controllerData)
-						\Dock(FILL)
-						menuPopulate(menuPanel)
-			else
-				with @settingsPanel = vgui.Create('PPM2SettingsBase', frame)
-					with vgui.Create('DLabel', @settingsPanel)
-						\Dock(TOP)
-						\SetFont('PPM2EditorPanelHeaderText')
-						\SetText(menu.name or menu.id or '<unknown>')
-						\SizeToContents()
-					\SetPos(x, y)
-					\SetSize(width, H)
-					\SetTargetData(@controllerData)
-					menu.populate(@settingsPanel)
+						menu.populate(settingsPanel)
+
+			with @menuPanelsCache[menu.id]
+				\SetVisible(true)
+				\SetPos(x, y)
+				\SetSize(width, H)
 
 			bX, bY = @backButton\GetPos()
 			bW, bH = @backButton\GetSize()
@@ -246,10 +256,13 @@ MODEL_BOX_PANEL = {
 
 	PopMenu: =>
 		assert(#@stack > 1, 'invalid stack size to pop from')
-		if @InMenu() and IsValid(@settingsPanel)
-			@settingsPanel\Remove()
+		_menu = @stack[#@stack]
+
+		if @InMenu() and IsValid(@menuPanelsCache[_menu.id])
+			@menuPanelsCache[_menu.id]\SetVisible(false)
 			@seqButton\SetPos(10, 10)
 			@emotesPanel\SetPos(10, 40)
+
 		table.remove(@stack)
 		@backButton\Remove() if #@stack == 1 and IsValid(@backButton)
 		menu = @stack[#@stack]
@@ -466,6 +479,7 @@ MODEL_BOX_PANEL = {
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
 		@buildingModel\Remove() if IsValid(@buildingModel)
+		panel\Remove() for panel in *@menuPanelsCache when panel\IsValid()
 }
 
 vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
