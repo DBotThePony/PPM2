@@ -634,53 +634,82 @@ genEyeMenu = (publicName) ->
 		@ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
 		@ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
 
+BackgroundColors = {
+	Color(200, 200, 200)
+	Color(150, 150, 150)
+	Color(255, 255, 255)
+	Color(131, 255, 240)
+	Color(131, 255, 143)
+	Color(206, 131, 255)
+	Color(131, 135, 255)
+	Color(92, 98, 228)
+	Color(92, 201, 228)
+	Color(92, 228, 201)
+	Color(228, 155, 92)
+	Color(228, 92, 110)
+}
+
 EDIT_TREE = {
 	type: 'level'
 	name: 'Pony overview'
 	dist: 100
 	defang: Angle(-10, -30, 0)
 
-	populate: =>
-		@Button 'New File', ->
-			data = @GetTargetData()
-			return if not data
-			confirmed = ->
-				data\SetFilename("new_pony-#{math.random(1, 100000)}")
-				data\Reset()
-				@ValueChanges()
-			Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
+	menus: {
+		'Main': =>
+			@Button 'New File', ->
+				data = @GetTargetData()
+				return if not data
+				confirmed = ->
+					data\SetFilename("new_pony-#{math.random(1, 100000)}")
+					data\Reset()
+					@ValueChanges()
+				Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
 
-		@Button 'Randomize!', ->
-			data = @GetTargetData()
-			return if not data
-			confirmed = ->
-				PPM2.Randomize(data, false)
-				@ValueChanges()
-			Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
+			@Button 'Randomize!', ->
+				data = @GetTargetData()
+				return if not data
+				confirmed = ->
+					PPM2.Randomize(data, false)
+					@ValueChanges()
+				Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
 
-		@ComboBox('Race', 'Race')
-		@ComboBox('Wings Type', 'WingsType')
-		@CheckBox('Gender', 'Gender')
-		@NumSlider('Male chest buff', 'MaleBuff', 2)
-		@NumSlider('Weight', 'Weight', 2)
-		@NumSlider('Pony Size', 'PonySize', 2)
+			@ComboBox('Race', 'Race')
+			@ComboBox('Wings Type', 'WingsType')
+			@CheckBox('Gender', 'Gender')
+			@NumSlider('Male chest buff', 'MaleBuff', 2)
+			@NumSlider('Weight', 'Weight', 2)
+			@NumSlider('Pony Size', 'PonySize', 2)
 
-		return if not ADVANCED_MODE\GetBool()
+			return if not ADVANCED_MODE\GetBool()
 
-		@CheckBox('Should hide weapons', 'HideWeapons')
-		@Hr()
-		@CheckBox('No flexes on new model', 'NoFlex')
-		@Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-		flexes = @Spoiler('Flexes controls')
-		for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-			@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-		flexes\SizeToContents()
+			@CheckBox('Should hide weapons', 'HideWeapons')
+			@Hr()
+			@CheckBox('No flexes on new model', 'NoFlex')
+			@Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
+			flexes = @Spoiler('Flexes controls')
+			for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+				@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+			flexes\SizeToContents()
+	}
 
 	points: {
 		{
 			type: 'bone'
 			target: 'LrigScull'
 			link: 'head_submenu'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_BL_Femur'
+			link: 'cutiemark'
+		}
+
+		{
+			type: 'bone'
+			target: 'Lrig_LEG_BR_Femur'
+			link: 'cutiemark'
 		}
 
 		{
@@ -721,6 +750,59 @@ EDIT_TREE = {
 	}
 
 	children: {
+		cutiemark: {
+			type: 'menu'
+			name: 'Cutiemark'
+			dist: 30
+			defang: Angle(0, -90, 0)
+
+			populate: =>
+				@CheckBox('Display cutiemark', 'CMark')
+				@ComboBox('Cutiemark type', 'CMarkType')
+				@markDisplay = vgui.Create('EditablePanel', @)
+				with @markDisplay
+					\Dock(TOP)
+					\SetSize(320, 320)
+					\DockMargin(20, 20, 20, 20)
+					.currentColor = BackgroundColors[1]
+					.lerpChange = 0
+					.colorIndex = 2
+					.nextColor = BackgroundColors[2]
+					.Paint = (pnl, w = 0, h = 0) ->
+						data = @GetTargetData()
+						return if not data
+						controller = data\GetController()
+						return if not controller
+						rcontroller = controller\GetRenderController()
+						return if not rcontroller
+						tcontroller = rcontroller\GetTextureController()
+						return if not tcontroller
+						mat = tcontroller\GetCMarkGUI()
+						return if not mat
+						.lerpChange += RealFrameTime() / 4
+						if .lerpChange >= 1
+							.lerpChange = 0
+							.currentColor = BackgroundColors[.colorIndex]
+							.colorIndex += 1
+							if .colorIndex > #BackgroundColors
+								.colorIndex = 1
+							.nextColor = BackgroundColors[.colorIndex]
+						{r: r1, g: g1, b: b1} = .currentColor
+						{r: r2, g: g2, b: b2} = .nextColor
+						r, g, b = r1 + (r2 - r1) * .lerpChange, g1 + (g2 - g1) * .lerpChange, r1 + (b2 - b1) * .lerpChange
+						surface.SetDrawColor(r, g, b, 100)
+						surface.DrawRect(0, 0, w, h)
+						surface.SetDrawColor(255, 255, 255)
+						surface.SetMaterial(mat)
+						surface.DrawTexturedRect(0, 0, w, h)
+
+				@NumSlider('Cutiemark size', 'CMarkSize', 2)
+				@ColorBox('Cutiemark color', 'CMarkColor')
+				@Hr()
+				@Label('Cutiemark URL image input field\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')\DockMargin(5, 10, 5, 10)
+				@URLInput('CMarkURL')
+		}
+
 		head_submenu: {
 			type: 'level'
 			name: 'Head anatomy'
@@ -1082,6 +1164,25 @@ EDIT_TREE = {
 								@URLInput("BodyDetailURL#{i}")
 								@ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
 								@Hr()
+
+						'Tattoos': =>
+							@ScrollPanel()
+
+							for i = 1, PPM2.MAX_TATTOOS
+								spoiler = @Spoiler("Tattoo layer #{i}")
+								updatePanels = {}
+								@Button('Edit using keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
+								@ComboBox('Type', "TattooType#{i}", nil, spoiler)
+								table.insert(updatePanels, @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler))
+								table.insert(updatePanels, @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler))
+								table.insert(updatePanels, @NumSlider('Y Position', "TattooPosY#{i}", 2, spoiler))
+								table.insert(updatePanels, @NumSlider('Width Scale', "TattooScaleX#{i}", 2, spoiler))
+								table.insert(updatePanels, @NumSlider('Height Scale', "TattooScaleY#{i}", 2, spoiler))
+								@CheckBox('Tattoo over body details', "TattooOverDetail#{i}", spoiler)
+								@CheckBox('Tattoo is glowing', "TattooGlow#{i}", spoiler)
+								@NumSlider('Tattoo glow strength', "TattooGlowStrength#{i}", 2, spoiler)
+								box, collapse = @ColorBox('Color of Tattoo', "TattooColor#{i}", spoiler)
+								collapse\SetExpanded(true)
 					}
 				}
 			}
