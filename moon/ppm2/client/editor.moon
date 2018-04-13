@@ -1610,8 +1610,9 @@ vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
 local cl_playermodel
 
-createTopButtons = (isNewEditor = false) =>
-	W, H = @GetSize()
+PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
+	oldPerformLayout = @PerformLayout or (->)
+
 	saveAs = (callback = (->)) ->
 		confirm = (txt = '') ->
 			txt = txt\Trim()
@@ -1625,17 +1626,13 @@ createTopButtons = (isNewEditor = false) =>
 			callback(txt)
 		Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .dat\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
 
-	@saveButton = vgui.Create('DButton', @)
-	with @saveButton
+	with @saveButton = vgui.Create('DButton', @)
 		\SetText('Save')
-		\SetPos(W - 205, 5)
 		\SetSize(90, 20)
 		.DoClick = -> saveAs()
 
-	@wearButton = vgui.Create('DButton', @)
-	with @wearButton
+	with @wearButton = vgui.Create('DButton', @)
 		\SetText('Apply changes (wear)')
-		\SetPos(W - 350, 5)
 		\SetSize(140, 20)
 		lastWear = 0
 		.DoClick = ->
@@ -1653,12 +1650,10 @@ createTopButtons = (isNewEditor = false) =>
 			RunConsoleCommand('cl_playermodel', 'pony') if not cl_playermodel\GetString()\find('pony')
 
 	if not isNewEditor
-		@selectModelBox = vgui.Create('DComboBox', @)
 		editorModelSelect = USE_MODEL\GetString()\upper()
 		editorModelSelect = EditorModels[editorModelSelect] and editorModelSelect or 'DEFAULT'
-		with @selectModelBox
+		with @selectModelBox = vgui.Create('DComboBox', @)
 			\SetSize(120, 20)
-			\SetPos(W - 475, 5)
 			\SetValue(editorModelSelect)
 			\AddChoice(choice) for choice in *{'default', 'cppm', 'new'}
 			.OnSelect = (pnl = box, index = 1, value = '', data = value) ->
@@ -1676,10 +1671,8 @@ createTopButtons = (isNewEditor = false) =>
 					'Noh!'
 				)
 
-	@enableAdvanced = vgui.Create('DCheckBoxLabel', @)
-	with @enableAdvanced
+	with @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
 		\SetSize(120, 20)
-		\SetPos(W - 590, 7)
 		\SetConVar('ppm2_editor_advanced')
 		\SetText('Advanced mode')
 		.ingore = true
@@ -1698,12 +1691,18 @@ createTopButtons = (isNewEditor = false) =>
 			)
 
 	if not isNewEditor
-		@fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
-		with @fullbrightSwitch
+		with @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
 			\SetSize(120, 20)
-			\SetPos(W - 670, 7)
 			\SetConVar('ppm2_editor_fullbright')
 			\SetText('Fullbright')
+
+	@PerformLayout = (W = 0, H = 0) =>
+		oldPerformLayout(@, w, h)
+		@wearButton\SetPos(W - 350, 5)
+		@saveButton\SetPos(W - 205, 5)
+		@enableAdvanced\SetPos(W - 590, 7)
+		@fullbrightSwitch\SetPos(W - 670, 7) if IsValid(@fullbrightSwitch)
+		@selectModelBox\SetPos(W - 475, 5) if IsValid(@selectModelBox)
 
 PPM2.OpenNewEditor = ->
 	if IsValid(PPM2.EditorTopFrame)
@@ -1749,7 +1748,7 @@ PPM2.OpenNewEditor = ->
 
 	@Paint = (w = 0, h = 0) => derma.SkinHook('Paint', 'Frame', @, w, h)
 	@DockPadding(5, 29, 5, 5)
-	createTopButtons(@, true)
+	PPM2.EditorCreateTopButtons(@, true)
 
 	@lblTitle = vgui.Create('DLabel', @)
 	@lblTitle\SetPos(5, 0)
@@ -1893,7 +1892,7 @@ PPM2.OpenOldEditor = ->
 	frame.data = copy
 	frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
-	createTopButtons(@)
+	PPM2.EditorCreateTopButtons(@)
 
 	@SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 
