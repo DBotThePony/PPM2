@@ -16,6 +16,7 @@
 
 ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options. Keep in mind Editor3 acts different with this option.')
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
+DISTANCE_LIMIT = CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Distance limit in PPM/2 Editor/2')
 
 BackgroundColors = {
 	Color(200, 200, 200)
@@ -386,6 +387,13 @@ CALC_VIEW_PANEL = {
 
 		if @up
 			@drawPos += @drawAngle\Up() * speedModifier * delta * 100
+
+		limitDist = DISTANCE_LIMIT\GetFloat()
+		if limitDist > 0
+			lenDist = @drawPos\Length()
+			if lenDist > limitDist
+				@drawPos\Normalize()
+				@drawPos = @drawPos * limitDist
 
 		if @IsActive()
 			if not @resizedToScreen
