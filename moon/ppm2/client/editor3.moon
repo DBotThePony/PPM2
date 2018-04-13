@@ -1407,6 +1407,7 @@ ppm2_editor3 = ->
 	@SetTitle('PPM/2 Editor/3')
 	@SetDraggable(false)
 	@RemoveResize()
+	@SetDeleteOnClose(false)
 
 	with @modelPanel = vgui.Create('PPM2Model2Panel', @)
 		\Dock(FILL)
@@ -1440,3 +1441,15 @@ ppm2_editor3 = ->
 	@DoUpdate = -> @modelPanel\DoUpdate()
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
+
+IconData3 =
+	title: 'PPM/2 Editor/3',
+	icon: 'gui/ppm2_icon.png',
+	width: 960,
+	height: 700,
+	onewindow: true,
+	init: (icon, window) ->
+		window\Remove()
+		ppm2_editor3()
+
+list.Set('DesktopWindows', 'PPM2_E3', IconData3)
