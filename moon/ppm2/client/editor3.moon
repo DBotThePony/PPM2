@@ -1453,3 +1453,4 @@ IconData3 =
 		ppm2_editor3()
 
 list.Set('DesktopWindows', 'PPM2_E3', IconData3)
+CreateContextMenu() if IsValid(g_ContextMenu)
