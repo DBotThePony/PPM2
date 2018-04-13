@@ -570,6 +570,172 @@ To rotate left/right use Q/E")
 
 vgui.Register('PPM2TattooEditor', TATTOO_INPUT_GRABBER, 'EditablePanel')
 
+PPM2.EditorBuildNewFilesPanel = =>
+	@Label('Open file by double click')
+	@Button 'Reload file list', -> @rebuildFileList()
+	list = vgui.Create('DListView', @)
+	list\Dock(FILL)
+	list\SetMultiSelect(false)
+	openFile = (fil) ->
+		confirm = ->
+			@frame.data\SetFilename(fil)
+			@frame.data\ReadFromDisk(true)
+			@frame.data\UpdateController()
+			@frame.DoUpdate()
+			@unsavedChanges = false
+			@frame.unsavedChanges = false
+			@frame\SetTitle("#{fil} - PPM2 Pony Editor")
+		if @unsavedChanges
+			Derma_Query(
+				"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
+				'Unsaved changes!',
+				'Yas!',
+				confirm,
+				'Noh!'
+			)
+		else
+			confirm()
+
+	PPM2.EditorFileManipFuncs(list, 'ppm2')
+	list\AddColumn('Filename')
+	@rebuildFileList = ->
+		list\Clear()
+		files, dirs = file.Find('ppm2/*.dat', 'DATA')
+		matchBak = '.bak.dat'
+		for fil in *files
+			if fil\sub(-#matchBak) ~= matchBak
+				fil2 = fil\sub(1, #fil - 4)
+				line = list\AddLine(fil2)
+				line.file = fil
+
+				recomputed = false
+
+				hook.Add 'PostRenderVGUI', line, =>
+					return if not @IsVisible() or not @IsHovered()
+
+					if not recomputed
+						recomputed = true
+						if file.Exists('ppm2/thumbnails/' .. fil2 .. '.png', 'DATA')
+							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
+							line.png\Recompute()
+							line.png\GetTexture('$basetexture')\Download()
+
+					parent = @GetParent()\GetParent()
+					x, y = parent\LocalToScreen(parent\GetWide(), 0)
+
+					if @png
+						surface.SetMaterial(@png)
+						surface.SetDrawColor(255, 255, 255)
+						surface.DrawTexturedRect(x, y, 512, 512)
+					else
+						if not @genPreview
+							PPM2.PonyDataInstance(fil2)\SavePreview()
+							@genPreview = true
+							timer.Simple 1, ->
+								@png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
+								@png\Recompute()
+								@png\GetTexture('$basetexture')\Download()
+
+						surface.SetDrawColor(0, 0, 0)
+						surface.DrawRect(x, y, 512, 512)
+						DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
+	@rebuildFileList()
+
+PPM2.EditorBuildOldFilesPanel = =>
+	@Label('!!! It may or may not work. You will be squished.')
+	@Button 'Reload file list', -> @rebuildFileList()
+	list = vgui.Create('DListView', @)
+	list\Dock(FILL)
+	list\SetMultiSelect(false)
+	list.DoDoubleClick = (pnl, rowID, line) ->
+		fil = line\GetColumnText(1)
+		confirm = ->
+			newData = PPM2.ReadFromOldData(fil)
+			if not newData
+				Derma_Message('Failed to import.', 'Onoh!', 'Okai ;w;')
+				return
+			@frame.data\SetFilename(newData\GetFilename())
+			newData\ApplyDataToObject(@frame.data, false)
+			@frame.data\UpdateController()
+			@frame.DoUpdate()
+			@unsavedChanges = true
+			@frame.unsavedChanges = true
+			@frame\SetTitle("#{newData\GetFilename()} - PPM2 Pony Editor; *Unsaved changes*")
+		if @unsavedChanges
+			Derma_Query(
+				"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
+				'Unsaved changes!',
+				'Yas!',
+				confirm,
+				'Noh!'
+			)
+		else
+			confirm()
+	list\AddColumn('Filename')
+	PPM2.EditorFileManipFuncs(list, 'ppm')
+	@rebuildFileList = ->
+		list\Clear()
+		files, dirs = file.Find('ppm/*', 'DATA')
+		for fil in *files
+			fil2 = fil\sub(1, #fil - 4)
+			line = list\AddLine(fil2)
+			line.file = fil
+
+			recomputed = false
+
+			hook.Add 'PostRenderVGUI', line, =>
+				return if not @IsVisible() or not @IsHovered()
+
+				if not recomputed
+					recomputed = true
+					if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
+						line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
+						line.png\Recompute()
+						line.png\GetTexture('$basetexture')\Download()
+
+				parent = @GetParent()\GetParent()
+				x, y = parent\LocalToScreen(parent\GetWide(), 0)
+
+				if @png
+					surface.SetMaterial(@png)
+					surface.SetDrawColor(255, 255, 255)
+					surface.DrawTexturedRect(x, y, 512, 512)
+				else
+					if not @genPreview
+						PPM2.ReadFromOldData(fil2)\SavePreview()
+						@genPreview = true
+						timer.Simple 1, ->
+							@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
+							@png\Recompute()
+							@png\GetTexture('$basetexture')\Download()
+
+					surface.SetDrawColor(0, 0, 0)
+					surface.DrawRect(x, y, 512, 512)
+					DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
+	@rebuildFileList()
+
+PPM2.EditorFileManipFuncs = (list, prefix, openFile) ->
+	list.DoDoubleClick = (pnl, rowID, line) ->
+		fil = line\GetColumnText(1)
+		openFile(fil)
+	list.OnRowRightClick = (pnl, rowID, line) ->
+		fil = line\GetColumnText(1)
+		menu = DermaMenu()
+		menu\AddOption('Open', -> openFile(fil))\SetIcon('icon16/accept.png')
+		menu\AddOption('Delete', ->
+			confirm = ->
+				file.Delete("#{prefix}/#{fil}.dat")
+				@rebuildFileList()
+			Derma_Query(
+				"Do you really want to delete #{fil}?\nIt will be gone forever!\n(a long time!)",
+				"Delete #{fil}?",
+				'Yas!',
+				confirm,
+				'Noh!'
+			)
+		)\SetIcon('icon16/cross.png')
+		menu\Open()
+
 PANEL_SETTINGS_BASE = {
 	Init: =>
 		@shouldSaveData = false
@@ -1367,160 +1533,14 @@ EditorPages = {
 	{
 		'name': 'Files'
 		'internal': 'saves'
-		'func': (sheet) =>
-			@Label('Open file by double click')
-			@Button 'Reload file list', -> @rebuildFileList()
-			list = vgui.Create('DListView', @)
-			list\Dock(FILL)
-			list\SetMultiSelect(false)
-			openFile = (fil) ->
-				confirm = ->
-					@frame.data\SetFilename(fil)
-					@frame.data\ReadFromDisk(true)
-					@frame.data\UpdateController()
-					@frame.DoUpdate()
-					@unsavedChanges = false
-					@frame.unsavedChanges = false
-					@frame\SetTitle("#{fil} - PPM2 Pony Editor")
-				if @unsavedChanges
-					Derma_Query(
-						"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
-						'Unsaved changes!',
-						'Yas!',
-						confirm,
-						'Noh!'
-					)
-				else
-					confirm()
-			list.DoDoubleClick = (pnl, rowID, line) ->
-				fil = line\GetColumnText(1)
-				openFile(fil)
-			list.OnRowRightClick = (pnl, rowID, line) ->
-				fil = line\GetColumnText(1)
-				menu = DermaMenu()
-				menu\AddOption('Open', -> openFile(fil))\SetIcon('icon16/accept.png')
-				menu\AddOption('Delete', ->
-					confirm = ->
-						file.Delete("ppm2/#{fil}.dat")
-						@rebuildFileList()
-					Derma_Query(
-						"Do you really want to delete #{fil}?\nIt will be gone forever!\n(a long time!)",
-						"Delete #{fil}?",
-						'Yas!',
-						confirm,
-						'Noh!'
-					)
-				)\SetIcon('icon16/cross.png')
-				menu\Open()
-			list\AddColumn('Filename')
-			@rebuildFileList = ->
-				list\Clear()
-				files, dirs = file.Find('ppm2/*.dat', 'DATA')
-				matchBak = '.bak.dat'
-				for fil in *files
-					if fil\sub(-#matchBak) ~= matchBak
-						fil2 = fil\sub(1, #fil - 4)
-						line = list\AddLine(fil2)
-						line.file = fil
+		'func': PPM2.EditorBuildNewFilesPanel
 
-						if file.Exists('ppm2/thumbnails/' .. fil2 .. '.png', 'DATA')
-							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
-							line.png\Recompute()
-							line.png\GetTexture('$basetexture')\Download()
-
-						hook.Add 'PostRenderVGUI', line, =>
-							return if not @IsVisible() or not @IsHovered()
-							parent = @GetParent()\GetParent()
-							x, y = parent\LocalToScreen(parent\GetWide(), 0)
-
-							if @png
-								surface.SetMaterial(@png)
-								surface.SetDrawColor(255, 255, 255)
-								surface.DrawTexturedRect(x, y, 512, 512)
-							else
-								if not @genPreview
-									PPM2.PonyDataInstance(fil2)\SavePreview()
-									@genPreview = true
-									timer.Simple 1, ->
-										@png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
-										@png\Recompute()
-										@png\GetTexture('$basetexture')\Download()
-
-								surface.SetDrawColor(0, 0, 0)
-								surface.DrawRect(x, y, 512, 512)
-								DLib.HUDCommons.WordBox('Generating preview', 'Trebuchet24', x + 240, y + 256, color_white, Color(150, 150, 150), true)
-			@rebuildFileList()
 	}
 
 	{
 		'name': 'Old Files'
 		'internal': 'oldsaves'
-		'func': (sheet) =>
-			@Label('!!! It may or may not work. You will be squished.')
-			@Button 'Reload file list', -> @rebuildFileList()
-			list = vgui.Create('DListView', @)
-			list\Dock(FILL)
-			list\SetMultiSelect(false)
-			list.DoDoubleClick = (pnl, rowID, line) ->
-				fil = line\GetColumnText(1)
-				confirm = ->
-					newData = PPM2.ReadFromOldData(fil)
-					if not newData
-						Derma_Message('Failed to import.', 'Onoh!', 'Okai ;w;')
-						return
-					@frame.data\SetFilename(newData\GetFilename())
-					newData\ApplyDataToObject(@frame.data, false)
-					@frame.data\UpdateController()
-					@frame.DoUpdate()
-					@unsavedChanges = true
-					@frame.unsavedChanges = true
-					@frame\SetTitle("#{newData\GetFilename()} - PPM2 Pony Editor; *Unsaved changes*")
-				if @unsavedChanges
-					Derma_Query(
-						"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
-						'Unsaved changes!',
-						'Yas!',
-						confirm,
-						'Noh!'
-					)
-				else
-					confirm()
-			list\AddColumn('Filename')
-			@rebuildFileList = ->
-				list\Clear()
-				files, dirs = file.Find('ppm/*', 'DATA')
-				for fil in *files
-					fil2 = fil\sub(1, #fil - 4)
-					line = list\AddLine(fil2)
-					line.file = fil
-
-					if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
-						line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
-						line.png\Recompute()
-						line.png\GetTexture('$basetexture')\Download()
-
-					hook.Add 'PostRenderVGUI', line, =>
-						return if not @IsVisible() or not @IsHovered()
-						parent = @GetParent()\GetParent()
-						x, y = parent\LocalToScreen(parent\GetWide(), 0)
-
-						if @png
-							surface.SetMaterial(@png)
-							surface.SetDrawColor(255, 255, 255)
-							surface.DrawTexturedRect(x, y, 512, 512)
-						else
-							if not @genPreview
-								PPM2.ReadFromOldData(fil2)\SavePreview()
-								@genPreview = true
-								timer.Simple 1, ->
-									@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
-									@png\Recompute()
-									@png\GetTexture('$basetexture')\Download()
-
-							surface.SetDrawColor(0, 0, 0)
-							surface.DrawRect(x, y, 512, 512)
-							DLib.HUDCommons.WordBox('Generating preview', 'Trebuchet24', x + 240, y + 256, color_white, Color(150, 150, 150), true)
-			@rebuildFileList()
+		'func': PPM2.EditorBuildOldFilesPanel
 	}
 
 	{

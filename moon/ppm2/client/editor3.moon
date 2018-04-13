@@ -73,6 +73,7 @@ MODEL_BOX_PANEL = {
 		@lastTick = RealTimeL()
 
 		@menuPanelsCache = {}
+		@updatePanels = {}
 
 		@holdLast = 0
 		@mouseX, @mouseY = 0, 0
@@ -202,6 +203,8 @@ MODEL_BOX_PANEL = {
 	GetParentTarget: => @parentTarget
 	SetParentTarget: (val) => @parentTarget = val
 
+	DoUpdate: => panel\DoUpdate() for panel in *@updatePanels when panel\IsValid()
+
 	UpdateMenu: (menu, goingToDelete = false) =>
 		if @InMenu2() and not goingToDelete
 			x, y = @GetPos()
@@ -218,6 +221,8 @@ MODEL_BOX_PANEL = {
 
 						for menuName, menuPopulate in pairs menu.menus
 							with menuPanel = vgui.Create('PPM2SettingsBase', settingsPanel)
+								table.insert(@updatePanels, menuPanel)
+								.frame = @frame
 								with vgui.Create('DLabel', menuPanel)
 									\Dock(TOP)
 									\SetFont('PPM2EditorPanelHeaderText')
@@ -230,6 +235,8 @@ MODEL_BOX_PANEL = {
 				else
 					with settingsPanel = vgui.Create('PPM2SettingsBase', frame)
 						@menuPanelsCache[menu.id] = settingsPanel
+						.frame = @frame
+						table.insert(@updatePanels, settingsPanel)
 						with vgui.Create('DLabel', settingsPanel)
 							\Dock(TOP)
 							\SetFont('PPM2EditorPanelHeaderText')
@@ -292,7 +299,7 @@ MODEL_BOX_PANEL = {
 	InRoot: => #@stack == 1
 	InSelection: => @CurrentMenu().type == 'level'
 	InMenu: => @CurrentMenu().type == 'menu'
-	InMenu2: => @CurrentMenu().type == 'menu' or @CurrentMenu().populate
+	InMenu2: => @CurrentMenu().type == 'menu' or @CurrentMenu().populate or @CurrentMenu().menus
 
 	ResetModel: (ponydata, model = 'models/ppm/player_default_base_new_nj.mdl') =>
 		@model\Remove() if IsValid(@model)
@@ -691,6 +698,9 @@ EDIT_TREE = {
 			for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
 				@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
 			flexes\SizeToContents()
+
+		'Files': PPM2.EditorBuildNewFilesPanel
+		'Old Files': PPM2.EditorBuildOldFilesPanel
 	}
 
 	points: {
@@ -1405,17 +1415,24 @@ ppm2_editor3 = ->
 	ply = LocalPlayer()
 	ent = @modelPanel\ResetModel()
 
+	@data = copy
+
 	controller = copy\CreateCustomController(ent)
 	controller\SetFlexLerpMultiplier(1.3)
 	copy\SetController(controller)
+
+	@controller = controller
 
 	@modelPanel\SetController(controller)
 	controller\SetupEntity(ent)
 	controller\SetDisableTask(true)
 
+	@modelPanel.frame = @
 	@modelPanel.stack = {EDIT_TREE}
 	@modelPanel\SetParentTarget(@)
 	@modelPanel.controllerData = copy
 	@modelPanel\UpdateMenu(@modelPanel\CurrentMenu())
+
+	@DoUpdate = -> @modelPanel\DoUpdate()
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
