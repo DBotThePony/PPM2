@@ -28,5 +28,5 @@ util.AddNetworkString('PPM2.RagdollEditFlex')
 util.AddNetworkString('PPM2.RagdollEditEmote')
 
 CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
-CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
+CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_ARCHIVE}, 'Distance limit in PPM/2 Editor/2')
 resource.AddWorkshop('933203381')
