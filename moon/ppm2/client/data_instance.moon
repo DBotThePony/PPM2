@@ -53,11 +53,11 @@ class PonyDataInstance
 	@DATA_DIR_BACKUP = "ppm2/backups/"
 
 	@FindFiles = =>
-		output = [str\sub(1, #str - 4) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.txt')]
+		output = [str\sub(1, #str - 4) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
 		return output
 
 	@FindInstances = =>
-		output = [@(str\sub(1, #str - 4)) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.txt')]
+		output = [@(str\sub(1, #str - 4)) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
 		return output
 
 	@PONY_DATA = PPM2.PonyDataRegistry
