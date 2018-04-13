@@ -231,7 +231,7 @@ MODEL_BOX_PANEL = {
 								settingsPanel\AddSheet(menuName, menuPanel)
 								\SetTargetData(@controllerData)
 								\Dock(FILL)
-								menuPopulate(menuPanel)
+								.Populate = menuPopulate
 				else
 					with settingsPanel = vgui.Create('PPM2SettingsBase', frame)
 						@menuPanelsCache[menu.id] = settingsPanel
@@ -245,7 +245,7 @@ MODEL_BOX_PANEL = {
 						\SetPos(x, y)
 						\SetSize(width, H)
 						\SetTargetData(@controllerData)
-						menu.populate(settingsPanel)
+						.Populate = menu.populate
 
 			with @menuPanelsCache[menu.id]
 				\SetVisible(true)

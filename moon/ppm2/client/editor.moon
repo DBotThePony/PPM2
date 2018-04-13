@@ -751,7 +751,7 @@ PANEL_SETTINGS_BASE = {
 
 	Populate: =>
 	Think: =>
-		if not @populated
+		if not @populated and @IsVisible()
 			@populated = true
 			@Populate()
 
