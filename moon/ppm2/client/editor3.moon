@@ -125,7 +125,7 @@ MODEL_BOX_PANEL = {
 		return @lautoTrackPos if @shouldAutoTrack
 		return @targetPos
 
-	UpdateSeqButtonsPos: (inMenus = @InMenu()) =>
+	UpdateSeqButtonsPos: (inMenus = @InMenu2()) =>
 		if inMenus
 			bX, bY = @GetSize()
 			bW, bH = 0, 0
@@ -155,7 +155,7 @@ MODEL_BOX_PANEL = {
 				\SetPos(x, y)
 				\SetSize(width, H)
 		else
-			@UpdateSeqButtonsPos(@InMenu())
+			@UpdateSeqButtonsPos(@InMenu2())
 
 	OnMousePressed: (code = MOUSE_LEFT) =>
 		if code == MOUSE_LEFT and @canHold
@@ -253,6 +253,7 @@ MODEL_BOX_PANEL = {
 				\SetSize(width, H)
 
 			@lastVisibleMenu = @menuPanelsCache[menu.id]
+			@UpdateSeqButtonsPos(true)
 		elseif IsValid(@menuPanelsCache[menu.id])
 			@menuPanelsCache[menu.id]\SetVisible(false)
 			@seqButton\SetPos(10, 10)
