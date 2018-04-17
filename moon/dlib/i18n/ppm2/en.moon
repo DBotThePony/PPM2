@@ -48,7 +48,7 @@ for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].pupil.rotation = "#{prefix}Eye rotation"
 
 	gui.ppm2.editor.eyes[tprefix].background = "#{prefix}Eye background"
-	gui.ppm2.editor.eyes[tprefix].pupil = "#{prefix}Pupil"
+	gui.ppm2.editor.eyes[tprefix].pupil_size = "#{prefix}Pupil"
 	gui.ppm2.editor.eyes[tprefix].top_iris = "#{prefix}Top eye iris"
 	gui.ppm2.editor.eyes[tprefix].bottom_iris = "#{prefix}Bottom eye iris"
 	gui.ppm2.editor.eyes[tprefix].line1 = "#{prefix}Eye line 1"

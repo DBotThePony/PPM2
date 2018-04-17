@@ -637,7 +637,7 @@ genEyeMenu = (publicName) ->
 
 		@Hr()
 		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.background", "EyeBackground#{publicName}")
-		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.pupil", "EyeHole#{publicName}")
+		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.pupil_size", "EyeHole#{publicName}")
 		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.top_iris", "EyeIrisTop#{publicName}")
 		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.bottom_iris", "EyeIrisBottom#{publicName}")
 		@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.line1", "EyeIrisLine1#{publicName}")
@@ -983,7 +983,7 @@ EDIT_TREE = {
 									@ColorBox("gui.ppm2.editor.mane.up.detail_color#{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 									@ColorBox("gui.ppm2.editor.mane.down.detail_color#{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
-								'gui.ppm2.editor.tabs.urldetails': =>
+								'gui.ppm2.editor.tabs.url_details': =>
 									for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
 										@Label("gui.ppm2.editor.url_mane.desc#{i}")
 										@URLInput("ManeURL#{i}")
