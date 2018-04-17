@@ -1949,6 +1949,7 @@ concommand.Add 'ppm2_new_editor_reload', -> PPM2.EditorTopFrame\Remove() if IsVa
 concommand.Add 'ppm2_editor_reload', ->
 	PPM2.OldEditorFrame\Remove() if IsValid(PPM2.OldEditorFrame)
 	PPM2.EditorTopFrame\Remove() if IsValid(PPM2.EditorTopFrame)
+	PPM2.EDITOR3\Remove() if IsValid(PPM2.EDITOR3)
 
 IconData =
 	title: 'PPM/2 Editor',
