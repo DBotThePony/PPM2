@@ -766,7 +766,7 @@ PANEL_SETTINGS_BASE = {
 		@unsavedChanges = true
 		return if not @frame
 		@frame.unsavedChanges = true
-		@frame\SetTitle("#{@GetTargetData() and @GetTargetData()\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor; *Unsaved changes*")
+		@frame\SetTitle('gui.ppm2.editor.generic.title_file_unsaved', @GetTargetData() and @GetTargetData()\GetFilename() or '%ERRNAME%')
 	GetFrame: => @frame
 	GetShouldSaveData: => @shouldSaveData
 	ShouldSaveData: => @shouldSaveData
@@ -1548,16 +1548,16 @@ EditorPages = {
 			title = @Label('PPM/2')
 			title\SetFont('PPM2.Title')
 			title\SizeToContents()
-			@URLLabel("Join DBot's Discord!", 'https://discord.gg/HG9eS79')\SetFont('PPM2.AboutLabels')
-			@URLLabel('PPM/2 is a Ponyscape project', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
-			@URLLabel('PPM/2 was created and being developed by DBot', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
-			@URLLabel('New models was created by Durpy', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
-			@URLLabel('CPPM Models (including pony hands) belong to UnkN', 'http://steamcommunity.com/profiles/76561198084938735')\SetFont('PPM2.AboutLabels')
-			@URLLabel('Old models belong to Scentus and others', 'https://github.com/ChristinaTech/PonyPlayerModels')\SetFont('PPM2.AboutLabels')
-			@URLLabel('Found a bug? Report here!', 'https://gitlab.com/DBotThePony/PPM2/issues')\SetFont('PPM2.AboutLabels')
-			@URLLabel('You can find sources here', 'https://gitlab.com/DBotThePony/PPM2')\SetFont('PPM2.AboutLabels')
-			@URLLabel('Or on GitHub mirror', 'https://github.com/roboderpy/PPM2')\SetFont('PPM2.AboutLabels')
-			@Label('Special thanks to everypony who criticized,\nhelped and tested PPM/2!')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.discord', 'https://discord.gg/HG9eS79')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.ponyscape', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.creator', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.newmodels', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.cppmmodels')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.oldmodels', 'https://github.com/ChristinaTech/PonyPlayerModels')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.bugs', 'https://gitlab.com/DBotThePony/PPM2/issues')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.sources', 'https://gitlab.com/DBotThePony/PPM2')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.githubsources', 'https://github.com/roboderpy/PPM2')\SetFont('PPM2.AboutLabels')
+			@Label('gui.ppm2.editor.info.thanks')\SetFont('PPM2.AboutLabels')
 	}
 }
 
@@ -1622,15 +1622,15 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
 			@SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
 			@panels.saves.rebuildFileList() if @panels.saves and @panels.saves.rebuildFileList
 			callback(txt)
-		Derma_StringRequest('Save as', 'Enter file name without ppm2/ and .dat\nTip: to save as autoload, type "_current" (without ")', @data\GetFilename(), confirm)
+		Derma_StringRequest('gui.ppm2.editor.io.save.button', 'gui.ppm2.editor.io.save.text', @data\GetFilename(), confirm)
 
 	with @saveButton = vgui.Create('DButton', @)
-		\SetText('Save')
+		\SetText('gui.ppm2.editor.io.save.button')
 		\SetSize(90, 20)
 		.DoClick = -> saveAs()
 
 	with @wearButton = vgui.Create('DButton', @)
-		\SetText('Apply changes (wear)')
+		\SetText('gui.ppm2.editor.io.wear')
 		\SetSize(140, 20)
 		lastWear = 0
 		.DoClick = ->
@@ -1662,11 +1662,11 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
 					@Close()
 					timer.Simple 0.1, PPM2.OpenOldEditor
 				Derma_Query(
-					'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
-					'Editor restart required',
-					'Yas!',
+					'gui.ppm2.editor.generic.restart.text',
+					'gui.ppm2.editor.generic.restart.needed',
+					'gui.ppm2.editor.generic.yes',
 					confirm,
-					'Noh!'
+					'gui.ppm2.editor.generic.no'
 				)
 
 	with @enableAdvanced = vgui.Create('DCheckBoxLabel', @)
@@ -1681,18 +1681,18 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
 				@Close()
 				timer.Simple 0.1, PPM2.OpenEditor
 			Derma_Query(
-				'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!',
-				'Editor restart required',
-				'Yas!',
+				'gui.ppm2.editor.generic.restart.text',
+				'gui.ppm2.editor.generic.restart.needed',
+				'gui.ppm2.editor.generic.yes',
 				confirm,
-				'Noh!'
+				'gui.ppm2.editor.generic.no'
 			)
 
 	if not isNewEditor
 		with @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
 			\SetSize(120, 20)
 			\SetConVar('ppm2_editor_fullbright')
-			\SetText('Fullbright')
+			\SetText('gui.ppm2.editor.generic.fullbright')
 
 	@PerformLayout = (W = 0, H = 0) =>
 		oldPerformLayout(@, w, h)
@@ -1722,7 +1722,7 @@ PPM2.OpenNewEditor = ->
 	ply = LocalPlayer()
 	controller = ply\GetPonyData()
 	if not controller
-		Derma_Message('For some reason, your player has no NetworkedPonyData - Nothing to edit!\nTry ppm2_reload in your console and try to open editor again', 'Oops!', 'Okai')
+		Derma_Message('gui.ppm2.editor.generic.wtf', 'gui.ppm2.editor.generic.ohno', 'gui.ppm2.editor.generic.okay')
 		return
 
 	PPM2.EditorTopFrame = vgui.Create('EditablePanel')
@@ -1804,7 +1804,7 @@ PPM2.OpenNewEditor = ->
 	@data = copy
 	@DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
-	@SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+	@SetTitle('gui.ppm2.editor.generic.title_file', copy\GetFilename() or '%ERRNAME%')
 
 	@EditTattoo = (index = 1, panelsToUpdate = {}) =>
 		editor = vgui.Create('PPM2TattooEditor')
@@ -1892,7 +1892,7 @@ PPM2.OpenOldEditor = ->
 
 	PPM2.EditorCreateTopButtons(@)
 
-	@SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+	@SetTitle('gui.ppm2.editor.generic.title_file', copy\GetFilename() or '%ERRNAME%')
 
 	@model\SetController(controller)
 	controller\SetupEntity(ent)

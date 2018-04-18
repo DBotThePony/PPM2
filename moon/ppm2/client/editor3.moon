@@ -1410,7 +1410,7 @@ ppm2_editor3 = ->
 	@modelPanel.controllerData = copy
 	@modelPanel\UpdateMenu(@modelPanel\CurrentMenu())
 
-	@SetTitle("#{copy\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+	@SetTitle('gui.ppm2.editor.generic.title_file', copy\GetFilename() or '%ERRNAME%')
 	PPM2.EditorCreateTopButtons(@, true)
 
 	@DoUpdate = -> @modelPanel\DoUpdate()

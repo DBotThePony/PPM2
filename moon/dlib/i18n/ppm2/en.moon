@@ -56,6 +56,10 @@ for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].reflection = "#{prefix}Eye reflection effect"
 	gui.ppm2.editor.eyes[tprefix].effect = "#{prefix}Eye effect"
 
+gui.ppm2.editor.generic.title = 'PPM/2 Pony Editor'
+gui.ppm2.editor.generic.title_file = '%q - PPM/2 Pony Editor'
+gui.ppm2.editor.generic.title_file_unsaved = '%q* - PPM/2 Pony Editor (unsaved changes!)'
+
 gui.ppm2.editor.generic.yes = 'Yas!'
 gui.ppm2.editor.generic.no = 'Noh!'
 gui.ppm2.editor.generic.ohno = 'Onoh!'
@@ -64,6 +68,11 @@ gui.ppm2.editor.generic.datavalue = '%s\nData value: %q'
 gui.ppm2.editor.generic.url = '%s\n\nLink goes to: %s'
 gui.ppm2.editor.generic.url_field = 'URL Field'
 gui.ppm2.editor.generic.spoiler = 'Mysterious spoiler'
+
+gui.ppm2.editor.generic.restart.needed = 'Editor restart required'
+gui.ppm2.editor.generic.restart.text = 'You should restart editor for applying change.\nRestart now?\nUnsaved data will lost!'
+gui.ppm2.editor.generic.fullbright = 'Fullbright'
+gui.ppm2.editor.generic.wtf = 'For some reason, your player has no NetworkedPonyData - Nothing to edit!\nTry ppm2_reload in your console and try to open editor again'
 
 gui.ppm2.editor.io.random.title = 'Randomize!'
 gui.ppm2.editor.io.newfile.title = 'New File'
@@ -80,6 +89,9 @@ gui.ppm2.editor.io.failed = 'Failed to import.'
 gui.ppm2.editor.io.warn.oldfile = '!!! It may or may not work. You will be squished.'
 gui.ppm2.editor.io.warn.text = "Currently, you did not stated your changes.\nDo you really want to open another file?"
 gui.ppm2.editor.io.warn.header = 'Unsaved changes!'
+gui.ppm2.editor.io.save.button = 'Save'
+gui.ppm2.editor.io.save.text = 'Enter file name without ppm2/ and .dat\nTip: to save as autoload, type "_current" (without ")'
+gui.ppm2.editor.io.wear = 'Apply changes (wear)'
 
 gui.ppm2.editor.misc.race = 'Race'
 gui.ppm2.editor.misc.weight = 'Weight'
@@ -317,3 +329,14 @@ gui.ppm2.editor.phong.frensel.sliding.front = 'Phong Sliding'
 gui.ppm2.editor.phong.lightwarp = 'Lightwarp'
 gui.ppm2.editor.phong.url_lightwarp = 'Lightwarp texture URL input\nIt must be 256x16!'
 gui.ppm2.editor.phong.bumpmap = 'Bumpmap URL input'
+
+gui.ppm2.editor.info.discord = "Join DBot's Discord!"
+gui.ppm2.editor.info.ponyscape = "PPM/2 is a Ponyscape project"
+gui.ppm2.editor.info.creator = "PPM/2 were created and being developed by DBot"
+gui.ppm2.editor.info.newmodels = "New models were created by Durpy"
+gui.ppm2.editor.info.cppmmodels = "CPPM Models (including pony hands) belong to UnkN', 'http://steamcommunity.com/profiles/76561198084938735"
+gui.ppm2.editor.info.oldmodels = "Old models belong to Scentus and others"
+gui.ppm2.editor.info.bugs = "Found a bug? Report here!"
+gui.ppm2.editor.info.sources = "You can find sources here"
+gui.ppm2.editor.info.githubsources = "Or on GitHub mirror"
+gui.ppm2.editor.info.thanks = "Special thanks to everypony who criticized,\nhelped and tested PPM/2!"
