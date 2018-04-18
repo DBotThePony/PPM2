@@ -68,15 +68,15 @@ MODEL_BOX_PANEL = {
 	PONY_VEC_Z: 64 * .7
 
 	SEQUENCES: {
-		'Standing':    22
-		'Moving':      316
-		'Walking':     232
-		'Sit':         202
-		'Swim':        370
-		'Run':         328
-		'Crouch walk': 286
-		'Crouch':      76
-		'Jump':        160
+		'gui.ppm2.editor.seq.standing':    	22
+		'gui.ppm2.editor.seq.move':      	316
+		'gui.ppm2.editor.seq.walk':     	232
+		'gui.ppm2.editor.seq.sit':         	202
+		'gui.ppm2.editor.seq.swim':        	370
+		'gui.ppm2.editor.seq.run':         	328
+		'gui.ppm2.editor.seq.duckwalk': 	286
+		'gui.ppm2.editor.seq.duck':      	76
+		'gui.ppm2.editor.seq.jump':        	160
 	}
 
 	Init: =>
