@@ -294,3 +294,20 @@ To rotate left/right use Q/E"
 
 for name, data in pairs PPM2.PonyDataRegistry
 	gui.ppm2.editor.reset[data.getFunc\lower()] = 'Reset ' .. data.getFunc
+
+gui.ppm2.editor.phong.info = 'More info about Phong on wiki'
+gui.ppm2.editor.phong.exponent = 'Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin'
+gui.ppm2.editor.phong.exponent_text = 'Phong Exponent'
+gui.ppm2.editor.phong.boost.title = 'Phong Boost - multiplies specular map reflections'
+gui.ppm2.editor.phong.boost.boost = 'Phong Boost'
+gui.ppm2.editor.phong.tint.title = 'Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)'
+gui.ppm2.editor.phong.tint.tint = 'Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)'
+gui.ppm2.editor.phong.frensel.front.title = 'Phong Front - Fresnel 0 degree reflection angle multiplier'
+gui.ppm2.editor.phong.frensel.front.front = 'Phong Front'
+gui.ppm2.editor.phong.frensel.middle.title = 'Phong Middle - Fresnel 45 degree reflection angle multiplier'
+gui.ppm2.editor.phong.frensel.middle.front = 'Phong Middle'
+gui.ppm2.editor.phong.frensel.sliding.title = 'Phong Sliding - Fresnel 45 degree reflection angle multiplier'
+gui.ppm2.editor.phong.frensel.sliding.front = 'Phong Sliding'
+gui.ppm2.editor.phong.lightwarp = 'Lightwarp'
+gui.ppm2.editor.phong.url_lightwarp = 'Lightwarp texture URL input\nIt must be 256x16!'
+gui.ppm2.editor.phong.bumpmap = 'Bumpmap URL input'
