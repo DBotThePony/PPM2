@@ -303,14 +303,14 @@ else
 			if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
 				if lastMessage < RealTimeL()
 					lastMessage = RealTimeL() + 1
-					PPM2.ChatPrint('You need to be a Pegasus or an Alicorn to fly!')
+					PPM2.LChatPrint('info.ppm2.fly.pegasus')
 				return
 			if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
 				can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
 				if not can
 					if lastMessage2 < RealTimeL()
 						lastMessage2 = RealTimeL() + 1
-						PPM2.ChatPrint("You can not #{data\GetFly() and 'land' or 'fly'} right now.")
+						PPM2.LChatPrint('info.ppm2.fly.cannot', data\GetFly() and 'land' or 'fly')
 					return
 			RunConsoleCommand('ppm2_fly')
 			lastDouble = 0

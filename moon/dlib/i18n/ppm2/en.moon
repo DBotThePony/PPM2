@@ -350,3 +350,37 @@ gui.ppm2.editor.info.bugs = "Found a bug? Report here!"
 gui.ppm2.editor.info.sources = "You can find sources here"
 gui.ppm2.editor.info.githubsources = "Or on GitHub mirror"
 gui.ppm2.editor.info.thanks = "Special thanks to everypony who criticized,\nhelped and tested PPM/2!"
+
+-- other stuff
+
+info.ppm2.fly.pegasus = 'You need to be a Pegasus or an Alicorn to fly!'
+info.ppm2.fly.cannot = 'You can not %s right now.'
+
+gui.ppm2.emotes.sad = 'Sad'
+gui.ppm2.emotes.wild = 'Wild'
+gui.ppm2.emotes.grin = 'Grin'
+gui.ppm2.emotes.angry = 'Angry'
+gui.ppm2.emotes.tongue = ':P'
+gui.ppm2.emotes.angrytongue = '>:P'
+gui.ppm2.emotes.pff = 'Pffff!'
+gui.ppm2.emotes.kitty = ':3'
+gui.ppm2.emotes.owo = 'oWo'
+gui.ppm2.emotes.ugh = 'Uuugh'
+gui.ppm2.emotes.lips = 'Lips lick'
+gui.ppm2.emotes.scrunch = 'Scrunch'
+gui.ppm2.emotes.sorry = 'Sorry'
+gui.ppm2.emotes.wink = 'Wink'
+gui.ppm2.emotes.right_wink = 'Right Wink'
+gui.ppm2.emotes.licking = 'Licking'
+gui.ppm2.emotes.suggestive_lips = 'Siggestive Lips lick'
+gui.ppm2.emotes.suggestive_no_tongue = 'Siggestive w/o tongue'
+gui.ppm2.emotes.gulp = 'Gulp'
+gui.ppm2.emotes.blah = 'Blah blah blah'
+gui.ppm2.emotes.happi = 'Happi'
+gui.ppm2.emotes.happi_grin = 'Happi grin'
+gui.ppm2.emotes.duck = 'DUCK'
+gui.ppm2.emotes.ducks = 'DUCK INSANITY'
+gui.ppm2.emotes.quack = 'QUACKS'
+gui.ppm2.emotes.suggestive = 'Soggestive w/ tongue'
+
+message.ppm2.emotes.invalid = 'No such emotion with ID: %s'

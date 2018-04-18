@@ -50,7 +50,7 @@ CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
 
 	if emoteID
 		if not PPM2.AVALIABLE_EMOTES[emoteID]
-			PPM2.Message('No such emotion with ID: ', emoteID)
+			PPM2.LMessage('message.ppm2.emotes.invalid', emoteID)
 			return
 		net.Start('PPM2.PlayEmote')
 		net.WriteUInt(emoteID, 8)
@@ -61,7 +61,7 @@ CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
 	else
 		emoteID = args[1]\lower()
 		if not PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID]
-			PPM2.Message('No such emotion with ID: ', emoteID)
+			PPM2.LMessage('message.ppm2.emotes.invalid', emoteID)
 			return
 		net.Start('PPM2.PlayEmote')
 		net.WriteUInt(PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].id, 8)

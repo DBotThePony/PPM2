@@ -17,157 +17,157 @@
 
 PPM2.AVALIABLE_EMOTES = {
 	{
-		'name': 'Sad'
+		'name': 'gui.ppm2.emotes.sad'
 		'sequence': 'sad'
 		'time': 6
 	}
 
 	{
-		'name': 'Wild'
+		'name': 'gui.ppm2.emotes.wild'
 		'sequence': 'wild'
 		'time': 3
 	}
 
 	{
-		'name': 'Grin'
+		'name': 'gui.ppm2.emotes.grin'
 		'sequence': 'big_grin'
 		'time': 6
 	}
 
 	{
-		'name': 'Angry'
+		'name': 'gui.ppm2.emotes.angry'
 		'sequence': 'anger'
 		'time': 7
 	}
 
 	{
-		'name': ':P'
+		'name': 'gui.ppm2.emotes.tongue'
 		'sequence': 'tongue'
 		'time': 10
 	}
 
 	{
-		'name': '>:P'
+		'name': 'gui.ppm2.emotes.angrytongue'
 		'sequence': 'angry_tongue'
 		'time': 7
 	}
 
 	{
-		'name': 'Pffff!'
+		'name': 'gui.ppm2.emotes.pff'
 		'sequence': 'pffff'
 		'time': 4
 	}
 
 	{
-		'name': ':3'
+		'name': 'gui.ppm2.emotes.kitty'
 		'sequence': 'cat'
 		'time': 10
 	}
 
 	{
-		'name': 'oWo'
+		'name': 'gui.ppm2.emotes.owo'
 		'sequence': 'owo_alternative'
 		'time': 8
 	}
 
 	{
-		'name': 'Uuugh'
+		'name': 'gui.ppm2.emotes.ugh'
 		'sequence': 'ugh'
 		'time': 5
 	}
 
 	{
-		'name': 'Lips lick'
+		'name': 'gui.ppm2.emotes.lips'
 		'sequence': 'lips_licking'
 		'time': 5
 	}
 
 	{
-		'name': 'Scrunch'
+		'name': 'gui.ppm2.emotes.scrunch'
 		'sequence': 'scrunch'
 		'time': 6
 	}
 
 	{
-		'name': 'Sorry'
+		'name': 'gui.ppm2.emotes.sorry'
 		'sequence': 'sorry'
 		'time': 4
 	}
 
 	{
-		'name': 'Wink'
+		'name': 'gui.ppm2.emotes.wink'
 		'sequence': 'wink_left'
 		'time': 2
 	}
 
 	{
-		'name': 'Right Wink'
+		'name': 'gui.ppm2.emotes.right_wink'
 		'sequence': 'wink_right'
 		'time': 2
 	}
 
 	{
-		'name': 'Licking'
+		'name': 'gui.ppm2.emotes.licking'
 		'sequence': 'licking'
 		'time': 6
 	}
 
 	{
-		'name': 'Siggestive Lips lick'
+		'name': 'gui.ppm2.emotes.suggestive_lips'
 		'sequence': 'lips_licking_suggestive'
 		'time': 4
 	}
 
 	{
-		'name': 'Siggestive w/o tongue'
+		'name': 'gui.ppm2.emotes.suggestive_no_tongue'
 		'sequence': 'suggestive_wo'
 		'time': 4
 	}
 
 	{
-		'name': 'Gulp'
+		'name': 'gui.ppm2.emotes.gulp'
 		'sequence': 'gulp'
 		'time': 1
 	}
 
 	{
-		'name': 'Blah blah blah'
+		'name': 'gui.ppm2.emotes.blah'
 		'sequence': 'blahblah'
 		'time': 3
 	}
 
 	{
-		'name': 'Happi'
+		'name': 'gui.ppm2.emotes.happi'
 		'sequence': 'happy_eyes'
 		'time': 4
 	}
 
 	{
-		'name': 'Happi grin'
+		'name': 'gui.ppm2.emotes.happi_grin'
 		'sequence': 'happy_grin'
 		'time': 5
 	}
 
 	{
-		'name': 'DUCK'
+		'name': 'gui.ppm2.emotes.duck'
 		'sequence': 'duck'
 		'time': 3
 	}
 
 	{
-		'name': 'DUCK INSANITY'
+		'name': 'gui.ppm2.emotes.ducks'
 		'sequence': 'duck_insanity'
 		'time': 2
 	}
 
 	{
-		'name': 'QUACKS'
+		'name': 'gui.ppm2.emotes.quack'
 		'sequence': 'duck_quack'
 		'time': 4
 	}
 
 	{
-		'name': 'Siggestive w/ tongue'
+		'name': 'gui.ppm2.emotes.suggestive'
 		'sequence': 'suggestive'
 		'time': 4
 	}
