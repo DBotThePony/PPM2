@@ -1056,101 +1056,94 @@ PPM2.EditorPhongPanels = (ttype = 'Body', spoilerName = ttype .. ' phong paramet
 
 EditorPages = {
 	{
-		'name': 'Main'
+		'name': 'gui.ppm2.editor.tabs.main'
 		'internal': 'main'
 		'func': (sheet) =>
-			@ScrollPanel()
-			@Button 'New File', ->
+			@Button 'gui.ppm2.editor.io.newfile.title', ->
 				data = @GetTargetData()
 				return if not data
 				confirmed = ->
 					data\SetFilename("new_pony-#{math.random(1, 100000)}")
 					data\Reset()
 					@ValueChanges()
-				Derma_Query('Really want to create a new file?', 'Reset', 'Yas!', confirmed, 'Noh!')
+				Derma_Query('gui.ppm2.editor.io.newfile.confirm', 'gui.ppm2.editor.io.newfile.toptext', 'gui.ppm2.editor.generic.yes', confirmed, 'gui.ppm2.editor.generic.no')
 
-			@Button 'Randomize!', ->
+			@Button 'gui.ppm2.editor.io.random', ->
 				data = @GetTargetData()
 				return if not data
 				confirmed = ->
 					PPM2.Randomize(data, false)
 					@ValueChanges()
-				Derma_Query('Really want to randomize?', 'Randomize', 'Yas!', confirmed, 'Noh!')
+				Derma_Query('Really want to randomize?', 'Randomize', 'gui.ppm2.editor.generic.yes', confirmed, 'gui.ppm2.editor.generic.no')
 
-			@ComboBox('Race', 'Race')
-			@ComboBox('Wings Type', 'WingsType') if IS_USING_NEW(@IsNewEditor())
-			@CheckBox('Gender', 'Gender')
-			@CheckBox('Use new muzzle for male model', 'NewMuzzle') if IS_USING_NEW(@IsNewEditor())
-			@NumSlider('Male chest buff', 'MaleBuff', 2) if IS_USING_NEW(@IsNewEditor())
-			@NumSlider('Weight', 'Weight', 2)
-			@NumSlider('Pony Size', 'PonySize', 2)
+			@ComboBox('gui.ppm2.editor.misc.race', 'Race')
+			@ComboBox('gui.ppm2.editor.misc.wings', 'WingsType')
+			@CheckBox('gui.ppm2.editor.misc.gender', 'Gender')
+			@NumSlider('gui.ppm2.editor.misc.chest', 'MaleBuff', 2)
+			@NumSlider('gui.ppm2.editor.misc.weight', 'Weight', 2)
+			@NumSlider('gui.ppm2.editor.misc.size', 'PonySize', 2)
 
-			if ADVANCED_MODE\GetBool()
-				@CheckBox('Should hide weapons', 'HideWeapons')
+			return if not ADVANCED_MODE\GetBool()
+			@CheckBox('gui.ppm2.editor.misc.hide_weapons', 'HideWeapons')
 
-				if IS_USING_NEW(@IsNewEditor())
-					@Hr()
-					@CheckBox('No flexes on new model', 'NoFlex')
-					@Label('You can disable separately any flex state controller\nSo these flexes can be modified with third-party addons (like PAC3)')
-					flexes = @Spoiler('Flexes controls')
-					for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
-						@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
-					flexes\SizeToContents()
+			if IS_USING_NEW(@IsNewEditor())
+				@Hr()
+				@CheckBox('gui.ppm2.editor.misc.no_flexes2', 'NoFlex')
+				@Label('gui.ppm2.editor.misc.no_flexes_desc')
+				flexes = @Spoiler('gui.ppm2.editor.misc.flexes')
+				for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+					@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
+				flexes\SizeToContents()
 	}
 
 	{
-		'name': 'Body'
+		'name': 'gui.ppm2.editor.tabs.body'
 		'internal': 'body'
 		'func': (sheet) =>
 			@ScrollPanel()
-			@ComboBox('Bodysuit', 'Bodysuit')
-			@ColorBox('Body color', 'BodyColor')
+			@ComboBox('gui.ppm2.editor.body.suit', 'Bodysuit')
+			@ColorBox('gui.ppm2.editor.body.color', 'BodyColor')
 
 			if ADVANCED_MODE\GetBool()
-				@CheckBox('Inherit Lips Color from body', 'LipsColorInherit')
-				@CheckBox('Inherit Nose Color from body', 'NoseColorInherit')
-				@ColorBox('Lips Color', 'LipsColor')
-				@ColorBox('Nose Color', 'NoseColor')
-				doAddPhongData(@, 'Body')
+				@CheckBox('gui.ppm2.editor.face.inherit.lips', 'LipsColorInherit')
+				@CheckBox('gui.ppm2.editor.face.inherit.nose', 'NoseColorInherit')
+				@ColorBox('gui.ppm2.editor.face.lips', 'LipsColor')
+				@ColorBox('gui.ppm2.editor.face.nose', 'NoseColor')
+				PPM2.EditorPhongPanels(@, 'Body')
 
-			@NumSlider('Neck height', 'NeckSize', 2)
-			@NumSlider('Legs height', 'LegsSize', 2)
-			@NumSlider('Spine length', 'BackSize', 2)
+			@NumSlider('gui.ppm2.editor.neck.height', 'NeckSize', 2)
+			@NumSlider('gui.ppm2.editor.legs.height', 'LegsSize', 2)
+			@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)
 
 			@Hr()
-			@CheckBox('Socks (simple texture)', 'Socks') if ADVANCED_MODE\GetBool()
-			@CheckBox('Socks (as model)', 'SocksAsModel')
-			@ColorBox('Socks model color', 'SocksColor')
+			@CheckBox('gui.ppm2.editor.legs.socks.simple', 'Socks') if ADVANCED_MODE\GetBool()
+			@CheckBox('gui.ppm2.editor.legs.socks.model', 'SocksAsModel')
+			@ColorBox('gui.ppm2.editor.legs.socks.color', 'SocksColor')
 
 			if ADVANCED_MODE\GetBool()
 				@Hr()
-				doAddPhongData(@, 'Socks')
-				@ComboBox('Socks Texture', 'SocksTexture')
-				@Label('Socks URL texture')
+				PPM2.EditorPhongPanels(@, 'Socks')
+				@ComboBox('gui.ppm2.editor.legs.socks.texture', 'SocksTexture')
+				@Label('gui.ppm2.editor.legs.socks.url_texture')
 				@URLInput('SocksTextureURL')
 
 				if IS_USING_NEW(@IsNewEditor())
 					@Hr()
-					@CheckBox('Hoof Fluffers', 'HoofFluffers')
-					@NumSlider('Hoof Fluffers', 'HoofFluffersStrength', 2)
+					@CheckBox('gui.ppm2.editor.hoof.fluffers', 'HoofFluffers')
+					@NumSlider('gui.ppm2.editor.hoof.fluffers', 'HoofFluffersStrength', 2)
 
 				@Hr()
-				@ColorBox('Socks detail color ' .. i, 'SocksDetailColor' .. i) for i = 1, 6
+				@ColorBox('gui.ppm2.editor.legs.socks.color' .. i, 'SocksDetailColor' .. i) for i = 1, 6
 
 			@Hr()
-			@CheckBox('Socks (as new model)', 'SocksAsNewModel')
-			@ColorBox('New Socks color 1', 'NewSocksColor1')
-			@ColorBox('New Socks color 2', 'NewSocksColor2')
-			@ColorBox('New Socks color 3', 'NewSocksColor3')
+			@CheckBox('gui.ppm2.editor.legs.newsocks.model', 'SocksAsNewModel')
+			@ColorBox('gui.ppm2.editor.legs.newsocks.color1', 'NewSocksColor1')
+			@ColorBox('gui.ppm2.editor.legs.newsocks.color1', 'NewSocksColor2')
+			@ColorBox('gui.ppm2.editor.legs.newsocks.color1', 'NewSocksColor3')
 
 			if ADVANCED_MODE\GetBool()
-				@Label('New Socks URL texture')
+				@Label('gui.ppm2.editor.legs.newsocks.url')
 				@URLInput('NewSocksTextureURL')
-				@Hr()
-				@CheckBox('Separate wings color from body', 'SeparateWings')
-				@CheckBox('Separate horn color from body', 'SeparateHorn')
-				@ColorBox('Wings color', 'WingsColor')
-				@ColorBox('Horn color', 'HornColor')
 	}
 
 	{
@@ -1158,37 +1151,37 @@ EditorPages = {
 		'internal': 'wings_horn'
 		'func': (sheet) =>
 			@ScrollPanel()
-			@CheckBox('Separate wings color from body', 'SeparateWings')
-			@CheckBox('Separate wings phong settings from body', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
-			@CheckBox('Separate horn color from body', 'SeparateHorn')
-			@CheckBox('Separate horn phong settings from body', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
-			@CheckBox('Separate magic color from eye color', 'SeparateMagicColor')
+			@CheckBox('gui.ppm2.editor.wings.separate_color', 'SeparateWings')
+			@CheckBox('gui.ppm2.editor.wings.separate_phong', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
+			@CheckBox('gui.ppm2.editor.horn.separate_color', 'SeparateHorn')
+			@CheckBox('gui.ppm2.editor.horn.separate_phong', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
+			@CheckBox('gui.ppm2.editor.horn.separate_magic_color', 'SeparateMagicColor')
 			@Hr()
-			@ColorBox('Wings color', 'WingsColor')
-			doAddPhongData(@, 'Wings') if ADVANCED_MODE\GetBool()
-			@ColorBox('Horn color', 'HornColor')
-			@ColorBox('Horn magic color', 'HornMagicColor')
-			doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
+			@ColorBox('gui.ppm2.editor.wings.color', 'WingsColor')
+			PPM2.EditorPhongPanels(@, 'Wings') if ADVANCED_MODE\GetBool()
+			@ColorBox('gui.ppm2.editor.horn.color', 'HornColor')
+			@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
+			PPM2.EditorPhongPanels(@, 'Horn') if ADVANCED_MODE\GetBool()
 			@Hr()
-			@ColorBox('Bat Wings color', 'BatWingColor')
-			@ColorBox('Bat Wings skin color', 'BatWingSkinColor')
-			doAddPhongData(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
+			@ColorBox('gui.ppm2.editor.wings.bat_color', 'BatWingColor')
+			@ColorBox('gui.ppm2.editor.wings.bat_skin_color', 'BatWingSkinColor')
+			PPM2.EditorPhongPanels(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
 			@Hr()
-			left = @Spoiler('Left wing settings')
-			@NumSlider('Left Wing Size', 'LWingSize', 2, left)
-			@NumSlider('Left Wing Forward', 'LWingX', 2, left)
-			@NumSlider('Left Wing Up', 'LWingY', 2, left)
-			@NumSlider('Left Wing Inside', 'LWingZ', 2, left)
-			right = @Spoiler('Right wing settings')
-			@NumSlider('Right Wing Size', 'RWingSize', 2, right)
-			@NumSlider('Right Wing Forward', 'RWingX', 2, right)
-			@NumSlider('Right Wing Up', 'RWingY', 2, right)
-			@NumSlider('Right Wing Inside', 'RWingZ', 2, right)
+			left = @Spoiler('gui.ppm2.editor.tabs.left')
+			@NumSlider('gui.ppm2.editor.wings.left.size', 'LWingSize', 2, left)
+			@NumSlider('gui.ppm2.editor.wings.left.fwd', 'LWingX', 2, left)
+			@NumSlider('gui.ppm2.editor.wings.left.up', 'LWingY', 2, left)
+			@NumSlider('gui.ppm2.editor.wings.left.inside', 'LWingZ', 2, left)
+			right = @Spoiler('gui.ppm2.editor.tabs.right')
+			@NumSlider('gui.ppm2.editor.wings.right.size', 'RWingSize', 2, right)
+			@NumSlider('gui.ppm2.editor.wings.right.fwd', 'RWingX', 2, right)
+			@NumSlider('gui.ppm2.editor.wings.right.up', 'RWingY', 2, right)
+			@NumSlider('gui.ppm2.editor.wings.right.inside', 'RWingZ', 2, right)
 			return if not ADVANCED_MODE\GetBool()
 			@Hr()
-			@ColorBox('Horn Detail Color', 'HornDetailColor')
-			@CheckBox('Glowing Horn Detail', 'HornGlow')
-			@NumSlider('Horn Glow Strength', 'HornGlowSrength', 2)
+			@ColorBox('gui.ppm2.editor.horn.detail_color', 'HornDetailColor')
+			@CheckBox('gui.ppm2.editor.horn.glowing_detail', 'HornGlow')
+			@NumSlider('gui.ppm2.editor.horn.glow_strength', 'HornGlowSrength', 2)
 	}
 
 	{
@@ -1221,43 +1214,43 @@ EditorPages = {
 		'display': IS_USING_NEW
 		'func': (sheet) =>
 			@ScrollPanel()
-			@ComboBox('Mane type', 'ManeTypeNew')
+			@ComboBox('gui.ppm2.editor.mane.type', 'ManeTypeNew')
 			@ComboBox('Lower Mane type', 'ManeTypeLowerNew')
-			@ComboBox('Tail type', 'TailTypeNew')
+			@ComboBox('gui.ppm2.editor.tail.type', 'TailTypeNew')
 
-			@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
-			@CheckBox('Hide socks when using PAC3 entity', 'HideManesSocks')
-			@CheckBox('Hide mane when using PAC3 entity', 'HideManesMane')
-			@CheckBox('Hide tail when using PAC3 entity', 'HideManesTail')
+			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
+			@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
+			@CheckBox('gui.ppm2.editor.misc.hide_socks', 'HideManesSocks')
+			@CheckBox('gui.ppm2.editor.misc.hide_tail', 'HideManesTail')
 
-			@NumSlider('Tail size', 'TailSize', 2)
-
-			@Hr()
-			@CheckBox('Separate mane phong settings from body', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
-			doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
-			@ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
-			@ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
+			@NumSlider('gui.ppm2.editor.tail.size', 'TailSize', 2)
 
 			@Hr()
-			@CheckBox('Separate tail phong settings from body', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
-			doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
-			@ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-			@ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Mane') if ADVANCED_MODE\GetBool()
+			@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
+			@ColorBox('gui.ppm2.editor.tail.color' .. i, "TailColor#{i}") for i = 1, 2
+
+			@Hr()
+			@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Tail') if ADVANCED_MODE\GetBool()
+			@ColorBox("gui.ppm2.editor.mane.detail_color#{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
 			return if not ADVANCED_MODE\GetBool()
 
 			@Hr()
-			@CheckBox('Separate upper and lower mane colors', 'SeparateMane')
-			doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings')
-			doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings')
+			@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane')
+			PPM2.EditorPhongPanels(@, 'UpperMane', 'gui.ppm2.editor.mane.up.phong') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'LowerMane', 'gui.ppm2.editor.mane.down.phong') if ADVANCED_MODE\GetBool()
 
 			@Hr()
-			@ColorBox("Upper Mane color #{i}", "UpperManeColor#{i}") for i = 1, 2
-			@ColorBox("Lower Mane color #{i}", "LowerManeColor#{i}") for i = 1, 2
+			@ColorBox("gui.ppm2.editor.mane.up.color#{i}", "UpperManeColor#{i}") for i = 1, 2
+			@ColorBox("gui.ppm2.editor.mane.down.color#{i}", "LowerManeColor#{i}") for i = 1, 2
 
 			@Hr()
-			@ColorBox("Upper Mane detail color #{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-			@ColorBox("Lower Mane detail color #{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@ColorBox("gui.ppm2.editor.mane.up.detail_color#{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@ColorBox("gui.ppm2.editor.mane.down.detail_color#{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 	}
 
 	{
@@ -1265,35 +1258,35 @@ EditorPages = {
 		'internal': 'face'
 		'func': (sheet) =>
 			@ScrollPanel()
-			@ComboBox('Eyelashes', 'EyelashType')
-			@ColorBox('Eyelashes Color', 'EyelashesColor')
-			@ColorBox('Eyebrows Color', 'EyebrowsColor')
+			@ComboBox('gui.ppm2.editor.face.eyelashes', 'EyelashType')
+			@ColorBox('gui.ppm2.editor.face.eyelashes_color', 'EyelashesColor')
+			@ColorBox('gui.ppm2.editor.face.eyebrows_color', 'EyebrowsColor')
 
 			if ADVANCED_MODE\GetBool()
-				@CheckBox('Glowing eyebrows', 'GlowingEyebrows')
-				@NumSlider('Glow strength', 'EyebrowsGlowStrength', 2)
+				@CheckBox('gui.ppm2.editor.face.eyebrows_glow', 'GlowingEyebrows')
+				@NumSlider('gui.ppm2.editor.face.eyebrows_glow_strength', 'EyebrowsGlowStrength', 2)
 
-				@CheckBox('Separate Eyelashes Phong', 'SeparateEyelashesPhong')
-				doAddPhongData(@, 'Eyelashes')
+				@CheckBox('gui.ppm2.editor.face.eyelashes_separate_phong', 'SeparateEyelashesPhong')
+				PPM2.EditorPhongPanels(@, 'Eyelashes')
 
 			if IS_USING_NEW(@IsNewEditor())
-				@CheckBox('Bat pony ears', 'BatPonyEars')
-				@NumSlider('Bat pony ears', 'BatPonyEarsStrength', 2) if ADVANCED_MODE\GetBool()
-				@CheckBox('Fangs', 'Fangs')
-				@CheckBox('Alternative Fangs', 'AlternativeFangs')
-				@NumSlider('Fangs', 'FangsStrength', 2) if ADVANCED_MODE\GetBool()
-				@CheckBox('Claw teeth', 'ClawTeeth')
-				@NumSlider('Claw teeth', 'ClawTeethStrength', 2) if ADVANCED_MODE\GetBool()
+				@CheckBox('gui.ppm2.editor.ears.bat', 'BatPonyEars')
+				@NumSlider('gui.ppm2.editor.ears.bat', 'BatPonyEarsStrength', 2) if ADVANCED_MODE\GetBool()
+				@CheckBox('gui.ppm2.editor.mouth.fangs', 'Fangs')
+				@CheckBox('gui.ppm2.editor.mouth.alt_fangs', 'AlternativeFangs')
+				@NumSlider('gui.ppm2.editor.mouth.fangs', 'FangsStrength', 2) if ADVANCED_MODE\GetBool()
+				@CheckBox('gui.ppm2.editor.mouth.claw', 'ClawTeeth')
+				@NumSlider('gui.ppm2.editor.mouth.claw', 'ClawTeethStrength', 2) if ADVANCED_MODE\GetBool()
 
 				if ADVANCED_MODE\GetBool()
-					@NumSlider('Ears Size', 'EarsSize', 2)
+					@NumSlider('gui.ppm2.editor.ears.size', 'EarsSize', 2)
 					@Hr()
-					@ColorBox('Teeth color', 'TeethColor')
-					@ColorBox('Mouth color', 'MouthColor')
-					@ColorBox('Tongue color', 'TongueColor')
-					doAddPhongData(@, 'Teeth')
-					doAddPhongData(@, 'Mouth')
-					doAddPhongData(@, 'Tongue')
+					@ColorBox('gui.ppm2.editor.mouth.teeth', 'TeethColor')
+					@ColorBox('gui.ppm2.editor.mouth.mouth', 'MouthColor')
+					@ColorBox('gui.ppm2.editor.mouth.tongue', 'TongueColor')
+					PPM2.EditorPhongPanels(@, 'Teeth')
+					PPM2.EditorPhongPanels(@, 'Mouth')
+					PPM2.EditorPhongPanels(@, 'Tongue')
 	}
 
 	{
@@ -1308,56 +1301,59 @@ EditorPages = {
 			eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
 			for publicName in *eyes
 				@Hr()
-				prefix = ''
-				if publicName ~= ''
-					prefix = publicName .. ' '
-					@Label("'#{publicName}' Eye settings")
 
-				@Label('Eye URL texture')
+				prefix = ''
+				tprefix = 'def'
+
+				if publicName ~= ''
+					tprefix = publicName\lower()
+					prefix = publicName .. ' '
+
+				@Label('gui.ppm2.editor.eyes.url')
 				@URLInput("EyeURL#{publicName}")
 
 				if ADVANCED_MODE\GetBool()
-					@Label('Lightwarp has effect only on EyeRefract eyes')
+					@Label('gui.ppm2.editor.eyes.lightwarp_desc')
 					ttype = publicName == '' and 'BEyes' or publicName == 'Left' and 'LEye' or 'REye'
-					@CheckBox("#{prefix}Use EyeRefract shader", "EyeRefract#{publicName}")
-					@CheckBox("#{prefix}Use Eye Cornera diffuse", "EyeCornerA#{publicName}")
-					@ComboBox('Lightwarp', ttype .. 'Lightwarp')
-					@Label('Lightwarp texture URL input\nIt must be 256x16!')
+					@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.lightwarp.shader", "EyeRefract#{publicName}")
+					@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.lightwarp.cornera", "EyeCornerA#{publicName}")
+					@ComboBox('gui.ppm2.editor.eyes.lightwarp', ttype .. 'Lightwarp')
+					@Label('gui.ppm2.editor.eyes.desc1')
 					@URLInput(ttype .. 'LightwarpURL')
-					@Label('Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror')
-					@NumSlider('Glossiness' .. publicName, 'EyeGlossyStrength' .. publicName, 2)
+					@Label('gui.ppm2.editor.eyes.desc2')
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.lightwarp.glossiness", 'EyeGlossyStrength' .. publicName, 2)
 
-				@Label('When uring eye URL texture; options below have no effect')
+				@Label('gui.ppm2.editor.eyes.url_desc')
 
-				@ComboBox("#{prefix}Eye type", "EyeType#{publicName}")
-				@CheckBox("#{prefix}Eye lines", "EyeLines#{publicName}")
-				@CheckBox("#{prefix}Derp eye", "DerpEyes#{publicName}")
-				@NumSlider("#{prefix}Derp eye strength", "DerpEyesStrength#{publicName}", 2)
-				@NumSlider("#{prefix}Eye size", "IrisSize#{publicName}", 2)
-
-				if ADVANCED_MODE\GetBool()
-					@CheckBox("#{prefix}Eye lines points inside", "EyeLineDirection#{publicName}")
-					@NumSlider("#{prefix}Eye width", "IrisWidth#{publicName}", 2)
-					@NumSlider("#{prefix}Eye height", "IrisHeight#{publicName}", 2)
-
-				@NumSlider("#{prefix}Pupil width", "HoleWidth#{publicName}", 2)
-				@NumSlider("#{prefix}Pupil height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
-				@NumSlider("#{prefix}Pupil size", "HoleSize#{publicName}", 2)
+				@ComboBox("gui.ppm2.editor.eyes.#{tprefix}.type", "EyeType#{publicName}")
+				@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.lines", "EyeLines#{publicName}")
+				@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.derp", "DerpEyes#{publicName}")
+				@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.derp_strength", "DerpEyesStrength#{publicName}", 2)
+				@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.iris_size", "IrisSize#{publicName}", 2)
 
 				if ADVANCED_MODE\GetBool()
-					@NumSlider("#{prefix}Pupil Shift X", "HoleShiftX#{publicName}", 2)
-					@NumSlider("#{prefix}Pupil Shift Y", "HoleShiftY#{publicName}", 2)
-					@NumSlider("#{prefix}Eye rotation", "EyeRotation#{publicName}", 0)
+					@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.points_inside", "EyeLineDirection#{publicName}")
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.width", "IrisWidth#{publicName}", 2)
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.height", "IrisHeight#{publicName}", 2)
+
+				@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.width", "HoleWidth#{publicName}", 2)
+				@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.height", "HoleHeight#{publicName}", 2) if ADVANCED_MODE\GetBool()
+				@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.size", "HoleSize#{publicName}", 2)
+
+				if ADVANCED_MODE\GetBool()
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.shift_x", "HoleShiftX#{publicName}", 2)
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.shift_y", "HoleShiftY#{publicName}", 2)
+					@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.pupil.rotation", "EyeRotation#{publicName}", 0)
 
 				@Hr()
-				@ColorBox("#{prefix}Eye background", "EyeBackground#{publicName}")
-				@ColorBox("#{prefix}Pupil", "EyeHole#{publicName}")
-				@ColorBox("#{prefix}Top eye iris", "EyeIrisTop#{publicName}")
-				@ColorBox("#{prefix}Bottom eye iris", "EyeIrisBottom#{publicName}")
-				@ColorBox("#{prefix}Eye line 1", "EyeIrisLine1#{publicName}")
-				@ColorBox("#{prefix}Eye line 2", "EyeIrisLine2#{publicName}")
-				@ColorBox("#{prefix}Eye reflection effect", "EyeReflection#{publicName}")
-				@ColorBox("#{prefix}Eye effect", "EyeEffect#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.background", "EyeBackground#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.pupil_size", "EyeHole#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.top_iris", "EyeIrisTop#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.bottom_iris", "EyeIrisBottom#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.line1", "EyeIrisLine1#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.line2", "EyeIrisLine2#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.reflection", "EyeReflection#{publicName}")
+				@ColorBox("gui.ppm2.editor.eyes.#{tprefix}.effect", "EyeEffect#{publicName}")
 	}
 
 	{
@@ -1368,39 +1364,37 @@ EditorPages = {
 			@ScrollPanel()
 
 			for i = 1, 3
-				@Label("Horn URL detail #{i}")
+				@Label('gui.ppm2.editor.horn.detail.desc' .. i)
 				@URLInput("HornURL#{i}")
-				@ColorBox("URL Detail color #{i}", "HornURLColor#{i}")
+				@ColorBox('gui.ppm2.editor.horn.detail.color' .. i, "HornURLColor#{i}")
 				@Hr()
 
 			@Hr()
-			@Label('Normal wings')
+			@Label('gui.ppm2.editor.wings.normal')
 			@Hr()
 
 			for i = 1, 3
-				@Label("Wings URL detail #{i}")
+				@Label('gui.ppm2.editor.wings.details.def.detail' .. i)
 				@URLInput("WingsURL#{i}")
-				@ColorBox("URL Detail color #{i}", "WingsURLColor#{i}")
+				@ColorBox('gui.ppm2.editor.wings.details.def.color' .. i, "WingsURLColor#{i}")
 				@Hr()
 
-			@Hr()
-			@Label('Bat wings')
+			@Label('gui.ppm2.editor.wings.bat')
 			@Hr()
 
 			for i = 1, 3
-				@Label("Bat Wings URL detail #{i}")
+				@Label('gui.ppm2.editor.wings.details.bat.detail' .. i)
 				@URLInput("BatWingURL#{i}")
-				@ColorBox('Bat wing URL color', "BatWingURLColor#{i}")
+				@ColorBox('gui.ppm2.editor.wings.details.bat.color' .. i, "BatWingURLColor#{i}")
 				@Hr()
 
-			@Hr()
-			@Label('Bat wings skin')
+			@Label('gui.ppm2.editor.wings.bat_skin')
 			@Hr()
 
 			for i = 1, 3
-				@Label("Bat Wings skin URL detail #{i}")
+				@Label('gui.ppm2.editor.wings.details.batskin.detail' .. i)
 				@URLInput("BatWingSkinURL#{i}")
-				@ColorBox('Bat wing skin URL color', "BatWingSkinURLColor#{i}")
+				@ColorBox('gui.ppm2.editor.wings.details.batskin.color' .. i, "BatWingSkinURLColor#{i}")
 				@Hr()
 	}
 
@@ -1411,20 +1405,20 @@ EditorPages = {
 			@ScrollPanel()
 
 			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
-				@ComboBox("Detail #{i}", "BodyDetail#{i}")
-				@ColorBox("Detail color #{i}", "BodyDetailColor#{i}")
+				@ComboBox('gui.ppm2.editor.body.detail.desc' .. i, "BodyDetail#{i}")
+				@ColorBox('gui.ppm2.editor.body.detail.color' .. i, "BodyDetailColor#{i}")
 				if ADVANCED_MODE\GetBool()
-					@CheckBox("Detail #{i} is glowing", "BodyDetailGlow#{i}")
-					@NumSlider("Detail #{i} glow strength", "BodyDetailGlowStrength#{i}", 2)
+					@CheckBox('gui.ppm2.editor.body.detail.glow' .. i, "BodyDetailGlow#{i}")
+					@NumSlider('gui.ppm2.editor.body.detail.glow_strength' .. i, "BodyDetailGlowStrength#{i}", 2)
 				@Hr()
 
-			@Label('Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')
+			@Label('gui.ppm2.editor.body.url_desc')
 			@Hr()
 
 			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
-				@Label("Body detail #{i}")
+				@Label('gui.ppm2.editor.body.detail.url.desc' .. i)
 				@URLInput("BodyDetailURL#{i}")
-				@ColorBox("URL Detail color #{i}", "BodyDetailURLColor#{i}")
+				@ColorBox('gui.ppm2.editor.body.detail.url.color' .. i, "BodyDetailURLColor#{i}")
 				@Hr()
 	}
 
@@ -1434,30 +1428,30 @@ EditorPages = {
 		'func': (sheet) =>
 			@ScrollPanel()
 			for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
-				@Label("Mane URL Detail #{i} input field")
+				@Label("gui.ppm2.editor.url_mane.desc#{i}")
 				@URLInput("ManeURL#{i}")
-				@ColorBox("Mane URL detail color #{i}", "ManeURLColor#{i}")
+				@ColorBox("gui.ppm2.editor.url_mane.color#{i}", "ManeURLColor#{i}")
 				@Hr()
 
-			for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
+				@Label('gui.ppm2.editor.body.detail.url.desc' .. i)
+				@URLInput("BodyDetailURL#{i}")
+				@ColorBox('gui.ppm2.editor.body.detail.url.color' .. i, "BodyDetailURLColor#{i}")
 				@Hr()
-				@Label("Tail URL Detail #{i} input field")
-				@URLInput("TailURL#{i}")
-				@ColorBox("Tail URL detail color #{i}", "TailURLColor#{i}")
 
-			@Label('Next options have effect only on new model')
-			@CheckBox('Separate upper and lower mane colors', 'SeparateMane')
+			@Label('gui.ppm2.editor.mane.newnotice')
+			@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane')
 			for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
 				@Hr()
-				@Label("Upper mane URL Detail #{i} input field")
+				@Label("gui.ppm2.editor.url_mane.sep.up.desc#{i}")
 				@URLInput("UpperManeURL#{i}")
-				@ColorBox("Upper Mane URL detail color #{i}", "UpperManeURLColor#{i}")
+				@ColorBox("gui.ppm2.editor.url_mane.sep.up.color#{i}", "UpperManeURLColor#{i}")
 
 			for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
 				@Hr()
-				@Label("Lower mane URL Detail #{i} input field")
+				@Label("gui.ppm2.editor.url_mane.sep.down.desc#{i}")
 				@URLInput("LowerManeURL#{i}")
-				@ColorBox("Lower Mane URL detail color #{i}", "LowerManeURLColor#{i}")
+				@ColorBox("gui.ppm2.editor.url_mane.sep.down.color#{i}", "LowerManeURLColor#{i}")
 	}
 
 	{
@@ -1468,19 +1462,19 @@ EditorPages = {
 			@ScrollPanel()
 
 			for i = 1, PPM2.MAX_TATTOOS
-				spoiler = @Spoiler("Tattoo layer #{i}")
+				spoiler = @Spoiler('gui.ppm2.editor.tattoo.layer' .. i)
 				updatePanels = {}
-				@Button('Edit using keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
-				@ComboBox('Type', "TattooType#{i}", nil, spoiler)
-				table.insert(updatePanels, @NumSlider('Rotation', "TattooRotate#{i}", 0, spoiler))
-				table.insert(updatePanels, @NumSlider('X Position', "TattooPosX#{i}", 2, spoiler))
-				table.insert(updatePanels, @NumSlider('Y Position', "TattooPosY#{i}", 2, spoiler))
-				table.insert(updatePanels, @NumSlider('Width Scale', "TattooScaleX#{i}", 2, spoiler))
-				table.insert(updatePanels, @NumSlider('Height Scale', "TattooScaleY#{i}", 2, spoiler))
-				@CheckBox('Tattoo over body details', "TattooOverDetail#{i}", spoiler)
-				@CheckBox('Tattoo is glowing', "TattooGlow#{i}", spoiler)
-				@NumSlider('Tattoo glow strength', "TattooGlowStrength#{i}", 2, spoiler)
-				box, collapse = @ColorBox('Color of Tattoo', "TattooColor#{i}", spoiler)
+				@Button('gui.ppm2.editor.edit_keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
+				@ComboBox('gui.ppm2.editor.type', "TattooType#{i}", nil, spoiler)
+				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.rotate', "TattooRotate#{i}", 0, spoiler))
+				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.x', "TattooPosX#{i}", 2, spoiler))
+				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.y', "TattooPosY#{i}", 2, spoiler))
+				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.width', "TattooScaleX#{i}", 2, spoiler))
+				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.height', "TattooScaleY#{i}", 2, spoiler))
+				@CheckBox('gui.ppm2.editor.tattoo.over', "TattooOverDetail#{i}", spoiler)
+				@CheckBox('gui.ppm2.editor.tattoo.glow', "TattooGlow#{i}", spoiler)
+				@NumSlider('gui.ppm2.editor.tattoo.glow_strength', "TattooGlowStrength#{i}", 2, spoiler)
+				box, collapse = @ColorBox('gui.ppm2.editor.tattoo.color', "TattooColor#{i}", spoiler)
 				collapse\SetExpanded(true)
 	}
 
@@ -1488,8 +1482,8 @@ EditorPages = {
 		'name': 'Cutiemark'
 		'internal': 'cmark'
 		'func': (sheet) =>
-			@CheckBox('Display cutiemark', 'CMark')
-			@ComboBox('Cutiemark type', 'CMarkType')
+			@CheckBox('gui.ppm2.editor.cutiemark.display', 'CMark')
+			@ComboBox('gui.ppm2.editor.cutiemark.type', 'CMarkType')
 			@markDisplay = vgui.Create('EditablePanel', @)
 			with @markDisplay
 				\Dock(TOP)
@@ -1527,10 +1521,10 @@ EditorPages = {
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, w, h)
 
-			@NumSlider('Cutiemark size', 'CMarkSize', 2)
-			@ColorBox('Cutiemark color', 'CMarkColor')
+			@NumSlider('gui.ppm2.editor.cutiemark.size', 'CMarkSize', 2)
+			@ColorBox('gui.ppm2.editor.cutiemark.color', 'CMarkColor')
 			@Hr()
-			@Label('Cutiemark URL image input field\nShould be PNG or JPEG (works same as\nPAC3 URL texture)')\DockMargin(5, 10, 5, 10)
+			@Label('gui.ppm2.editor.cutiemark.input')\DockMargin(5, 10, 5, 10)
 			@URLInput('CMarkURL')
 	}
 

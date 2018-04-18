@@ -158,6 +158,9 @@ gui.ppm2.editor.mouth.tongue = 'Tongue color'
 gui.ppm2.editor.mane.type = 'Mane Type'
 gui.ppm2.editor.mane.phong = 'Separate mane phong settings from body'
 gui.ppm2.editor.mane.phong_sep = 'Separate upper and lower mane colors'
+gui.ppm2.editor.mane.up.phong = 'Upper Mane Phong Settings'
+gui.ppm2.editor.mane.down.phong = 'Lower Mane Phong Settings'
+gui.ppm2.editor.mane.newnotice = 'Next options have effect only on new model'
 
 for i = 1, 2
 	gui.ppm2.editor.mane['color' .. i] = "Mane color #{i}"
@@ -259,6 +262,9 @@ for i = 1, PPM2.MAX_TATTOOS
 gui.ppm2.editor.tail.type = 'Tail type'
 gui.ppm2.editor.tail.size = 'Tail size'
 gui.ppm2.editor.tail.separate = 'Separate tail phong settings from body'
+
+for i = 1, 2
+	gui.ppm2.editor.tail['color' .. i] = 'Tail color ' .. i
 
 for i = 1, 6
 	gui.ppm2.editor.tail['detail' .. i] = "Tail detail color #{i}"

@@ -1009,7 +1009,6 @@ EDIT_TREE = {
 									@ColorBox('gui.ppm2.editor.horn.color', 'HornColor')
 									@CheckBox('gui.ppm2.editor.horn.separate_magic_color', 'SeparateMagicColor')
 									@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
-									@CheckBox('gui.ppm2.editor.horn.separate', 'SeparateHorn')
 									@CheckBox('gui.ppm2.editor.horn.separate_phong', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
 									PPM2.EditorPhongPanels(@, 'Horn') if ADVANCED_MODE\GetBool()
 								'gui.ppm2.editor.tabs.details': =>
@@ -1069,7 +1068,6 @@ EDIT_TREE = {
 						'gui.ppm2.editor.tabs.main': =>
 							@CheckBox('gui.ppm2.editor.wings.separate_color', 'SeparateWings')
 							@ColorBox('gui.ppm2.editor.wings.color', 'WingsColor')
-							@CheckBox('gui.ppm2.editor.wings.separate', 'SeparateWings')
 							@CheckBox('gui.ppm2.editor.wings.separate_phong', 'SeparateWingsPhong') if ADVANCED_MODE\GetBool()
 							@Hr()
 							@ColorBox('gui.ppm2.editor.wings.bat_color', 'BatWingColor')
@@ -1196,6 +1194,8 @@ EDIT_TREE = {
 
 					@NumSlider('gui.ppm2.editor.tail.size', 'TailSize', 2)
 
+					@ColorBox('gui.ppm2.editor.tail.color' .. i, "TailColor#{i}") for i = 1, 2
+
 					@Hr()
 					@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
 					PPM2.EditorPhongPanels(@, 'Tail') if ADVANCED_MODE\GetBool()
@@ -1313,7 +1313,6 @@ EDIT_TREE = {
 							if ADVANCED_MODE\GetBool()
 								@Label('gui.ppm2.editor.legs.newsocks.url')
 								@URLInput('NewSocksTextureURL')
-								@Hr()
 					}
 				}
 			}
