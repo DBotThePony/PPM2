@@ -58,11 +58,28 @@ for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 
 gui.ppm2.editor.generic.yes = 'Yas!'
 gui.ppm2.editor.generic.no = 'Noh!'
+gui.ppm2.editor.generic.ohno = 'Onoh!'
+gui.ppm2.editor.generic.okay = 'Okai ;w;'
+gui.ppm2.editor.generic.datavalue = '%s\nData value: %q'
+gui.ppm2.editor.generic.url = '%s\n\nLink goes to: %s'
+gui.ppm2.editor.generic.url_field = 'URL Field'
+gui.ppm2.editor.generic.spoiler = 'Mysterious spoiler'
 
 gui.ppm2.editor.io.random.title = 'Randomize!'
 gui.ppm2.editor.io.newfile.title = 'New File'
 gui.ppm2.editor.io.newfile.confirm = 'Really want to create a new file?'
 gui.ppm2.editor.io.newfile.toptext = 'Reset'
+gui.ppm2.editor.io.delete.confirm = 'Do you really want to delete that file?\nIt will be gone forever!\n(a long time!)'
+gui.ppm2.editor.io.delete.title = 'Really Delete?'
+
+gui.ppm2.editor.io.filename = 'Filename'
+gui.ppm2.editor.io.hint = 'Open file by double click'
+gui.ppm2.editor.io.reload = 'Reload file list'
+gui.ppm2.editor.io.failed = 'Failed to import.'
+
+gui.ppm2.editor.io.warn.oldfile = '!!! It may or may not work. You will be squished.'
+gui.ppm2.editor.io.warn.text = "Currently, you did not stated your changes.\nDo you really want to open another file?"
+gui.ppm2.editor.io.warn.header = 'Unsaved changes!'
 
 gui.ppm2.editor.misc.race = 'Race'
 gui.ppm2.editor.misc.weight = 'Weight'
@@ -266,3 +283,14 @@ for i = 1, 3
 	gui.ppm2.editor.legs.newsocks['color' .. i] = 'New Socks color ' .. i
 
 gui.ppm2.editor.legs.newsocks.url = 'New Socks URL texture'
+
+-- shared editor stuffs
+
+gui.ppm2.editor.tattoo.help = "To exit edit mode, press Escape or click anywhere with mouse
+To move tatto use WASD
+To Scale higher/lower use Up/Down arrows
+To Scale wider/smaller use Right/Left arrows
+To rotate left/right use Q/E"
+
+for name, data in pairs PPM2.PonyDataRegistry
+	gui.ppm2.editor.reset[data.getFunc\lower()] = 'Reset ' .. data.getFunc

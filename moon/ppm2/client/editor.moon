@@ -473,11 +473,7 @@ TATTOO_INPUT_GRABBER = {
 			\Dock(FILL)
 			\DockMargin(10, 10, 10, 10)
 			\SetTextColor(color_white)
-			\SetText("To exit edit mode, press Escape or click anywhere with mouse
-To move tatto use WASD
-To Scale higher/lower use Up/Down arrows
-To Scale wider/smaller use Right/Left arrows
-To rotate left/right use Q/E")
+			\SetText('gui.ppm2.editor.tattoo.help')
 
 	HandleKey: (code = KEY_NONE, status = false) =>
 		switch code
@@ -579,8 +575,8 @@ To rotate left/right use Q/E")
 vgui.Register('PPM2TattooEditor', TATTOO_INPUT_GRABBER, 'EditablePanel')
 
 PPM2.EditorBuildNewFilesPanel = =>
-	@Label('Open file by double click')
-	@Button 'Reload file list', -> @rebuildFileList()
+	@Label('gui.ppm2.editor.io.hint')
+	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
 	list = vgui.Create('DListView', @)
 	list\Dock(FILL)
 	list\SetMultiSelect(false)
@@ -595,17 +591,17 @@ PPM2.EditorBuildNewFilesPanel = =>
 			@frame\SetTitle("#{fil} - PPM2 Pony Editor")
 		if @unsavedChanges
 			Derma_Query(
-				"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
-				'Unsaved changes!',
-				'Yas!',
+				'gui.ppm2.editor.io.warn.text',
+				'gui.ppm2.editor.io.warn.header',
+				'gui.ppm2.editor.generic.yes',
 				confirm,
-				'Noh!'
+				'gui.ppm2.editor.generic.no'
 			)
 		else
 			confirm()
 
 	PPM2.EditorFileManipFuncs(list, 'ppm2')
-	list\AddColumn('Filename')
+	list\AddColumn('gui.ppm2.editor.io.filename')
 	@rebuildFileList = ->
 		list\Clear()
 		files, dirs = file.Find('ppm2/*.dat', 'DATA')
@@ -650,8 +646,8 @@ PPM2.EditorBuildNewFilesPanel = =>
 	@rebuildFileList()
 
 PPM2.EditorBuildOldFilesPanel = =>
-	@Label('!!! It may or may not work. You will be squished.')
-	@Button 'Reload file list', -> @rebuildFileList()
+	@Label('gui.ppm2.editor.io.warn.oldfile')
+	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
 	list = vgui.Create('DListView', @)
 	list\Dock(FILL)
 	list\SetMultiSelect(false)
@@ -660,7 +656,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 		confirm = ->
 			newData = PPM2.ReadFromOldData(fil)
 			if not newData
-				Derma_Message('Failed to import.', 'Onoh!', 'Okai ;w;')
+				Derma_Message('gui.ppm2.editor.io.failed', 'gui.ppm2.editor.generic.ohno', 'gui.ppm2.editor.generic.okay')
 				return
 			@frame.data\SetFilename(newData\GetFilename())
 			newData\ApplyDataToObject(@frame.data, false)
@@ -671,15 +667,15 @@ PPM2.EditorBuildOldFilesPanel = =>
 			@frame\SetTitle("#{newData\GetFilename()} - PPM2 Pony Editor; *Unsaved changes*")
 		if @unsavedChanges
 			Derma_Query(
-				"Currently, you did not stated your changes.\nDo you really want to open #{fil}?",
-				'Unsaved changes!',
-				'Yas!',
+				'gui.ppm2.editor.io.warn.text',
+				'gui.ppm2.editor.io.warn.header',
+				'gui.ppm2.editor.generic.yes',
 				confirm,
-				'Noh!'
+				'gui.ppm2.editor.generic.no'
 			)
 		else
 			confirm()
-	list\AddColumn('Filename')
+	list\AddColumn('gui.ppm2.editor.io.filename')
 	PPM2.EditorFileManipFuncs(list, 'ppm')
 	@rebuildFileList = ->
 		list\Clear()
@@ -735,11 +731,11 @@ PPM2.EditorFileManipFuncs = (list, prefix, openFile) ->
 				file.Delete("#{prefix}/#{fil}.dat")
 				@rebuildFileList()
 			Derma_Query(
-				"Do you really want to delete #{fil}?\nIt will be gone forever!\n(a long time!)",
-				"Delete #{fil}?",
-				'Yas!',
+				'gui.ppm2.editor.io.delete.confirm',
+				'gui.ppm2.editor.io.delete.title',
+				'gui.ppm2.editor.generic.yes',
 				confirm,
-				'Noh!'
+				'gui.ppm2.editor.generic.no'
 			)
 		)\SetIcon('icon16/cross.png')
 		menu\Open()
@@ -787,7 +783,7 @@ PANEL_SETTINGS_BASE = {
 				\SetParent(@resetCollapse)
 				\Dock(TOP)
 				\DockMargin(2, 0, 2, 0)
-				\SetText('Reset ' .. name)
+				\SetText('gui.ppm2.editor.reset.' .. option\lower())
 				.DoClick = ->
 					dt = @GetTargetData()
 					dt['Reset' .. option](dt)
@@ -821,7 +817,7 @@ PANEL_SETTINGS_BASE = {
 			@CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
 			\DockMargin(2, 0, 2, 0)
-			\SetTooltip("#{name}\nData value: #{option}")
+			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
 			\SetText(name)
 			\SetMin(0)
 			\SetMax(1)
@@ -860,7 +856,7 @@ PANEL_SETTINGS_BASE = {
 		@createdPanels += 1
 		with withPanel = vgui.Create('DLabel', parent)
 			\SetText(text)
-			\SetTooltip(text .. '\n\nLink goes to: ' .. url)
+			\SetTooltip('gui.ppm2.editor.generic.url', text, url)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
 			\SetTextColor(Color(158, 208, 208))
@@ -897,7 +893,7 @@ PANEL_SETTINGS_BASE = {
 			\DockMargin(2, 2, 2, 2)
 			\SetText(name)
 			\SetTextColor(color_white)
-			\SetTooltip("#{name}\nData value: #{option}")
+			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
 			\SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.OnChange = (pnl, newVal = false) ->
 				return if option == ''
@@ -915,7 +911,7 @@ PANEL_SETTINGS_BASE = {
 		collapse.box = box
 		with box
 			\SetSize(250, 270)
-			\SetTooltip("#{name}\nData value: #{option}")
+			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
 			\SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.ValueChanged = (pnl) ->
 				timer.Simple 0, ->
@@ -937,7 +933,7 @@ PANEL_SETTINGS_BASE = {
 			@scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
 			@CreateResetButton(name, option, collapse)
 		return box, collapse
-	Spoiler: (name = 'Mysterious spoiler', parent = @scroll or @) =>
+	Spoiler: (name = 'gui.ppm2.editor.generic.spoiler', parent = @scroll or @) =>
 		@createdPanels += 2
 		collapse = vgui.Create('DCollapsibleCategory', parent)
 		canvas = vgui.Create('EditablePanel', collapse)
@@ -993,7 +989,7 @@ PANEL_SETTINGS_BASE = {
 			\SetSize(0, 20)
 			@scroll\AddItem(wrapper) if IsValid(@scroll) and parent == @scroll
 			with textInput = vgui.Create('DTextEntry', wrapper)
-				@CreateResetButton('URL field', option, textInput)
+				@CreateResetButton('gui.ppm2.editor.generic.url_field', option, textInput)
 				\Dock(FILL)
 				\SetText(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 				\SetKeyboardInputEnabled(true)
@@ -1036,7 +1032,7 @@ PANEL_SETTINGS_BASE = {
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
 
-doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
+PPM2.EditorPhongPanels = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
 	spoiler = @Spoiler(spoilerName)
 	@URLLabel('More info about Phong on wiki', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
 	@Label('Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin', spoiler)

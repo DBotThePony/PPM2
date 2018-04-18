@@ -563,28 +563,6 @@ vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
 -- 50 wing_open_l
 -- 51 wing_open_r
 
-doAddPhongData = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
-	spoiler = @Spoiler(spoilerName)
-	@URLLabel('More info about Phong on wiki', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
-	@Label('Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin', spoiler)
-	@NumSlider('Phong Exponent', ttype .. 'PhongExponent', 3, spoiler)
-	@Label('Phong Boost - multiplies specular map reflections', spoiler)
-	@NumSlider('Phong Boost', ttype .. 'PhongBoost', 3, spoiler)
-	@Label('Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)', spoiler)
-	picker, pickerSpoiler = @ColorBox('Phong Tint', ttype .. 'PhongTint', spoiler)
-	pickerSpoiler\SetExpanded(true)
-	@Label('Phong Front - Fresnel 0 degree reflection angle multiplier', spoiler)
-	@NumSlider('Phong Front', ttype .. 'PhongFront', 2, spoiler)
-	@Label('Phong Middle - Fresnel 45 degree reflection angle multiplier', spoiler)
-	@NumSlider('Phong Middle', ttype .. 'PhongMiddle', 2, spoiler)
-	@Label('Phong Sliding - Fresnel 90 degree reflection angle multiplier', spoiler)
-	@NumSlider('Phong Sliding', ttype .. 'PhongSliding', 2, spoiler)
-	@ComboBox('Lightwarp', ttype .. 'Lightwarp', nil, spoiler)
-	@Label('Lightwarp texture URL input\nIt must be 256x16!', spoiler)
-	@URLInput(ttype .. 'LightwarpURL', spoiler)
-	@Label('Bumpmap input URL', spoiler)
-	@URLInput(ttype .. 'BumpmapURL', spoiler)
-
 genEyeMenu = (publicName) ->
 	return =>
 		@ScrollPanel()
@@ -880,7 +858,7 @@ EDIT_TREE = {
 								@NumSlider('gui.ppm2.editor.face.eyebrows_glow_strength', 'EyebrowsGlowStrength', 2)
 
 								@CheckBox('gui.ppm2.editor.face.eyelashes_separate_phong', 'SeparateEyelashesPhong')
-								doAddPhongData(@, 'Eyelashes')
+								PPM2.EditorPhongPanels(@, 'Eyelashes')
 
 						'gui.ppm2.editor.tabs.mouth': =>
 							@CheckBox('gui.ppm2.editor.mouth.fangs', 'Fangs')
@@ -894,9 +872,9 @@ EDIT_TREE = {
 							@ColorBox('gui.ppm2.editor.mouth.teeth', 'TeethColor')
 							@ColorBox('gui.ppm2.editor.mouth.mouth', 'MouthColor')
 							@ColorBox('gui.ppm2.editor.mouth.tongue', 'TongueColor')
-							doAddPhongData(@, 'Teeth')
-							doAddPhongData(@, 'Mouth')
-							doAddPhongData(@, 'Tongue')
+							PPM2.EditorPhongPanels(@, 'Teeth')
+							PPM2.EditorPhongPanels(@, 'Mouth')
+							PPM2.EditorPhongPanels(@, 'Tongue')
 					}
 				}
 
@@ -964,7 +942,7 @@ EDIT_TREE = {
 
 									@Hr()
 									@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
-									doAddPhongData(@, 'Mane') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'Mane') if ADVANCED_MODE\GetBool()
 									@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
 
 									@Hr()
@@ -972,8 +950,8 @@ EDIT_TREE = {
 
 								'gui.ppm2.editor.tabs.details': =>
 									@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane')
-									doAddPhongData(@, 'UpperMane', 'Upper Mane Phong Settings') if ADVANCED_MODE\GetBool()
-									doAddPhongData(@, 'LowerMane', 'Lower Mane Phong Settings') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'UpperMane', 'Upper Mane Phong Settings') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'LowerMane', 'Lower Mane Phong Settings') if ADVANCED_MODE\GetBool()
 
 									@Hr()
 									@ColorBox("gui.ppm2.editor.mane.up.color#{i}", "UpperManeColor#{i}") for i = 1, 2
@@ -1033,7 +1011,7 @@ EDIT_TREE = {
 									@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
 									@CheckBox('gui.ppm2.editor.horn.separate', 'SeparateHorn')
 									@CheckBox('gui.ppm2.editor.horn.separate_phong', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
-									doAddPhongData(@, 'Horn') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'Horn') if ADVANCED_MODE\GetBool()
 								'gui.ppm2.editor.tabs.details': =>
 									for i = 1, 3
 										@Label('gui.ppm2.editor.horn.detail.desc' .. i)
@@ -1096,7 +1074,7 @@ EDIT_TREE = {
 							@Hr()
 							@ColorBox('gui.ppm2.editor.wings.bat_color', 'BatWingColor')
 							@ColorBox('gui.ppm2.editor.wings.bat_skin_color', 'BatWingSkinColor')
-							doAddPhongData(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
+							PPM2.EditorPhongPanels(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
 
 						'gui.ppm2.editor.tabs.left': =>
 							@NumSlider('gui.ppm2.editor.wings.left.size', 'LWingSize', 2)
@@ -1220,7 +1198,7 @@ EDIT_TREE = {
 
 					@Hr()
 					@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
-					doAddPhongData(@, 'Tail') if ADVANCED_MODE\GetBool()
+					PPM2.EditorPhongPanels(@, 'Tail') if ADVANCED_MODE\GetBool()
 					@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
 				'gui.ppm2.editor.tabs.details': =>
@@ -1318,7 +1296,7 @@ EDIT_TREE = {
 
 							if ADVANCED_MODE\GetBool()
 								@Hr()
-								doAddPhongData(@, 'Socks')
+								PPM2.EditorPhongPanels(@, 'Socks')
 								@ComboBox('gui.ppm2.editor.legs.socks.texture', 'SocksTexture')
 								@Label('gui.ppm2.editor.legs.socks.url_texture')
 								@URLInput('SocksTextureURL')
