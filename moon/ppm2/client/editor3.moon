@@ -1379,7 +1379,11 @@ patchSubtree = (node) ->
 EDIT_TREE.id = 'root'
 patchSubtree(EDIT_TREE)
 
-PPM2.EDITOR3\Remove() if IsValid(PPM2.EDITOR3)
+if IsValid(PPM2.EDITOR3)
+	PPM2.OldEditorFrame\Remove()
+	net.Start('PPM2.EditorStatus')
+	net.WriteBool(false)
+	net.SendToServer()
 
 ppm2_editor3 = ->
 	if IsValid(PPM2.EDITOR3)
@@ -1426,6 +1430,14 @@ ppm2_editor3 = ->
 	PPM2.EditorCreateTopButtons(@, true, true)
 
 	@DoUpdate = -> @modelPanel\DoUpdate()
+	@OnClose = ->
+		net.Start('PPM2.EditorStatus')
+		net.WriteBool(false)
+		net.SendToServer()
+
+	net.Start('PPM2.EditorStatus')
+	net.WriteBool(true)
+	net.SendToServer()
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
 
