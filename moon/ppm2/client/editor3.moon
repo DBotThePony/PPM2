@@ -958,8 +958,8 @@ EDIT_TREE = {
 
 								'gui.ppm2.editor.tabs.details': =>
 									@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane')
-									PPM2.EditorPhongPanels(@, 'UpperMane', 'Upper Mane Phong Settings') if ADVANCED_MODE\GetBool()
-									PPM2.EditorPhongPanels(@, 'LowerMane', 'Lower Mane Phong Settings') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'UpperMane', 'gui.ppm2.editor.mane.up.phong') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'LowerMane', 'gui.ppm2.editor.mane.down.phong') if ADVANCED_MODE\GetBool()
 
 									@Hr()
 									@ColorBox("gui.ppm2.editor.mane.up.color#{i}", "UpperManeColor#{i}") for i = 1, 2
