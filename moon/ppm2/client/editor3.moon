@@ -1235,12 +1235,14 @@ EDIT_TREE = {
 					type: 'bone'
 					target: 'Lrig_LEG_BL_RearHoof'
 					link: 'bottom_hoof'
+					defang: Angle(0, 90, 0)
 				}
 
 				{
 					type: 'bone'
 					target: 'Lrig_LEG_FL_FrontHoof'
 					link: 'bottom_hoof'
+					defang: Angle(0, 90, 0)
 				}
 
 				{
@@ -1253,6 +1255,7 @@ EDIT_TREE = {
 					type: 'bone'
 					target: 'Lrig_LEG_FL_Metacarpus'
 					link: 'legs_generic'
+					defang: Angle(0, 90, 0)
 				}
 
 				{
@@ -1271,6 +1274,7 @@ EDIT_TREE = {
 					type: 'bone'
 					target: 'Lrig_LEG_BL_LargeCannon'
 					link: 'legs_generic'
+					defang: Angle(0, 90, 0)
 				}
 			}
 

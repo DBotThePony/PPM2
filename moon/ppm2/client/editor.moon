@@ -600,7 +600,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 		else
 			confirm()
 
-	PPM2.EditorFileManipFuncs(list, 'ppm2')
+	PPM2.EditorFileManipFuncs(list, 'ppm2', openFile)
 	list\AddColumn('gui.ppm2.editor.io.filename')
 	@rebuildFileList = ->
 		list\Clear()
@@ -651,8 +651,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 	list = vgui.Create('DListView', @)
 	list\Dock(FILL)
 	list\SetMultiSelect(false)
-	list.DoDoubleClick = (pnl, rowID, line) ->
-		fil = line\GetColumnText(1)
+	openFile = (fil) ->
 		confirm = ->
 			newData = PPM2.ReadFromOldData(fil)
 			if not newData
@@ -676,7 +675,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 		else
 			confirm()
 	list\AddColumn('gui.ppm2.editor.io.filename')
-	PPM2.EditorFileManipFuncs(list, 'ppm')
+	PPM2.EditorFileManipFuncs(list, 'ppm', openFile)
 	@rebuildFileList = ->
 		list\Clear()
 		files, dirs = file.Find('ppm/*', 'DATA')
