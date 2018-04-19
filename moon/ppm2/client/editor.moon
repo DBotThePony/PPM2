@@ -1608,7 +1608,7 @@ vgui.Register('PPM2.Editor.Stretch', STRETCHING_PANEL, 'EditablePanel')
 
 local cl_playermodel
 
-PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
+PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 	oldPerformLayout = @PerformLayout or (->)
 
 	saveAs = (callback = (->)) ->
@@ -1688,7 +1688,7 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
 				'gui.ppm2.editor.generic.no'
 			)
 
-	if not isNewEditor
+	if not isNewEditor or addFullbright
 		with @fullbrightSwitch = vgui.Create('DCheckBoxLabel', @)
 			\SetSize(120, 20)
 			\SetConVar('ppm2_editor_fullbright')
@@ -1699,7 +1699,7 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false) =>
 		@wearButton\SetPos(W - 350, 5)
 		@saveButton\SetPos(W - 205, 5)
 		@enableAdvanced\SetPos(W - 590, 7)
-		@fullbrightSwitch\SetPos(W - 670, 7) if IsValid(@fullbrightSwitch)
+		@fullbrightSwitch\SetPos(W - 700, 7) if IsValid(@fullbrightSwitch)
 		@selectModelBox\SetPos(W - 475, 5) if IsValid(@selectModelBox)
 
 PPM2.OpenNewEditor = ->

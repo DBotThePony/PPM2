@@ -1419,7 +1419,7 @@ ppm2_editor3 = ->
 	@modelPanel\UpdateMenu(@modelPanel\CurrentMenu())
 
 	@SetTitle('gui.ppm2.editor.generic.title_file', copy\GetFilename() or '%ERRNAME%')
-	PPM2.EditorCreateTopButtons(@, true)
+	PPM2.EditorCreateTopButtons(@, true, true)
 
 	@DoUpdate = -> @modelPanel\DoUpdate()
 
