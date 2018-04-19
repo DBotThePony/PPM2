@@ -1373,6 +1373,8 @@ patchSubtree = (node) ->
 				point.linkTable = table.Copy(node.children[point.link])
 				if type(point.linkTable) == 'table'
 					point.linkTable.getpos = point.getpos
+					if point.defang
+						point.linkTable.defang = Angle(point.defang)
 				else
 					PPM2.Message('Editor3: Missing submenu ' .. point.link .. ' of ' .. node.id .. '!')
 
@@ -1380,7 +1382,7 @@ EDIT_TREE.id = 'root'
 patchSubtree(EDIT_TREE)
 
 if IsValid(PPM2.EDITOR3)
-	PPM2.OldEditorFrame\Remove()
+	PPM2.EDITOR3\Remove()
 	net.Start('PPM2.EditorStatus')
 	net.WriteBool(false)
 	net.SendToServer()
