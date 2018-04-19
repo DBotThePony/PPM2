@@ -214,6 +214,7 @@ MODEL_BOX_PANEL = {
 
 			if not @menuPanelsCache[menu.id]
 				if menu.menus
+					local targetPanel
 					with settingsPanel = vgui.Create('DPropertySheet', frame)
 						\SetPos(x, y)
 						\SetSize(width, H)
@@ -232,6 +233,12 @@ MODEL_BOX_PANEL = {
 								\SetTargetData(@controllerData)
 								\Dock(FILL)
 								.Populate = menuPopulate
+								targetPanel = menuPanel if menu.selectmenu == menuName
+						-- god i hate gmod
+						if targetPanel
+							for item in *\GetItems()
+								if item.Panel == targetPanel
+									\SetActiveTab(item.Tab)
 				else
 					with settingsPanel = vgui.Create('PPM2SettingsBase', frame)
 						@menuPanelsCache[menu.id] = settingsPanel
@@ -643,6 +650,7 @@ EDIT_TREE = {
 	name: 'Pony overview'
 	dist: 100
 	defang: Angle(-10, -30, 0)
+	selectmenu: 'gui.ppm2.editor.tabs.main'
 
 	menus: {
 		'gui.ppm2.editor.tabs.main': =>
