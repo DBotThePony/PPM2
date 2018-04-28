@@ -189,7 +189,6 @@ PPM2.PrePlayerDraw = =>
 			f = FrameNumberL()
 			return if @__ppm2_last_draw == f
 			@__ppm2_last_draw = f
-			return if IsDormant(@)
 			@__ppm2_last_dead = @__ppm2_last_dead or 0
 			return if @__ppm2_last_dead > RealTimeL()
 			bones = PPMBonesModifier(@)
@@ -204,6 +203,12 @@ PPM2.PrePlayerDraw = =>
 			status = renderController\PreDraw() if renderController
 	else
 		with data = GetPonyData(@)
+			return if not data
+			@__cachedIsPony = IsPony(@)
+			return if not @__cachedIsPony
+			f = FrameNumberL()
+			return if @__ppm2_last_draw == f
+			@__ppm2_last_draw = f
 			bones = PPMBonesModifier(@)
 			if data and bones\CanThink()
 				@ResetBoneManipCache()
