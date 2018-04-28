@@ -15,16 +15,16 @@
 
 -- editor stuffs
 
-gui.ppm2.editor.eyes.separate = 'Use separated settings for eyes'
-gui.ppm2.editor.eyes.url = 'Eye URL texture'
-gui.ppm2.editor.eyes.url_desc = 'When uring eye URL texture; options below have no effect'
+gui.ppm2.editor.eyes.separate = 'Getrennte Einstellungen für Augen verwenden'
+gui.ppm2.editor.eyes.url = 'Augen URL Textur'
+gui.ppm2.editor.eyes.url_desc = 'Bei Verwendung der Augen URL Textur; Die folgenden Optionen haben keine Auswirkung'
 
-gui.ppm2.editor.eyes.lightwarp_desc = 'Lightwarp has effect only on EyeRefract eyes'
+gui.ppm2.editor.eyes.lightwarp_desc = 'Lightwarp wirkt nur auf EyeRefract Augen'
 gui.ppm2.editor.eyes.lightwarp = "Lightwarp"
 gui.ppm2.editor.eyes.desc1 = "Lightwarp texture URL input\nIt must be 256x16!"
 gui.ppm2.editor.eyes.desc2 = "Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror"
 
-for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
+for {tprefix, prefix} in *{{'def', ''}, {'left', 'Links '}, {'right', 'Rechts '}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.shader = "#{prefix}Use EyeRefract shader"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Use Eye Cornera diffuse"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Glossiness"
