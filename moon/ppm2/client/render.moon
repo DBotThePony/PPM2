@@ -180,24 +180,38 @@ Think = ->
 					ent.RenderOverride = ent.__ppm2RenderOverride
 
 PPM2.PrePlayerDraw = =>
-	return if not ALTERNATIVE_RENDER\GetBool() or PPM2.__RENDERING_REFLECTIONS
-	with data = GetPonyData(@)
-		return if not data
-		@__cachedIsPony = IsPony(@)
-		return if not @__cachedIsPony
-		f = FrameNumberL()
-		return if @__ppm2_last_draw == f
-		@__ppm2_last_draw = f
-		return if IsDormant(@)
-		@__ppm2_last_dead = @__ppm2_last_dead or 0
-		return if @__ppm2_last_dead > RealTimeL()
-		bones = PPMBonesModifier(@)
-		if data and bones\CanThink()
-			bones\ResetBones()
-			hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-			bones\Think()
-		renderController = data\GetRenderController()
-		status = renderController\PreDraw() if renderController
+	return if PPM2.__RENDERING_REFLECTIONS
+	if ALTERNATIVE_RENDER\GetBool()
+		with data = GetPonyData(@)
+			return if not data
+			@__cachedIsPony = IsPony(@)
+			return if not @__cachedIsPony
+			f = FrameNumberL()
+			return if @__ppm2_last_draw == f
+			@__ppm2_last_draw = f
+			return if IsDormant(@)
+			@__ppm2_last_dead = @__ppm2_last_dead or 0
+			return if @__ppm2_last_dead > RealTimeL()
+			bones = PPMBonesModifier(@)
+			if data and bones\CanThink()
+				@ResetBoneManipCache()
+				bones\ResetBones()
+				hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
+				bones\Think()
+				@ApplyBoneManipulations()
+				@_ppmBonesModified = true
+			renderController = data\GetRenderController()
+			status = renderController\PreDraw() if renderController
+	else
+		with data = GetPonyData(@)
+			bones = PPMBonesModifier(@)
+			if data and bones\CanThink()
+				@ResetBoneManipCache()
+				bones\ResetBones()
+				hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
+				bones\Think()
+				@ApplyBoneManipulations()
+				@_ppmBonesModified = true
 
 PPM2.PostPlayerDraw = =>
 	return if not ALTERNATIVE_RENDER\GetBool() or PPM2.__RENDERING_REFLECTIONS
