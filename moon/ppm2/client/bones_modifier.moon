@@ -245,7 +245,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 							lent.__ppmBonesModifiers = nil
 				return
 
-			if obj.ent\IsPony()
+			if obj.ent\IsPony() and not obj.ent\IsPlayer()
 				if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
 					obj.ent\ResetBoneManipCache()
 					resetBones(obj.ent)
