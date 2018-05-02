@@ -601,6 +601,7 @@ genEyeMenu = (publicName) ->
 		@Label('gui.ppm2.editor.eyes.url_desc')
 
 		@ComboBox("gui.ppm2.editor.eyes.#{tprefix}.type", "EyeType#{publicName}")
+		@ComboBox("gui.ppm2.editor.eyes.#{tprefix}.reflection_type", "EyeReflectionType#{publicName}")
 		@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.lines", "EyeLines#{publicName}")
 		@CheckBox("gui.ppm2.editor.eyes.#{tprefix}.derp", "DerpEyes#{publicName}")
 		@NumSlider("gui.ppm2.editor.eyes.#{tprefix}.derp_strength", "DerpEyesStrength#{publicName}", 2)

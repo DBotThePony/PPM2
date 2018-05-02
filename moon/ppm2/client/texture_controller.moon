@@ -120,7 +120,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@EYE_OVALS = _M.EYE_OVALS
 	@EYE_GRAD = _M.EYE_GRAD
 	@EYE_EFFECT = _M.EYE_EFFECT
-	@EYE_REFLECTION = _M.EYE_REFLECTION
 	@EYE_LINE_L_1 = _M.EYE_LINE_L_1
 	@EYE_LINE_R_1 = _M.EYE_LINE_R_1
 	@EYE_LINE_L_2 = _M.EYE_LINE_L_2
@@ -1700,6 +1699,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		EyeLines =          @GrabData("EyeLines#{prefixData}")
 		HoleSize =          @GrabData("HoleSize#{prefixData}")
 		EyeReflection =     @GrabData("EyeReflection#{prefixData}")
+		EyeReflectionType = @GrabData("EyeReflectionType#{prefixData}")
 		EyeEffect =         @GrabData("EyeEffect#{prefixData}")
 		DerpEyes =          @GrabData("DerpEyes#{prefixData}")
 		DerpEyesStrength =  @GrabData("DerpEyesStrength#{prefixData}")
@@ -1820,7 +1820,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			surface.SetDrawColor(EyeReflection)
-			surface.SetMaterial(@@EYE_REFLECTION)
+			surface.SetMaterial(_M.EYE_REFLECTIONS[EyeReflectionType + 1])
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', @EndRT())

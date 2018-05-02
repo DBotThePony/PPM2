@@ -225,6 +225,14 @@ module.EYE_OVALS = {
 	Material('models/ppm2/partrender/eye_oval_aperture.png')
 }
 
+module.EYE_REFLECTIONS = {
+	Material('models/ppm2/partrender/eye_reflection.png')
+	Material('models/ppm2/partrender/eye_reflection_crystal_foal.png')
+	Material('models/ppm2/partrender/eye_reflection_crystal_unisex.png')
+	Material('models/ppm2/partrender/eye_reflection_foal.png')
+	Material('models/ppm2/partrender/eye_reflection_male.png')
+}
+
 module.DEBUGWHITE = CreateMaterial('PPM2.Debugwhite', 'UnlitGeneric', debugwhite)
 module.HAIR_MATERIAL_COLOR = CreateMaterial('PPM2.ManeTextureBase', 'UnlitGeneric', debugwhite)
 module.TAIL_MATERIAL_COLOR = CreateMaterial('PPM2.TailTextureBase', 'UnlitGeneric', debugwhite)
@@ -236,7 +244,6 @@ module.HORN_DETAIL_COLOR = Material('models/ppm2/partrender/horn_detail.png')
 module.EYE_OVAL = Material('models/ppm2/partrender/eye_oval.png')
 module.EYE_GRAD = Material('models/ppm2/partrender/eye_grad.png')
 module.EYE_EFFECT = Material('models/ppm2/partrender/eye_effect.png')
-module.EYE_REFLECTION = Material('models/ppm2/partrender/eye_reflection.png')
 module.EYE_LINE_L_1 = Material('models/ppm2/partrender/eye_line_l1.png')
 module.EYE_LINE_R_1 = Material('models/ppm2/partrender/eye_line_r1.png')
 module.EYE_LINE_L_2 = Material('models/ppm2/partrender/eye_line_l2.png')

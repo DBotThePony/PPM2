@@ -762,6 +762,12 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 		enum: [arg for arg in *PPM2.AvaliableEyeTypes]
 	}
 
+	PPM2.PonyDataRegistry["eye_reflection_type#{internal}"] = {
+		default: -> 0
+		getFunc: "EyeReflectionType#{publicName}"
+		enum: [arg for arg in *PPM2.AvaliableEyeReflections]
+	}
+
 	PPM2.PonyDataRegistry["hole_width#{internal}"] = {
 		default: -> 1
 		getFunc: "HoleWidth#{publicName}"

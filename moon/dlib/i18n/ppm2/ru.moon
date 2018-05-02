@@ -30,6 +30,7 @@ for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Стеклянность (?)"
 
 	gui.ppm2.editor.eyes[tprefix].type = "#{prefix}Тип глаза"
+	gui.ppm2.editor.eyes[tprefix].reflection_type = "#{prefix}Тип отражений глаза"
 	gui.ppm2.editor.eyes[tprefix].lines = "#{prefix}Линии радужной оболочки"
 	gui.ppm2.editor.eyes[tprefix].derp = "#{prefix}Derp глаз"
 	gui.ppm2.editor.eyes[tprefix].derp_strength = "#{prefix}Сила Derp глаза"
