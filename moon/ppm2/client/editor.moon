@@ -1551,7 +1551,7 @@ EditorPages = {
 			@URLLabel('gui.ppm2.editor.info.ponyscape', 'http://steamcommunity.com/groups/Ponyscape')\SetFont('PPM2.AboutLabels')
 			@URLLabel('gui.ppm2.editor.info.creator', 'https://steamcommunity.com/profiles/76561198077439269')\SetFont('PPM2.AboutLabels')
 			@URLLabel('gui.ppm2.editor.info.newmodels', 'https://steamcommunity.com/profiles/76561198013875404')\SetFont('PPM2.AboutLabels')
-			@URLLabel('gui.ppm2.editor.info.cppmmodels')\SetFont('PPM2.AboutLabels')
+			@URLLabel('gui.ppm2.editor.info.cppmmodels', 'http://steamcommunity.com/profiles/76561198084938735')\SetFont('PPM2.AboutLabels')
 			@URLLabel('gui.ppm2.editor.info.oldmodels', 'https://github.com/ChristinaTech/PonyPlayerModels')\SetFont('PPM2.AboutLabels')
 			@URLLabel('gui.ppm2.editor.info.bugs', 'https://gitlab.com/DBotThePony/PPM2/issues')\SetFont('PPM2.AboutLabels')
 			@URLLabel('gui.ppm2.editor.info.sources', 'https://gitlab.com/DBotThePony/PPM2')\SetFont('PPM2.AboutLabels')
