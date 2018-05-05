@@ -1146,7 +1146,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Wings and horn'
+		'name': 'gui.ppm2.editor.old_tabs.wings_and_horn'
 		'internal': 'wings_horn'
 		'func': (sheet) =>
 			@ScrollPanel()
@@ -1184,7 +1184,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Mane and tail'
+		'name': 'gui.ppm2.editor.old_tabs.mane_tail'
 		'internal': 'manetail_old'
 		'display': (editorMode = false) -> not IS_USING_NEW(editorMode)
 		'func': (sheet) =>
@@ -1208,7 +1208,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Mane and tail'
+		'name': 'gui.ppm2.editor.old_tabs.mane_tail'
 		'internal': 'manetail_new'
 		'display': IS_USING_NEW
 		'func': (sheet) =>
@@ -1253,7 +1253,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Face'
+		'name': 'gui.ppm2.editor.tabs.face'
 		'internal': 'face'
 		'func': (sheet) =>
 			@ScrollPanel()
@@ -1289,7 +1289,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Eyes'
+		'name': 'gui.ppm2.editor.tabs.eyes'
 		'internal': 'eyes'
 		'func': (sheet) =>
 			@ScrollPanel()
@@ -1357,7 +1357,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Wings and horn details'
+		'name': 'gui.ppm2.editor.old_tabs.wings_and_horn_details'
 		'internal': 'wings_horn_details'
 		'display': (editorMode = false) -> ADVANCED_MODE\GetBool()
 		'func': (sheet) =>
@@ -1399,7 +1399,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Body details'
+		'name': 'gui.ppm2.editor.old_tabs.body_details'
 		'internal': 'bodydetails'
 		'func': (sheet) =>
 			@ScrollPanel()
@@ -1423,7 +1423,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Mane and tail URL details'
+		'name': 'gui.ppm2.editor.old_tabs.mane_tail_detals'
 		'internal': 'manetail'
 		'func': (sheet) =>
 			@ScrollPanel()
@@ -1455,7 +1455,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Tattoos'
+		'name': 'gui.ppm2.editor.tabs.tattoos'
 		'internal': 'tattoos'
 		'display': -> ADVANCED_MODE\GetBool()
 		'func': (sheet) =>
@@ -1479,7 +1479,7 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Cutiemark'
+		'name': 'gui.ppm2.editor.tabs.cutiemark'
 		'internal': 'cmark'
 		'func': (sheet) =>
 			@CheckBox('gui.ppm2.editor.cutiemark.display', 'CMark')
@@ -1529,20 +1529,20 @@ EditorPages = {
 	}
 
 	{
-		'name': 'Files'
+		'name': 'gui.ppm2.editor.tabs.files'
 		'internal': 'saves'
 		'func': PPM2.EditorBuildNewFilesPanel
 
 	}
 
 	{
-		'name': 'Old Files'
+		'name': 'gui.ppm2.editor.tabs.old_files'
 		'internal': 'oldsaves'
 		'func': PPM2.EditorBuildOldFilesPanel
 	}
 
 	{
-		'name': 'About'
+		'name': 'gui.ppm2.editor.tabs.about'
 		'internal': 'about'
 		'func': (sheet) =>
 			title = @Label('PPM/2')

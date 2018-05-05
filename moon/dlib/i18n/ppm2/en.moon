@@ -152,6 +152,12 @@ gui.ppm2.editor.tabs.socks = 'Socks'
 gui.ppm2.editor.tabs.newsocks = 'New Socks'
 gui.ppm2.editor.tabs.about = 'About'
 
+gui.ppm2.editor.old_tabs.mane_tail = 'Mane and tail'
+gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Wings and horn details'
+gui.ppm2.editor.old_tabs.wings_and_horn = 'Wings and horn'
+gui.ppm2.editor.old_tabs.body_details = 'Body details'
+gui.ppm2.editor.old_tabs.mane_tail_detals = 'Mane and tail URL details'
+
 gui.ppm2.editor.cutiemark.display = 'Display cutiemark'
 gui.ppm2.editor.cutiemark.type = 'Cutiemark type'
 gui.ppm2.editor.cutiemark.size = 'Cutiemark size'

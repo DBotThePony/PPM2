@@ -152,6 +152,12 @@ gui.ppm2.editor.tabs.socks = 'Носки'
 gui.ppm2.editor.tabs.newsocks = 'Новые носки'
 gui.ppm2.editor.tabs.about = 'О PPM/2'
 
+gui.ppm2.editor.old_tabs.mane_tail = 'Грива и хвост'
+gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Детали крыльев и рога'
+gui.ppm2.editor.old_tabs.wings_and_horn = 'Крылья и рог'
+gui.ppm2.editor.old_tabs.body_details = 'Детали тела'
+gui.ppm2.editor.old_tabs.mane_tail_detals = 'URL детали хвоста и гривы'
+
 gui.ppm2.editor.cutiemark.display = 'Отображать кьютимарку'
 gui.ppm2.editor.cutiemark.type = 'Тип кьютимарки'
 gui.ppm2.editor.cutiemark.size = 'Размер кьютимарки'
