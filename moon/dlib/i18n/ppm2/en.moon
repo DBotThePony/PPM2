@@ -386,3 +386,19 @@ gui.ppm2.emotes.quack = 'QUACKS'
 gui.ppm2.emotes.suggestive = 'Suggestive w/ tongue'
 
 message.ppm2.emotes.invalid = 'No such emotion with ID: %s'
+
+gui.ppm2.editor.intro.text = "Welcome to my new... Robosurgeon for Ponies! It allows you to....\n" ..
+	"hmmm... become a pony, and yes, this process is IRREVERSIBLE! But don't need worry,\n" ..
+	"you won't loose any of your brain cells before, in, and after then operation, because it performs operation very gently...\n\n" ..
+	"Actually i have no idea, you biological being! His mechanical hands will envelop you in the most tight hugs you ever get!\n" ..
+	"And, please, don't die in process, because this would cause VOID OF YOUR LIFE WARRANTY... and you will not be a pony!\n" ..
+	"----\n\n\n" ..
+	"Caution: Do not disassemble Robosurgeon.\nDo not put your hands/hooves into moving parts of Robosurgeon.\n" ..
+	"Do not poweroff it while it operates.\nDo not try to resist it's actions.\n" ..
+	"Always be gently with Robosurgeon\n" ..
+	"Never slap Robosurgeon onto his interface.\n" ..
+	"DBot's DLibCo take no responsibility for any harm caused by wrong usage of Robosurgeon.\n" ..
+	"Warranty is voided if user die.\n" ..
+	"No refunds."
+gui.ppm2.editor.intro.title = 'Welcome here, Human!'
+gui.ppm2.editor.intro.okay = "Ok, i will never read this license anyway"
