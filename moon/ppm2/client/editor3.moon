@@ -1483,7 +1483,7 @@ ppm2_editor3 = ->
 	net.SendToServer()
 
 	if not file.Exists('ppm2_intro.txt', 'DATA')
-		file.Write('ppm2_into.txt', '')
+		file.Write('ppm2_intro.txt', '')
 		Derma_Message('gui.ppm2.editor.intro.text', 'gui.ppm2.editor.intro.title', 'gui.ppm2.editor.intro.okay')
 
 concommand.Add 'ppm2_editor3', ppm2_editor3
