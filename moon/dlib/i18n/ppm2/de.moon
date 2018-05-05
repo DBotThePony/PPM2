@@ -393,7 +393,7 @@ gui.ppm2.emotes.suggestive = 'Anzüglich mit Zunge'
 
 message.ppm2.emotes.invalid = 'Keine Emotion mit ID: %s'
 
-gui.ppm2.editor.intro.text = "Willkommen in meinem neuen.... Robochirurgen für Ponys! Es erlaubt Ihnen....\n" ..
+gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys! Es erlaubt Ihnen....\n" ..
 	"hmmm... ein Pony zu werden, und ja, dieser Prozess ist UNUMKEHRBAR! Aber mach dir keine Sorgen,\n" ..
 	"Du verlierst keine deiner Gehirnzellen, in und nach der Operation, weil wir die Operation sehr schonend durchführen...\n\n" ..
 	"Eigentlich habe ich keine Ahnung, du biologisches Wesen! Seine mechanischen Hände werden dich in die engsten Umarmungen hüllen, die du je bekommen hast!\n" ..
