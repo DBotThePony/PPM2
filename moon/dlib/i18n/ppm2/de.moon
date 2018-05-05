@@ -402,7 +402,7 @@ gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys!
 	"Vorsicht: Nehme den Robochirurgen nicht auseinander.\nLege deine Hände/Hufe nicht in bewegliche Teile des Robochirurgen.\n" ..
 	"Schalte es während des Betriebs nicht aus..\nVersuche nicht sich seinen Taten zu widersetzen.\n" ..
 	"Sei immer sanft mit den Robochirurgen.\n" ..
-	"Schlage Robochirurgen nie auf sein Interface.\n" ..
+	"Schlage den Robochirurgen nie auf sein Interface.\n" ..
 	"DBot's DLibCo übernimmt keine Verantwortung für Schäden, die durch falsche Verwendung von Robochirurgen entstehen.\n" ..
 	"Die Garantie erlischt, wenn der Benutzer stirbt.\n" ..
 	"Keine Rückerstattung."
