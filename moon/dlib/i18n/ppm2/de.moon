@@ -79,7 +79,7 @@ gui.ppm2.editor.io.random.title = 'Randomisieren!'
 gui.ppm2.editor.io.newfile.title = 'Neue Datei'
 gui.ppm2.editor.io.newfile.confirm = 'Willst Du wirklich eine neue Datei erstellen?'
 gui.ppm2.editor.io.newfile.toptext = 'Zurücksetzen'
-gui.ppm2.editor.io.delete.confirm = 'Willst Du Datei wirklich löschen?\nEs wird für immer weg sein.!\n(eine lange Zeit!)'
+gui.ppm2.editor.io.delete.confirm = 'Willst Du diese Datei wirklich löschen?\nEs wird für immer weg sein!\n(eine lange Zeit!)'
 gui.ppm2.editor.io.delete.title = 'Wirklich löschen?'
 
 gui.ppm2.editor.io.filename = 'Dateiname'
@@ -95,7 +95,7 @@ gui.ppm2.editor.io.save.text = 'Dateiname ohne ppm2/ und .dat eingeben\nTipp: Um
 gui.ppm2.editor.io.wear = 'Änderungen übernehmen (Anziehen)'
 
 gui.ppm2.editor.seq.standing = 'Stehen'
-gui.ppm2.editor.seq.move = 'Bewegend'
+gui.ppm2.editor.seq.move = 'Bewegen'
 gui.ppm2.editor.seq.walk = 'Gehen'
 gui.ppm2.editor.seq.sit = 'Sitzen'
 gui.ppm2.editor.seq.swim = 'Schwimmen'
@@ -136,7 +136,7 @@ gui.ppm2.editor.tabs.details = 'Details'
 gui.ppm2.editor.tabs.url_details = 'URL Details'
 gui.ppm2.editor.tabs.url_separated_details = 'URL Getrennte Details'
 gui.ppm2.editor.tabs.ears = 'Ohren'
-gui.ppm2.editor.tabs.horn = 'Ohren'
+gui.ppm2.editor.tabs.horn = 'Horn'
 gui.ppm2.editor.tabs.back = 'Rücken'
 gui.ppm2.editor.tabs.wings = 'Flügel'
 gui.ppm2.editor.tabs.left = 'Links'
@@ -153,15 +153,15 @@ gui.ppm2.editor.tabs.newsocks = 'Neue Socken'
 gui.ppm2.editor.tabs.about = 'Über PPM/2'
 
 gui.ppm2.editor.old_tabs.mane_tail = 'Mähne und Schweif'
-gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Flügel und Horn details'
+gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Flügel und Horn Details'
 gui.ppm2.editor.old_tabs.wings_and_horn = 'Flügel und Horn'
-gui.ppm2.editor.old_tabs.body_details = 'Körper details'
-gui.ppm2.editor.old_tabs.mane_tail_detals = 'Mähne und Schweif URL details'
+gui.ppm2.editor.old_tabs.body_details = 'Körper Details'
+gui.ppm2.editor.old_tabs.mane_tail_detals = 'Mähne und Schweif URL Details'
 
 gui.ppm2.editor.cutiemark.display = 'Schönheitsfleck anzeigen'
 gui.ppm2.editor.cutiemark.type = 'Schönheitsfleck typ'
 gui.ppm2.editor.cutiemark.size = 'Schönheitsfleck größe'
-gui.ppm2.editor.cutiemark.color = 'Schönheitsfleck farbe'
+gui.ppm2.editor.cutiemark.color = 'Schönheitsfleck Farbe'
 gui.ppm2.editor.cutiemark.input = 'Schönheitsfleck URL bild Eingabefeld\nSollte PNG oder JPEG sein (funktioniert wie bei\nPAC3 URL texture)'
 
 gui.ppm2.editor.face.eyelashes = 'Wimpern'
@@ -203,13 +203,13 @@ for i = 1, 6
 	gui.ppm2.editor.mane.down['detail_color' .. i] = "Untere Mähnefarbe #{i}"
 
 	gui.ppm2.editor.url_mane['desc' .. i] = "Mähne URL Detail #{i} Eingabefeld"
-	gui.ppm2.editor.url_mane['color' .. i] = "Mähne URL detail farbe #{i}"
+	gui.ppm2.editor.url_mane['color' .. i] = "Mähne URL Detail Farbe #{i}"
 
 	gui.ppm2.editor.url_mane.sep.up['desc' .. i] = "Obere Mähne URL Detail #{i} Eingabefeld"
-	gui.ppm2.editor.url_mane.sep.up['color' .. i] = "Obere Mähne URL detail farbe #{i}"
+	gui.ppm2.editor.url_mane.sep.up['color' .. i] = "Obere Mähne URL Detail Farbe #{i}"
 
 	gui.ppm2.editor.url_mane.sep.down['desc' .. i] = "Untere Mähne URL Detail #{i} Eingabefeld"
-	gui.ppm2.editor.url_mane.sep.down['color' .. i] = "Untere Mähne URL detail farbe #{i}"
+	gui.ppm2.editor.url_mane.sep.down['color' .. i] = "Untere Mähne URL Detail Farbe #{i}"
 
 gui.ppm2.editor.ears.bat = 'Bat pony Ohren'
 gui.ppm2.editor.ears.size = 'Ohrengröße'
@@ -217,23 +217,23 @@ gui.ppm2.editor.ears.size = 'Ohrengröße'
 gui.ppm2.editor.horn.detail_color = 'Horn Detailfarbe'
 gui.ppm2.editor.horn.glowing_detail = 'Horn leuchten Detail'
 gui.ppm2.editor.horn.glow_strength = 'Horn leuchten Stärke'
-gui.ppm2.editor.horn.separate_color = 'Trenne Horn farbe vom Körper'
-gui.ppm2.editor.horn.color = 'Horn farbe'
-gui.ppm2.editor.horn.magic = 'Horn magie farbe'
-gui.ppm2.editor.horn.separate_magic_color = 'Trenne magie farbe vom Augen farbe'
-gui.ppm2.editor.horn.separate = 'Trenne Horn farbe vom Körper'
+gui.ppm2.editor.horn.separate_color = 'Trenne Horn Farbe vom Körper'
+gui.ppm2.editor.horn.color = 'Horn Farbe'
+gui.ppm2.editor.horn.magic = 'Horn magie Farbe'
+gui.ppm2.editor.horn.separate_magic_color = 'Trenne magie Farbe vom Augen Farbe'
+gui.ppm2.editor.horn.separate = 'Trenne Horn Farbe vom Körper'
 gui.ppm2.editor.horn.separate_phong = 'Trenne Horn phong Einstellungen vom Körper'
 
 for i = 1, 3
-	gui.ppm2.editor.horn.detail['desc' .. i] = "Horn URL detail #{i}"
-	gui.ppm2.editor.horn.detail['color' .. i] = "URL Detail farbe #{i}"
+	gui.ppm2.editor.horn.detail['desc' .. i] = "Horn URL Detail #{i}"
+	gui.ppm2.editor.horn.detail['color' .. i] = "URL Detail Farbe #{i}"
 
-gui.ppm2.editor.wings.separate_color = 'Trenne Flügel farbe vom Körper'
-gui.ppm2.editor.wings.color = 'Flügel farbe'
-gui.ppm2.editor.wings.separate = 'Trenne Flügel farbe vom Körper'
+gui.ppm2.editor.wings.separate_color = 'Trenne Flügel Farbe vom Körper'
+gui.ppm2.editor.wings.color = 'Flügel Farbe'
+gui.ppm2.editor.wings.separate = 'Trenne Flügel Farbe vom Körper'
 gui.ppm2.editor.wings.separate_phong = 'Trenne Flügel phong Einstellungen vom Körper'
-gui.ppm2.editor.wings.bat_color = 'Bat Flügel farbe'
-gui.ppm2.editor.wings.bat_skin_color = 'Bat Flügel Haut farbe'
+gui.ppm2.editor.wings.bat_color = 'Bat Flügel Farbe'
+gui.ppm2.editor.wings.bat_skin_color = 'Bat Flügel Haut Farbe'
 
 gui.ppm2.editor.wings.normal = 'Normale Flügel'
 gui.ppm2.editor.wings.bat = 'Bat Flügel'
@@ -250,28 +250,28 @@ gui.ppm2.editor.wings.right.up = 'Rechter Flügel Hoch'
 gui.ppm2.editor.wings.right.inside = 'Rechter Flügel Innen'
 
 for i = 1, 3
-	gui.ppm2.editor.wings.details.def['detail' .. i] = "Flügel URL detail #{i}"
-	gui.ppm2.editor.wings.details.def['color' .. i] = "URL Detail farbe #{i}"
-	gui.ppm2.editor.wings.details.bat['detail' .. i] = "Bat Flügel URL detail #{i}"
-	gui.ppm2.editor.wings.details.bat['color' .. i] = "Bat Flügel URL Detail farbe #{i}"
-	gui.ppm2.editor.wings.details.batskin['detail' .. i] = "Bat Flügel Haut URL detail #{i}"
-	gui.ppm2.editor.wings.details.batskin['color' .. i] = "Bat Flügel Haut URL Detail farbe #{i}"
+	gui.ppm2.editor.wings.details.def['detail' .. i] = "Flügel URL Detail #{i}"
+	gui.ppm2.editor.wings.details.def['color' .. i] = "URL Detail Farbe #{i}"
+	gui.ppm2.editor.wings.details.bat['detail' .. i] = "Bat Flügel URL Detail #{i}"
+	gui.ppm2.editor.wings.details.bat['color' .. i] = "Bat Flügel URL Detail Farbe #{i}"
+	gui.ppm2.editor.wings.details.batskin['detail' .. i] = "Bat Flügel Haut URL Detail #{i}"
+	gui.ppm2.editor.wings.details.batskin['color' .. i] = "Bat Flügel Haut URL Detail Farbe #{i}"
 
 gui.ppm2.editor.neck.height = 'Halshöhe'
 
 gui.ppm2.editor.body.suit = 'Körperanzug'
-gui.ppm2.editor.body.color = 'Korper farbe'
+gui.ppm2.editor.body.color = 'Korper Farbe'
 gui.ppm2.editor.body.spine_length = 'Rückenlänge'
-gui.ppm2.editor.body.url_desc = 'Körper detail URL Bild Eingabefeld\nSollte PNG oder JPEG sein (funktioniert wie bei\nPAC3 URL textur)'
+gui.ppm2.editor.body.url_desc = 'Körper Detail URL Bild Eingabefeld\nSollte PNG oder JPEG sein (funktioniert wie bei\nPAC3 URL textur)'
 
 for i = 1, PPM2.MAX_BODY_DETAILS
 	gui.ppm2.editor.body.detail['desc' .. i] = "Detail #{i}"
-	gui.ppm2.editor.body.detail['color' .. i] = "Detail farbe #{i}"
+	gui.ppm2.editor.body.detail['color' .. i] = "Detail Farbe #{i}"
 	gui.ppm2.editor.body.detail['glow' .. i] = "Detail #{i} leuchtet"
 	gui.ppm2.editor.body.detail['glow_strength' .. i] = "Detail #{i} leuchtkraft"
 
 	gui.ppm2.editor.body.detail.url['desc' .. i] = "Detail #{i}"
-	gui.ppm2.editor.body.detail.url['color' .. i] = "Detail farbe #{i}"
+	gui.ppm2.editor.body.detail.url['color' .. i] = "Detail Farbe #{i}"
 
 gui.ppm2.editor.tattoo.edit_keyboard = 'Bearbeiten mit der Tastatur'
 gui.ppm2.editor.tattoo.type = 'Typ'
@@ -294,12 +294,12 @@ gui.ppm2.editor.tail.size = 'Schweif größe'
 gui.ppm2.editor.tail.separate = 'Trenne Schweif phong Einstellungen vom Körper'
 
 for i = 1, 2
-	gui.ppm2.editor.tail['color' .. i] = 'Schweif farbe ' .. i
+	gui.ppm2.editor.tail['color' .. i] = 'Schweif Farbe ' .. i
 
 for i = 1, 6
-	gui.ppm2.editor.tail['detail' .. i] = "Schweif detail farbe #{i}"
-	gui.ppm2.editor.tail.url['detail' .. i] = "Schweif URL detail #{i}"
-	gui.ppm2.editor.tail.url['color' .. i] = "Schweif URL detail #{i}"
+	gui.ppm2.editor.tail['detail' .. i] = "Schweif Detail Farbe #{i}"
+	gui.ppm2.editor.tail.url['detail' .. i] = "Schweif URL Detail #{i}"
+	gui.ppm2.editor.tail.url['color' .. i] = "Schweif URL Detail #{i}"
 
 gui.ppm2.editor.hoof.fluffers = 'Huf flausch'
 
@@ -311,7 +311,7 @@ gui.ppm2.editor.legs.socks.texture = 'Socken Textur'
 gui.ppm2.editor.legs.socks.url_texture = 'Socken URL textur'
 
 for i = 1, 6
-	gui.ppm2.editor.legs.socks['color' .. i] = 'Socken detail farbe ' .. i
+	gui.ppm2.editor.legs.socks['color' .. i] = 'Socken Detail Farbe ' .. i
 
 gui.ppm2.editor.legs.newsocks.model = 'Socken (als neues Modell)'
 
