@@ -150,6 +150,7 @@ gui.ppm2.editor.tabs.bottom_hoof = 'Bottom hoof'
 gui.ppm2.editor.tabs.legs = 'Legs'
 gui.ppm2.editor.tabs.socks = 'Socks'
 gui.ppm2.editor.tabs.newsocks = 'New Socks'
+gui.ppm2.editor.tabs.about = 'About'
 
 gui.ppm2.editor.cutiemark.display = 'Display cutiemark'
 gui.ppm2.editor.cutiemark.type = 'Cutiemark type'

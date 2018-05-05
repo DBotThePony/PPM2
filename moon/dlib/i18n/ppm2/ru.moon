@@ -150,6 +150,7 @@ gui.ppm2.editor.tabs.bottom_hoof = 'Нижняя часть'
 gui.ppm2.editor.tabs.legs = 'Ноги'
 gui.ppm2.editor.tabs.socks = 'Носки'
 gui.ppm2.editor.tabs.newsocks = 'Новые носки'
+gui.ppm2.editor.tabs.about = 'О PPM/2'
 
 gui.ppm2.editor.cutiemark.display = 'Отображать кьютимарку'
 gui.ppm2.editor.cutiemark.type = 'Тип кьютимарки'
