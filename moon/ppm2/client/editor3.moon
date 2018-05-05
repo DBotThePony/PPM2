@@ -71,6 +71,11 @@ MODEL_BOX_PANEL = {
 		@holdRightClick = false
 		@canHold = true
 		@lastTick = RealTimeL()
+		@startAnimStart = RealTimeL() + 2
+		@startAnimEnd = RealTimeL() + 8
+
+		@startAnimStart2 = RealTimeL() + 2.5
+		@startAnimEnd2 = RealTimeL() + 9
 
 		@menuPanelsCache = {}
 		@updatePanels = {}
@@ -388,6 +393,7 @@ MODEL_BOX_PANEL = {
 	WALL_COLOR: Color() - 255
 	FLOOR_COLOR: Color() - 255
 	EMPTY_VECTOR: Vector()
+	WIREFRAME: Material('models/wireframe')
 
 	Paint: (w = 0, h = 0) =>
 		surface.SetDrawColor(0, 0, 0)
@@ -422,17 +428,37 @@ MODEL_BOX_PANEL = {
 			@model\SetPoseParameter('head_yaw', 0)
 			@model\SetPoseParameter('head_pitch', 0)
 
-		render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
-
-		for {pos, ang, w, h} in *@DRAW_WALLS
-			render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
-
 		if ENABLE_FULLBRIGHT\GetBool()
 			render.SuppressEngineLighting(true)
 			render.ResetModelLighting(1, 1, 1)
 			render.SetColorModulation(1, 1, 1)
 
-		@buildingModel\DrawModel()
+		progression = RealTimeL()\progression(@startAnimStart, @startAnimEnd)
+		progression2 = RealTimeL()\progression(@startAnimStart2, @startAnimEnd2)
+
+		if progression2 == 1
+			@buildingModel\DrawModel()
+		else
+			old = render.EnableClipping(true)
+
+			ProtectedCall ->
+				render.SetBlend(0.2)
+				render.MaterialOverride(@WIREFRAME)
+
+				for layer = -16, 16
+					render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression) * 1200 + layer * 9 - 800)
+					@buildingModel\DrawModel()
+					render.PopCustomClipPlane()
+
+				render.MaterialOverride()
+				render.SetBlend(1)
+
+				render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression2) * 1200 - 800)
+				@buildingModel\DrawModel()
+				render.PopCustomClipPlane()
+
+			render.EnableClipping(old)
+
 		ctrl = @controller\GetRenderController()
 
 		if bg = @controller\GetBodygroupController()
