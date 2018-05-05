@@ -336,13 +336,13 @@ gui.ppm2.editor.phong.exponent = 'Phong Exponent - wie stark die reflektierende 
 gui.ppm2.editor.phong.exponent_text = 'Phong Exponent'
 gui.ppm2.editor.phong.boost.title = 'Phong Verstärkung - multipliziert spiegelnde Kartenreflexionen'
 gui.ppm2.editor.phong.boost.boost = 'Phong Verstärkung'
-gui.ppm2.editor.phong.tint.title = 'Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)'
-gui.ppm2.editor.phong.tint.tint = 'Tint color - what colors does reflect specular map\nWhite - Reflects all colors\n(In white room - white specular map)'
-gui.ppm2.editor.phong.frensel.front.title = 'Phong Front - Fresnel 0 Grad ReflexionswinkelMultiplikator'
+gui.ppm2.editor.phong.tint.title = 'Tönung Farbe - welche Farben reflektieren Spiegelkarte\nWeiß - Reflektiert alle Farben\n(Im weißen Raum - weiße Spiegelkarte)'
+gui.ppm2.editor.phong.tint.tint = 'Tönung Farbe - welche Farben reflektieren Spiegelkarte\nWeiß - Reflektiert alle Farben\n(Im weißen Raum - weiße Spiegelkarte)'
+gui.ppm2.editor.phong.frensel.front.title = 'Phong Front - Fresnel 0 Grad Reflexionswinkel Multiplikator'
 gui.ppm2.editor.phong.frensel.front.front = 'Phong Front'
-gui.ppm2.editor.phong.frensel.middle.title = 'Phong Mitte - FFresnel 45 Grad ReflexionswinkelMultiplikator'
+gui.ppm2.editor.phong.frensel.middle.title = 'Phong Mitte - Fresnel 45 Grad Reflexionswinkel Multiplikator'
 gui.ppm2.editor.phong.frensel.middle.front = 'Phong Mitte'
-gui.ppm2.editor.phong.frensel.sliding.title = 'Phong Gleitend - Fresnel 45 Grad ReflexionswinkelMultiplikator'
+gui.ppm2.editor.phong.frensel.sliding.title = 'Phong Gleitend - Fresnel 45 Grad Reflexionswinkel Multiplikator'
 gui.ppm2.editor.phong.frensel.sliding.front = 'Phong Gleitend'
 gui.ppm2.editor.phong.lightwarp = 'Lightwarp'
 gui.ppm2.editor.phong.url_lightwarp = 'Lightwarp textur URL eingabe\nEs muss 256x16 sein!'
@@ -393,7 +393,7 @@ gui.ppm2.emotes.suggestive = 'Anzüglich mit Zunge'
 
 message.ppm2.emotes.invalid = 'Keine Emotion mit ID: %s'
 
-gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys! Es erlaubt Ihnen....\n" ..
+gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys! Es erlaubt Dir....\n" ..
 	"hmmm... ein Pony zu werden, und ja, dieser Prozess ist UNUMKEHRBAR! Aber mach dir keine Sorgen,\n" ..
 	"Du verlierst keine deiner Gehirnzellen, in und nach der Operation, weil wir die Operation sehr schonend durchführen...\n\n" ..
 	"Eigentlich habe ich keine Ahnung, du biologisches Wesen! Seine mechanischen Hände werden dich in die engsten Umarmungen hüllen, die du je bekommen hast!\n" ..
@@ -401,7 +401,7 @@ gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys!
 	"----\n\n\n" ..
 	"Vorsicht: Nehme den Robochirurgen nicht auseinander.\nLege deine Hände/Hufe nicht in bewegliche Teile des Robochirurgen.\n" ..
 	"Schalte es während des Betriebs nicht aus..\nVersuche nicht sich seinen Taten zu widersetzen.\n" ..
-	"Seie immer sanft mit Robochirurgen.\n" ..
+	"Sei immer sanft mit den Robochirurgen.\n" ..
 	"Schlage Robochirurgen nie auf sein Interface.\n" ..
 	"DBot's DLibCo übernimmt keine Verantwortung für Schäden, die durch falsche Verwendung von Robochirurgen entstehen.\n" ..
 	"Die Garantie erlischt, wenn der Benutzer stirbt.\n" ..
