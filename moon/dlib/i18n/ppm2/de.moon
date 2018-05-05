@@ -30,6 +30,7 @@ for {tprefix, prefix} in *{{'def', ''}, {'left', 'Links '}, {'right', 'Rechts '}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Glanz"
 
 	gui.ppm2.editor.eyes[tprefix].type = "#{prefix}Augentyp"
+	gui.ppm2.editor.eyes[tprefix].reflection_type = "#{prefix}Augenreflexion typ"
 	gui.ppm2.editor.eyes[tprefix].lines = "#{prefix}Augenlinien"
 	gui.ppm2.editor.eyes[tprefix].derp = "#{prefix}Derp Augen"
 	gui.ppm2.editor.eyes[tprefix].derp_strength = "#{prefix}Derp Augen Stärke"
@@ -79,7 +80,7 @@ gui.ppm2.editor.io.newfile.title = 'Neue Datei'
 gui.ppm2.editor.io.newfile.confirm = 'Willst Du wirklich eine neue Datei erstellen?'
 gui.ppm2.editor.io.newfile.toptext = 'Zurücksetzen'
 gui.ppm2.editor.io.delete.confirm = 'Willst Du Datei wirklich löschen?\nEs wird für immer weg sein.!\n(eine lange Zeit!)'
-gui.ppm2.editor.io.delete.title = 'Really Delete?'
+gui.ppm2.editor.io.delete.title = 'Wirklich löschen?'
 
 gui.ppm2.editor.io.filename = 'Dateiname'
 gui.ppm2.editor.io.hint = 'Datei per Doppelklick öffnen'
@@ -147,8 +148,15 @@ gui.ppm2.editor.tabs.tail = 'Schweif'
 gui.ppm2.editor.tabs.hooves = 'Huf Anatomie'
 gui.ppm2.editor.tabs.bottom_hoof = 'Huf unten'
 gui.ppm2.editor.tabs.legs = 'Beine'
-gui.ppm2.editor.tabs.socks = 'Beine'
-gui.ppm2.editor.tabs.newsocks = 'Neue Legs'
+gui.ppm2.editor.tabs.socks = 'Socken'
+gui.ppm2.editor.tabs.newsocks = 'Neue Socken'
+gui.ppm2.editor.tabs.about = 'Über PPM/2'
+
+gui.ppm2.editor.old_tabs.mane_tail = 'Mähne und Schweif'
+gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Flügel und Horn details'
+gui.ppm2.editor.old_tabs.wings_and_horn = 'Flügel und Horn'
+gui.ppm2.editor.old_tabs.body_details = 'Körper details'
+gui.ppm2.editor.old_tabs.mane_tail_detals = 'Mähne und Schweif URL details'
 
 gui.ppm2.editor.cutiemark.display = 'Schönheitsfleck anzeigen'
 gui.ppm2.editor.cutiemark.type = 'Schönheitsfleck typ'
@@ -384,3 +392,19 @@ gui.ppm2.emotes.quack = 'QUACK'
 gui.ppm2.emotes.suggestive = 'Anzüglich mit Zunge'
 
 message.ppm2.emotes.invalid = 'Keine Emotion mit ID: %s'
+
+gui.ppm2.editor.intro.text = "Willkommen in meinem neuen.... Robochirurgen für Ponys! Es erlaubt Ihnen....\n" ..
+	"hmmm... ein Pony zu werden, und ja, dieser Prozess ist UNUMKEHRBAR! Aber mach dir keine Sorgen,\n" ..
+	"Du verlierst keine deiner Gehirnzellen, in und nach der Operation, weil wir die Operation sehr schonend durchführen...\n\n" ..
+	"Eigentlich habe ich keine Ahnung, du biologisches Wesen! Seine mechanischen Hände werden dich in die engsten Umarmungen hüllen, die du je bekommen hast!\n" ..
+	"Und, bitte, sterbe nicht in diesen Prozess, denn dies würde dazu führen DAS ERLÖSCHEN DEINER LEBENSLANGEN GARANTIE... und Du wirst kein Pony sein!\n" ..
+	"----\n\n\n" ..
+	"Vorsicht: Nehme den Robochirurgen nicht auseinander.\nLege deine Hände/Hufe nicht in bewegliche Teile des Robochirurgen.\n" ..
+	"Schalte es während des Betriebs nicht aus..\nVersuche nicht sich seinen Taten zu widersetzen.\n" ..
+	"Seie immer sanft mit Robochirurgen.\n" ..
+	"Schlage Robochirurgen nie auf sein Interface.\n" ..
+	"DBot's DLibCo übernimmt keine Verantwortung für Schäden, die durch falsche Verwendung von Robochirurgen entstehen.\n" ..
+	"Die Garantie erlischt, wenn der Benutzer stirbt.\n" ..
+	"Keine Rückerstattung."
+gui.ppm2.editor.intro.title = 'Willkommen hier, Mensch!'
+gui.ppm2.editor.intro.okay = "Ok, ich werde diese Lizenz sowieso nie lesen."
