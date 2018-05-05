@@ -441,21 +441,20 @@ MODEL_BOX_PANEL = {
 		else
 			old = render.EnableClipping(true)
 
-			ProtectedCall ->
-				render.SetBlend(0.2)
-				render.MaterialOverride(@WIREFRAME)
+			render.SetBlend(0.2)
+			render.MaterialOverride(@WIREFRAME)
 
-				for layer = -16, 16
-					render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression) * 1200 + layer * 9 - 800)
-					@buildingModel\DrawModel()
-					render.PopCustomClipPlane()
-
-				render.MaterialOverride()
-				render.SetBlend(1)
-
-				render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression2) * 1200 - 800)
+			for layer = -16, 16
+				render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression) * 1200 + layer * 9 - 800)
 				@buildingModel\DrawModel()
 				render.PopCustomClipPlane()
+
+			render.MaterialOverride()
+			render.SetBlend(1)
+
+			render.PushCustomClipPlane(Vector(0, 0, -1), (1 - progression2) * 1200 - 800)
+			@buildingModel\DrawModel()
+			render.PopCustomClipPlane()
 
 			render.EnableClipping(old)
 
