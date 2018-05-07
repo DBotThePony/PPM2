@@ -191,6 +191,7 @@ gui.ppm2.editor.mouth.tongue_phong = 'Zunge Phong Parameter'
 
 gui.ppm2.editor.mane.type = 'Mähne Typ'
 gui.ppm2.editor.mane.phong = 'Trenne Mähne phong Einstellungen vom Körper'
+gui.ppm2.editor.mane.mane_phong = 'Mähne Phong Parameter'
 gui.ppm2.editor.mane.phong_sep = 'Trenne obere und untere Mähnenfarbe'
 gui.ppm2.editor.mane.up.phong = 'Obere Mähne Phong Einstellungen'
 gui.ppm2.editor.mane.down.type = 'Untere Mähne Typ'
@@ -224,6 +225,7 @@ gui.ppm2.editor.horn.glowing_detail = 'Horn leuchten Detail'
 gui.ppm2.editor.horn.glow_strength = 'Horn leuchten Stärke'
 gui.ppm2.editor.horn.separate_color = 'Trenne Horn Farbe vom Körper'
 gui.ppm2.editor.horn.color = 'Horn Farbe'
+gui.ppm2.editor.horn.horn_phong = 'Horn Phong Parameter'
 gui.ppm2.editor.horn.magic = 'Horn magie Farbe'
 gui.ppm2.editor.horn.separate_magic_color = 'Trenne magie Farbe vom Augen Farbe'
 gui.ppm2.editor.horn.separate = 'Trenne Horn Farbe vom Körper'
@@ -235,6 +237,7 @@ for i = 1, 3
 
 gui.ppm2.editor.wings.separate_color = 'Trenne Flügel Farbe vom Körper'
 gui.ppm2.editor.wings.color = 'Flügel Farbe'
+gui.ppm2.editor.wings.wings_phong = 'Flügel Phong Parameter'
 gui.ppm2.editor.wings.separate = 'Trenne Flügel Farbe vom Körper'
 gui.ppm2.editor.wings.separate_phong = 'Trenne Flügel phong Einstellungen vom Körper'
 gui.ppm2.editor.wings.bat_color = 'Bat Flügel Farbe'
@@ -267,6 +270,7 @@ gui.ppm2.editor.neck.height = 'Halshöhe'
 
 gui.ppm2.editor.body.suit = 'Körperanzug'
 gui.ppm2.editor.body.color = 'Korper Farbe'
+gui.ppm2.editor.body.body_phong = 'Körper Phong Parameter'
 gui.ppm2.editor.body.spine_length = 'Rückenlänge'
 gui.ppm2.editor.body.url_desc = 'Körper Detail URL Bild Eingabefeld\nSollte PNG oder JPEG sein (funktioniert wie bei\nPAC3 URL textur)'
 
@@ -297,6 +301,7 @@ for i = 1, PPM2.MAX_TATTOOS
 
 gui.ppm2.editor.tail.type = 'Schweif typ'
 gui.ppm2.editor.tail.size = 'Schweif größe'
+gui.ppm2.editor.tail.tail_phong = 'Schweif Phong Parameter'
 gui.ppm2.editor.tail.separate = 'Trenne Schweif phong Einstellungen vom Körper'
 
 for i = 1, 2
@@ -313,6 +318,7 @@ gui.ppm2.editor.legs.height = 'Bein höhe'
 gui.ppm2.editor.legs.socks.simple = 'Socken (einfache Textur)'
 gui.ppm2.editor.legs.socks.model = 'Socken (als Modell)'
 gui.ppm2.editor.legs.socks.color = 'Socken Modell Farbe'
+gui.ppm2.editor.legs.socks.socks_phong = 'Socks phong parameters'
 gui.ppm2.editor.legs.socks.texture = 'Socken Textur'
 gui.ppm2.editor.legs.socks.url_texture = 'Socken URL textur'
 

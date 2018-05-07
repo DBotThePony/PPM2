@@ -191,6 +191,7 @@ gui.ppm2.editor.mouth.tongue_phong = 'Tongue phong parameters'
 
 gui.ppm2.editor.mane.type = 'Mane Type'
 gui.ppm2.editor.mane.phong = 'Separate mane phong settings from body'
+gui.ppm2.editor.mane.mane_phong = 'Mane phong parameters'
 gui.ppm2.editor.mane.phong_sep = 'Separate upper and lower mane colors'
 gui.ppm2.editor.mane.up.phong = 'Upper Mane Phong Settings'
 gui.ppm2.editor.mane.down.type = 'Lower Mane Type'
@@ -224,6 +225,7 @@ gui.ppm2.editor.horn.glowing_detail = 'Glowing Horn Detail'
 gui.ppm2.editor.horn.glow_strength = 'Horn Glow Strength'
 gui.ppm2.editor.horn.separate_color = 'Separate horn color from body'
 gui.ppm2.editor.horn.color = 'Horn color'
+gui.ppm2.editor.horn.horn_phong = 'Horn phong parameters'
 gui.ppm2.editor.horn.magic = 'Horn magic color'
 gui.ppm2.editor.horn.separate_magic_color = 'Separate magic color from eye color'
 gui.ppm2.editor.horn.separate = 'Separate horn color from body'
@@ -235,6 +237,7 @@ for i = 1, 3
 
 gui.ppm2.editor.wings.separate_color = 'Separate wings color from body'
 gui.ppm2.editor.wings.color = 'Wings color'
+gui.ppm2.editor.wings.wings_phong = 'Wings phong parameters'
 gui.ppm2.editor.wings.separate = 'Separate wings color from body'
 gui.ppm2.editor.wings.separate_phong = 'Separate wings phong settings from body'
 gui.ppm2.editor.wings.bat_color = 'Bat Wings color'
@@ -267,6 +270,7 @@ gui.ppm2.editor.neck.height = 'Neck height'
 
 gui.ppm2.editor.body.suit = 'Bodysuit'
 gui.ppm2.editor.body.color = 'Body color'
+gui.ppm2.editor.body.body_phong = 'Body phong parameters'
 gui.ppm2.editor.body.spine_length = 'Spine length'
 gui.ppm2.editor.body.url_desc = 'Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)'
 
@@ -297,6 +301,7 @@ for i = 1, PPM2.MAX_TATTOOS
 
 gui.ppm2.editor.tail.type = 'Tail type'
 gui.ppm2.editor.tail.size = 'Tail size'
+gui.ppm2.editor.tail.tail_phong = 'Tail phong parameters'
 gui.ppm2.editor.tail.separate = 'Separate tail phong settings from body'
 
 for i = 1, 2
@@ -313,6 +318,7 @@ gui.ppm2.editor.legs.height = 'Legs height'
 gui.ppm2.editor.legs.socks.simple = 'Socks (simple texture)'
 gui.ppm2.editor.legs.socks.model = 'Socks (as model)'
 gui.ppm2.editor.legs.socks.color = 'Socks model color'
+gui.ppm2.editor.legs.socks.socks_phong = 'Socks phong parameters'
 gui.ppm2.editor.legs.socks.texture = 'Socks Texture'
 gui.ppm2.editor.legs.socks.url_texture = 'Socks URL texture'
 

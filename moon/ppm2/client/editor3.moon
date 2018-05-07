@@ -991,7 +991,7 @@ EDIT_TREE = {
 
 									@Hr()
 									@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
-									PPM2.EditorPhongPanels(@, 'Mane') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'Mane', 'gui.ppm2.editor.mane.mane_phong') if ADVANCED_MODE\GetBool()
 									@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
 
 									@Hr()
@@ -1059,7 +1059,7 @@ EDIT_TREE = {
 									@CheckBox('gui.ppm2.editor.horn.separate_magic_color', 'SeparateMagicColor')
 									@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
 									@CheckBox('gui.ppm2.editor.horn.separate_phong', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
-									PPM2.EditorPhongPanels(@, 'Horn') if ADVANCED_MODE\GetBool()
+									PPM2.EditorPhongPanels(@, 'Horn', 'gui.ppm2.editor.horn.horn_phong') if ADVANCED_MODE\GetBool()
 								'gui.ppm2.editor.tabs.details': =>
 									for i = 1, 3
 										@Label('gui.ppm2.editor.horn.detail.desc' .. i)
@@ -1247,7 +1247,7 @@ EDIT_TREE = {
 
 					@Hr()
 					@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
-					PPM2.EditorPhongPanels(@, 'Tail') if ADVANCED_MODE\GetBool()
+					PPM2.EditorPhongPanels(@, 'Tail', 'gui.ppm2.editor.tail.tail_phong') if ADVANCED_MODE\GetBool()
 					@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 
 				'gui.ppm2.editor.tabs.details': =>
@@ -1349,7 +1349,7 @@ EDIT_TREE = {
 
 							if ADVANCED_MODE\GetBool()
 								@Hr()
-								PPM2.EditorPhongPanels(@, 'Socks')
+								PPM2.EditorPhongPanels(@, 'Socks', 'gui.ppm2.editor.legs.socks.socks_phong')
 								@ComboBox('gui.ppm2.editor.legs.socks.texture', 'SocksTexture')
 								@Label('gui.ppm2.editor.legs.socks.url_texture')
 								@URLInput('SocksTextureURL')

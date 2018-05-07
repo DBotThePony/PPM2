@@ -1108,7 +1108,7 @@ EditorPages = {
 				@CheckBox('gui.ppm2.editor.face.inherit.nose', 'NoseColorInherit')
 				@ColorBox('gui.ppm2.editor.face.lips', 'LipsColor')
 				@ColorBox('gui.ppm2.editor.face.nose', 'NoseColor')
-				PPM2.EditorPhongPanels(@, 'Body')
+				PPM2.EditorPhongPanels(@, 'Body', 'gui.ppm2.editor.body.body_phong')
 
 			@NumSlider('gui.ppm2.editor.neck.height', 'NeckSize', 2)
 			@NumSlider('gui.ppm2.editor.legs.height', 'LegsSize', 2)
@@ -1121,7 +1121,7 @@ EditorPages = {
 
 			if ADVANCED_MODE\GetBool()
 				@Hr()
-				PPM2.EditorPhongPanels(@, 'Socks')
+				PPM2.EditorPhongPanels(@, 'Socks', 'gui.ppm2.editor.legs.socks.socks_phong')
 				@ComboBox('gui.ppm2.editor.legs.socks.texture', 'SocksTexture')
 				@Label('gui.ppm2.editor.legs.socks.url_texture')
 				@URLInput('SocksTextureURL')
@@ -1157,10 +1157,10 @@ EditorPages = {
 			@CheckBox('gui.ppm2.editor.horn.separate_magic_color', 'SeparateMagicColor')
 			@Hr()
 			@ColorBox('gui.ppm2.editor.wings.color', 'WingsColor')
-			PPM2.EditorPhongPanels(@, 'Wings') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Wings', 'gui.ppm2.editor.wings.wings_phong') if ADVANCED_MODE\GetBool()
 			@ColorBox('gui.ppm2.editor.horn.color', 'HornColor')
 			@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
-			PPM2.EditorPhongPanels(@, 'Horn') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Horn', 'gui.ppm2.editor.horn.horn_phong') if ADVANCED_MODE\GetBool()
 			@Hr()
 			@ColorBox('gui.ppm2.editor.wings.bat_color', 'BatWingColor')
 			@ColorBox('gui.ppm2.editor.wings.bat_skin_color', 'BatWingSkinColor')
@@ -1226,13 +1226,13 @@ EditorPages = {
 
 			@Hr()
 			@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
-			PPM2.EditorPhongPanels(@, 'Mane') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Mane', 'gui.ppm2.editor.mane.mane_phong') if ADVANCED_MODE\GetBool()
 			@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
 			@ColorBox('gui.ppm2.editor.tail.color' .. i, "TailColor#{i}") for i = 1, 2
 
 			@Hr()
 			@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
-			PPM2.EditorPhongPanels(@, 'Tail') if ADVANCED_MODE\GetBool()
+			PPM2.EditorPhongPanels(@, 'Tail', 'gui.ppm2.editor.tail.tail_phong') if ADVANCED_MODE\GetBool()
 			@ColorBox("gui.ppm2.editor.mane.detail_color#{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 			@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
 

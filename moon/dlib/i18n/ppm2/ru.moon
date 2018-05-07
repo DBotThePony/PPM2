@@ -191,6 +191,7 @@ gui.ppm2.editor.mouth.tongue_phong = 'Tongue phong parameters'
 
 gui.ppm2.editor.mane.type = 'Тип гривы'
 gui.ppm2.editor.mane.phong = 'Отделить фонг настройки гривы от тела'
+gui.ppm2.editor.mane.mane_phong = 'Mane phong parameters'
 gui.ppm2.editor.mane.phong_sep = 'Отделить нижний и верхний цвета гривы'
 gui.ppm2.editor.mane.up.phong = 'Фонг настройки верхней гривы'
 gui.ppm2.editor.mane.down.type = 'Lower Mane Type'
@@ -224,6 +225,7 @@ gui.ppm2.editor.horn.glowing_detail = 'Светящаяся деталь рог�
 gui.ppm2.editor.horn.glow_strength = 'Сила свечения'
 gui.ppm2.editor.horn.separate_color = 'Отделить цвет рога от тела'
 gui.ppm2.editor.horn.color = 'Цвет рога'
+gui.ppm2.editor.horn.horn_phong = 'Horn phong parameters'
 gui.ppm2.editor.horn.magic = 'Цвет магии рога'
 gui.ppm2.editor.horn.separate_magic_color = 'Отделить цвет магии от цвета глаз'
 gui.ppm2.editor.horn.separate = 'Отделить цвет рога от тела'
@@ -235,6 +237,7 @@ for i = 1, 3
 
 gui.ppm2.editor.wings.separate_color = 'Отделить цвет крыльев от тела'
 gui.ppm2.editor.wings.color = 'Wings color'
+gui.ppm2.editor.wings.wings_phong = 'Wings phong parameters'
 gui.ppm2.editor.wings.separate = 'Отделить цвет крыльев от тела'
 gui.ppm2.editor.wings.separate_phong = 'Отделить настройки фонга крыльев от тела'
 gui.ppm2.editor.wings.bat_color = 'Цвет крыльев летучей мыши'
@@ -267,6 +270,7 @@ gui.ppm2.editor.neck.height = 'Neck height'
 
 gui.ppm2.editor.body.suit = 'Bodysuit'
 gui.ppm2.editor.body.color = 'Body color'
+gui.ppm2.editor.body.body_phong = 'Body phong parameters'
 gui.ppm2.editor.body.spine_length = 'Spine length'
 gui.ppm2.editor.body.url_desc = 'Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)'
 
@@ -297,6 +301,7 @@ for i = 1, PPM2.MAX_TATTOOS
 
 gui.ppm2.editor.tail.type = 'Тип хвоста'
 gui.ppm2.editor.tail.size = 'Размер хвоста'
+gui.ppm2.editor.tail.tail_phong = 'Tail phong parameters'
 gui.ppm2.editor.tail.separate = 'Отделить настройки фонга хвоста от тела'
 
 for i = 1, 2
@@ -313,6 +318,7 @@ gui.ppm2.editor.legs.height = 'Высота ног'
 gui.ppm2.editor.legs.socks.simple = 'Носочки (простая текстура)'
 gui.ppm2.editor.legs.socks.model = 'Носочки (моделью)'
 gui.ppm2.editor.legs.socks.color = 'Цвет носок'
+gui.ppm2.editor.legs.socks.socks_phong = 'Socks phong parameters'
 gui.ppm2.editor.legs.socks.texture = 'Текстура носок'
 gui.ppm2.editor.legs.socks.url_texture = 'URL текстура носок'
 
