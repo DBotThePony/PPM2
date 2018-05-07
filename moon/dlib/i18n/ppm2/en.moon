@@ -189,6 +189,7 @@ gui.ppm2.editor.mane.type = 'Mane Type'
 gui.ppm2.editor.mane.phong = 'Separate mane phong settings from body'
 gui.ppm2.editor.mane.phong_sep = 'Separate upper and lower mane colors'
 gui.ppm2.editor.mane.up.phong = 'Upper Mane Phong Settings'
+gui.ppm2.editor.mane.down.type = 'Lower Mane Type'
 gui.ppm2.editor.mane.down.phong = 'Lower Mane Phong Settings'
 gui.ppm2.editor.mane.newnotice = 'Next options have effect only on new model'
 

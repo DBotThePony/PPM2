@@ -189,6 +189,7 @@ gui.ppm2.editor.mane.type = 'Тип гривы'
 gui.ppm2.editor.mane.phong = 'Отделить фонг настройки гривы от тела'
 gui.ppm2.editor.mane.phong_sep = 'Отделить нижний и верхний цвета гривы'
 gui.ppm2.editor.mane.up.phong = 'Фонг настройки верхней гривы'
+gui.ppm2.editor.mane.down.type = 'Lower Mane Type'
 gui.ppm2.editor.mane.down.phong = 'Фонг настройки нижней гривы'
 gui.ppm2.editor.mane.newnotice = 'Следующие опции имеют эффект только на новой модели'
 
