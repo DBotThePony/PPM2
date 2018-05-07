@@ -235,6 +235,7 @@ gui.ppm2.editor.wings.separate = 'Trenne Flügel Farbe vom Körper'
 gui.ppm2.editor.wings.separate_phong = 'Trenne Flügel phong Einstellungen vom Körper'
 gui.ppm2.editor.wings.bat_color = 'Bat Flügel Farbe'
 gui.ppm2.editor.wings.bat_skin_color = 'Bat Flügel Haut Farbe'
+gui.ppm2.editor.wings.bat_skin_phong = 'Bat Flügel Haut Phong Parameter'
 
 gui.ppm2.editor.wings.normal = 'Normale Flügel'
 gui.ppm2.editor.wings.bat = 'Bat Flügel'

@@ -235,6 +235,7 @@ gui.ppm2.editor.wings.separate = 'Separate wings color from body'
 gui.ppm2.editor.wings.separate_phong = 'Separate wings phong settings from body'
 gui.ppm2.editor.wings.bat_color = 'Bat Wings color'
 gui.ppm2.editor.wings.bat_skin_color = 'Bat Wings skin color'
+gui.ppm2.editor.wings.bat_skin_phong = 'Bat wings skin phong parameters'
 
 gui.ppm2.editor.wings.normal = 'Normal wings'
 gui.ppm2.editor.wings.bat = 'Bat wings'

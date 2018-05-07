@@ -235,6 +235,7 @@ gui.ppm2.editor.wings.separate = 'Отделить цвет крыльев от 
 gui.ppm2.editor.wings.separate_phong = 'Отделить настройки фонга крыльев от тела'
 gui.ppm2.editor.wings.bat_color = 'Цвет крыльев летучей мыши'
 gui.ppm2.editor.wings.bat_skin_color = 'Цвет кожи крыльев летучей мыши'
+gui.ppm2.editor.wings.bat_skin_phong = 'Bat wings skin phong parameters'
 
 gui.ppm2.editor.wings.normal = 'Обычные крылья'
 gui.ppm2.editor.wings.bat = 'Крылья летучей мыши'
