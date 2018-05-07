@@ -75,7 +75,7 @@ gui.ppm2.editor.generic.restart.text = 'Вы должны перезапусти
 gui.ppm2.editor.generic.fullbright = 'Без затенения'
 gui.ppm2.editor.generic.wtf = 'Волею хаоса у вас отсутствует NetworkedPonyData который необходимо изменять.\nПопробуйте выполнить ppm2_reload в консоли и открыть редактор снова.'
 
-gui.ppm2.editor.io.random.title = 'Рандомизировать!'
+gui.ppm2.editor.io.random = 'Рандомизировать!'
 gui.ppm2.editor.io.newfile.title = 'Новый файл'
 gui.ppm2.editor.io.newfile.confirm = 'Вы действительно хотите создать новый файл?'
 gui.ppm2.editor.io.newfile.toptext = 'Сбросить'

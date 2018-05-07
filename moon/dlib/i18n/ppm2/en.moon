@@ -75,7 +75,7 @@ gui.ppm2.editor.generic.restart.text = 'You should restart editor for applying c
 gui.ppm2.editor.generic.fullbright = 'Fullbright'
 gui.ppm2.editor.generic.wtf = 'For some reason, your player has no NetworkedPonyData - Nothing to edit!\nTry ppm2_reload in your console and try to open editor again'
 
-gui.ppm2.editor.io.random.title = 'Randomize!'
+gui.ppm2.editor.io.random = 'Randomize!'
 gui.ppm2.editor.io.newfile.title = 'New File'
 gui.ppm2.editor.io.newfile.confirm = 'Really want to create a new file?'
 gui.ppm2.editor.io.newfile.toptext = 'Reset'
