@@ -182,8 +182,11 @@ gui.ppm2.editor.mouth.alt_fangs = 'Alternative Fangzähne'
 gui.ppm2.editor.mouth.claw = 'Klauenzähne'
 
 gui.ppm2.editor.mouth.teeth = 'Zahnfarbe'
+gui.ppm2.editor.mouth.teeth_phong = 'Zahn'
 gui.ppm2.editor.mouth.mouth = 'Mundfarbe'
+gui.ppm2.editor.mouth.mouth_phong = 'Mund'
 gui.ppm2.editor.mouth.tongue = 'Zungenfarbe'
+gui.ppm2.editor.mouth.tongue_phong = 'Zunge'
 
 gui.ppm2.editor.mane.type = 'Mähne Typ'
 gui.ppm2.editor.mane.phong = 'Trenne Mähne phong Einstellungen vom Körper'
@@ -365,6 +368,8 @@ gui.ppm2.editor.info.thanks = "Besonderer Dank geht an alle, die kritisiert,\nge
 
 info.ppm2.fly.pegasus = 'Du musst eine Pegasus oder ein Alicorn sein, um zu fliegen!'
 info.ppm2.fly.cannot = 'Du kannst nicht %s im Augenblick.'
+
+gui.ppm2.phong.parameters = ' Phong Parameter'
 
 gui.ppm2.emotes.sad = 'Traurig'
 gui.ppm2.emotes.wild = 'Wild'
