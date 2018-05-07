@@ -1214,7 +1214,7 @@ EditorPages = {
 		'func': (sheet) =>
 			@ScrollPanel()
 			@ComboBox('gui.ppm2.editor.mane.type', 'ManeTypeNew')
-			@ComboBox('Lower Mane type', 'ManeTypeLowerNew')
+			@ComboBox('gui.ppm2.editor.mane.down.type', 'ManeTypeLowerNew')
 			@ComboBox('gui.ppm2.editor.tail.type', 'TailTypeNew')
 
 			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
@@ -1295,7 +1295,7 @@ EditorPages = {
 			@ScrollPanel()
 			if ADVANCED_MODE\GetBool()
 				@Hr()
-				@CheckBox('Use separated settings for eyes', 'SeparateEyes')
+				@CheckBox('gui.ppm2.editor.eyes.separate', 'SeparateEyes')
 			eyes = {''}
 			eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
 			for publicName in *eyes
@@ -1464,8 +1464,8 @@ EditorPages = {
 			for i = 1, PPM2.MAX_TATTOOS
 				spoiler = @Spoiler('gui.ppm2.editor.tattoo.layer' .. i)
 				updatePanels = {}
-				@Button('gui.ppm2.editor.edit_keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
-				@ComboBox('gui.ppm2.editor.type', "TattooType#{i}", nil, spoiler)
+				@Button('gui.ppm2.editor.tattoo.edit_keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
+				@ComboBox('gui.ppm2.editor.tattoo.type', "TattooType#{i}", nil, spoiler)
 				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.rotate', "TattooRotate#{i}", 0, spoiler))
 				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.x', "TattooPosX#{i}", 2, spoiler))
 				table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.y', "TattooPosY#{i}", 2, spoiler))

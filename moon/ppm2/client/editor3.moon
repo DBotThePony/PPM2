@@ -1211,8 +1211,8 @@ EDIT_TREE = {
 							for i = 1, PPM2.MAX_TATTOOS
 								spoiler = @Spoiler('gui.ppm2.editor.tattoo.layer' .. i)
 								updatePanels = {}
-								@Button('gui.ppm2.editor.edit_keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
-								@ComboBox('gui.ppm2.editor.type', "TattooType#{i}", nil, spoiler)
+								@Button('gui.ppm2.editor.tattoo.edit_keyboard', (-> @GetFrame()\EditTattoo(i, updatePanels)), spoiler)
+								@ComboBox('gui.ppm2.editor.tattoo.type', "TattooType#{i}", nil, spoiler)
 								table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.rotate', "TattooRotate#{i}", 0, spoiler))
 								table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.x', "TattooPosX#{i}", 2, spoiler))
 								table.insert(updatePanels, @NumSlider('gui.ppm2.editor.tattoo.tweak.y', "TattooPosY#{i}", 2, spoiler))
