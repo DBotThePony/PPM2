@@ -318,7 +318,7 @@ gui.ppm2.editor.legs.height = 'Bein höhe'
 gui.ppm2.editor.legs.socks.simple = 'Socken (einfache Textur)'
 gui.ppm2.editor.legs.socks.model = 'Socken (als Modell)'
 gui.ppm2.editor.legs.socks.color = 'Socken Modell Farbe'
-gui.ppm2.editor.legs.socks.socks_phong = 'Socks phong parameters'
+gui.ppm2.editor.legs.socks.socks_phong = 'Socken Phong Parameter'
 gui.ppm2.editor.legs.socks.texture = 'Socken Textur'
 gui.ppm2.editor.legs.socks.url_texture = 'Socken URL textur'
 
