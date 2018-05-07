@@ -182,11 +182,8 @@ gui.ppm2.editor.mouth.alt_fangs = 'Alternative Fangs'
 gui.ppm2.editor.mouth.claw = 'Claw teeth'
 
 gui.ppm2.editor.mouth.teeth = 'Teeth color'
-gui.ppm2.editor.mouth.teeth_phong = 'Teeth'
 gui.ppm2.editor.mouth.mouth = 'Mouth color'
-gui.ppm2.editor.mouth.mouth_phong = 'Mouth'
 gui.ppm2.editor.mouth.tongue = 'Tongue color'
-gui.ppm2.editor.mouth.tongue_phong = 'Tongue'
 
 gui.ppm2.editor.mane.type = 'Mane Type'
 gui.ppm2.editor.mane.phong = 'Separate mane phong settings from body'
@@ -368,8 +365,6 @@ gui.ppm2.editor.info.thanks = "Special thanks to everypony who criticized,\nhelp
 
 info.ppm2.fly.pegasus = 'You need to be a Pegasus or an Alicorn to fly!'
 info.ppm2.fly.cannot = 'You can not %s right now.'
-
-gui.ppm2.phong.parameters = ' phong parameters'
 
 gui.ppm2.emotes.sad = 'Sad'
 gui.ppm2.emotes.wild = 'Wild'

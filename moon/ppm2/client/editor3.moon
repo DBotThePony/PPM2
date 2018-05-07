@@ -921,9 +921,9 @@ EDIT_TREE = {
 							@ColorBox('gui.ppm2.editor.mouth.teeth', 'TeethColor')
 							@ColorBox('gui.ppm2.editor.mouth.mouth', 'MouthColor')
 							@ColorBox('gui.ppm2.editor.mouth.tongue', 'TongueColor')
-							PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.teeth_phong')
-							PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.mouth_phong')
-							PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.tongue_phong')
+							PPM2.EditorPhongPanels(@, 'Teeth')
+							PPM2.EditorPhongPanels(@, 'Mouth')
+							PPM2.EditorPhongPanels(@, 'Tongue')
 					}
 				}
 

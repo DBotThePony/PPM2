@@ -182,11 +182,8 @@ gui.ppm2.editor.mouth.alt_fangs = 'Альтернативные клыки'
 gui.ppm2.editor.mouth.claw = 'Акульи зубы'
 
 gui.ppm2.editor.mouth.teeth = 'Цвет зубов'
-gui.ppm2.editor.mouth.teeth_phong = 'Teeth'
 gui.ppm2.editor.mouth.mouth = 'Цвет полости рта'
-gui.ppm2.editor.mouth.mouth_phong = 'Mouth'
 gui.ppm2.editor.mouth.tongue = 'Цвет языка'
-gui.ppm2.editor.mouth.tongue_phong = 'Tongue'
 
 gui.ppm2.editor.mane.type = 'Тип гривы'
 gui.ppm2.editor.mane.phong = 'Отделить фонг настройки гривы от тела'
@@ -368,8 +365,6 @@ gui.ppm2.editor.info.thanks = "Спасибочки всем участвующ�
 
 info.ppm2.fly.pegasus = 'Вы должны быть пегасом или аликорном что бы летать!'
 info.ppm2.fly.cannot = 'Вы сейчас не можете %s.'
-
-gui.ppm2.phong.parameters = ' phong parameters'
 
 gui.ppm2.emotes.sad = 'Грустный'
 gui.ppm2.emotes.wild = 'Дикий'
