@@ -166,6 +166,7 @@ gui.ppm2.editor.cutiemark.input = 'Schönheitsfleck URL bild Eingabefeld\nSollte
 
 gui.ppm2.editor.face.eyelashes = 'Wimpern'
 gui.ppm2.editor.face.eyelashes_color = 'Wimpern Farbe'
+gui.ppm2.editor.face.eyelashes_phong = 'Wimpern Phong Parameter'
 gui.ppm2.editor.face.eyebrows_color = 'Augenbrauen Farbe'
 gui.ppm2.editor.face.new_muzzle = 'Neue Schnauze für das männliche Modell nutzen'
 
@@ -182,11 +183,11 @@ gui.ppm2.editor.mouth.alt_fangs = 'Alternative Fangzähne'
 gui.ppm2.editor.mouth.claw = 'Klauenzähne'
 
 gui.ppm2.editor.mouth.teeth = 'Zahnfarbe'
-gui.ppm2.editor.mouth.teeth_phong = 'Zahn Phong Parametern'
+gui.ppm2.editor.mouth.teeth_phong = 'Zahn Phong Parameter'
 gui.ppm2.editor.mouth.mouth = 'Mundfarbe'
-gui.ppm2.editor.mouth.mouth_phong = 'Mund Phong Parametern'
+gui.ppm2.editor.mouth.mouth_phong = 'Mund Phong Parameter'
 gui.ppm2.editor.mouth.tongue = 'Zungenfarbe'
-gui.ppm2.editor.mouth.tongue_phong = 'Zunge Phong Parametern'
+gui.ppm2.editor.mouth.tongue_phong = 'Zunge Phong Parameter'
 
 gui.ppm2.editor.mane.type = 'Mähne Typ'
 gui.ppm2.editor.mane.phong = 'Trenne Mähne phong Einstellungen vom Körper'

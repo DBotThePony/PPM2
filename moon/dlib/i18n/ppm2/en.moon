@@ -166,6 +166,7 @@ gui.ppm2.editor.cutiemark.input = 'Cutiemark URL image input field\nShould be PN
 
 gui.ppm2.editor.face.eyelashes = 'Eyelashes'
 gui.ppm2.editor.face.eyelashes_color = 'Eyelashes Color'
+gui.ppm2.editor.face.eyelashes_phong = 'Eyelashes phong parameters'
 gui.ppm2.editor.face.eyebrows_color = 'Eyebrows Color'
 gui.ppm2.editor.face.new_muzzle = 'Use new muzzle for male model'
 

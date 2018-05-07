@@ -1266,7 +1266,7 @@ EditorPages = {
 				@NumSlider('gui.ppm2.editor.face.eyebrows_glow_strength', 'EyebrowsGlowStrength', 2)
 
 				@CheckBox('gui.ppm2.editor.face.eyelashes_separate_phong', 'SeparateEyelashesPhong')
-				PPM2.EditorPhongPanels(@, 'Eyelashes')
+				PPM2.EditorPhongPanels(@, 'Eyelashes', 'gui.ppm2.editor.face.eyelashes_phong')
 
 			if IS_USING_NEW(@IsNewEditor())
 				@CheckBox('gui.ppm2.editor.ears.bat', 'BatPonyEars')

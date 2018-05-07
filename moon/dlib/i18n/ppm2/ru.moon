@@ -166,6 +166,7 @@ gui.ppm2.editor.cutiemark.input = 'URL кьютимарка\nДолжна быт
 
 gui.ppm2.editor.face.eyelashes = 'Ресницы'
 gui.ppm2.editor.face.eyelashes_color = 'Цвет ресниц'
+gui.ppm2.editor.face.eyelashes_phong = 'Eyelashes phong parameters'
 gui.ppm2.editor.face.eyebrows_color = 'Цвет бровей'
 gui.ppm2.editor.face.new_muzzle = 'Использовать новую мордочку'
 
