@@ -1121,7 +1121,7 @@ EDIT_TREE = {
 							@Hr()
 							@ColorBox('gui.ppm2.editor.wings.bat_color', 'BatWingColor')
 							@ColorBox('gui.ppm2.editor.wings.bat_skin_color', 'BatWingSkinColor')
-							PPM2.EditorPhongPanels(@, 'BatWingsSkin', 'Bat wings skin phong parameters') if ADVANCED_MODE\GetBool()
+							PPM2.EditorPhongPanels(@, 'BatWingsSkin', 'gui.ppm2.editor.wings.bat_skin_phong') if ADVANCED_MODE\GetBool()
 
 						'gui.ppm2.editor.tabs.left': =>
 							@NumSlider('gui.ppm2.editor.wings.left.size', 'LWingSize', 2)
