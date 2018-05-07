@@ -369,8 +369,6 @@ gui.ppm2.editor.info.thanks = "Besonderer Dank geht an alle, die kritisiert,\nge
 info.ppm2.fly.pegasus = 'Du musst eine Pegasus oder ein Alicorn sein, um zu fliegen!'
 info.ppm2.fly.cannot = 'Du kannst nicht %s im Augenblick.'
 
-gui.ppm2.phong.parameters = ' Phong Parameter'
-
 gui.ppm2.emotes.sad = 'Traurig'
 gui.ppm2.emotes.wild = 'Wild'
 gui.ppm2.emotes.grin = 'Grinsen'

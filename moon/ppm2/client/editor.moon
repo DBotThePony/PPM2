@@ -1031,7 +1031,7 @@ PANEL_SETTINGS_BASE = {
 
 vgui.Register('PPM2SettingsBase', PANEL_SETTINGS_BASE, 'EditablePanel')
 
-PPM2.EditorPhongPanels = (ttype = 'Body', spoilerName = ttype .. ' gui.ppm2.phong.parameters') =>
+PPM2.EditorPhongPanels = (ttype = 'Body', spoilerName = ttype .. ' phong parameters') =>
 	spoiler = @Spoiler(spoilerName)
 	@URLLabel('gui.ppm2.editor.phong.info', 'https://developer.valvesoftware.com/wiki/Phong_materials', spoiler)
 	@Label('gui.ppm2.editor.phong.exponent', spoiler)
@@ -1283,9 +1283,9 @@ EditorPages = {
 					@ColorBox('gui.ppm2.editor.mouth.teeth', 'TeethColor')
 					@ColorBox('gui.ppm2.editor.mouth.mouth', 'MouthColor')
 					@ColorBox('gui.ppm2.editor.mouth.tongue', 'TongueColor')
-					PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.teeth_phong')
-					PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.mouth_phong')
-					PPM2.EditorPhongPanels(@, 'gui.ppm2.editor.mouth.tongue_phong')
+					PPM2.EditorPhongPanels(@, 'Teeth', 'gui.ppm2.editor.mouth.teeth_phong')
+					PPM2.EditorPhongPanels(@, 'Mouth', 'gui.ppm2.editor.mouth.mouth_phong')
+					PPM2.EditorPhongPanels(@, 'Tongue', 'gui.ppm2.editor.mouth.tongue_phong')
 	}
 
 	{
