@@ -71,7 +71,7 @@ gui.ppm2.editor.generic.url_field = 'URL Feld'
 gui.ppm2.editor.generic.spoiler = 'Geheimnisvoller Spoiler'
 
 gui.ppm2.editor.generic.restart.needed = 'Neustart des Editors erforderlich'
-gui.ppm2.editor.generic.restart.text = 'Sie sollten den Editor neu starten, um die Änderung zu übernehmen.\nJetzt neu starten?\nNicht gespeicherte Daten gehen verloren!'
+gui.ppm2.editor.generic.restart.text = 'Du solltest den Editor neu starten, um die Änderung zu übernehmen.\nJetzt neu starten?\nNicht gespeicherte Daten gehen verloren!'
 gui.ppm2.editor.generic.fullbright = 'Volle Helligkeit'
 gui.ppm2.editor.generic.wtf = 'Aus irgendeinem Grund hat Dein Player kein NetworkedPonyData. - Nichts zu bearbeiten!\nVersuche ppm2_reload in Deine Konsole einzugeben und versuche es erneut, den Editor zu öffnen.'
 
@@ -113,7 +113,7 @@ gui.ppm2.editor.misc.gender = 'Geschlecht'
 gui.ppm2.editor.misc.wings = 'Flügel Typ'
 gui.ppm2.editor.misc.flexes = 'Flex steuerung'
 gui.ppm2.editor.misc.no_flexes2 = 'Kein Flex beim neuen Modell'
-gui.ppm2.editor.misc.no_flexes_desc = 'Du kannst jeden Flex Zustandsregler separat deaktivieren.\nSo können diese Flexe mit Addons von Drittanbietern (wie PAC3) modifiziert werden.'
+gui.ppm2.editor.misc.no_flexes_desc = 'Du kannst jeden Flex Zustandsregler separat deaktivieren.\nSo können diese Flexe mit Addons wie PAC3 modifiziert werden.'
 
 gui.ppm2.editor.misc.hide_pac3 = 'Entitys ausblenden wenn PAC3 Entity verwendet wird'
 gui.ppm2.editor.misc.hide_mane = 'Mähne ausblenden wenn PAC3 Entity verwendet wird'
@@ -172,8 +172,8 @@ gui.ppm2.editor.face.new_muzzle = 'Neue Schnauze für das männliche Modell nutz
 gui.ppm2.editor.face.nose = 'Nasenfarbe'
 gui.ppm2.editor.face.lips = 'Lippen Farbe'
 gui.ppm2.editor.face.eyelashes_separate_phong = 'Separate Wimpern Phong'
-gui.ppm2.editor.face.eyebrows_glow = 'Leuchtende Augenbrauen'
-gui.ppm2.editor.face.eyebrows_glow_strength = 'Augenbrauen leuchten Stärke'
+gui.ppm2.editor.face.eyebrows_glow = 'Glühende Augenbrauen'
+gui.ppm2.editor.face.eyebrows_glow_strength = 'Augenbrauen Glühstärke'
 gui.ppm2.editor.face.inherit.lips = 'Erbe Lippen Farbe vom Körper'
 gui.ppm2.editor.face.inherit.nose = 'Erbe Nasen Farbe vom Körper'
 
