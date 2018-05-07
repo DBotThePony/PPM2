@@ -92,7 +92,7 @@ gui.ppm2.editor.io.warn.text = "Derzeit hast du deine Änderungen nicht angegebe
 gui.ppm2.editor.io.warn.header = 'Nicht gespeicherte Änderungen!'
 gui.ppm2.editor.io.save.button = 'Speichern'
 gui.ppm2.editor.io.save.text = 'Dateiname ohne ppm2/ und .dat eingeben\nTipp: Um als Autoload zu speichern, schreibe "_current" (ohne ") ein.'
-gui.ppm2.editor.io.wear = 'Änderungen übernehmen (Anziehen)'
+gui.ppm2.editor.io.wear = 'übernehmen (Anziehen)'
 
 gui.ppm2.editor.seq.standing = 'Stehen'
 gui.ppm2.editor.seq.move = 'Bewegen'
@@ -171,7 +171,7 @@ gui.ppm2.editor.face.eyebrows_color = 'Augenbrauen Farbe'
 gui.ppm2.editor.face.new_muzzle = 'Neue Schnauze für das männliche Modell nutzen'
 
 gui.ppm2.editor.face.nose = 'Nasenfarbe'
-gui.ppm2.editor.face.lips = 'Lippen Farbe'
+gui.ppm2.editor.face.lips = 'Lippenfarbe'
 gui.ppm2.editor.face.eyelashes_separate_phong = 'Separate Wimpern Phong'
 gui.ppm2.editor.face.eyebrows_glow = 'leuchtende Augenbrauen'
 gui.ppm2.editor.face.eyebrows_glow_strength = 'Augenbrauen Leuchtstärke'
@@ -236,12 +236,12 @@ for i = 1, 3
 	gui.ppm2.editor.horn.detail['color' .. i] = "URL Detail Farbe #{i}"
 
 gui.ppm2.editor.wings.separate_color = 'Trenne Flügel Farbe vom Körper'
-gui.ppm2.editor.wings.color = 'Flügel Farbe'
+gui.ppm2.editor.wings.color = 'Flügelfarbe'
 gui.ppm2.editor.wings.wings_phong = 'Flügel Phong Parameter'
-gui.ppm2.editor.wings.separate = 'Trenne Flügel Farbe vom Körper'
+gui.ppm2.editor.wings.separate = 'Trenne Flügelfarbe vom Körper'
 gui.ppm2.editor.wings.separate_phong = 'Trenne Flügel phong Einstellungen vom Körper'
-gui.ppm2.editor.wings.bat_color = 'Bat Flügel Farbe'
-gui.ppm2.editor.wings.bat_skin_color = 'Bat Flügel Haut Farbe'
+gui.ppm2.editor.wings.bat_color = 'Bat Flügelfarbe'
+gui.ppm2.editor.wings.bat_skin_color = 'Bat Flügel Hautfarbe'
 gui.ppm2.editor.wings.bat_skin_phong = 'Bat Flügel Haut Phong Parameter'
 
 gui.ppm2.editor.wings.normal = 'Normale Flügel'
@@ -269,7 +269,7 @@ for i = 1, 3
 gui.ppm2.editor.neck.height = 'Halshöhe'
 
 gui.ppm2.editor.body.suit = 'Körperanzug'
-gui.ppm2.editor.body.color = 'Korper Farbe'
+gui.ppm2.editor.body.color = 'Körperfarbe'
 gui.ppm2.editor.body.body_phong = 'Körper Phong Parameter'
 gui.ppm2.editor.body.spine_length = 'Rückenlänge'
 gui.ppm2.editor.body.url_desc = 'Körper Detail URL Bild Eingabefeld\nSollte PNG oder JPEG sein (funktioniert wie bei\nPAC3 URL textur)'
@@ -305,7 +305,7 @@ gui.ppm2.editor.tail.tail_phong = 'Schweif Phong Parameter'
 gui.ppm2.editor.tail.separate = 'Trenne Schweif phong Einstellungen vom Körper'
 
 for i = 1, 2
-	gui.ppm2.editor.tail['color' .. i] = 'Schweif Farbe ' .. i
+	gui.ppm2.editor.tail['color' .. i] = 'Schweiffarbe ' .. i
 
 for i = 1, 6
 	gui.ppm2.editor.tail['detail' .. i] = "Schweif Detail Farbe #{i}"
@@ -328,7 +328,7 @@ for i = 1, 6
 gui.ppm2.editor.legs.newsocks.model = 'Socken (als neues Modell)'
 
 for i = 1, 3
-	gui.ppm2.editor.legs.newsocks['color' .. i] = 'Neue Socken Farbe ' .. i
+	gui.ppm2.editor.legs.newsocks['color' .. i] = 'Neue Sockenfarbe ' .. i
 
 gui.ppm2.editor.legs.newsocks.url = 'Neue Socken URL textur'
 
