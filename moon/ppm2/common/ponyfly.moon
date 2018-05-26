@@ -292,8 +292,11 @@ else
 	lastDouble = 0
 	lastMessage = 0
 	lastMessage2 = 0
+	FLIGHT_BIND = CreateConVar('ppm2_flight_djump', '1', {FCVAR_ARCHIVE}, 'Double press of Jump activates flight')
+
 	hook.Add 'PlayerBindPress', 'PPM2.Ponyfly', (bind = '', pressed = false) =>
 		return if not ALLOW_FLIGHT\GetBool()
+		return if not FLIGHT_BIND\GetBool()
 		return if not pressed
 		return if bind ~= '+jump' and bind ~= 'jump'
 		if lastDouble > RealTimeL()

@@ -68,15 +68,15 @@ MODEL_BOX_PANEL = {
 	PONY_VEC_Z: 64 * .7
 
 	SEQUENCES: {
-		'gui.ppm2.editor.seq.standing':    	22
-		'gui.ppm2.editor.seq.move':      	316
-		'gui.ppm2.editor.seq.walk':     	232
-		'gui.ppm2.editor.seq.sit':         	202
-		'gui.ppm2.editor.seq.swim':        	370
-		'gui.ppm2.editor.seq.run':         	328
-		'gui.ppm2.editor.seq.duckwalk': 	286
-		'gui.ppm2.editor.seq.duck':      	76
-		'gui.ppm2.editor.seq.jump':        	160
+		'gui.ppm2.editor.seq.standing':     22
+		'gui.ppm2.editor.seq.move':         316
+		'gui.ppm2.editor.seq.walk':         232
+		'gui.ppm2.editor.seq.sit':          202
+		'gui.ppm2.editor.seq.swim':         370
+		'gui.ppm2.editor.seq.run':          328
+		'gui.ppm2.editor.seq.duckwalk':     286
+		'gui.ppm2.editor.seq.duck':         76
+		'gui.ppm2.editor.seq.jump':         160
 	}
 
 	Init: =>
@@ -1983,5 +1983,6 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
 	@CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
 	@CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
 	@CheckBox 'Enable real time eyes reflections', 'ppm2_cl_reflections'
-	@CheckBox 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
-	@CheckBox 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
+	@NumSlider 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
+	@NumSlider 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
+	@CheckBox 'Double jump activate flight', 'ppm2_flight_djump'
