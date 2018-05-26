@@ -63,6 +63,7 @@ net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
 	ply\SetNWBool('PPM2.InEditor', net.ReadBool())
 
 ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+RAGDOLL_COLLISIONS = CreateConVar('ppm2_sv_ragdolls_collisions', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable ragdolls collisions')
 
 createPlayerRagdoll = =>
 	@__ppm2_ragdoll\Remove() if IsValid(@__ppm2_ragdoll)
@@ -73,7 +74,8 @@ createPlayerRagdoll = =>
 		\SetModel(@GetModel())
 		\SetPos(@GetPos())
 		\SetAngles(@EyeAngles())
-		\SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		\SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS) if RAGDOLL_COLLISIONS\GetBool()
+		\SetCollisionGroup(COLLISION_GROUP_WORLD) if not RAGDOLL_COLLISIONS\GetBool()
 		\Spawn()
 		\Activate()
 		hook.Run 'PlayerSpawnedRagdoll', @, @GetModel(), @__ppm2_ragdoll
