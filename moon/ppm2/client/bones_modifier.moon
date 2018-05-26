@@ -50,51 +50,51 @@ class BonesSequence extends PPM2.SequenceBase
 
 PPM2.BonesSequence = BonesSequence
 
--- 0	LrigPelvis
--- 1	Lrig_LEG_BL_Femur
--- 2	Lrig_LEG_BL_Tibia
--- 3	Lrig_LEG_BL_LargeCannon
--- 4	Lrig_LEG_BL_PhalanxPrima
--- 5	Lrig_LEG_BL_RearHoof
--- 6	Lrig_LEG_BR_Femur
--- 7	Lrig_LEG_BR_Tibia
--- 8	Lrig_LEG_BR_LargeCannon
--- 9	Lrig_LEG_BR_PhalanxPrima
--- 10	Lrig_LEG_BR_RearHoof
--- 11	LrigSpine1
--- 12	LrigSpine2
--- 13	LrigRibcage
--- 14	Lrig_LEG_FL_Scapula
--- 15	Lrig_LEG_FL_Humerus
--- 16	Lrig_LEG_FL_Radius
--- 17	Lrig_LEG_FL_Metacarpus
--- 18	Lrig_LEG_FL_PhalangesManus
--- 19	Lrig_LEG_FL_FrontHoof
--- 20	Lrig_LEG_FR_Scapula
--- 21	Lrig_LEG_FR_Humerus
--- 22	Lrig_LEG_FR_Radius
--- 23	Lrig_LEG_FR_Metacarpus
--- 24	Lrig_LEG_FR_PhalangesManus
--- 25	Lrig_LEG_FR_FrontHoof
--- 26	LrigNeck1
--- 27	LrigNeck2
--- 28	LrigNeck3
--- 29	LrigScull
--- 30	Jaw
--- 31	Ear_L
--- 32	Ear_R
--- 33	Mane02
--- 34	Mane03
--- 35	Mane03_tip
--- 36	Mane04
--- 37	Mane05
--- 38	Mane06
--- 39	Mane07
--- 40	Mane01
--- 41	Lrigweaponbone
--- 42	Tail01
--- 43	Tail02
--- 44	Tail03
+-- 0    LrigPelvis
+-- 1    Lrig_LEG_BL_Femur
+-- 2    Lrig_LEG_BL_Tibia
+-- 3    Lrig_LEG_BL_LargeCannon
+-- 4    Lrig_LEG_BL_PhalanxPrima
+-- 5    Lrig_LEG_BL_RearHoof
+-- 6    Lrig_LEG_BR_Femur
+-- 7    Lrig_LEG_BR_Tibia
+-- 8    Lrig_LEG_BR_LargeCannon
+-- 9    Lrig_LEG_BR_PhalanxPrima
+-- 10   Lrig_LEG_BR_RearHoof
+-- 11   LrigSpine1
+-- 12   LrigSpine2
+-- 13   LrigRibcage
+-- 14   Lrig_LEG_FL_Scapula
+-- 15   Lrig_LEG_FL_Humerus
+-- 16   Lrig_LEG_FL_Radius
+-- 17   Lrig_LEG_FL_Metacarpus
+-- 18   Lrig_LEG_FL_PhalangesManus
+-- 19   Lrig_LEG_FL_FrontHoof
+-- 20   Lrig_LEG_FR_Scapula
+-- 21   Lrig_LEG_FR_Humerus
+-- 22   Lrig_LEG_FR_Radius
+-- 23   Lrig_LEG_FR_Metacarpus
+-- 24   Lrig_LEG_FR_PhalangesManus
+-- 25   Lrig_LEG_FR_FrontHoof
+-- 26   LrigNeck1
+-- 27   LrigNeck2
+-- 28   LrigNeck3
+-- 29   LrigScull
+-- 30   Jaw
+-- 31   Ear_L
+-- 32   Ear_R
+-- 33   Mane02
+-- 34   Mane03
+-- 35   Mane03_tip
+-- 36   Mane04
+-- 37   Mane05
+-- 38   Mane06
+-- 39   Mane07
+-- 40   Mane01
+-- 41   Lrigweaponbone
+-- 42   Tail01
+-- 43   Tail02
+-- 44   Tail03
 
 RESET_BONE_POS = Vector(0, 0, 0)
 RESET_BONE_ANGLES = Angle(0, 0, 0)
@@ -245,7 +245,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 							lent.__ppmBonesModifiers = nil
 				return
 
-			if obj.ent\IsPony() and not obj.ent\IsPlayer()
+			if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
 				if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
 					obj.ent\ResetBoneManipCache()
 					resetBones(obj.ent)
