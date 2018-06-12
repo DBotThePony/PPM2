@@ -15,6 +15,9 @@
 -- limitations under the License.
 --
 
+ENABLE_EMOTES_IN_CHAT = CreateConVar('ppm2_cl_emotes_chat', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Show emotes list while chatbox is open')
+ENABLE_EMOTES_IN_CONTEXT = CreateConVar('ppm2_cl_emotes_context', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Show emotes list while context menu is open')
+
 net.Receive 'PPM2.DamageAnimation', ->
 	ent = net.ReadEntity()
 	return if not IsValid(ent) or not ent\GetPonyData()
@@ -182,6 +185,7 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 
 hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
 	return if not IsValid(@)
+	return if not ENABLE_EMOTES_IN_CONTEXT\GetBool()
 	PPM2.EmotesPanelContext\Remove() if IsValid(PPM2.EmotesPanelContext)
 	PPM2.EmotesPanelContext = PPM2.CreateEmotesPanel(@)
 	PPM2.EmotesPanelContext\SetPos(ScrW() / 2 - 100, ScrH() - 300)
@@ -197,7 +201,7 @@ hook.Add 'ContextMenuCreated', 'PPM2.Emotes', =>
 		PPM2.EmotesPanelContext\SetMouseInputEnabled(status)
 
 hook.Add 'StartChat', 'PPM2.Emotes', ->
-	if not IsValid(PPM2.EmotesPanel)
+	if not IsValid(PPM2.EmotesPanel) and ENABLE_EMOTES_IN_CHAT\GetBool()
 		PPM2.EmotesPanel = PPM2.CreateEmotesPanel()
 		PPM2.EmotesPanel\SetPos(ScrW() - 500, ScrH() - 300)
 
