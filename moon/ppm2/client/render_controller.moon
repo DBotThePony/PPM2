@@ -21,8 +21,8 @@ PPM2.ALTERNATIVE_RENDER = CreateConVar('ppm2_alternative_render', '0', {FCVAR_AR
 ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
-LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
-ENABLE_STARE = CreateConVar('ppm2_render_stare', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Make eyes follow players and move when idling')
+LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
+ENABLE_STARE = CreateConVar('ppm2_render_stare', '1', {FCVAR_ARCHIVE}, 'Make eyes follow players and move when idling')
 
 class PonyRenderController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}

@@ -15,8 +15,8 @@
 -- limitations under the License.
 --
 
-ENABLE_EMOTES_IN_CHAT = CreateConVar('ppm2_cl_emotes_chat', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Show emotes list while chatbox is open')
-ENABLE_EMOTES_IN_CONTEXT = CreateConVar('ppm2_cl_emotes_context', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Show emotes list while context menu is open')
+ENABLE_EMOTES_IN_CHAT = CreateConVar('ppm2_cl_emotes_chat', '1', {FCVAR_ARCHIVE}, 'Show emotes list while chatbox is open')
+ENABLE_EMOTES_IN_CONTEXT = CreateConVar('ppm2_cl_emotes_context', '1', {FCVAR_ARCHIVE}, 'Show emotes list while context menu is open')
 
 net.Receive 'PPM2.DamageAnimation', ->
 	ent = net.ReadEntity()
