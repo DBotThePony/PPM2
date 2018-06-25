@@ -227,6 +227,7 @@ MODEL_BOX_PANEL = {
 
 						for menuName, menuPopulate in pairs menu.menus
 							with menuPanel = vgui.Create('PPM2SettingsBase', settingsPanel)
+								@saves = settingsPanel if menu.id == 'saves'
 								table.insert(@updatePanels, menuPanel)
 								.frame = @frame
 								with vgui.Create('DLabel', menuPanel)
@@ -236,6 +237,8 @@ MODEL_BOX_PANEL = {
 									\SizeToContents()
 								settingsPanel\AddSheet(menuName, menuPanel)
 								\SetTargetData(@controllerData)
+								@saves = menuPanel if menuName == 'gui.ppm2.editor.tabs.files'
+								@savesOld = menuPanel if menuName == 'gui.ppm2.editor.tabs.old_files'
 								\Dock(FILL)
 								.Populate = menuPopulate
 								targetPanel = menuPanel if menu.selectmenu == menuName
@@ -247,6 +250,7 @@ MODEL_BOX_PANEL = {
 				else
 					with settingsPanel = vgui.Create('PPM2SettingsBase', frame)
 						@menuPanelsCache[menu.id] = settingsPanel
+						@saves = settingsPanel if menu.id == 'saves'
 						.frame = @frame
 						table.insert(@updatePanels, settingsPanel)
 						with vgui.Create('DLabel', settingsPanel)
@@ -1471,6 +1475,8 @@ ppm2_editor3 = ->
 
 	@SetTitle('gui.ppm2.editor.generic.title_file', copy\GetFilename() or '%ERRNAME%')
 	PPM2.EditorCreateTopButtons(@, true, true)
+	@saves = @modelPanel.saves
+	@savesOld = @modelPanel.savesOld
 
 	@DoUpdate = -> @modelPanel\DoUpdate()
 	@OnClose = ->

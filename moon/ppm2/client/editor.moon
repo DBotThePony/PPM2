@@ -1620,7 +1620,8 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 			@unsavedChanges = false
 			@model.unsavedChanges = false if IsValid(@model)
 			@SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
-			@panels.saves.rebuildFileList() if @panels.saves and @panels.saves.rebuildFileList
+			@panels.saves.rebuildFileList() if @panels and @panels.saves and @panels.saves.rebuildFileList
+			@saves.rebuildFileList() if @saves and @saves.rebuildFileList
 			callback(txt)
 		Derma_StringRequest('gui.ppm2.editor.io.save.button', 'gui.ppm2.editor.io.save.text', @data\GetFilename(), confirm)
 
