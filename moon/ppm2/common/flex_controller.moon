@@ -15,47 +15,47 @@
 -- limitations under the License.
 --
 --
--- 0	eyes_updown
--- 1	eyes_rightleft
--- 2	JawOpen
--- 3	JawClose
--- 4	Smirk
--- 5	Frown
--- 6	Stretch
--- 7	Pucker
--- 8	Grin
--- 9	CatFace
--- 10	Mouth_O
--- 11	Mouth_O2
--- 12	Mouth_Full
--- 13	Tongue_Out
--- 14	Tongue_Up
--- 15	Tongue_Down
--- 16	NoEyelashes
--- 17	Eyes_Blink
--- 18	Left_Blink
--- 19	Right_Blink
--- 20	Scrunch
--- 21	FatButt
--- 22	Stomach_Out
--- 23	Stomach_In
--- 24	Throat_Bulge
--- 25	Male
--- 26	Hoof_Fluffers
--- 27	o3o
--- 28	Ear_Fluffers
--- 29	Fangs
--- 30	Claw_Teeth
--- 31	Fang_Test
--- 32	angry_eyes
--- 33	sad_eyes
--- 34	Eyes_Blink_Lower
--- 35	Male_2
--- 36	Buff_Body
--- 37	Manliest_Chin
--- 38	Lowerlid_Raise
--- 39	Happy_Eyes
--- 40	Duck
+-- 0    eyes_updown
+-- 1    eyes_rightleft
+-- 2    JawOpen
+-- 3    JawClose
+-- 4    Smirk
+-- 5    Frown
+-- 6    Stretch
+-- 7    Pucker
+-- 8    Grin
+-- 9    CatFace
+-- 10   Mouth_O
+-- 11   Mouth_O2
+-- 12   Mouth_Full
+-- 13   Tongue_Out
+-- 14   Tongue_Up
+-- 15   Tongue_Down
+-- 16   NoEyelashes
+-- 17   Eyes_Blink
+-- 18   Left_Blink
+-- 19   Right_Blink
+-- 20   Scrunch
+-- 21   FatButt
+-- 22   Stomach_Out
+-- 23   Stomach_In
+-- 24   Throat_Bulge
+-- 25   Male
+-- 26   Hoof_Fluffers
+-- 27   o3o
+-- 28   Ear_Fluffers
+-- 29   Fangs
+-- 30   Claw_Teeth
+-- 31   Fang_Test
+-- 32   angry_eyes
+-- 33   sad_eyes
+-- 34   Eyes_Blink_Lower
+-- 35   Male_2
+-- 36   Buff_Body
+-- 37   Manliest_Chin
+-- 38   Lowerlid_Raise
+-- 39   Happy_Eyes
+-- 40   Duck
 
 DISABLE_FLEXES = CreateConVar('ppm2_disable_flexes', '0', {FCVAR_ARCHIVE}, 'Disable pony flexes controllers. Saves some FPS.')
 
@@ -274,8 +274,8 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetTime(math.random(15, 45) / 10)
 				@lastStrengthUpdate = @lastStrengthUpdate or 0
-				if @lastStrengthUpdate < RealTimeL()
-					@lastStrengthUpdate = RealTimeL() + 2
+				if @lastStrengthUpdate < CurTimeL()
+					@lastStrengthUpdate = CurTimeL() + 2
 					@frownStrength = math.random(40, 100) / 100
 					@grinStrength = math.random(15, 40) / 100
 					@angryStrength = math.random(30, 80) / 100
@@ -295,8 +295,8 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetTime(math.random(15, 45) / 10)
 				@lastStrengthUpdate = @lastStrengthUpdate or 0
-				if @lastStrengthUpdate < RealTimeL()
-					@lastStrengthUpdate = RealTimeL() + 2
+				if @lastStrengthUpdate < CurTimeL()
+					@lastStrengthUpdate = CurTimeL() + 2
 					@frownStrength = math.random(40, 100) / 100
 					@grinStrength = math.random(15, 40) / 100
 					@angryStrength = math.random(30, 80) / 100
@@ -341,7 +341,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'reset': =>
 				@SetModifierWeight(1, 0.9)
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(2, 0.75 + math.sin(RealTimeL() * 7) * 0.25)
+				@SetModifierWeight(2, 0.75 + math.sin(CurTimeL() * 7) * 0.25)
 		}
 
 		{
@@ -351,7 +351,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.15 + math.sin(RealTimeL() * 10) * 0.1)
+				@SetModifierWeight(1, 0.15 + math.sin(CurTimeL() * 10) * 0.1)
 		}
 
 		{
@@ -361,7 +361,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.5 + math.sin(RealTimeL() * 4) * 0.5)
+				@SetModifierWeight(1, 0.5 + math.sin(CurTimeL() * 4) * 0.5)
 		}
 
 		{
@@ -371,7 +371,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Tongue_Out'}
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(1, 0.5 + math.sin(RealTimeL() * 8) * 0.5)
+				@SetModifierWeight(1, 0.5 + math.sin(CurTimeL() * 8) * 0.5)
 		}
 
 		{
@@ -396,7 +396,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@SetModifierWeight(1, math.Rand(0.28, 0.34))
 				@SetModifierWeight(3, math.Rand(0.45, 0.50))
 			'func': (delta, timeOfAnim) =>
-				@SetModifierWeight(2, 0.2 + math.sin(RealTimeL() * 16) * 0.07)
+				@SetModifierWeight(2, 0.2 + math.sin(CurTimeL() * 16) * 0.07)
 		}
 
 		{
@@ -418,7 +418,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
 				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
-				value = math.abs(math.sin(RealTimeL() * .5) * .15)
+				value = math.abs(math.sin(CurTimeL() * .5) * .15)
 				@SetModifierWeight(1, value)
 				@SetModifierWeight(2, value)
 		}
@@ -481,7 +481,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				JawOpenState = @GetFlexState(6)
 
 				if strength > .75
-					JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(RealTimeL() * strength * 3) * .1)
+					JawOpenState\SetModifierWeight(JawOpen, strength * .2 + math.sin(CurTimeL() * strength * 3) * .1)
 				else
 					JawOpenState\SetModifierWeight(JawOpen, 0)
 
@@ -500,7 +500,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'func': (delta, timeOfAnim) =>
 				Grin = @GetModifierID(1)
 				GrinState = @GetFlexState(1)
-				strength = .5 + math.sin(RealTimeL() * 2) * .25
+				strength = .5 + math.sin(CurTimeL() * 2) * .25
 				GrinState\SetModifierWeight(Grin, strength)
 		}
 
@@ -602,7 +602,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@SetModifierWeight(5, math.random(10, 15) / 100)
 				@SetModifierWeight(6, math.random(80, 100) / 100)
 			'func': (delta, timeOfAnim) =>
-				val = math.sin(RealTimeL() * 8) * .6
+				val = math.sin(CurTimeL() * 8) * .6
 				if val > 0
 					@SetModifierWeight(7, val)
 					@SetModifierWeight(8, 0)

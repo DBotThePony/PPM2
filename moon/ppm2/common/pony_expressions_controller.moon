@@ -58,9 +58,9 @@ class ExpressionSequence extends PPM2.SequenceBase
 					@flexStates = [{flexController\GetFlexState(flex), flexController\GetFlexState(flex)\GetModifierID(@name .. '_emote')} for flex in *@flexNames]
 
 		@knownBonesSequences = {}
-		if @bonesSequence
-			if bones = @ent\PPMBonesModifier()
-				@bonesController = bones
+		if bones = @ent\PPMBonesModifier()
+			@bonesController = bones
+			if @bonesSequence
 				if type(@bonesSequence) == 'table'
 					for seq in *@bonesSequence
 						bones\StartSequence(seq, @time)\SetInfinite(@GetInfinite())
@@ -72,7 +72,7 @@ class ExpressionSequence extends PPM2.SequenceBase
 				@bonesModifierID = bones\GetModifierID(@name .. '_emote')
 
 	PlayBonesSequence: (name, time = @time) =>
-		return if not @bonesController
+		return PPM2.Message('Bones controller not found for sequence ', @, '! This is a bug. ', @controller) if not @bonesController
 		table.insert(@knownBonesSequences, name)
 		return @bonesController\StartSequence(name, time)
 

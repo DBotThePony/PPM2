@@ -157,7 +157,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'bones': {'LrigNeck3'}
 			'reset': =>
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, -12 * timeOfAnim, math.sin(RealTimeL() * 4) * 20))
+				@SetBoneAngles(1, Angle(0, -12 * timeOfAnim, math.sin(CurTimeL() * 4) * 20))
 		}
 
 		{
@@ -176,7 +176,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'time': 5
 			'bones': {'LrigNeck3'}
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, math.cos(RealTimeL() * 4) * 20, 0))
+				@SetBoneAngles(1, Angle(0, math.cos(CurTimeL() * 4) * 20, 0))
 		}
 
 		{
@@ -186,7 +186,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			'time': 5
 			'bones': {'LrigNeck3'}
 			'func': (delta, timeOfAnim) =>
-				@SetBoneAngles(1, Angle(0, math.cos(RealTimeL() * 8) * 20, 0))
+				@SetBoneAngles(1, Angle(0, math.cos(CurTimeL() * 8) * 20, 0))
 		}
 
 		{
