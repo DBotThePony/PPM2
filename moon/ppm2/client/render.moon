@@ -32,12 +32,12 @@ SV_SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY
 
 hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
 	return if PPM2.__RENDERING_REFLECTIONS
-	return true unless SV_SHOULD_DRAW_VIEWMODEL\GetBool()
-	return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
 	return unless IsValid(arms)
 	return unless ply.__cachedIsPony
+	return true unless SV_SHOULD_DRAW_VIEWMODEL\GetBool()
+	return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
 	return unless ply\Alive()
-	arms\SetPos(LocalPlayer()\EyePos() + Vector(0, 0, 100))
+	arms\SetPos(ply\EyePos() + Vector(0, 0, 100))
 	wep = ply\GetActiveWeapon()
 	if IsValid(wep) and wep.UseHands == false
 		return true -- Dafuck?
