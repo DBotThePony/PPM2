@@ -36,13 +36,13 @@ DLib.manifest({
 		'common/flex_controller.lua'
 		'common/registry_data.lua'
 		'common/ponydata.lua'
+		'common/bones_modifier.lua'
 		'common/ponyfly.lua'
 		'common/size_controller.lua'
 		'common/hooks.lua'
 	}
 
 	client: {
-		'client/bones_modifier.lua'
 		'client/data_instance.lua'
 		'client/materials_registry.lua'
 		'client/texture_controller.lua'

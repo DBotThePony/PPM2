@@ -230,35 +230,65 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 
 	@SequenceObject = BonesSequence
 
-	PreDrawOpaqueRenderables = (a, b) ->
-		for obj in *@OBJECTS
-			if not obj\IsValid()
-				oldObjects = @OBJECTS
-				@OBJECTS = {}
-				for obj2 in *oldObjects
-					if obj2\IsValid()
-						table.insert(@OBJECTS, obj2)
-					else
-						lent = obj2.ent
-						obj2.invalidate = true
-						if IsValid(lent)
-							lent.__ppmBonesModifiers = nil
-				return
+	if CLIENT
+		PreDrawOpaqueRenderables = (a, b) ->
+			for obj in *@OBJECTS
+				if not obj\IsValid()
+					oldObjects = @OBJECTS
+					@OBJECTS = {}
+					for obj2 in *oldObjects
+						if obj2\IsValid()
+							table.insert(@OBJECTS, obj2)
+						else
+							lent = obj2.ent
+							obj2.invalidate = true
+							if IsValid(lent)
+								lent.__ppmBonesModifiers = nil
+					return
 
-			if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
-				if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
-					obj.ent\ResetBoneManipCache()
+				if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
+					if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+						obj.ent\ResetBoneManipCache()
+						resetBones(obj.ent)
+						data = obj.ent\GetPonyData()
+						hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
+						obj\Think()
+						obj.ent.__ppmBonesModified = true
+						obj.ent\ApplyBoneManipulations()
+				elseif obj.ent.__ppmBonesModified
 					resetBones(obj.ent)
-					data = obj.ent\GetPonyData()
-					hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
-					obj\Think()
-					obj.ent.__ppmBonesModified = true
-					obj.ent\ApplyBoneManipulations()
-			elseif obj.ent.__ppmBonesModified
-				resetBones(obj.ent)
-				obj.ent.__ppmBonesModified = false
+					obj.ent.__ppmBonesModified = false
 
-	hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -5
+
+		hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -5
+	else
+		timer.Create 'PPM2.ThinkBoneModifiers', 1, 0, ->
+			for obj in *@OBJECTS
+				if not obj\IsValid()
+					oldObjects = @OBJECTS
+					@OBJECTS = {}
+					for obj2 in *oldObjects
+						if obj2\IsValid()
+							table.insert(@OBJECTS, obj2)
+						else
+							lent = obj2.ent
+							obj2.invalidate = true
+							if IsValid(lent)
+								lent.__ppmBonesModifiers = nil
+					return
+
+				if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
+					if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
+						obj.ent\ResetBoneManipCache()
+						resetBones(obj.ent)
+						data = obj.ent\GetPonyData()
+						hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
+						obj\Think()
+						obj.ent.__ppmBonesModified = true
+						obj.ent\ApplyBoneManipulations()
+				elseif obj.ent.__ppmBonesModified
+					resetBones(obj.ent)
+					obj.ent.__ppmBonesModified = false
 
 	new: (ent = NULL) =>
 		super()
@@ -353,14 +383,15 @@ with FindMetaTable('Entity')
 			.__ppmBonesModifiers\Setup(@) if .__ppmBonesModifiers.lastModel ~= @GetModel()
 			return .__ppmBonesModifiers
 
-hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
-	return if not @IsPony()
-	data = @GetPonyData()
-	@ResetBoneManipCache()
-	hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-	if @__ppmBonesModifiers
-		@__ppmBonesModifiers\Think(true)
-		@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
-	@ApplyBoneManipulations()
+if CLIENT
+	hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
+		return if not @IsPony()
+		data = @GetPonyData()
+		@ResetBoneManipCache()
+		hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
+		if @__ppmBonesModifiers
+			@__ppmBonesModifiers\Think(true)
+			@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
+		@ApplyBoneManipulations()
 
 ent.__ppmBonesModifiers = nil for ent in *ents.GetAll()
