@@ -328,7 +328,7 @@ class PonySizeController extends PPM2.ControllerChildren
 					if type(ent) == 'NPC' or type(NPC) == 'NextBot'
 						ent\SetPreventTransmit(ply, true) for ply in *player.GetAll()
 						ent\SetModelScale(newscale)
-						ent\SetPreventTransmit(ply, true) for ply in *player.GetAll()
+						ent\SetPreventTransmit(ply, false) for ply in *player.GetAll()
 					else
 						ent\SetModelScale(newscale)
 			return
