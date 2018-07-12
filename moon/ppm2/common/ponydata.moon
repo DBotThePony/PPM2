@@ -383,8 +383,9 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@GetSizeController()\DataChanges(state) if @ent and @GetBodygroupController()
 		@GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
 
+		@GetWeightController()\DataChanges(state) if @ent and @GetWeightController()
+
 		if CLIENT and @ent
-			@GetWeightController()\DataChanges(state) if @GetWeightController()
 			@GetRenderController()\DataChanges(state) if @GetRenderController()
 
 	ResetScale: =>
@@ -419,9 +420,10 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		if scale = @GetSizeController()
 			scale\PlayerRespawn()
 
+		@GetWeightController()\UpdateWeight() if @GetWeightController()
+
 		if CLIENT
 			@deathRagdollMerged = false
-			@GetWeightController()\UpdateWeight() if @GetWeightController()
 			@GetRenderController()\PlayerRespawn() if @GetRenderController()
 			@GetBodygroupController()\MergeModels(@ent) if IsValid(@ent) and @GetBodygroupController().MergeModels
 
@@ -491,7 +493,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return @renderController
 
 	GetWeightController: =>
-		return if SERVER
 		return @weightController if not @isValid
 		if not @weightController or @modelCached ~= @modelWeight
 			@modelCached = @modelCached or @ent\GetModel()
@@ -542,8 +543,9 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
 		@entTable.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
+		@GetWeightController()\Remove() if @GetWeightController()
+
 		if CLIENT
-			@GetWeightController()\Remove() if @GetWeightController()
 			@GetRenderController()\Remove() if @GetRenderController()
 			if IsValid(@ent) and @ent.__ppm2_task_hit
 				@entTable.__ppm2_task_hit = false
