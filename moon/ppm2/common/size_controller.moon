@@ -15,47 +15,47 @@
 -- limitations under the License.
 --
 
--- 0	LrigPelvis
--- 1	LrigSpine1
--- 2	LrigSpine2
--- 3	LrigRibcage
--- 4	LrigNeck1
--- 5	LrigNeck2
--- 6	LrigNeck3
--- 7	LrigScull
--- 8	Lrig_LEG_BL_Femur
--- 9	Lrig_LEG_BL_Tibia
--- 10	Lrig_LEG_BL_LargeCannon
--- 11	Lrig_LEG_BL_PhalanxPrima
--- 12	Lrig_LEG_BL_RearHoof
--- 13	Lrig_LEG_BR_Femur
--- 14	Lrig_LEG_BR_Tibia
--- 15	Lrig_LEG_BR_LargeCannon
--- 16	Lrig_LEG_BR_PhalanxPrima
--- 17	Lrig_LEG_BR_RearHoof
--- 18	Lrig_LEG_FL_Scapula
--- 19	Lrig_LEG_FL_Humerus
--- 20	Lrig_LEG_FL_Radius
--- 21	Lrig_LEG_FL_Metacarpus
--- 22	Lrig_LEG_FL_PhalangesManus
--- 23	Lrig_LEG_FL_FrontHoof
--- 24	Lrig_LEG_FR_Scapula
--- 25	Lrig_LEG_FR_Humerus
--- 26	Lrig_LEG_FR_Radius
--- 27	Lrig_LEG_FR_Metacarpus
--- 28	Lrig_LEG_FR_PhalangesManus
--- 29	Lrig_LEG_FR_FrontHoof
--- 30	Mane01
--- 31	Mane02
--- 32	Mane03
--- 33	Mane04
--- 34	Mane05
--- 35	Mane06
--- 36	Mane07
--- 37	Mane03_tip
--- 38	Tail01
--- 39	Tail02
--- 40	Tail03
+-- 0    LrigPelvis
+-- 1    LrigSpine1
+-- 2    LrigSpine2
+-- 3    LrigRibcage
+-- 4    LrigNeck1
+-- 5    LrigNeck2
+-- 6    LrigNeck3
+-- 7    LrigScull
+-- 8    Lrig_LEG_BL_Femur
+-- 9    Lrig_LEG_BL_Tibia
+-- 10   Lrig_LEG_BL_LargeCannon
+-- 11   Lrig_LEG_BL_PhalanxPrima
+-- 12   Lrig_LEG_BL_RearHoof
+-- 13   Lrig_LEG_BR_Femur
+-- 14   Lrig_LEG_BR_Tibia
+-- 15   Lrig_LEG_BR_LargeCannon
+-- 16   Lrig_LEG_BR_PhalanxPrima
+-- 17   Lrig_LEG_BR_RearHoof
+-- 18   Lrig_LEG_FL_Scapula
+-- 19   Lrig_LEG_FL_Humerus
+-- 20   Lrig_LEG_FL_Radius
+-- 21   Lrig_LEG_FL_Metacarpus
+-- 22   Lrig_LEG_FL_PhalangesManus
+-- 23   Lrig_LEG_FL_FrontHoof
+-- 24   Lrig_LEG_FR_Scapula
+-- 25   Lrig_LEG_FR_Humerus
+-- 26   Lrig_LEG_FR_Radius
+-- 27   Lrig_LEG_FR_Metacarpus
+-- 28   Lrig_LEG_FR_PhalangesManus
+-- 29   Lrig_LEG_FR_FrontHoof
+-- 30   Mane01
+-- 31   Mane02
+-- 32   Mane03
+-- 33   Mane04
+-- 34   Mane05
+-- 35   Mane06
+-- 36   Mane07
+-- 37   Mane03_tip
+-- 38   Tail01
+-- 39   Tail02
+-- 40   Tail03
 
 USE_NEW_HULL = CreateConVar('ppm2_sv_newhull', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Use proper collision box for ponies. Slightly affects jump mechanics. When disabled, unexpected behaviour could happen.')
 ALLOW_TO_MODIFY_SCALE = PPM2.ALLOW_TO_MODIFY_SCALE
@@ -99,9 +99,10 @@ class PonySizeController extends PPM2.ControllerChildren
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 		PPM2.DebugPrint('Created new size controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
+		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
-	IsValid: => @isValid
+	IsValid: => @controller\IsValid()
 	GetData: => @controller
 	GetEntity: => @ent
 	GetEntityID: => @entID
@@ -123,6 +124,8 @@ class PonySizeController extends PPM2.ControllerChildren
 	DataChanges: (state) =>
 		return if not IsValid(@ent)
 		return if not @ent\IsPony()
+		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
+
 		if state\GetKey() == 'PonySize'
 			@ModifyScale()
 
@@ -151,8 +154,10 @@ class PonySizeController extends PPM2.ControllerChildren
 		ent\SetJumpPower(ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
 		ent.__ppm2_modified_jump = false
 
-	ResetDrawMatrix: (ent = @ent) =>
-		return if SERVER
+	ResetModelScale: (ent = @ent) =>
+		if SERVER
+			--ent\SetModelScale(1)
+			return
 		mat = Matrix()
 		mat\Scale(@@DEF_SCALE)
 		ent\EnableMatrix('RenderMultiply', mat)
@@ -165,7 +170,7 @@ class PonySizeController extends PPM2.ControllerChildren
 			@ResetJumpHeight(ent)
 
 		@ResetViewOffset(ent)
-		@ResetDrawMatrix(ent)
+		@ResetModelScale(ent)
 		@ResetNeck(ent)
 		@ResetLegs(ent)
 
@@ -269,9 +274,17 @@ class PonySizeController extends PPM2.ControllerChildren
 			HULL_MAXS_DUCK.z *= legssize
 
 		with ent
-			\SetHull(HULL_MINS, HULL_MAXS) if .SetHull
-			\SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if .SetHullDuck
-			\SetStepSize(@@STEP_SIZE * size * @GetLegsModifier(1.2)) if .SetStepSize
+			if .SetHull
+				cmins, cmaxs = \GetHull()
+				\SetHull(HULL_MINS, HULL_MAXS) if cmins ~= HULL_MINS or cmaxs ~= HULL_MAXS
+
+			if .SetHullDuck
+				cmins, cmaxs = \GetHullDuck()
+				\SetHullDuck(HULL_MINS, HULL_MAXS_DUCK) if cmins ~= HULL_MINS or cmaxs ~= HULL_MAXS_DUCK
+
+			if .SetStepSize
+				newsize = @@STEP_SIZE * size * @GetLegsModifier(1.2)
+				\SetStepSize(newsize) if \GetStepSize() ~= newsize
 
 	ModifyJumpHeight: (ent = @ent) =>
 		return if CLIENT
@@ -304,9 +317,22 @@ class PonySizeController extends PPM2.ControllerChildren
 		ent\SetViewOffset(PLAYER_VIEW_OFFSET) if ent.SetViewOffset
 		ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if ent.SetViewOffsetDucked
 
-	ModifyDrawMatrix: (ent = @ent) =>
-		return if SERVER
+	ModifyModelScale: (ent = @ent) =>
 		return if not @AllowResize()
+		-- https://github.com/Facepunch/garrysmod-issues/issues/2193
+		if SERVER
+			if not ent\IsPlayer()
+				newscale = (@GetPonySize() * 100)\floor() / 100
+				currscale = (ent\GetModelScale() * 100)\floor() / 100
+				if currscale ~= newscale
+					if type(ent) == 'NPC' or type(NPC) == 'NextBot'
+						ent\SetPreventTransmit(ply, true) for ply in *player.GetAll()
+						ent\SetModelScale(newscale)
+						ent\SetPreventTransmit(ply, true) for ply in *player.GetAll()
+					else
+						ent\SetModelScale(newscale)
+			return
+		--return if not ent\IsClientsideEntity()
 		return if ent.RenderOverride -- PAC3 and other stuff that can change this value
 		mat = Matrix()
 		mat\Scale(@@DEF_SCALE * @GetPonySize())
@@ -322,13 +348,13 @@ class PonySizeController extends PPM2.ControllerChildren
 			@ModifyJumpHeight(ent)
 
 		@ModifyViewOffset(ent)
-		@ModifyDrawMatrix(ent)
-		if @lastPAC3BoneReset < RealTimeL()
+		@ModifyModelScale(ent)
+
+		if CLIENT and @lastPAC3BoneReset < RealTimeL()
 			@ModifyNeck(ent)
 			@ModifyLegs(ent)
 
 	ModifyNeck: (ent = @ent) =>
-		return if SERVER
 		return if not IsValid(ent)
 		return if not @AllowResize()
 		size = (@GetNeckSize() - 1) * 3
@@ -344,7 +370,6 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition2Safe(@@NECK_BONE_4, vec + (boneAnimTable[@@NECK_BONE_4] or emptyVector))
 
 	ModifyLegs: (ent = @ent) =>
-		return if SERVER
 		return if not IsValid(ent)
 		return if not @AllowResize()
 		realSizeModify = @GetLegsSize() - 1
@@ -375,51 +400,51 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_2] or emptyVector))
 
 --
--- 0	LrigPelvis
--- 1	Lrig_LEG_BL_Femur
--- 2	Lrig_LEG_BL_Tibia
--- 3	Lrig_LEG_BL_LargeCannon
--- 4	Lrig_LEG_BL_PhalanxPrima
--- 5	Lrig_LEG_BL_RearHoof
--- 6	Lrig_LEG_BR_Femur
--- 7	Lrig_LEG_BR_Tibia
--- 8	Lrig_LEG_BR_LargeCannon
--- 9	Lrig_LEG_BR_PhalanxPrima
--- 10	Lrig_LEG_BR_RearHoof
--- 11	LrigSpine1
--- 12	LrigSpine2
--- 13	LrigRibcage
--- 14	Lrig_LEG_FL_Scapula
--- 15	Lrig_LEG_FL_Humerus
--- 16	Lrig_LEG_FL_Radius
--- 17	Lrig_LEG_FL_Metacarpus
--- 18	Lrig_LEG_FL_PhalangesManus
--- 19	Lrig_LEG_FL_FrontHoof
--- 20	Lrig_LEG_FR_Scapula
--- 21	Lrig_LEG_FR_Humerus
--- 22	Lrig_LEG_FR_Radius
--- 23	Lrig_LEG_FR_Metacarpus
--- 24	Lrig_LEG_FR_PhalangesManus
--- 25	Lrig_LEG_FR_FrontHoof
--- 26	LrigNeck1
--- 27	LrigNeck2
--- 28	LrigNeck3
--- 29	LrigScull
--- 30	Jaw
--- 31	Ear_L
--- 32	Ear_R
--- 33	Mane02
--- 34	Mane03
--- 35	Mane03_tip
--- 36	Mane04
--- 37	Mane05
--- 38	Mane06
--- 39	Mane07
--- 40	Mane01
--- 41	Lrigweaponbone
--- 42	Tail01
--- 43	Tail02
--- 44	Tail03
+-- 0    LrigPelvis
+-- 1    Lrig_LEG_BL_Femur
+-- 2    Lrig_LEG_BL_Tibia
+-- 3    Lrig_LEG_BL_LargeCannon
+-- 4    Lrig_LEG_BL_PhalanxPrima
+-- 5    Lrig_LEG_BL_RearHoof
+-- 6    Lrig_LEG_BR_Femur
+-- 7    Lrig_LEG_BR_Tibia
+-- 8    Lrig_LEG_BR_LargeCannon
+-- 9    Lrig_LEG_BR_PhalanxPrima
+-- 10   Lrig_LEG_BR_RearHoof
+-- 11   LrigSpine1
+-- 12   LrigSpine2
+-- 13   LrigRibcage
+-- 14   Lrig_LEG_FL_Scapula
+-- 15   Lrig_LEG_FL_Humerus
+-- 16   Lrig_LEG_FL_Radius
+-- 17   Lrig_LEG_FL_Metacarpus
+-- 18   Lrig_LEG_FL_PhalangesManus
+-- 19   Lrig_LEG_FL_FrontHoof
+-- 20   Lrig_LEG_FR_Scapula
+-- 21   Lrig_LEG_FR_Humerus
+-- 22   Lrig_LEG_FR_Radius
+-- 23   Lrig_LEG_FR_Metacarpus
+-- 24   Lrig_LEG_FR_PhalangesManus
+-- 25   Lrig_LEG_FR_FrontHoof
+-- 26   LrigNeck1
+-- 27   LrigNeck2
+-- 28   LrigNeck3
+-- 29   LrigScull
+-- 30   Jaw
+-- 31   Ear_L
+-- 32   Ear_R
+-- 33   Mane02
+-- 34   Mane03
+-- 35   Mane03_tip
+-- 36   Mane04
+-- 37   Mane05
+-- 38   Mane06
+-- 39   Mane07
+-- 40   Mane01
+-- 41   Lrigweaponbone
+-- 42   Tail01
+-- 43   Tail02
+-- 44   Tail03
 --
 
 class NewPonySizeContoller extends PonySizeController
@@ -451,13 +476,12 @@ class NewPonySizeContoller extends PonySizeController
 	new: (...) =>
 		super(...)
 
-if CLIENT
-	hook.Add 'PPM2.SetupBones', 'PPM2.Size', (ent, data) ->
-		if sizes = data\GetSizeController()
-			sizes.ent = ent
-			sizes\ModifyNeck()
-			sizes\ModifyLegs()
-			sizes.lastPAC3BoneReset = RealTimeL() + 1
+hook.Add 'PPM2.SetupBones', 'PPM2.Size', (ent, data) ->
+	if sizes = data\GetSizeController()
+		sizes.ent = ent
+		sizes\ModifyNeck()
+		sizes\ModifyLegs()
+		sizes.lastPAC3BoneReset = RealTimeL() + 1
 
 ppm2_sv_allow_resize = ->
 	for ply in *player.GetAll()

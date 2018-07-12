@@ -100,7 +100,7 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
 	lpos = lply\EyePos()
 	for ply in *player.GetAll()
 		if ply ~= lply
-			if ply\GetNWBool('PPM2.InEditor')
+			if ply\GetDLibVar('PPM2.InEditor')
 				pos = ply\EyePos()
 				dist = pos\Distance(lpos)
 				if dist < 250

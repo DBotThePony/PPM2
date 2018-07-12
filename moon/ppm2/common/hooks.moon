@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+DLib.nw.PoolBoolean('PPM2.InEditor', false)
+
 do
 	import GetModel, IsDormant, GetPonyData, IsValid from FindMetaTable('Entity')
 	callback = ->

@@ -246,7 +246,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 								lent.__ppmBonesModifiers = nil
 					return
 
-				if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
+				if obj.ent\IsPony() and (not obj.ent\IsPlayer() and not obj.ent.__ppm2RenderOverride or obj.ent == LocalPlayer())
 					if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
 						obj.ent\ResetBoneManipCache()
 						resetBones(obj.ent)
@@ -255,10 +255,9 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 						obj\Think()
 						obj.ent.__ppmBonesModified = true
 						obj.ent\ApplyBoneManipulations()
-				elseif obj.ent.__ppmBonesModified
+				elseif obj.ent.__ppmBonesModified and not obj.ent\IsPlayer() and not obj.ent.__ppm2RenderOverride
 					resetBones(obj.ent)
 					obj.ent.__ppmBonesModified = false
-
 
 		hook.Add 'PreDrawOpaqueRenderables', 'PPM2.EntityBonesModifier', PreDrawOpaqueRenderables, -5
 	else
@@ -274,18 +273,19 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 							lent = obj2.ent
 							obj2.invalidate = true
 							if IsValid(lent)
+								if lent.__ppmBonesModifiers
+									resetBones(lent)
 								lent.__ppmBonesModifiers = nil
 					return
 
-				if obj.ent\IsPony() and (not obj.ent\IsPlayer() or obj.ent == LocalPlayer())
-					if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
-						obj.ent\ResetBoneManipCache()
-						resetBones(obj.ent)
-						data = obj.ent\GetPonyData()
-						hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
-						obj\Think()
-						obj.ent.__ppmBonesModified = true
-						obj.ent\ApplyBoneManipulations()
+				if obj.ent\IsPony() and obj\CanThink()
+					obj.ent\ResetBoneManipCache()
+					resetBones(obj.ent)
+					data = obj.ent\GetPonyData()
+					hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
+					obj\Think()
+					obj.ent.__ppmBonesModified = true
+					obj.ent\ApplyBoneManipulations()
 				elseif obj.ent.__ppmBonesModified
 					resetBones(obj.ent)
 					obj.ent.__ppmBonesModified = false
@@ -336,10 +336,16 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			--@RegisterModifier(name .. 'Jiggle', 0)
 			{i, name, 'Calculate' .. name .. 'Position', 'Calculate' .. name .. 'Scale', 'Calculate' .. name .. 'Angles'}
 
-	CanThink: => @callFrame ~= FrameNumberL() and (not @defferReset or @defferReset < RealTimeL())
+	CanThink: =>
+		return true if SERVER
+		return @callFrame ~= FrameNumberL() and (not @defferReset or @defferReset < RealTimeL())
+
 	Think: (force = false) =>
-		return if not super() or not force and @callFrame == FrameNumberL()
-		@callFrame = FrameNumberL()
+		return if not super() or not force and CLIENT and @callFrame == FrameNumberL()
+		@callFrame = FrameNumberL() if CLIENT
+
+		--if SERVER
+		--  print(@ent, debug.traceback())
 
 		with @ent
 			calcBonesPos = {}

@@ -52,15 +52,18 @@ do
 	timer.Create 'PPM2.Require', 0.25, 0, -> xpcall(safeSendFunction, errorTrack)
 	net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
 		return if not IsValid(ply)
-		REQUIRE_CLIENTS[ply] = for ent in *ents.GetAll()
-			continue if ent == ply
-			data = ent\GetPonyData()
-			continue if not data
-			ent
+		REQUIRE_CLIENTS[ply] = {}
+		target = REQUIRE_CLIENTS[ply]
+
+		for ent in *ents.GetAll()
+			if ent ~= ply
+				data = ent\GetPonyData()
+				if data
+					table.insert(target, ent)
 
 net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
 	return if not IsValid(ply)
-	ply\SetNWBool('PPM2.InEditor', net.ReadBool())
+	ply\SetDLibVar('PPM2.InEditor', net.ReadBool())
 
 ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
 RAGDOLL_COLLISIONS = CreateConVar('ppm2_sv_ragdolls_collisions', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable ragdolls collisions')

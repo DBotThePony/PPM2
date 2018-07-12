@@ -68,8 +68,8 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
-for ply in *player.GetAll()
-	ply.__PPM2_PonyData\Remove() if ply.__PPM2_PonyData
+for ent in *ents.GetAll()
+	ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)
@@ -352,7 +352,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return unless IsValid(ent)
 		@modelCached = ent\GetModel()
 		@ent = ent
-		ent\PPMBonesModifier() if CLIENT
+		ent\PPMBonesModifier()
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
 		@lastLerpThink = RealTimeL()
