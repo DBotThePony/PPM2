@@ -243,13 +243,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		net.pool(@NW_Rejected)
 		net.pool(@NW_Broadcast)
 
-	net.BindMessageGroup(@NW_Create, 'ppm2nwobject')
-	net.BindMessageGroup(@NW_Modify, 'ppm2nwobject')
-	net.BindMessageGroup(@NW_Remove, 'ppm2nwobject')
-	net.BindMessageGroup(@NW_ReceiveID, 'ppm2nwobject')
-	net.BindMessageGroup(@NW_Rejected, 'ppm2nwobject')
-	net.BindMessageGroup(@NW_Broadcast, 'ppm2nwobject')
-
 	net.Receive @NW_Create, (len = 0, ply = NULL, obj) -> @OnNetworkedCreated(ply, len, obj)
 	net.Receive @NW_Modify, (len = 0, ply = NULL, obj) -> @OnNetworkedModify(ply, len, obj)
 	net.Receive @NW_Remove, (len = 0, ply = NULL, obj) -> @OnNetworkedDelete(ply, len, obj)
