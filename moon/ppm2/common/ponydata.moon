@@ -600,7 +600,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			net.WriteBool(IsValid(@NW_Player))
 			net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
 			@WriteNetworkData()
-			net.CompressOngoing()
 			filter = RecipientFilter()
 			filter\AddAllPlayers()
 			filter\RemovePlayer(@NW_Player) if IsValid(@NW_Player)
@@ -612,7 +611,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			before = net.BytesWritten()
 			net.WriteUInt(@waitID, 16)
 			@WriteNetworkData()
-			net.CompressOngoing()
 			after = net.BytesWritten()
 			net.SendToServer()
 			@@NW_Waiting[@waitID] = @
@@ -623,7 +621,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		net.WriteBool(IsValid(@NW_Player))
 		net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
 		@WriteNetworkData()
-		net.CompressOngoing()
 		net.Send(targets)
 
 PPM2.NetworkedPonyData = NetworkedPonyData
