@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+DLib.RegisterAddonName('PPM/2')
+
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
 	for task in *PPM2.NetworkedPonyData.RenderTasks
 		ent = task.ent
