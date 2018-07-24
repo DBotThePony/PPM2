@@ -57,6 +57,15 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 	data\GetRenderController()\PostDrawArms(arms)
 	arms.__ppm2_draw = false
 
+mat_dxlevel = GetConVar('mat_dxlevel')
+
+timer.Create 'PPM2.CheckDXLevel', 180, 0, ->
+	if mat_dxlevel\GetInt() > 90
+		timer.Remove 'PPM2.CheckDXLevel'
+		return
+
+	PPM2.Message('Direct3D Level is LESS THAN 9.1! This will not work!')
+
 IN_DRAW = false
 MARKED_FOR_DRAW = {}
 
