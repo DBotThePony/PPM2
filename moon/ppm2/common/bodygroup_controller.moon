@@ -119,15 +119,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	@BONE_SPINE_ROOT = 'LrigPelvis'
 	@BONE_SPINE = 'LrigSpine2'
 
-	new: (controller) =>
-		@isValid = true
-		@ent = controller.ent
-		@entID = controller.entID
-		@controller = controller
-		@objID = @@NEXT_OBJ_ID
-		@@NEXT_OBJ_ID += 1
-		@lastPAC3BoneReset = 0
-
+	Remap: =>
 		mapping = {
 			'BONE_SPINE_ROOT'
 			'BONE_TAIL_1', 'BONE_TAIL_2', 'BONE_TAIL_3'
@@ -136,7 +128,23 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			'BONE_MANE_6', 'BONE_MANE_7', 'BONE_MANE_8'
 		}
 
-		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
+		@validSkeleton = true
+
+		for name in *mapping
+			@[name] = @ent\LookupBone(@@[name])
+
+			if not @[name]
+				@validSkeleton = false
+
+	new: (controller) =>
+		@isValid = true
+		@ent = controller.ent
+		@entID = controller.entID
+		@controller = controller
+		@objID = @@NEXT_OBJ_ID
+		@@NEXT_OBJ_ID += 1
+		@lastPAC3BoneReset = 0
+		@Remap()
 
 		PPM2.DebugPrint('Created new bodygroups controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
@@ -250,6 +258,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	ResetTail: =>
 		return if not CLIENT
+		return if not @validSkeleton
 		with @ent
 			\ManipulateBoneScale2Safe(@BONE_TAIL_1, Vector(1, 1, 1))
 			\ManipulateBoneScale2Safe(@BONE_TAIL_2, Vector(1, 1, 1))
@@ -263,6 +272,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	ResetBack: =>
 		return if not CLIENT
+		return if not @validSkeleton
 		with @ent
 			\ManipulateBoneScale2Safe(@BONE_SPINE_ROOT, Vector(1, 1, 1))
 			\ManipulateBoneScale2Safe(@BONE_SPINE, Vector(1, 1, 1))
@@ -273,6 +283,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	ResetMane: =>
 		return if not CLIENT
+		return if not @validSkeleton
 		vec1, ang, vec2 = Vector(1, 1, 1), Angle(0, 0, 0), Vector(0, 0, 0)
 		with @ent
 			for i = 1, 7
@@ -284,8 +295,11 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return unless @isValid
 		return unless IsValid(@ent)
 		return unless @ent\GetBodyGroups()
+		return if not @validSkeleton
+
 		for grp in *@ent\GetBodyGroups()
 			@ent\SetBodygroup(grp.id, 0)
+
 		if @lastPAC3BoneReset < RealTimeL()
 			@ResetTail()
 			@ResetMane()
@@ -298,6 +312,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	UpdateTailSize: (ent = @ent) =>
 		return if not CLIENT
+		return if @ent.Alive and not @ent\Alive()
+		return if not @validSkeleton
 		size = @GetData()\GetTailSize()
 		size *= @GetData()\GetPonySize() if not ent\IsRagdoll() and not ent\IsNJPony()
 		vec = Vector(1, 1, 1)
@@ -320,6 +336,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not CLIENT
 		return if ent\IsRagdoll()
 		return if ent\IsNJPony()
+		return if @ent.Alive and not @ent\Alive()
+		return if not @validSkeleton
 		size = @GetData()\GetPonySize()
 		vecMane = Vector(1, 1, 1) * size
 
@@ -348,6 +366,9 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not CLIENT
 		return if ent\IsRagdoll()
 		return if ent\IsNJPony()
+		return if @ent.Alive and not @ent\Alive()
+		return if not @validSkeleton
+
 		vecModify = Vector(-(@GetData()\GetBackSize() - 1) * 2, 0, 0)
 		vecModify2 = Vector((@GetData()\GetBackSize() - 1) * 5, 0, 0)
 
@@ -385,12 +406,11 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@ResetBodygroups()
 		@isValid = false
 
-	@TAIL_BONE1 = 38
-	@TAIL_BONE2 = 39
-	@TAIL_BONE3 = 40
 	DataChanges: (state) =>
 		return unless @isValid
 		return if not IsValid(@ent)
+		@Remap()
+
 		switch state\GetKey()
 			when 'ManeType'
 				@ent\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GetData()\GetManeType())
@@ -514,16 +534,19 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
-	new: (...) =>
-		super(...)
-
+	Remap: =>
+		super!
 		mapping = {
 			'EAR_L', 'EAR_R'
 			'WING_LEFT_1', 'WING_LEFT_2', 'WING_RIGHT_1'
 			'WING_RIGHT_2', 'WING_OPEN_LEFT', 'WING_OPEN_RIGHT'
 		}
 
-		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
+		for name in *mapping
+			@[name] = @ent\LookupBone(@@[name])
+
+			if not @[name]
+				@validSkeleton = false
 
 	CreateUpperManeModel: (force = false) =>
 		return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
@@ -705,6 +728,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	ResetWings: =>
 		return if SERVER
+		return if not @validSkeleton
 		ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
 		for wing in *{@WING_LEFT_1, @WING_LEFT_2, @WING_RIGHT_1, @WING_RIGHT_2, @WING_OPEN_LEFT, @WING_OPEN_RIGHT}
 			with @ent
@@ -714,6 +738,8 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	UpdateWings: =>
 		return if SERVER
+		return if not @validSkeleton
+		return if @ent.Alive and not @ent\Alive()
 		left = @GetData()\GetLWingSize() * Vector(1, 1, 1)
 		leftX = @GetData()\GetLWingX()
 		leftY = @GetData()\GetLWingY()
@@ -844,6 +870,7 @@ class NewBodygroupController extends DefaultBodygroupController
 	DataChanges: (state) =>
 		return unless @isValid
 		return if not IsValid(@ent)
+		@Remap()
 		switch state\GetKey()
 			when 'EyelashType'
 				@ent\SetFlexWeight(@@FLEX_ID_EYELASHES, @GetData()\GetEyelashType() == PPM2.EYELASHES_NONE and 1 or 0)

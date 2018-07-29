@@ -413,7 +413,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		if scale = @GetSizeController()
 			scale\PlayerRespawn()
 
-		@GetWeightController()\UpdateWeight() if @GetWeightController()
+		if weight = @GetWeightController()
+			weight\PlayerRespawn()
 
 		if CLIENT
 			@deathRagdollMerged = false
@@ -422,16 +423,22 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	PlayerDeath: =>
 		return if not IsValid(@ent)
+
 		@entTable.__cachedIsPony = @ent\IsPony()
+
 		if not @entTable.__cachedIsPony
 			return if @alreadyCalledDeath
 			@alreadyCalledDeath = true
 		else
 			@alreadyCalledDeath = false
+
 		@SetFly(false) if SERVER
 
 		if scale = @GetSizeController()
 			scale\PlayerDeath()
+
+		if weight = @GetWeightController()
+			weight\PlayerDeath()
 
 		if CLIENT
 			@DoRagdollMerge()

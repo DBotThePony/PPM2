@@ -70,6 +70,15 @@ class PonyWeightController extends PPM2.ControllerChildren
 	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
 	@NEXT_OBJ_ID = 0
 
+	Remap: =>
+		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for {:id, :scale} in *@@WEIGHT_BONES]
+
+		@validSkeleton = true
+		for {:id} in *@WEIGHT_BONES
+			if not id
+				@validSkeleton = false
+				break
+
 	new: (data, applyWeight = true) =>
 		@isValid = true
 		@networkedData = data
@@ -79,7 +88,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@lastPAC3BoneReset = 0
 		@scale = 1
 		@SetWeight(data\GetWeight())
-		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for {:id, :scale} in *@@WEIGHT_BONES]
+		@Remap()
 		@UpdateWeight() if IsValid(@ent) and applyWeight
 		PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
 
@@ -89,6 +98,14 @@ class PonyWeightController extends PPM2.ControllerChildren
 	GetData: => @networkedData
 	GetController: => @networkedData
 	GetModel: => @networkedData\GetModel()
+
+	PlayerDeath: =>
+		@ResetBones()
+		@Remap()
+
+	PlayerRespawn: =>
+		@Remap()
+		@UpdateWeight()
 
 	@WEIGHT_BONES = {
 		{id: 'LrigPelvis', scale: 1.1}
@@ -126,6 +143,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	DataChanges: (state) =>
 		return if not IsValid(@ent) or not @isValid
+		@Remap()
 
 		if state\GetKey() == 'Weight'
 			@SetWeight(state\GetValue())
@@ -139,6 +157,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	ResetBones: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
+		return if not @validSkeleton
 		for {:id} in *@WEIGHT_BONES
 			ent\ManipulateBoneScale2Safe(id, @@DEFAULT_BONE_SIZE)
 
@@ -147,6 +166,8 @@ class PonyWeightController extends PPM2.ControllerChildren
 	UpdateWeight: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
 		return if not @ent\IsPony()
+		return if @ent.Alive and not @ent\Alive()
+		return if not @validSkeleton
 
 		for {:id, :scale} in *@WEIGHT_BONES
 			delta = 1 + (@weight * @scale - 1) * scale

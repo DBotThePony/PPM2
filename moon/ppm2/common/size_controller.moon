@@ -90,15 +90,7 @@ class PonySizeController extends PPM2.ControllerChildren
 
 	@NEXT_OBJ_ID = 0
 
-	new: (controller) =>
-		@isValid = true
-		@ent = controller.ent
-		@entID = controller.entID
-		@controller = controller
-		@objID = @@NEXT_OBJ_ID
-		@@NEXT_OBJ_ID += 1
-		@lastPAC3BoneReset = 0
-
+	Remap: =>
 		mapping = {
 			'NECK_BONE_1'
 			'NECK_BONE_2'
@@ -119,8 +111,21 @@ class PonySizeController extends PPM2.ControllerChildren
 			'LEGS_BEHIND_3_2'
 		}
 
-		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
+		@validSkeleton = true
 
+		for name in *mapping
+			@[name] = @ent\LookupBone(@@[name])
+			@validSkeleton = false if not @[name]
+
+	new: (controller) =>
+		@isValid = true
+		@ent = controller.ent
+		@entID = controller.entID
+		@controller = controller
+		@objID = @@NEXT_OBJ_ID
+		@@NEXT_OBJ_ID += 1
+		@lastPAC3BoneReset = 0
+		@Remap()
 		PPM2.DebugPrint('Created new size controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
 
@@ -147,6 +152,7 @@ class PonySizeController extends PPM2.ControllerChildren
 	DataChanges: (state) =>
 		return if not IsValid(@ent)
 		return if not @ent\IsPony()
+		@Remap()
 		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
 
 		if state\GetKey() == 'PonySize'
@@ -194,12 +200,14 @@ class PonySizeController extends PPM2.ControllerChildren
 
 		@ResetViewOffset(ent)
 		@ResetModelScale(ent)
-		@ResetNeck(ent)
-		@ResetLegs(ent)
+		if @validSkeleton
+			@ResetNeck(ent)
+			@ResetLegs(ent)
 
 	ResetNeck: (ent = @ent) =>
 		return if not CLIENT
 		return if not IsValid(@ent)
+		return if not @validSkeleton
 		with ent
 			\ManipulateBoneScale2Safe(@NECK_BONE_1, Vector(1, 1, 1))
 			\ManipulateBoneScale2Safe(@NECK_BONE_2, Vector(1, 1, 1))
@@ -217,6 +225,7 @@ class PonySizeController extends PPM2.ControllerChildren
 	ResetLegs: (ent = @ent) =>
 		return if not CLIENT
 		return if not IsValid(ent)
+		return if not @validSkeleton
 
 		vec1 = Vector(1, 1, 1)
 		vec2 = Vector(0, 0, 0)
@@ -271,11 +280,15 @@ class PonySizeController extends PPM2.ControllerChildren
 		@ResetScale()
 		@ResetNeck()
 		@ResetLegs()
+		@Remap()
+
 	PlayerRespawn: =>
+		@Remap()
 		@ResetScale()
 		@ModifyScale()
 
 	SlowUpdate: =>
+		@Remap()
 		@ModifyScale()
 
 	ModifyHull: (ent = @ent) =>
@@ -380,6 +393,7 @@ class PonySizeController extends PPM2.ControllerChildren
 	ModifyNeck: (ent = @ent) =>
 		return if not IsValid(ent)
 		return if not @AllowResize()
+		return if not @validSkeleton
 		size = (@GetNeckSize() - 1) * 3
 		vec = Vector(size, -size, 0)
 
@@ -395,6 +409,7 @@ class PonySizeController extends PPM2.ControllerChildren
 	ModifyLegs: (ent = @ent) =>
 		return if not IsValid(ent)
 		return if not @AllowResize()
+		return if not @validSkeleton
 		realSizeModify = @GetLegsSize() - 1
 		size = realSizeModify * 3
 
