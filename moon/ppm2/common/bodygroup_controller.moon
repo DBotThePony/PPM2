@@ -42,47 +42,47 @@ PPM2.BODYGROUP_TAIL = 6
 PPM2.BODYGROUP_CMARK = 7
 PPM2.BODYGROUP_EYELASH = 8
 
--- 0	LrigPelvis
--- 1	LrigSpine1
--- 2	LrigSpine2
--- 3	LrigRibcage
--- 4	LrigNeck1
--- 5	LrigNeck2
--- 6	LrigNeck3
--- 7	LrigScull
--- 8	Lrig_LEG_BL_Femur
--- 9	Lrig_LEG_BL_Tibia
--- 10	Lrig_LEG_BL_LargeCannon
--- 11	Lrig_LEG_BL_PhalanxPrima
--- 12	Lrig_LEG_BL_RearHoof
--- 13	Lrig_LEG_BR_Femur
--- 14	Lrig_LEG_BR_Tibia
--- 15	Lrig_LEG_BR_LargeCannon
--- 16	Lrig_LEG_BR_PhalanxPrima
--- 17	Lrig_LEG_BR_RearHoof
--- 18	Lrig_LEG_FL_Scapula
--- 19	Lrig_LEG_FL_Humerus
--- 20	Lrig_LEG_FL_Radius
--- 21	Lrig_LEG_FL_Metacarpus
--- 22	Lrig_LEG_FL_PhalangesManus
--- 23	Lrig_LEG_FL_FrontHoof
--- 24	Lrig_LEG_FR_Scapula
--- 25	Lrig_LEG_FR_Humerus
--- 26	Lrig_LEG_FR_Radius
--- 27	Lrig_LEG_FR_Metacarpus
--- 28	Lrig_LEG_FR_PhalangesManus
--- 29	Lrig_LEG_FR_FrontHoof
--- 30	Mane01
--- 31	Mane02
--- 32	Mane03
--- 33	Mane04
--- 34	Mane05
--- 35	Mane06
--- 36	Mane07
--- 37	Mane03_tip
--- 38	Tail01
--- 39	Tail02
--- 40	Tail03
+-- 0    LrigPelvis
+-- 1    LrigSpine1
+-- 2    LrigSpine2
+-- 3    LrigRibcage
+-- 4    LrigNeck1
+-- 5    LrigNeck2
+-- 6    LrigNeck3
+-- 7    LrigScull
+-- 8    Lrig_LEG_BL_Femur
+-- 9    Lrig_LEG_BL_Tibia
+-- 10   Lrig_LEG_BL_LargeCannon
+-- 11   Lrig_LEG_BL_PhalanxPrima
+-- 12   Lrig_LEG_BL_RearHoof
+-- 13   Lrig_LEG_BR_Femur
+-- 14   Lrig_LEG_BR_Tibia
+-- 15   Lrig_LEG_BR_LargeCannon
+-- 16   Lrig_LEG_BR_PhalanxPrima
+-- 17   Lrig_LEG_BR_RearHoof
+-- 18   Lrig_LEG_FL_Scapula
+-- 19   Lrig_LEG_FL_Humerus
+-- 20   Lrig_LEG_FL_Radius
+-- 21   Lrig_LEG_FL_Metacarpus
+-- 22   Lrig_LEG_FL_PhalangesManus
+-- 23   Lrig_LEG_FL_FrontHoof
+-- 24   Lrig_LEG_FR_Scapula
+-- 25   Lrig_LEG_FR_Humerus
+-- 26   Lrig_LEG_FR_Radius
+-- 27   Lrig_LEG_FR_Metacarpus
+-- 28   Lrig_LEG_FR_PhalangesManus
+-- 29   Lrig_LEG_FR_FrontHoof
+-- 30   Mane01
+-- 31   Mane02
+-- 32   Mane03
+-- 33   Mane04
+-- 34   Mane05
+-- 35   Mane06
+-- 36   Mane07
+-- 37   Mane03_tip
+-- 38   Tail01
+-- 39   Tail02
+-- 40   Tail03
 
 class DefaultBodygroupController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
@@ -421,60 +421,58 @@ class CPPMBodygroupController extends DefaultBodygroupController
 				@ent\SetBodygroup(@@BODYGROUP_HORN, 2)
 				@ent\SetBodygroup(@@BODYGROUP_WINGS, 3)
 
---
--- 0	LrigPelvis
--- 1	Lrig_LEG_BL_Femur
--- 2	Lrig_LEG_BL_Tibia
--- 3	Lrig_LEG_BL_LargeCannon
--- 4	Lrig_LEG_BL_PhalanxPrima
--- 5	Lrig_LEG_BL_RearHoof
--- 6	Lrig_LEG_BR_Femur
--- 7	Lrig_LEG_BR_Tibia
--- 8	Lrig_LEG_BR_LargeCannon
--- 9	Lrig_LEG_BR_PhalanxPrima
--- 10	Lrig_LEG_BR_RearHoof
--- 11	LrigSpine1
--- 12	LrigSpine2
--- 13	LrigRibcage
--- 14	Lrig_LEG_FL_Scapula
--- 15	Lrig_LEG_FL_Humerus
--- 16	Lrig_LEG_FL_Radius
--- 17	Lrig_LEG_FL_Metacarpus
--- 18	Lrig_LEG_FL_PhalangesManus
--- 19	Lrig_LEG_FL_FrontHoof
--- 20	Lrig_LEG_FR_Scapula
--- 21	Lrig_LEG_FR_Humerus
--- 22	Lrig_LEG_FR_Radius
--- 23	Lrig_LEG_FR_Metacarpus
--- 24	Lrig_LEG_FR_PhalangesManus
--- 25	Lrig_LEG_FR_FrontHoof
--- 26	LrigNeck1
--- 27	LrigNeck2
--- 28	LrigNeck3
--- 29	LrigScull
--- 30	Jaw
--- 31	Ear_L
--- 32	Ear_R
--- 33	Mane02
--- 34	Mane03
--- 35	Mane03_tip
--- 36	Mane04
--- 37	Mane05
--- 38	Mane06
--- 39	Mane07
--- 40	Mane01
--- 41	Lrigweaponbone
--- 42	right_hand
--- 43	Tail01
--- 44	Tail02
--- 45	Tail03
--- 46	wing_l
--- 47	wing_r
--- 48	wing_l_bat
--- 49	wing_r_bat
--- 50	wing_open_l
--- 51	wing_open_r
---
+-- 0    LrigPelvis
+-- 1    Lrig_LEG_BL_Femur
+-- 2    Lrig_LEG_BL_Tibia
+-- 3    Lrig_LEG_BL_LargeCannon
+-- 4    Lrig_LEG_BL_PhalanxPrima
+-- 5    Lrig_LEG_BL_RearHoof
+-- 6    Lrig_LEG_BR_Femur
+-- 7    Lrig_LEG_BR_Tibia
+-- 8    Lrig_LEG_BR_LargeCannon
+-- 9    Lrig_LEG_BR_PhalanxPrima
+-- 10   Lrig_LEG_BR_RearHoof
+-- 11   LrigSpine1
+-- 12   LrigSpine2
+-- 13   LrigRibcage
+-- 14   Lrig_LEG_FL_Scapula
+-- 15   Lrig_LEG_FL_Humerus
+-- 16   Lrig_LEG_FL_Radius
+-- 17   Lrig_LEG_FL_Metacarpus
+-- 18   Lrig_LEG_FL_PhalangesManus
+-- 19   Lrig_LEG_FL_FrontHoof
+-- 20   Lrig_LEG_FR_Scapula
+-- 21   Lrig_LEG_FR_Humerus
+-- 22   Lrig_LEG_FR_Radius
+-- 23   Lrig_LEG_FR_Metacarpus
+-- 24   Lrig_LEG_FR_PhalangesManus
+-- 25   Lrig_LEG_FR_FrontHoof
+-- 26   LrigNeck1
+-- 27   LrigNeck2
+-- 28   LrigNeck3
+-- 29   LrigScull
+-- 30   Jaw
+-- 31   Ear_L
+-- 32   Ear_R
+-- 33   Mane02
+-- 34   Mane03
+-- 35   Mane03_tip
+-- 36   Mane04
+-- 37   Mane05
+-- 38   Mane06
+-- 39   Mane07
+-- 40   Mane01
+-- 41   Lrigweaponbone
+-- 42   right_hand
+-- 43   wing_l
+-- 44   wing_r
+-- 45   Tail01
+-- 46   Tail02
+-- 47   Tail03
+-- 48   wing_l_bat
+-- 49   wing_r_bat
+-- 50   wing_open_l
+-- 51   wing_open_r
 
 class NewBodygroupController extends DefaultBodygroupController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
@@ -487,13 +485,13 @@ class NewBodygroupController extends DefaultBodygroupController
 	@EAR_L = 31
 	@EAR_R = 32
 
-	@BONE_TAIL_1 = 43
-	@BONE_TAIL_2 = 44
-	@BONE_TAIL_3 = 45
+	@BONE_TAIL_1 = 45
+	@BONE_TAIL_2 = 46
+	@BONE_TAIL_3 = 47
 
-	@WING_LEFT_1 = 46
+	@WING_LEFT_1 = 43
 	@WING_LEFT_2 = 48
-	@WING_RIGHT_1 = 47
+	@WING_RIGHT_1 = 44
 	@WING_RIGHT_2 = 49
 
 	@WING_OPEN_LEFT = 50

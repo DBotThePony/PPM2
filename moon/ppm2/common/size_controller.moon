@@ -399,7 +399,6 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_1] or emptyVector))
 			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_2] or emptyVector))
 
---
 -- 0    LrigPelvis
 -- 1    Lrig_LEG_BL_Femur
 -- 2    Lrig_LEG_BL_Tibia
@@ -442,10 +441,16 @@ class PonySizeController extends PPM2.ControllerChildren
 -- 39   Mane07
 -- 40   Mane01
 -- 41   Lrigweaponbone
--- 42   Tail01
--- 43   Tail02
--- 44   Tail03
---
+-- 42   right_hand
+-- 43   wing_l
+-- 44   wing_r
+-- 45   Tail01
+-- 46   Tail02
+-- 47   Tail03
+-- 48   wing_l_bat
+-- 49   wing_r_bat
+-- 50   wing_open_l
+-- 51   wing_open_r
 
 class NewPonySizeContoller extends PonySizeController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}

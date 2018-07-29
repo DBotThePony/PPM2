@@ -18,20 +18,20 @@
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
--- [ 1] = "models/ppm/base/cmark",
--- [ 2] = "models/ppm/base/eyelashes",
--- [ 3] = "models/ppm/base/tongue",
--- [ 4] = "models/ppm/base/body",
--- [ 5] = "models/ppm/base/teeth",
--- [ 6] = "models/ppm/base/eye_l",
--- [ 7] = "models/ppm/base/eye_r",
--- [ 8] = "models/ppm/base/mouth",
--- [ 9] = "models/ppm/base/horn",
--- [10] = "models/ppm/base/wings",
--- [11] = "models/ppm/base/wing_bat",
--- [12] = "models/ppm/base/wing_bat_skin",
--- [13] = "models/ppm/base/hair_color_1",
--- [14] = "models/ppm/base/tail_color_1"
+-- [ 1] = "models/ppm2/base/cmark",
+-- [ 2] = "models/ppm2/base/tongue",
+-- [ 3] = "models/ppm2/base/body",
+-- [ 4] = "models/ppm2/base/eyelashes",
+-- [ 5] = "models/ppm2/base/eye_r",
+-- [ 6] = "models/ppm2/base/teeth",
+-- [ 7] = "models/ppm2/base/mouth",
+-- [ 8] = "models/ppm2/base/eye_l",
+-- [ 9] = "models/ppm2/base/horn",
+-- [10] = "models/ppm2/base/wings",
+-- [11] = "models/ppm2/base/wing_bat",
+-- [12] = "models/ppm2/base/wing_bat_skin",
+-- [13] = "models/ppm2/base/hair_color_1",
+-- [14] = "models/ppm2/base/tail_color_1"
 
 class NewPonyTextureController extends PPM2.PonyTextureController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
@@ -53,13 +53,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
 
 	@MAT_INDEX_CMARK = 0
-	@MAT_INDEX_EYELASHES = 1
-	@MAT_INDEX_TONGUE = 2
-	@MAT_INDEX_BODY = 3
-	@MAT_INDEX_TEETH = 4
-	@MAT_INDEX_EYE_LEFT = 5
-	@MAT_INDEX_EYE_RIGHT = 6
-	@MAT_INDEX_MOUTH = 7
+	@MAT_INDEX_EYELASHES = 3
+	@MAT_INDEX_TONGUE = 1
+	@MAT_INDEX_BODY = 2
+	@MAT_INDEX_TEETH = 5
+	@MAT_INDEX_EYE_LEFT = 7
+	@MAT_INDEX_EYE_RIGHT = 4
+	@MAT_INDEX_MOUTH = 6
 	@MAT_INDEX_HORN = 8
 	@MAT_INDEX_WINGS = 9
 	@MAT_INDEX_WINGS_BAT = 10
