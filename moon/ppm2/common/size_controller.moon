@@ -64,29 +64,29 @@ class PonySizeController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
-	@NECK_BONE_1 = 4
-	@NECK_BONE_2 = 5
-	@NECK_BONE_3 = 6
-	@NECK_BONE_4 = 7
+	@NECK_BONE_1 = 'LrigNeck1'
+	@NECK_BONE_2 = 'LrigNeck2'
+	@NECK_BONE_3 = 'LrigNeck3'
+	@NECK_BONE_4 = 'LrigScull'
 
-	@LEGS_BONE_ROOT = 0
+	@LEGS_BONE_ROOT = 'LrigPelvis'
 
-	@LEGS_FRONT_1 = 23
-	@LEGS_FRONT_2 = 29
+	@LEGS_FRONT_1 = 'Lrig_LEG_FL_FrontHoof'
+	@LEGS_FRONT_2 = 'Lrig_LEG_FR_FrontHoof'
 
-	@LEGS_FRONT_3 = 21
-	@LEGS_FRONT_4 = 27
+	@LEGS_FRONT_3 = 'Lrig_LEG_FL_Metacarpus'
+	@LEGS_FRONT_4 = 'Lrig_LEG_FR_Metacarpus'
 
-	@LEGS_FRONT_5 = 20
-	@LEGS_FRONT_6 = 26
+	@LEGS_FRONT_5 = 'Lrig_LEG_FL_Radius'
+	@LEGS_FRONT_6 = 'Lrig_LEG_FR_Radius'
 
-	@LEGS_BEHIND_1_1 = 14
-	@LEGS_BEHIND_2_1 = 16
-	@LEGS_BEHIND_3_1 = 15
+	@LEGS_BEHIND_1_1 = 'Lrig_LEG_BR_Tibia'
+	@LEGS_BEHIND_2_1 = 'Lrig_LEG_BR_PhalanxPrima'
+	@LEGS_BEHIND_3_1 = 'Lrig_LEG_BR_LargeCannon'
 
-	@LEGS_BEHIND_1_2 = 9
-	@LEGS_BEHIND_2_2 = 11
-	@LEGS_BEHIND_3_2 = 10
+	@LEGS_BEHIND_1_2 = 'Lrig_LEG_BL_Tibia'
+	@LEGS_BEHIND_2_2 = 'Lrig_LEG_BL_PhalanxPrima'
+	@LEGS_BEHIND_3_2 = 'Lrig_LEG_BL_LargeCannon'
 
 	@NEXT_OBJ_ID = 0
 
@@ -98,6 +98,29 @@ class PonySizeController extends PPM2.ControllerChildren
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
+
+		mapping = {
+			'NECK_BONE_1'
+			'NECK_BONE_2'
+			'NECK_BONE_3'
+			'NECK_BONE_4'
+			'LEGS_BONE_ROOT'
+			'LEGS_FRONT_1'
+			'LEGS_FRONT_2'
+			'LEGS_FRONT_3'
+			'LEGS_FRONT_4'
+			'LEGS_FRONT_5'
+			'LEGS_FRONT_6'
+			'LEGS_BEHIND_1_1'
+			'LEGS_BEHIND_2_1'
+			'LEGS_BEHIND_3_1'
+			'LEGS_BEHIND_1_2'
+			'LEGS_BEHIND_2_2'
+			'LEGS_BEHIND_3_2'
+		}
+
+		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
+
 		PPM2.DebugPrint('Created new size controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
 
@@ -178,18 +201,18 @@ class PonySizeController extends PPM2.ControllerChildren
 		return if not CLIENT
 		return if not IsValid(@ent)
 		with ent
-			\ManipulateBoneScale2Safe(@@NECK_BONE_1, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@NECK_BONE_2, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@NECK_BONE_3, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@NECK_BONE_4, Vector(1, 1, 1))
-			\ManipulateBoneAngles2Safe(@@NECK_BONE_1, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@NECK_BONE_2, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@NECK_BONE_3, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@NECK_BONE_4, Angle(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_1, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_2, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_3, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_4, Vector(0, 0, 0))
+			\ManipulateBoneScale2Safe(@NECK_BONE_1, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_2, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_3, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_4, Vector(1, 1, 1))
+			\ManipulateBoneAngles2Safe(@NECK_BONE_1, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@NECK_BONE_2, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@NECK_BONE_3, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@NECK_BONE_4, Angle(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_1, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_2, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_3, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_4, Vector(0, 0, 0))
 
 	ResetLegs: (ent = @ent) =>
 		return if not CLIENT
@@ -200,35 +223,35 @@ class PonySizeController extends PPM2.ControllerChildren
 		ang = Angle(0, 0, 0)
 
 		with ent
-			\ManipulateBoneScale2Safe(@@LEGS_BONE_ROOT, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_FRONT_1, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_FRONT_2, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_1_1, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_2_1, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_3_1, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_1_2, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_2_2, vec1)
-			\ManipulateBoneScale2Safe(@@LEGS_BEHIND_3_2, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BONE_ROOT, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_FRONT_1, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_FRONT_2, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_1_1, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_2_1, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_3_1, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_1_2, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_2_2, vec1)
+			\ManipulateBoneScale2Safe(@LEGS_BEHIND_3_2, vec1)
 
-			\ManipulateBoneAngles2Safe(@@LEGS_BONE_ROOT, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_FRONT_1, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_FRONT_2, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_1_1, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_2_1, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_3_1, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_1_2, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_2_2, ang)
-			\ManipulateBoneAngles2Safe(@@LEGS_BEHIND_3_2, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BONE_ROOT, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_FRONT_1, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_FRONT_2, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_1_1, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_2_1, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_3_1, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_1_2, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_2_2, ang)
+			\ManipulateBoneAngles2Safe(@LEGS_BEHIND_3_2, ang)
 
-			\ManipulateBonePosition2Safe(@@LEGS_BONE_ROOT, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_1, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_2, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_1_1, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_2_1, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_1, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_1_2, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_2_2, vec2)
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_2, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BONE_ROOT, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_1, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_2, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_1, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_1, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_1, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_2, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_2, vec2)
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_2, vec2)
 
 	Remove: => @ResetScale()
 	Reset: =>
@@ -364,10 +387,10 @@ class PonySizeController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition2Safe(@@NECK_BONE_1, vec + (boneAnimTable[@@NECK_BONE_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_2, vec + (boneAnimTable[@@NECK_BONE_2] or emptyVector))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_3, vec + (boneAnimTable[@@NECK_BONE_3] or emptyVector))
-			\ManipulateBonePosition2Safe(@@NECK_BONE_4, vec + (boneAnimTable[@@NECK_BONE_4] or emptyVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_1, vec + (boneAnimTable[@NECK_BONE_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_2, vec + (boneAnimTable[@NECK_BONE_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_3, vec + (boneAnimTable[@NECK_BONE_3] or emptyVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_4, vec + (boneAnimTable[@NECK_BONE_4] or emptyVector))
 
 	ModifyLegs: (ent = @ent) =>
 		return if not IsValid(ent)
@@ -379,25 +402,25 @@ class PonySizeController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition2Safe(@@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + \GetManipulateBonePosition2Safe(@@LEGS_BONE_ROOT))
+			\ManipulateBonePosition2Safe(@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + \GetManipulateBonePosition2Safe(@LEGS_BONE_ROOT))
 
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@@LEGS_FRONT_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_2] or emptyVector))
 
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_3, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_3] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_4, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_FRONT_4] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_3, Vector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_3] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_4, Vector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_4] or emptyVector))
 
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_5] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@@LEGS_FRONT_6] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_5] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_6] or emptyVector))
 
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0) + (boneAnimTable[@@LEGS_BEHIND_1_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0) + (boneAnimTable[@@LEGS_BEHIND_1_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_2] or emptyVector))
 
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_2_1, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_2_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_2_2, Vector(size, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_2_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_1, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_2, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_2] or emptyVector))
 
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@@LEGS_BEHIND_3_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_2] or emptyVector))
 
 -- 0    LrigPelvis
 -- 1    Lrig_LEG_BL_Femur
@@ -455,28 +478,28 @@ class PonySizeController extends PPM2.ControllerChildren
 class NewPonySizeContoller extends PonySizeController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
-	@NECK_BONE_1 = 26
-	@NECK_BONE_2 = 27
-	@NECK_BONE_3 = 28
-	@NECK_BONE_4 = 29
+	@NECK_BONE_1 = 'LrigNeck1'
+	@NECK_BONE_2 = 'LrigNeck2'
+	@NECK_BONE_3 = 'LrigNeck3'
+	@NECK_BONE_4 = 'LrigScull'
 
-	@LEGS_FRONT_1 = 19
-	@LEGS_FRONT_2 = 25
+	@LEGS_FRONT_1 = 'Lrig_LEG_FL_FrontHoof'
+	@LEGS_FRONT_2 = 'Lrig_LEG_FR_FrontHoof'
 
-	@LEGS_FRONT_3 = 17
-	@LEGS_FRONT_4 = 23
+	@LEGS_FRONT_3 = 'Lrig_LEG_FL_Metacarpus'
+	@LEGS_FRONT_4 = 'Lrig_LEG_FR_Metacarpus'
 
-	@LEGS_FRONT_5 = 16
-	@LEGS_FRONT_6 = 22
+	@LEGS_FRONT_5 = 'Lrig_LEG_FL_Radius'
+	@LEGS_FRONT_6 = 'Lrig_LEG_FR_Radius'
 
-	@LEGS_BEHIND_1_1 = 2
-	@LEGS_BEHIND_1_2 = 7
+	@LEGS_BEHIND_1_1 = 'Lrig_LEG_BL_Tibia'
+	@LEGS_BEHIND_1_2 = 'Lrig_LEG_BR_Tibia'
 
-	@LEGS_BEHIND_2_1 = 4
-	@LEGS_BEHIND_2_2 = 9
+	@LEGS_BEHIND_2_1 = 'Lrig_LEG_BL_PhalanxPrima'
+	@LEGS_BEHIND_2_2 = 'Lrig_LEG_BR_PhalanxPrima'
 
-	@LEGS_BEHIND_3_1 = 3
-	@LEGS_BEHIND_3_2 = 8
+	@LEGS_BEHIND_3_1 = 'Lrig_LEG_BL_LargeCannon'
+	@LEGS_BEHIND_3_2 = 'Lrig_LEG_BR_LargeCannon'
 
 	new: (...) =>
 		super(...)

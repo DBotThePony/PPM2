@@ -79,6 +79,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@lastPAC3BoneReset = 0
 		@scale = 1
 		@SetWeight(data\GetWeight())
+		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for {:id, :scale} in *@@WEIGHT_BONES]
 		@UpdateWeight() if IsValid(@ent) and applyWeight
 		PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
 
@@ -90,13 +91,38 @@ class PonyWeightController extends PPM2.ControllerChildren
 	GetModel: => @networkedData\GetModel()
 
 	@WEIGHT_BONES = {
-		{id: 0, scale: 1.1}
-		{id: 1, scale: 0.7}
-		{id: 2, scale: 0.7}
-		{id: 3, scale: 0.7}
+		{id: 'LrigPelvis', scale: 1.1}
+		{id: 'LrigSpine1', scale: 0.7}
+		{id: 'LrigSpine2', scale: 0.7}
+		{id: 'LrigRibcage', scale: 0.7}
 	}
 
-	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 8, 29
+	extrabones = {
+		'Lrig_LEG_BL_Femur'
+		'Lrig_LEG_BL_Tibia'
+		'Lrig_LEG_BL_LargeCannon'
+		'Lrig_LEG_BL_PhalanxPrima'
+		'Lrig_LEG_BL_RearHoof'
+		'Lrig_LEG_BR_Femur'
+		'Lrig_LEG_BR_Tibia'
+		'Lrig_LEG_BR_LargeCannon'
+		'Lrig_LEG_BR_PhalanxPrima'
+		'Lrig_LEG_BR_RearHoof'
+		'Lrig_LEG_FL_Scapula'
+		'Lrig_LEG_FL_Humerus'
+		'Lrig_LEG_FL_Radius'
+		'Lrig_LEG_FL_Metacarpus'
+		'Lrig_LEG_FL_PhalangesManus'
+		'Lrig_LEG_FL_FrontHoof'
+		'Lrig_LEG_FR_Scapula'
+		'Lrig_LEG_FR_Humerus'
+		'Lrig_LEG_FR_Radius'
+		'Lrig_LEG_FR_Metacarpus'
+		'Lrig_LEG_FR_PhalangesManus'
+		'Lrig_LEG_FR_FrontHoof'
+	}
+
+	table.insert(@WEIGHT_BONES, {id: name, scale: 1}) for name in *extrabones
 
 	DataChanges: (state) =>
 		return if not IsValid(@ent) or not @isValid
@@ -113,7 +139,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	ResetBones: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
-		for {:id} in *@@WEIGHT_BONES
+		for {:id} in *@WEIGHT_BONES
 			ent\ManipulateBoneScale2Safe(id, @@DEFAULT_BONE_SIZE)
 
 	Reset: => @ResetBones()
@@ -122,7 +148,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		return if not IsValid(ent) or not @isValid
 		return if not @ent\IsPony()
 
-		for {:id, :scale} in *@@WEIGHT_BONES
+		for {:id, :scale} in *@WEIGHT_BONES
 			delta = 1 + (@weight * @scale - 1) * scale
 			ent\ManipulateBoneScale2Safe(id, Vector(delta, delta, delta))
 
@@ -196,23 +222,41 @@ class NewPonyWeightController extends PonyWeightController
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
 	@WEIGHT_BONES = {
-		{id: 0, scale: 1.1}
-		{id: 1, scale: 0.7}
-		{id: 6, scale: 0.7}
-		{id: 11, scale: 0.7}
-		{id: 12, scale: 0.7}
-		{id: 13, scale: 0.7}
-		{id: 14, scale: 0.7}
-		{id: 20, scale: 0.7}
+		{id: 'LrigPelvis', scale: 1.1}
+		{id: 'Lrig_LEG_BL_Femur', scale: 0.7}
+		{id: 'Lrig_LEG_BR_Femur', scale: 0.7}
+		{id: 'LrigSpine1', scale: 0.7}
+		{id: 'LrigSpine2', scale: 0.7}
+		{id: 'LrigRibcage', scale: 0.7}
+		{id: 'Lrig_LEG_FL_Scapula', scale: 0.7}
+		{id: 'Lrig_LEG_FR_Scapula', scale: 0.7}
 
-		{id: 5, scale: 0.9}
-		{id: 10, scale: 0.9}
-		{id: 19, scale: 0.9}
-		{id: 25, scale: 0.9}
+		{id: 'Lrig_LEG_BL_RearHoof', scale: 0.9}
+		{id: 'Lrig_LEG_BR_RearHoof', scale: 0.9}
+		{id: 'Lrig_LEG_FL_FrontHoof', scale: 0.9}
+		{id: 'Lrig_LEG_FR_FrontHoof', scale: 0.9}
+
+		{id: 'Lrig_LEG_BL_Tibia', scale: 1}
+		{id: 'Lrig_LEG_BL_LargeCannon', scale: 1}
+		{id: 'Lrig_LEG_BL_PhalanxPrima', scale: 1}
+		{id: 'Lrig_LEG_BR_Femur', scale: 1}
+		{id: 'Lrig_LEG_BR_Tibia', scale: 1}
+		{id: 'Lrig_LEG_BR_LargeCannon', scale: 1}
+		{id: 'Lrig_LEG_BR_PhalanxPrima', scale: 1}
+
+		{id: 'Lrig_LEG_FL_Humerus', scale: 1}
+		{id: 'Lrig_LEG_FL_Radius', scale: 1}
+		{id: 'Lrig_LEG_FL_Metacarpus', scale: 1}
+		{id: 'Lrig_LEG_FL_PhalangesManus', scale: 1}
+		{id: 'Lrig_LEG_FR_Humerus', scale: 1}
+		{id: 'Lrig_LEG_FR_Radius', scale: 1}
+		{id: 'Lrig_LEG_FR_Metacarpus', scale: 1}
+		{id: 'Lrig_LEG_FR_PhalangesManus', scale: 1}
+		{id: 'LrigNeck1', scale: 1}
+		{id: 'LrigNeck2', scale: 1}
+		{id: 'LrigNeck3', scale: 1}
 	}
 
-	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 1, 10
-	table.insert(@WEIGHT_BONES, {id: i, scale: 1}) for i = 14, 28
 
 PPM2.PonyWeightController = PonyWeightController
 PPM2.NewPonyWeightController = NewPonyWeightController

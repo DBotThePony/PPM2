@@ -103,15 +103,21 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	@COOLDOWN_TIME = 5
 	@COOLDOWN_MAX_COUNT = 4
 
-	for i = 1, 8
-		@['BONE_MANE_' .. i] = 29 + i
+	@BONE_MANE_1 = 'Mane01'
+	@BONE_MANE_2 = 'Mane02'
+	@BONE_MANE_3 = 'Mane03'
+	@BONE_MANE_4 = 'Mane04'
+	@BONE_MANE_5 = 'Mane05'
+	@BONE_MANE_6 = 'Mane06'
+	@BONE_MANE_7 = 'Mane07'
+	@BONE_MANE_8 = 'Mane03_tip'
 
-	@BONE_TAIL_1 = 38
-	@BONE_TAIL_2 = 39
-	@BONE_TAIL_3 = 40
+	@BONE_TAIL_1 = 'Tail01'
+	@BONE_TAIL_2 = 'Tail02'
+	@BONE_TAIL_3 = 'Tail03'
 
-	@BONE_SPINE_ROOT = 0
-	@BONE_SPINE = 2
+	@BONE_SPINE_ROOT = 'LrigPelvis'
+	@BONE_SPINE = 'LrigSpine2'
 
 	new: (controller) =>
 		@isValid = true
@@ -121,6 +127,17 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
+
+		mapping = {
+			'BONE_SPINE_ROOT'
+			'BONE_TAIL_1', 'BONE_TAIL_2', 'BONE_TAIL_3'
+			'BONE_SPINE', 'BONE_MANE_1', 'BONE_MANE_2'
+			'BONE_MANE_3', 'BONE_MANE_4', 'BONE_MANE_5'
+			'BONE_MANE_6', 'BONE_MANE_7', 'BONE_MANE_8'
+		}
+
+		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
+
 		PPM2.DebugPrint('Created new bodygroups controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
@@ -234,34 +251,34 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	ResetTail: =>
 		return if not CLIENT
 		with @ent
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_1, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_2, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_3, Vector(1, 1, 1))
-			\ManipulateBoneAngles2Safe(@@BONE_TAIL_1, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@BONE_TAIL_2, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@BONE_TAIL_3, Angle(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@BONE_TAIL_1, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@BONE_TAIL_2, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@BONE_TAIL_3, Vector(0, 0, 0))
+			\ManipulateBoneScale2Safe(@BONE_TAIL_1, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@BONE_TAIL_2, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@BONE_TAIL_3, Vector(1, 1, 1))
+			\ManipulateBoneAngles2Safe(@BONE_TAIL_1, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@BONE_TAIL_2, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@BONE_TAIL_3, Angle(0, 0, 0))
+			\ManipulateBonePosition2Safe(@BONE_TAIL_1, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@BONE_TAIL_2, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@BONE_TAIL_3, Vector(0, 0, 0))
 
 	ResetBack: =>
 		return if not CLIENT
 		with @ent
-			\ManipulateBoneScale2Safe(@@BONE_SPINE_ROOT, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@@BONE_SPINE, Vector(1, 1, 1))
-			\ManipulateBoneAngles2Safe(@@BONE_SPINE_ROOT, Angle(0, 0, 0))
-			\ManipulateBoneAngles2Safe(@@BONE_SPINE, Angle(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@BONE_SPINE_ROOT, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@@BONE_SPINE, Vector(0, 0, 0))
+			\ManipulateBoneScale2Safe(@BONE_SPINE_ROOT, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@BONE_SPINE, Vector(1, 1, 1))
+			\ManipulateBoneAngles2Safe(@BONE_SPINE_ROOT, Angle(0, 0, 0))
+			\ManipulateBoneAngles2Safe(@BONE_SPINE, Angle(0, 0, 0))
+			\ManipulateBonePosition2Safe(@BONE_SPINE_ROOT, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@BONE_SPINE, Vector(0, 0, 0))
 
 	ResetMane: =>
 		return if not CLIENT
 		vec1, ang, vec2 = Vector(1, 1, 1), Angle(0, 0, 0), Vector(0, 0, 0)
 		with @ent
 			for i = 1, 7
-				\ManipulateBoneScale2Safe(@@['BONE_MANE_' .. i], vec1)
-				\ManipulateBoneAngles2Safe(@@['BONE_MANE_' .. i], ang)
-				\ManipulateBonePosition2Safe(@@['BONE_MANE_' .. i], vec2)
+				\ManipulateBoneScale2Safe(@['BONE_MANE_' .. i], vec1)
+				\ManipulateBoneAngles2Safe(@['BONE_MANE_' .. i], ang)
+				\ManipulateBonePosition2Safe(@['BONE_MANE_' .. i], vec2)
 
 	ResetBodygroups: =>
 		return unless @isValid
@@ -291,13 +308,13 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_1, vecTail)
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_2, vecTail)
-			\ManipulateBoneScale2Safe(@@BONE_TAIL_3, vecTail)
+			\ManipulateBoneScale2Safe(@BONE_TAIL_1, vecTail)
+			\ManipulateBoneScale2Safe(@BONE_TAIL_2, vecTail)
+			\ManipulateBoneScale2Safe(@BONE_TAIL_3, vecTail)
 
-			--\ManipulateBonePosition2Safe(@@BONE_TAIL_1, vecTail + (boneAnimTable[@@BONE_TAIL_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_TAIL_2, vecTailPos + (boneAnimTable[@@BONE_TAIL_2] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_TAIL_3, vecTailPos + (boneAnimTable[@@BONE_TAIL_3] or emptyVector))
+			--\ManipulateBonePosition2Safe(@BONE_TAIL_1, vecTail + (boneAnimTable[@BONE_TAIL_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_TAIL_2, vecTailPos + (boneAnimTable[@BONE_TAIL_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_TAIL_3, vecTailPos + (boneAnimTable[@BONE_TAIL_3] or emptyVector))
 
 	UpdateManeSize: (ent = @ent) =>
 		return if not CLIENT
@@ -310,22 +327,22 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBoneScale2Safe(@@BONE_MANE_1, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_2, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_3, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_4, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_5, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_6, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_7, vecMane)
-			\ManipulateBoneScale2Safe(@@BONE_MANE_8, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_1, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_2, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_3, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_4, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_5, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_6, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_7, vecMane)
+			\ManipulateBoneScale2Safe(@BONE_MANE_8, vecMane)
 
-			\ManipulateBonePosition2Safe(@@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0) + (boneAnimTable[@@BONE_MANE_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1) + (boneAnimTable[@@BONE_MANE_2] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_3, Vector((size - 1) * 2, 0, 0) +               (boneAnimTable[@@BONE_MANE_3] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size) + (boneAnimTable[@@BONE_MANE_4] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@@BONE_MANE_5] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_6] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@@BONE_MANE_7] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0) + (boneAnimTable[@BONE_MANE_1] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1) + (boneAnimTable[@BONE_MANE_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_3, Vector((size - 1) * 2, 0, 0) +               (boneAnimTable[@BONE_MANE_3] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size) + (boneAnimTable[@BONE_MANE_4] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@BONE_MANE_5] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_6] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_7] or emptyVector))
 
 	UpdateBack: (ent = @ent) =>
 		return if not CLIENT
@@ -338,8 +355,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition2Safe(@@BONE_SPINE_ROOT, vecModify + (boneAnimTable[@@BONE_SPINE_ROOT] or emptyVector))
-			\ManipulateBonePosition2Safe(@@BONE_SPINE, vecModify2 + (boneAnimTable[@@BONE_SPINE] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_SPINE_ROOT, vecModify + (boneAnimTable[@BONE_SPINE_ROOT] or emptyVector))
+			\ManipulateBonePosition2Safe(@BONE_SPINE, vecModify2 + (boneAnimTable[@BONE_SPINE] or emptyVector))
 
 	SlowUpdate: (createModels = CLIENT, ent = @ent, force = false) =>
 		return if not IsValid(ent)
@@ -482,36 +499,31 @@ class NewBodygroupController extends DefaultBodygroupController
 	@BODYGROUP_HORN = 1
 	@BODYGROUP_WINGS = 2
 
-	@EAR_L = 31
-	@EAR_R = 32
+	@EAR_L = 'Ear_L'
+	@EAR_R = 'Ear_R'
 
-	@BONE_TAIL_1 = 45
-	@BONE_TAIL_2 = 46
-	@BONE_TAIL_3 = 47
+	@WING_LEFT_1 = 'wing_l'
+	@WING_LEFT_2 = 'wing_l_bat'
+	@WING_RIGHT_1 = 'wing_r'
+	@WING_RIGHT_2 = 'wing_r_bat'
 
-	@WING_LEFT_1 = 43
-	@WING_LEFT_2 = 48
-	@WING_RIGHT_1 = 44
-	@WING_RIGHT_2 = 49
+	@WING_OPEN_LEFT = 'wing_open_l'
+	@WING_OPEN_RIGHT = 'wing_open_r'
 
-	@WING_OPEN_LEFT = 50
-	@WING_OPEN_RIGHT = 51
-
-	@BONE_SPINE = 11
-
-	@BONE_MANE_1 = 40
-	@BONE_MANE_2 = 33
-	@BONE_MANE_3 = 34
-	@BONE_MANE_4 = 36
-	@BONE_MANE_5 = 37
-	@BONE_MANE_6 = 38
-	@BONE_MANE_7 = 39
-	@BONE_MANE_8 = 35
+	@BONE_SPINE = 'LrigSpine1'
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
 	new: (...) =>
 		super(...)
+
+		mapping = {
+			'EAR_L', 'EAR_R'
+			'WING_LEFT_1', 'WING_LEFT_2', 'WING_RIGHT_1'
+			'WING_RIGHT_2', 'WING_OPEN_LEFT', 'WING_OPEN_RIGHT'
+		}
+
+		@[name] = @ent\LookupBone(@@[name]) for name in *mapping
 
 	CreateUpperManeModel: (force = false) =>
 		return NULL if SERVER or not @isValid or not IsValid(@ent) or not force and @ent\IsDormant() or not @ent\IsPony()
@@ -694,7 +706,7 @@ class NewBodygroupController extends DefaultBodygroupController
 	ResetWings: =>
 		return if SERVER
 		ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
-		for wing in *{@@WING_LEFT_1, @@WING_LEFT_2, @@WING_RIGHT_1, @@WING_RIGHT_2, @@WING_OPEN_LEFT, @@WING_OPEN_RIGHT}
+		for wing in *{@WING_LEFT_1, @WING_LEFT_2, @WING_RIGHT_1, @WING_RIGHT_2, @WING_OPEN_LEFT, @WING_OPEN_RIGHT}
 			with @ent
 				\ManipulateBoneAngles2Safe(wing, ang)
 				\ManipulateBoneScale2Safe(wing, vec1)
@@ -714,28 +726,28 @@ class NewBodygroupController extends DefaultBodygroupController
 		rightPos = Vector(rightX, rightY, rightZ)
 
 		with @ent
-			\ManipulateBoneScale2Safe(@@WING_LEFT_1, left)
-			\ManipulateBoneScale2Safe(@@WING_LEFT_2, left)
-			\ManipulateBoneScale2Safe(@@WING_OPEN_LEFT, left)
-			\ManipulateBoneScale2Safe(@@WING_RIGHT_1, right)
-			\ManipulateBoneScale2Safe(@@WING_RIGHT_2, right)
-			\ManipulateBoneScale2Safe(@@WING_OPEN_RIGHT, right)
+			\ManipulateBoneScale2Safe(@WING_LEFT_1, left)
+			\ManipulateBoneScale2Safe(@WING_LEFT_2, left)
+			\ManipulateBoneScale2Safe(@WING_OPEN_LEFT, left)
+			\ManipulateBoneScale2Safe(@WING_RIGHT_1, right)
+			\ManipulateBoneScale2Safe(@WING_RIGHT_2, right)
+			\ManipulateBoneScale2Safe(@WING_OPEN_RIGHT, right)
 
-			\ManipulateBonePosition2Safe(@@WING_LEFT_1, leftPos)
-			\ManipulateBonePosition2Safe(@@WING_LEFT_2, leftPos)
-			\ManipulateBonePosition2Safe(@@WING_OPEN_LEFT, leftPos)
-			\ManipulateBonePosition2Safe(@@WING_RIGHT_1, rightPos)
-			\ManipulateBonePosition2Safe(@@WING_RIGHT_2, rightPos)
-			\ManipulateBonePosition2Safe(@@WING_OPEN_RIGHT, rightPos)
+			\ManipulateBonePosition2Safe(@WING_LEFT_1, leftPos)
+			\ManipulateBonePosition2Safe(@WING_LEFT_2, leftPos)
+			\ManipulateBonePosition2Safe(@WING_OPEN_LEFT, leftPos)
+			\ManipulateBonePosition2Safe(@WING_RIGHT_1, rightPos)
+			\ManipulateBonePosition2Safe(@WING_RIGHT_2, rightPos)
+			\ManipulateBonePosition2Safe(@WING_OPEN_RIGHT, rightPos)
 
 	UpdateEars: =>
 		vec = Vector(1, 1, 1) * @GrabData('EarsSize')
-		@ent\ManipulateBoneScale2Safe(@@EAR_L, vec)
-		@ent\ManipulateBoneScale2Safe(@@EAR_R, vec)
+		@ent\ManipulateBoneScale2Safe(@EAR_L, vec)
+		@ent\ManipulateBoneScale2Safe(@EAR_R, vec)
 
 	ResetEars: =>
 		ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
-		for part in *{@@EAR_L, @@EAR_R}
+		for part in *{@EAR_L, @EAR_R}
 			with @ent
 				\ManipulateBoneAngles2Safe(part, ang)
 				\ManipulateBoneScale2Safe(part, vec1)
