@@ -32,7 +32,7 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 
 	new: (controller) =>
 		super()
-		@isValid = true
+
 		if controller
 			@ent = controller.ent
 			@entID = controller.entID
@@ -59,6 +59,6 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	RemoveFunc: =>
 	Remove: =>
 		return false if not @isValid
-		@isValid = false
+		super()
 		@RemoveFunc()
 		return true

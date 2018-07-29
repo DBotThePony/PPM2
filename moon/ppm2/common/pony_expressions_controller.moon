@@ -483,6 +483,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			seqPlay = @RestartSequence(emote, time)
 			if not seqPlay
 				PPM2.Message("Unknown Emote - #{emote}!")
+				print(seqPlay, @isValid)
 				print(debug.traceback())
 				return
 			seqPlay\SetInfinite(isEndless)

@@ -386,6 +386,12 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	IsValid: => @isValid and @ent\IsValid()
 	GetEntity: => @ent
 
+	Remove: =>
+		return if not @isValid
+		@ClearModifiers()
+		super()
+		@ent.__ppmBonesModifiers = nil if IsValid(@ent)
+
 with FindMetaTable('Entity')
 	.PPMBonesModifier = =>
 		with t = .GetTable(@)

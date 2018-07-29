@@ -28,6 +28,7 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 
 	new: =>
 		super()
+		@isValid = true
 		@hooks = {}
 		@@NEXT_HOOK_ID += 1
 		@fid = @@NEXT_HOOK_ID
@@ -41,7 +42,7 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 		return false if not @@SEQUENCES_TABLE
 		return false if not @isValid
 		return @currentSequences[seqID] if @currentSequences[seqID]
-		return if not @@SEQUENCES_TABLE[seqID]
+		return false if not @@SEQUENCES_TABLE[seqID]
 		SequenceObject = @@SequenceObject
 		@currentSequences[seqID] = SequenceObject(@, @@SEQUENCES_TABLE[seqID])
 		@currentSequences[seqID]\SetTime(time) if time

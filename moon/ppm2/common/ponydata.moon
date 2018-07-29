@@ -410,6 +410,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@ApplyBodygroups(CLIENT, true)
 		@SetFly(false) if SERVER
 
+		@ent\PPMBonesModifier()
+
 		if scale = @GetSizeController()
 			scale\PlayerRespawn()
 
@@ -423,6 +425,9 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	PlayerDeath: =>
 		return if not IsValid(@ent)
+
+		if @ent.__ppmBonesModifiers
+			@ent.__ppmBonesModifiers\Remove()
 
 		@entTable.__cachedIsPony = @ent\IsPony()
 
