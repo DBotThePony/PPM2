@@ -491,7 +491,7 @@ MODEL_BOX_PANEL = {
 		if type(menu.points) == 'table'
 			@drawPoints = true
 			@pointsData = for point in *menu.points
-				vecpos = point.getpos(@model)
+				vecpos = point.getpos(@model, @controller\GetPonySize())
 				position = vecpos\ToScreen()
 				{position, point, vecpos\Distance(drawpos)}
 		elseif @InMenu() and menu.getpos
@@ -1393,26 +1393,26 @@ patchSubtree = (node) ->
 				when 'point'
 					point.getpos = => Vector(point.target)
 				when 'bone'
-					point.getpos = =>
+					point.getpos = (ponysize = 1) =>
 						if not point.targetID or point.targetID == -1
 							point.targetID = @LookupBone(point.target) or -1
 
 						if point.targetID == -1
-							return Vector(point.addvector)
+							return point.addvector * ponysize
 						else
 							--bonepos = @GetBonePosition(point.targetID)
 							--print(point.target, bonepos) if bonepos == Vector()
-							return @GetBonePosition(point.targetID) + point.addvector
+							return @GetBonePosition(point.targetID) + point.addvector * ponysize
 				when 'attach'
-					point.getpos = =>
+					point.getpos = (ponysize = 1) =>
 						if not point.targetID or point.targetID == -1
 							point.targetID = @LookupAttachment(point.target) or -1
 
 						if point.targetID == -1
-							return Vector(point.addvector)
+							return point.addvector * ponysize
 						else
 							{:Pos, :Ang} = @GetAttachment(point.targetID)
-							return Pos and (Pos + point.addvector) or Vector(point.addvector)
+							return Pos and (Pos + point.addvector * ponysize) or point.addvector * ponysize
 
 			if type(node.children) == 'table'
 				point.linkTable = table.Copy(node.children[point.link])
