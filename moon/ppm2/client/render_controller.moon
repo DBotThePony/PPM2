@@ -294,8 +294,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	PlayerDeath: =>
 		return if not @isValid
-		@emotes\Remove()
-		@emotes = nil
+		if @emotes
+			@emotes\Remove()
+			@emotes = nil
 		@HideModels(true)
 		@GetTextureController()\ResetTextures() if @GetTextureController() and @ent\IsPony()
 
