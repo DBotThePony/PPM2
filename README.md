@@ -29,7 +29,7 @@ cvar list
 ppm2_bots                                : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Whatever spawn bots as ponies
 ppm2_debug                               : 0        : , "sv", "demo", "clientcmd_can_execute", "lua_server" : Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.
 ppm2_disable_flexes                      : 0        : , "sv", "demo", "clientcmd_can_execute", "lua_server" : Disable pony flexes controllers. Saves some FPS.
-ppm2_fly                                 : cmd      :                  : 
+ppm2_fly                                 : cmd      :                  :
 ppm2_no_hoofsound                        : 0        : , "sv", "rep", "demo", "clientcmd_can_execute", "lua_server" : Disable hoofstep sound play time
 ppm2_sv_dmg                              : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Enable hitbox damage scailing
 ppm2_sv_dmg_chest                        : 1        : , "sv", "nf", "demo", "clientcmd_can_execute", "lua_server" : Damage scale when pony-player got shot in chest
@@ -61,22 +61,22 @@ ppm2_alternative_render                  : 0        : , "demo", "server_can_exec
 ppm2_cl_hires_body                       : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)
 ppm2_cl_hires_generic                    : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Create 1024x1024 textures instead of 512x512 on texture compiling
 ppm2_cl_no_hoofsound                     : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Disable hoofstep sound play time
-ppm2_cleanup                             : cmd      :                  : 
+ppm2_cleanup                             : cmd      :                  :
 ppm2_debug                               : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.
 ppm2_disable_flexes                      : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Disable pony flexes controllers. Saves some FPS.
 ppm2_draw_legs                           : 1        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Draw pony legs.
-ppm2_editor                              : cmd      :                  : 
+ppm2_editor                              : cmd      :                  :
 ppm2_editor_advanced                     : 1        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Show all options
 ppm2_editor_fullbright                   : 1        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Disable lighting in editor
 ppm2_editor_model                        : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : What model to use in editor. Valids are 'default', 'cppm', 'new'
-ppm2_editor_reload                       : cmd      :                  : 
+ppm2_editor_reload                       : cmd      :                  :
 ppm2_editor_width                        : 384      : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Width of editor panel, in pixels
-ppm2_emote                               : cmd      :                  : 
+ppm2_emote                               : cmd      :                  :
 ppm2_flashlight_pass                     : 1        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Enable flashlight render pass. This kills FPS.
 ppm2_no_hoofsound                        : 0        : , "rep", "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Disable hoofstep sound play time
-ppm2_reload                              : cmd      :                  : 
-ppm2_reload_materials                    : cmd      :                  : 
-ppm2_require                             : cmd      :                  : 
+ppm2_reload                              : cmd      :                  :
+ppm2_reload_materials                    : cmd      :                  :
+ppm2_require                             : cmd      :                  :
 ppm2_sv_edit_no_players                  : 1        : , "nf", "rep", "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : When unrestricted edit allowed, do not allow to edit players.
 ppm2_sv_edit_ragdolls_only               : 0        : , "nf", "rep", "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Allow to edit only ragdolls
 ppm2_sv_flight                           : 0        : , "nf", "rep", "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.
@@ -95,141 +95,148 @@ ppm2_task_render_type                    : 1        : , "nf", "demo", "server_ca
 ## Old Model Bones
 
 ```
-0	LrigPelvis
-1	LrigSpine1
-2	LrigSpine2
-3	LrigRibcage
-4	LrigNeck1
-5	LrigNeck2
-6	LrigNeck3
-7	LrigScull
-8	Lrig_LEG_BL_Femur
-9	Lrig_LEG_BL_Tibia
-10	Lrig_LEG_BL_LargeCannon
-11	Lrig_LEG_BL_PhalanxPrima
-12	Lrig_LEG_BL_RearHoof
-13	Lrig_LEG_BR_Femur
-14	Lrig_LEG_BR_Tibia
-15	Lrig_LEG_BR_LargeCannon
-16	Lrig_LEG_BR_PhalanxPrima
-17	Lrig_LEG_BR_RearHoof
-18	Lrig_LEG_FL_Scapula
-19	Lrig_LEG_FL_Humerus
-20	Lrig_LEG_FL_Radius
-21	Lrig_LEG_FL_Metacarpus
-22	Lrig_LEG_FL_PhalangesManus
-23	Lrig_LEG_FL_FrontHoof
-24	Lrig_LEG_FR_Scapula
-25	Lrig_LEG_FR_Humerus
-26	Lrig_LEG_FR_Radius
-27	Lrig_LEG_FR_Metacarpus
-28	Lrig_LEG_FR_PhalangesManus
-29	Lrig_LEG_FR_FrontHoof
-30	Mane01
-31	Mane02
-32	Mane03
-33	Mane04
-34	Mane05
-35	Mane06
-36	Mane07
-37	Mane03_tip
-38	Tail01
-39	Tail02
-40	Tail03
+0   LrigPelvis
+1   LrigSpine1
+2   LrigSpine2
+3   LrigRibcage
+4   LrigNeck1
+5   LrigNeck2
+6   LrigNeck3
+7   LrigScull
+8   Lrig_LEG_BL_Femur
+9   Lrig_LEG_BL_Tibia
+10  Lrig_LEG_BL_LargeCannon
+11  Lrig_LEG_BL_PhalanxPrima
+12  Lrig_LEG_BL_RearHoof
+13  Lrig_LEG_BR_Femur
+14  Lrig_LEG_BR_Tibia
+15  Lrig_LEG_BR_LargeCannon
+16  Lrig_LEG_BR_PhalanxPrima
+17  Lrig_LEG_BR_RearHoof
+18  Lrig_LEG_FL_Scapula
+19  Lrig_LEG_FL_Humerus
+20  Lrig_LEG_FL_Radius
+21  Lrig_LEG_FL_Metacarpus
+22  Lrig_LEG_FL_PhalangesManus
+23  Lrig_LEG_FL_FrontHoof
+24  Lrig_LEG_FR_Scapula
+25  Lrig_LEG_FR_Humerus
+26  Lrig_LEG_FR_Radius
+27  Lrig_LEG_FR_Metacarpus
+28  Lrig_LEG_FR_PhalangesManus
+29  Lrig_LEG_FR_FrontHoof
+30  Mane01
+31  Mane02
+32  Mane03
+33  Mane04
+34  Mane05
+35  Mane06
+36  Mane07
+37  Mane03_tip
+38  Tail01
+39  Tail02
+40  Tail03
 ```
 
 ## New model bones
-```
-0	LrigPelvis
-1	Lrig_LEG_BL_Femur
-2	Lrig_LEG_BL_Tibia
-3	Lrig_LEG_BL_LargeCannon
-4	Lrig_LEG_BL_PhalanxPrima
-5	Lrig_LEG_BL_RearHoof
-6	Lrig_LEG_BR_Femur
-7	Lrig_LEG_BR_Tibia
-8	Lrig_LEG_BR_LargeCannon
-9	Lrig_LEG_BR_PhalanxPrima
-10	Lrig_LEG_BR_RearHoof
-11	LrigSpine1
-12	LrigSpine2
-13	LrigRibcage
-14	Lrig_LEG_FL_Scapula
-15	Lrig_LEG_FL_Humerus
-16	Lrig_LEG_FL_Radius
-17	Lrig_LEG_FL_Metacarpus
-18	Lrig_LEG_FL_PhalangesManus
-19	Lrig_LEG_FL_FrontHoof
-20	Lrig_LEG_FR_Scapula
-21	Lrig_LEG_FR_Humerus
-22	Lrig_LEG_FR_Radius
-23	Lrig_LEG_FR_Metacarpus
-24	Lrig_LEG_FR_PhalangesManus
-25	Lrig_LEG_FR_FrontHoof
-26	LrigNeck1
-27	LrigNeck2
-28	LrigNeck3
-29	LrigScull
-30	Jaw
-31	Ear_L
-32	Ear_R
-33	Mane02
-34	Mane03
-35	Mane03_tip
-36	Mane04
-37	Mane05
-38	Mane06
-39	Mane07
-40	Mane01
-41	Lrigweaponbone
-42	Tail01
-43	Tail02
-44	Tail03
+```lua
+-- 0    LrigPelvis
+-- 1    Lrig_LEG_BL_Femur
+-- 2    Lrig_LEG_BL_Tibia
+-- 3    Lrig_LEG_BL_LargeCannon
+-- 4    Lrig_LEG_BL_PhalanxPrima
+-- 5    Lrig_LEG_BL_RearHoof
+-- 6    Lrig_LEG_BR_Femur
+-- 7    Lrig_LEG_BR_Tibia
+-- 8    Lrig_LEG_BR_LargeCannon
+-- 9    Lrig_LEG_BR_PhalanxPrima
+-- 10   Lrig_LEG_BR_RearHoof
+-- 11   LrigSpine1
+-- 12   LrigSpine2
+-- 13   LrigRibcage
+-- 14   Lrig_LEG_FL_Scapula
+-- 15   Lrig_LEG_FL_Humerus
+-- 16   Lrig_LEG_FL_Radius
+-- 17   Lrig_LEG_FL_Metacarpus
+-- 18   Lrig_LEG_FL_PhalangesManus
+-- 19   Lrig_LEG_FL_FrontHoof
+-- 20   Lrig_LEG_FR_Scapula
+-- 21   Lrig_LEG_FR_Humerus
+-- 22   Lrig_LEG_FR_Radius
+-- 23   Lrig_LEG_FR_Metacarpus
+-- 24   Lrig_LEG_FR_PhalangesManus
+-- 25   Lrig_LEG_FR_FrontHoof
+-- 26   LrigNeck1
+-- 27   LrigNeck2
+-- 28   LrigNeck3
+-- 29   LrigScull
+-- 30   Jaw
+-- 31   Ear_L
+-- 32   Ear_R
+-- 33   Mane02
+-- 34   Mane03
+-- 35   Mane03_tip
+-- 36   Mane04
+-- 37   Mane05
+-- 38   Mane06
+-- 39   Mane07
+-- 40   Mane01
+-- 41   Lrigweaponbone
+-- 42   right_hand
+-- 43   wing_l
+-- 44   wing_r
+-- 45   Tail01
+-- 46   Tail02
+-- 47   Tail03
+-- 48   wing_l_bat
+-- 49   wing_r_bat
+-- 50   wing_open_l
+-- 51   wing_open_r
 ```
 
 ## Flexes
 ```
-0	eyes_updown
-1	eyes_rightleft
-2	JawOpen
-3	JawClose
-4	Smirk
-5	Frown
-6	Stretch
-7	Pucker
-8	Grin
-9	CatFace
-10	Mouth_O
-11	Mouth_O2
-12	Mouth_Full
-13	Tongue_Out
-14	Tongue_Up
-15	Tongue_Down
-16	NoEyelashes
-17	Eyes_Blink
-18	Left_Blink
-19	Right_Blink
-20	Scrunch
-21	FatButt
-22	Stomach_Out
-23	Stomach_In
-24	Throat_Bulge
-25	Male
-26	Hoof_Fluffers
-27	o3o
-28	Ear_Fluffers
-29	Fangs
-30	Claw_Teeth
-31	Fang_Test
-32	angry_eyes
-33	sad_eyes
-34	Eyes_Blink_Lower
-35	Male_2
-36	Buff_Body
-37	Manliest_Chin
-38	Lowerlid_Raise
-39	Happy_Eyes
-40	Duck
+0   eyes_updown
+1   eyes_rightleft
+2   JawOpen
+3   JawClose
+4   Smirk
+5   Frown
+6   Stretch
+7   Pucker
+8   Grin
+9   CatFace
+10  Mouth_O
+11  Mouth_O2
+12  Mouth_Full
+13  Tongue_Out
+14  Tongue_Up
+15  Tongue_Down
+16  NoEyelashes
+17  Eyes_Blink
+18  Left_Blink
+19  Right_Blink
+20  Scrunch
+21  FatButt
+22  Stomach_Out
+23  Stomach_In
+24  Throat_Bulge
+25  Male
+26  Hoof_Fluffers
+27  o3o
+28  Ear_Fluffers
+29  Fangs
+30  Claw_Teeth
+31  Fang_Test
+32  angry_eyes
+33  sad_eyes
+34  Eyes_Blink_Lower
+35  Male_2
+36  Buff_Body
+37  Manliest_Chin
+38  Lowerlid_Raise
+39  Happy_Eyes
+40  Duck
 ```
 
 # Credits
