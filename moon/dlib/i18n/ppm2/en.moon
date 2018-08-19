@@ -15,6 +15,9 @@
 
 -- editor stuffs
 
+gui.ppm2.dxlevel.not_supported = 'Your DirectX™ level is too low. At least 9.0 is required. If you use 8.1 for framerate,\nyou either have the most ancient videocard or have bad drivers.\nBecause framerate in gmod can only be low because of other addons which create pointless high CPU load.\nYes, this message will appear several times to annoy you. Because WHY THE FK YOU THEN REPORT ABOUT MISSING TEXTURES???'
+gui.ppm2.dxlevel.toolow = 'DirectX™ level is too low for PPM/2'
+
 gui.ppm2.editor.eyes.separate = 'Use separated settings for eyes'
 gui.ppm2.editor.eyes.url = 'Eye URL texture'
 gui.ppm2.editor.eyes.url_desc = 'When uring eye URL texture; options below have no effect'

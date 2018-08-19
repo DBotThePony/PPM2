@@ -17,6 +17,15 @@
 
 DLib.RegisterAddonName('PPM/2')
 
+mat_dxlevel = GetConVar('mat_dxlevel')
+
+timer.Create 'PPM2.Unsupported', 600, 4, ->
+	if mat_dxlevel\GetInt() >= 90
+		timer.Remove 'PPM2.Unsupported'
+		return
+
+	Derma_Message('gui.ppm2.dxlevel.not_supported', 'gui.ppm2.dxlevel.toolow')
+
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
 	for task in *PPM2.NetworkedPonyData.RenderTasks
 		ent = task.ent
