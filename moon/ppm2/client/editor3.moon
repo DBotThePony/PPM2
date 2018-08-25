@@ -1442,7 +1442,6 @@ ppm2_editor3 = ->
 	@SetSize(ScrWL(), ScrHL())
 	@SetPos(0, 0)
 	@MakePopup()
-	@SetTitle('PPM/2 Editor/3')
 	@SetDraggable(false)
 	@RemoveResize()
 	@SetDeleteOnClose(false)

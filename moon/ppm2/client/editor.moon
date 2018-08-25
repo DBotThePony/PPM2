@@ -588,7 +588,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 			@frame.DoUpdate()
 			@unsavedChanges = false
 			@frame.unsavedChanges = false
-			@frame\SetTitle("#{fil} - PPM2 Pony Editor")
+			@frame\SetTitle('gui.ppm2.editor.generic.title_file', fil)
 		if @unsavedChanges
 			Derma_Query(
 				'gui.ppm2.editor.io.warn.text',
@@ -663,7 +663,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 			@frame.DoUpdate()
 			@unsavedChanges = true
 			@frame.unsavedChanges = true
-			@frame\SetTitle("#{newData\GetFilename()} - PPM2 Pony Editor; *Unsaved changes*")
+			@frame\SetTitle('gui.ppm2.editor.generic.title_file_unsaved', newData\GetFilename())
 		if @unsavedChanges
 			Derma_Query(
 				'gui.ppm2.editor.io.warn.text',
@@ -1619,7 +1619,7 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 			@data\Save()
 			@unsavedChanges = false
 			@model.unsavedChanges = false if IsValid(@model)
-			@SetTitle("#{@data\GetFilename() or '%ERRNAME%'} - PPM2 Pony Editor")
+			@SetTitle('gui.ppm2.editor.generic.title_file', @data\GetFilename() or '%ERRNAME%')
 			@panels.saves.rebuildFileList() if @panels and @panels.saves and @panels.saves.rebuildFileList
 			@saves.rebuildFileList() if @saves and @saves.rebuildFileList
 			callback(txt)
@@ -1752,7 +1752,7 @@ PPM2.OpenNewEditor = ->
 	@lblTitle = vgui.Create('DLabel', @)
 	@lblTitle\SetPos(5, 0)
 	@lblTitle\SetSize(300, 20)
-	@SetTitle = (text = '') => @lblTitle\SetText(text)
+	@SetTitle = (text = '', ...) => @lblTitle\SetText(text, ...)
 	@GetTitle = => @lblTitle\GetText()
 	@deleteOnClose = false
 	@SetDeleteOnClose = (val = false) => @deleteOnClose = val
@@ -1854,7 +1854,6 @@ PPM2.OpenOldEditor = ->
 	W, H = ScrW() - 25, ScrH() - 25
 	@SetSize(W, H)
 	@Center()
-	@SetTitle('PPM2 Pony Editor')
 	@SetDeleteOnClose(false)
 	PPM2.OldEditorFrame = @
 
