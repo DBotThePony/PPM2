@@ -43,7 +43,7 @@ applyPonyData = {
 				net.WriteBool(true)
 				net.SendToServer()
 			\AddSpacer()
-			for fil in *PPM2.PonyDataInstance\FindFiles()
+			for _, fil in ipairs PPM2.PonyDataInstance\FindFiles()
 				\AddOption "Use '#{fil}' data", ->
 					net.Start('PPM2.RagdollEdit')
 					net.WriteEntity(ent)
@@ -101,7 +101,7 @@ playEmote = {
 	MenuOpen: (menu, ent = NULL, tr) =>
 		return if not IsValid(ent)
 		with menu\AddSubMenu()
-			for {:name, :sequence, :id, :time} in *PPM2.AVALIABLE_EMOTES
+			for _, {:name, :sequence, :id, :time} in ipairs PPM2.AVALIABLE_EMOTES
 					\AddOption "Play '#{name}' emote", ->
 						net.Start('PPM2.RagdollEditEmote')
 						net.WriteEntity(ent)

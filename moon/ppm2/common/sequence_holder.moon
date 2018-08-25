@@ -20,8 +20,8 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 		super(child)
 		return if not child.SEQUENCES
 		seq.numid = i for i, seq in ipairs child.SEQUENCES
-		child.SEQUENCES_TABLE = {seq.name, seq for seq in *child.SEQUENCES}
-		child.SEQUENCES_TABLE[seq.numid] = seq for seq in *child.SEQUENCES
+		child.SEQUENCES_TABLE = {seq.name, seq for _, seq in ipairs child.SEQUENCES}
+		child.SEQUENCES_TABLE[seq.numid] = seq for _, seq in ipairs child.SEQUENCES
 
 	@NEXT_HOOK_ID = 0
 	@SequenceObject = PPM2.SequenceBase
@@ -79,15 +79,15 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 	ResetSequences: =>
 		return false if not @@SEQUENCES
 		return false if not @isValid
-		seq\Stop() for seq in *@currentSequencesIterable
+		seq\Stop() for _, seq in ipairs @currentSequencesIterable
 		@currentSequences = {}
 		@currentSequencesIterable = {}
-		@StartSequence(seq.name) for seq in *@@SEQUENCES when seq.autostart
+		@StartSequence(seq.name) for _, seq in ipairs @@SEQUENCES when seq.autostart
 
 	Reset: => @ResetSequences()
 
 	RemoveHooks: =>
-		for iHook in *@hooks
+		for _, iHook in ipairs @hooks
 			hook.Remove iHook, @hookID
 
 	PlayerRespawn: =>
@@ -122,7 +122,7 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 			@ent = @nwController.ent
 			ent = @ent
 		return if not IsValid(ent) or ent\IsDormant()
-		for seq in *@currentSequencesIterable
+		for _, seq in ipairs @currentSequencesIterable
 			if not seq\IsValid()
 				@EndSequence(seq\GetName(), false)
 				break

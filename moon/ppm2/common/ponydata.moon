@@ -68,7 +68,7 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
-for ent in *ents.GetAll()
+for _, ent in ipairs ents.GetAll()
 	ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData
 
 wUInt = (def = 0, size = 8) ->
@@ -210,7 +210,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
 
 	@ReadNetworkData = =>
-		output = {strName, {getName, readFunc()} for {:getName, :strName, :readFunc} in *@NW_Vars}
+		output = {strName, {getName, readFunc()} for _, {:getName, :strName, :readFunc} in ipairs @NW_Vars}
 		return output
 
 	@NW_RemoveOnPlayerLeave = true
@@ -307,7 +307,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
 
-		@[data.strName] = data.defFunc() for data in *@@NW_Vars when data.defFunc
+		@[data.strName] = data.defFunc() for _, data in ipairs @@NW_Vars when data.defFunc
 
 		if SERVER
 			@netID = @@NW_NextObjectID
@@ -475,7 +475,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		delta = time - @lastLerpThink
 		@lastLerpThink = time
 		if @isValid and IsValid(@ent)
-			for change in *@TriggerLerpAll(delta * 5)
+			for _, change in ipairs @TriggerLerpAll(delta * 5)
 				state = PPM2.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
 				state\SetCantApply(true)
 				@GenericDataChange(state)
@@ -576,21 +576,21 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
 		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
-		for state in *states
+		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())
 				state\Apply()
 				@NetworkDataChanges(state) unless silent
 
 	NetworkedIterable: (grabEntities = true) =>
-		data = [{getName, @[strName]} for {:strName, :getName} in *@@NW_Vars when grabEntities or not checkForEntity(@[strName])]
+		data = [{getName, @[strName]} for _, {:strName, :getName} in ipairs @@NW_Vars when grabEntities or not checkForEntity(@[strName])]
 		return data
 
 	ApplyDataToObject: (target, applyEntities = false) =>
-		for {key, value} in *@NetworkedIterable(applyEntities)
+		for _, {key, value} in ipairs @NetworkedIterable(applyEntities)
 			target["Set#{key}"](target, value) if target["Set#{key}"]
 		return target
 
-	WriteNetworkData: => writeFunc(@[strName]) for {:strName, :writeFunc} in *@@NW_Vars
+	WriteNetworkData: => writeFunc(@[strName]) for _, {:strName, :writeFunc} in ipairs @@NW_Vars
 
 	ReBroadcast: =>
 		return false if not @NETWORKED

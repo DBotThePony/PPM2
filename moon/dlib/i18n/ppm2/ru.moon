@@ -27,7 +27,7 @@ gui.ppm2.editor.eyes.lightwarp = "Lightwarp"
 gui.ppm2.editor.eyes.desc1 = "Lightwarp URL текстура\nОБЯЗАНА БЫТЬ 256x16!"
 gui.ppm2.editor.eyes.desc2 = "Сила 'Зеркалья' у глаз\nЭтот параметр влияет на отражения в режиме Отражений в реальном времени\nЗа это отвечает переменная клиента ppm2_cl_reflections\nОстальные игроки увидят отражения только с ppm2_cl_reflections 1\n0 - матовая поверхность; 1 - зеркальная"
 
-for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
+for _, {tprefix, prefix} in ipairs {{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.shader = "#{prefix}Использовать шейдер EyeRefract"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Испольщовать Cornera диффуз текстуру"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Стеклянность (?)"

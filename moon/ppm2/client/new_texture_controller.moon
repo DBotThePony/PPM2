@@ -36,13 +36,13 @@ USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 class NewPonyTextureController extends PPM2.PonyTextureController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
-	@UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @UPPER_MANE_MATERIALS}
-	@LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @LOWER_MANE_MATERIALS}
-	@TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs @TAIL_DETAIL_MATERIALS}
+	@UPPER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @UPPER_MANE_MATERIALS}
+	@LOWER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @LOWER_MANE_MATERIALS}
+	@TAIL_DETAIL_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @TAIL_DETAIL_MATERIALS}
 
 	@PHONG_UPDATE_TRIGGER = {k, v for k, v in pairs PPM2.PonyTextureController.PHONG_UPDATE_TRIGGER}
 
-	for ttype in *{'Mouth', 'Teeth', 'Tongue'}
+	for _, ttype in ipairs {'Mouth', 'Teeth', 'Tongue'}
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
@@ -163,7 +163,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			maneTypeUpper = @GetManeType()
 			if @@UPPER_MANE_MATERIALS[maneTypeUpper]
 				i = 1
-				for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+				for _, mat in ipairs @@UPPER_MANE_MATERIALS[maneTypeUpper]
 					continue if type(mat) == 'number'
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -185,7 +185,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			maneTypeLower = @GetManeTypeLower()
 			if @@LOWER_MANE_MATERIALS[maneTypeLower]
 				i = 1
-				for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+				for _, mat in ipairs @@LOWER_MANE_MATERIALS[maneTypeLower]
 					continue if type(mat) == 'number'
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -208,7 +208,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -291,7 +291,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -353,7 +353,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat

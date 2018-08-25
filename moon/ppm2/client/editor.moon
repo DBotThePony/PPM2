@@ -211,7 +211,7 @@ MODEL_BOX_PANEL = {
 
 		render.DrawQuadEasy(@FLOOR_VECTOR, @FLOOR_ANGLE, 7000, 7000, @FLOOR_COLOR)
 
-		for {pos, ang, w, h} in *@DRAW_WALLS
+		for _, {pos, ang, w, h} in ipairs @DRAW_WALLS
 			render.DrawQuadEasy(pos, ang, w, h, @WALL_COLOR)
 
 		if ENABLE_FULLBRIGHT\GetBool()
@@ -437,7 +437,7 @@ TATTOO_INPUT_GRABBER = {
 	DataGet: (key = '', ...) => @targetData['Get' .. key .. @targetID](@targetData, ...)
 	DataAdd: (key = '', val = 0) => @DataSet(key, @DataGet(key) + val)
 
-	TriggerUpdate: => pnl\DoUpdate() for pnl in *@panelsToUpdate when IsValid(pnl)
+	TriggerUpdate: => pnl\DoUpdate() for _, pnl in ipairs @panelsToUpdate when IsValid(pnl)
 
 	Init: =>
 		@targetID = 1
@@ -606,7 +606,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 		list\Clear()
 		files, dirs = file.Find('ppm2/*.dat', 'DATA')
 		matchBak = '.bak.dat'
-		for fil in *files
+		for _, fil in ipairs files
 			if fil\sub(-#matchBak) ~= matchBak
 				fil2 = fil\sub(1, #fil - 4)
 				line = list\AddLine(fil2)
@@ -679,7 +679,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 	@rebuildFileList = ->
 		list\Clear()
 		files, dirs = file.Find('ppm/*', 'DATA')
-		for fil in *files
+		for _, fil in ipairs files
 			fil2 = fil\sub(1, #fil - 4)
 			line = list\AddLine(fil2)
 			line.file = fil
@@ -773,7 +773,7 @@ PANEL_SETTINGS_BASE = {
 	GetTargetData: => @data
 	TargetData: => @data
 	SetTargetData: (val) => @data = val
-	DoUpdate: => func() for func in *@updateFuncs
+	DoUpdate: => func() for _, func in ipairs @updateFuncs
 
 	CreateResetButton: (name = 'NULL', option = 'NULL', parent) =>
 		@createdPanels += 1
@@ -965,9 +965,9 @@ PANEL_SETTINGS_BASE = {
 				\SetSortItems(false)
 				\SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
 				if choices
-					\AddChoice(choice) for choice in *choices
+					\AddChoice(choice) for _, choice in ipairs choices
 				else
-					\AddChoice(choice) for choice in *@GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
+					\AddChoice(choice) for _, choice in ipairs @GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
 				.OnSelect = (pnl = box, index = 1, value = '', data = value) ->
 					index -= 1
 					data = @GetTargetData()
@@ -1090,7 +1090,7 @@ EditorPages = {
 				@CheckBox('gui.ppm2.editor.misc.no_flexes2', 'NoFlex')
 				@Label('gui.ppm2.editor.misc.no_flexes_desc')
 				flexes = @Spoiler('gui.ppm2.editor.misc.flexes')
-				for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+				for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 					@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
 				flexes\SizeToContents()
 	}
@@ -1298,7 +1298,7 @@ EditorPages = {
 				@CheckBox('gui.ppm2.editor.eyes.separate', 'SeparateEyes')
 			eyes = {''}
 			eyes = {'', 'Left', 'Right'} if ADVANCED_MODE\GetBool()
-			for publicName in *eyes
+			for _, publicName in ipairs eyes
 				@Hr()
 
 				prefix = ''
@@ -1654,7 +1654,7 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 		with @selectModelBox = vgui.Create('DComboBox', @)
 			\SetSize(120, 20)
 			\SetValue(editorModelSelect)
-			\AddChoice(choice) for choice in *{'default', 'cppm', 'new'}
+			\AddChoice(choice) for _, choice in ipairs {'default', 'cppm', 'new'}
 			.OnSelect = (pnl = box, index = 1, value = '', data = value) ->
 				@SetDeleteOnClose(true)
 				RunConsoleCommand('ppm2_editor_model', value)
@@ -1817,7 +1817,7 @@ PPM2.OpenNewEditor = ->
 
 	createdPanels = 9
 
-	for {:name, :func, :internal, :display} in *EditorPages
+	for _, {:name, :func, :internal, :display} in ipairs EditorPages
 		continue if display and not display(true)
 		pnl = vgui.Create('PPM2SettingsBase', @menus)
 		@menus\AddSheet(name, pnl)
@@ -1908,7 +1908,7 @@ PPM2.OpenOldEditor = ->
 
 	createdPanels = 17
 
-	for {:name, :func, :internal, :display} in *EditorPages
+	for _, {:name, :func, :internal, :display} in ipairs EditorPages
 		continue if display and not display(false)
 		pnl = vgui.Create('PPM2SettingsBase', @menus)
 		@menus\AddSheet(name, pnl)

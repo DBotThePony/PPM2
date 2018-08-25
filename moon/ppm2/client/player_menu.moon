@@ -19,7 +19,7 @@ doPatch = =>
 	return if not @IsValid()
 	local target
 
-	for child in *@GetChildren()
+	for _, child in ipairs @GetChildren()
 		if child\GetName() == 'DIconLayout'
 			target = child
 			break
@@ -27,7 +27,7 @@ doPatch = =>
 	return if not target
 	local buttonTarget
 
-	for button in *target\GetChildren()
+	for _, button in ipairs target\GetChildren()
 		buttonChilds = button\GetChildren()
 		cond1 = buttonChilds[1] and buttonChilds[1]\GetName() == 'DLabel'
 		cond2 = buttonChilds[2] and buttonChilds[2]\GetName() == 'DLabel'
@@ -52,7 +52,7 @@ doPatch = =>
 		init(buttonTarget, buttonTarget.Window)
 		local targetModel
 
-		for child in *buttonTarget.Window\GetChildren()
+		for _, child in ipairs buttonTarget.Window\GetChildren()
 			if child\GetName() == 'DModelPanel'
 				targetModel = child
 				break

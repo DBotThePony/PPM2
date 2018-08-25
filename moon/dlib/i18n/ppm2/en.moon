@@ -27,7 +27,7 @@ gui.ppm2.editor.eyes.lightwarp = "Lightwarp"
 gui.ppm2.editor.eyes.desc1 = "Lightwarp texture URL input\nIt must be 256x16!"
 gui.ppm2.editor.eyes.desc2 = "Glossiness strength\nThis parameters adjucts strength of real time reflections on eye\nTo see changes, set ppm2_cl_reflections convar to 1\nOther players would see reflections only with ppm2_cl_reflections set to 1\n0 - is matted; 1 - is mirror"
 
-for {tprefix, prefix} in *{{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
+for _, {tprefix, prefix} in ipairs {{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.shader = "#{prefix}Use EyeRefract shader"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Use Eye Cornera diffuse"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Glossiness"

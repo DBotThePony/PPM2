@@ -27,19 +27,19 @@ timer.Create 'PPM2.Unsupported', 600, 4, ->
 	Derma_Message('gui.ppm2.dxlevel.not_supported', 'gui.ppm2.dxlevel.toolow')
 
 timer.Create 'PPM2.ModelChecks', 1, 0, ->
-	for task in *PPM2.NetworkedPonyData.RenderTasks
+	for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 		ent = task.ent
 		if IsValid(ent)
 			ent.__cachedIsPony = ent\IsPony()
 
-	for ply in *player.GetAll()
+	for _, ply in ipairs player.GetAll()
 		if not ply\IsDormant()
 			ply.__cachedIsPony = ply\IsPony()
 			ponydata = ply\GetPonyData()
 
 			if ply.__cachedIsPony
 				if (not ponydata or ponydata\GetHideWeapons()) and not hook.Run('SuppressPonyWeaponsHide', ply) and not ply.RenderOverride
-					for wep in *ply\GetWeapons()
+					for _, wep in ipairs ply\GetWeapons()
 						if wep
 							if not hook.Run('ShouldDrawPonyWeapon', ply, wep) and (not wep.ShouldPonyDraw or not wep\ShouldPonyDraw(ply))
 								wep\SetNoDraw(true)
@@ -48,7 +48,7 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
 								wep\SetNoDraw(false)
 								ply.__ppm2_weapon_hit = false
 				else
-					for wep in *ply\GetWeapons()
+					for _, wep in ipairs ply\GetWeapons()
 						if wep and wep.__ppm2_weapon_hit
 							wep\SetNoDraw(false)
 							ply.__ppm2_weapon_hit = false
@@ -109,7 +109,7 @@ PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
 hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
 	lply = LocalPlayer()
 	lpos = lply\EyePos()
-	for ply in *player.GetAll()
+	for _, ply in ipairs player.GetAll()
 		if ply ~= lply
 			if ply\GetDLibVar('PPM2.InEditor')
 				pos = ply\EyePos()
@@ -122,13 +122,13 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
 					draw.DrawText('In PPM/2 Editor', 'HudHintTextLarge', x, y, Color(0, 0, 0, alpha), TEXT_ALIGN_CENTER)
 
 concommand.Add 'ppm2_cleanup', ->
-	for ent in *ents.GetAll()
+	for _, ent in ipairs ents.GetAll()
 		if ent.isPonyPropModel and not IsValid(ent.manePlayer)
 			ent\Remove()
 	PPM2.Message('All unused models were removed')
 
 timer.Create 'PPM2.ModelCleanup', 60, 0, ->
-	for ent in *ents.GetAll()
+	for _, ent in ipairs ents.GetAll()
 		if ent.isPonyPropModel and not IsValid(ent.manePlayer)
 			ent\Remove()
 

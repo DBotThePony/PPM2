@@ -140,8 +140,8 @@ class FlexState extends PPM2.ModifierBase
 				@modifiers[i] = Lerp(delta * 15 * @speed * @speedModify * @lerpMultiplier, @modifiers[i] or 0, @WeightModifiers[i])
 				@current += @modifiers[i]
 
-			@scale += modif for modif in *@ScaleModifiers
-			@speed += modif for modif in *@SpeedModifiers
+			@scale += modif for _, modif in ipairs @ScaleModifiers
+			@speed += modif for _, modif in ipairs @SpeedModifiers
 			@current = math.Clamp(@current, @min, @max) * @scale
 
 		if not IsValid(@ent)
@@ -180,7 +180,7 @@ class FlexSequence extends PPM2.SequenceBase
 		@flexIDS = {}
 		@flexStates = {}
 		i = 1
-		for id in *data.ids
+		for _, id in ipairs data.ids
 			state = controller\GetFlexState(id)
 			num = state\GetModifierID(@name)
 			@["flex_#{id}"] = num
@@ -207,7 +207,7 @@ class FlexSequence extends PPM2.SequenceBase
 	Stop: =>
 		super()
 		if @parent
-			for id in *@flexIDsIterable
+			for _, id in ipairs @flexIDsIterable
 				@parent\GetFlexState(id)\ResetModifiers(@name)
 
 	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
@@ -930,8 +930,8 @@ class PonyFlexController extends PPM2.ControllerChildren
 		for i, flex in pairs @FLEX_LIST
 			flex.id = i - 1
 			flex.targetName = "target#{flex.flex}"
-		@FLEX_IDS = {flex.id, flex for flex in *@FLEX_LIST}
-		@FLEX_TABLE = {flex.flex, flex for flex in *@FLEX_LIST}
+		@FLEX_IDS = {flex.id, flex for _, flex in ipairs @FLEX_LIST}
+		@FLEX_TABLE = {flex.flex, flex for _, flex in ipairs @FLEX_LIST}
 
 	@SetupFlexesTables()
 
@@ -940,14 +940,14 @@ class PonyFlexController extends PPM2.ControllerChildren
 
 	new: (data) =>
 		super(data)
-		@states = [FlexState(@, flex, id, scale, speed, active) for {:flex, :id, :scale, :speed, :active} in *@@FLEX_LIST]
-		@statesTable = {state\GetFlexName(), state for state in *@states}
-		@statesTable[state\GetFlexName()\lower()] = state for state in *@states
-		@statesTable[state\GetFlexID()] = state for state in *@states
+		@states = [FlexState(@, flex, id, scale, speed, active) for _, {:flex, :id, :scale, :speed, :active} in ipairs @@FLEX_LIST]
+		@statesTable = {state\GetFlexName(), state for _, state in ipairs @states}
+		@statesTable[state\GetFlexName()\lower()] = state for _, state in ipairs @states
+		@statesTable[state\GetFlexID()] = state for _, state in ipairs @states
 		@RebuildIterableList()
 		ponyData = data\GetData()
-		flex\SetUseLerp(ponyData\GetUseFlexLerp()) for flex in *@states
-		flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for flex in *@states
+		flex\SetUseLerp(ponyData\GetUseFlexLerp()) for _, flex in ipairs @states
+		flex\SetLerpModify(ponyData\GetFlexLerpMultiplier()) for _, flex in ipairs @states
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
 		@ResetSequences()
@@ -958,14 +958,14 @@ class PonyFlexController extends PPM2.ControllerChildren
 	GetFlexState: (name = '') => @statesTable[name]
 	RebuildIterableList: =>
 		return false if not @isValid
-		@statesIterable = [state for state in *@states when state\GetIsActive()]
+		@statesIterable = [state for _, state in ipairs @states when state\GetIsActive()]
 	DataChanges: (state) =>
 		return if not @isValid
-		flexState\DataChanges(state) for flexState in *@states
+		flexState\DataChanges(state) for _, flexState in ipairs @states
 		if state\GetKey() == 'UseFlexLerp'
-			flex\SetUseLerp(state\GetValue()) for flex in *@states
+			flex\SetUseLerp(state\GetValue()) for _, flex in ipairs @states
 		if state\GetKey() == 'FlexLerpMultiplier'
-			flex\SetLerpModify(state\GetValue()) for flex in *@states
+			flex\SetLerpModify(state\GetValue()) for _, flex in ipairs @states
 	GetEntity: => @ent
 	GetData: => @controller
 	GetController: => @controller
@@ -979,18 +979,18 @@ class PonyFlexController extends PPM2.ControllerChildren
 
 	ResetSequences: =>
 		super()
-		state\Reset(false) for state in *@statesIterable
+		state\Reset(false) for _, state in ipairs @statesIterable
 
 	Think: (ent = @ent) =>
 		return if DISABLE_FLEXES\GetBool()
 		delta = super(ent)
 		return if not delta
-		state\Think(ent, delta) for state in *@statesIterable
+		state\Think(ent, delta) for _, state in ipairs @statesIterable
 		return delta
 
 do
 	ppm2_disable_flexes = (cvar, oldval, newval) ->
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			data = ply\GetPonyData()
 			continue if not data
 			renderer = data\GetRenderController()

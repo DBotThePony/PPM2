@@ -67,14 +67,14 @@ class PonyWeightController extends PPM2.ControllerChildren
 	@HARD_LIMIT_MINIMAL = 0.1
 	@HARD_LIMIT_MAXIMAL = 3
 
-	@DEFAULT_BONE_SIZE = Vector(1, 1, 1)
+	@DEFAULT_BONE_SIZE = LVector(1, 1, 1)
 	@NEXT_OBJ_ID = 0
 
 	Remap: =>
-		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for {:id, :scale} in *@@WEIGHT_BONES]
+		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for _, {:id, :scale} in ipairs @@WEIGHT_BONES]
 
 		@validSkeleton = true
-		for {:id} in *@WEIGHT_BONES
+		for _, {:id} in ipairs @WEIGHT_BONES
 			if not id
 				@validSkeleton = false
 				break
@@ -139,7 +139,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 		'Lrig_LEG_FR_FrontHoof'
 	}
 
-	table.insert(@WEIGHT_BONES, {id: name, scale: 1}) for name in *extrabones
+	table.insert(@WEIGHT_BONES, {id: name, scale: 1}) for _, name in ipairs extrabones
 
 	DataChanges: (state) =>
 		return if not IsValid(@ent) or not @isValid
@@ -158,7 +158,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	ResetBones: (ent = @ent) =>
 		return if not IsValid(ent) or not @isValid
 		return if not @validSkeleton
-		for {:id} in *@WEIGHT_BONES
+		for _, {:id} in ipairs @WEIGHT_BONES
 			ent\ManipulateBoneScale2Safe(id, @@DEFAULT_BONE_SIZE)
 
 	Reset: => @ResetBones()
@@ -169,9 +169,9 @@ class PonyWeightController extends PPM2.ControllerChildren
 		return if @ent.Alive and not @ent\Alive()
 		return if not @validSkeleton
 
-		for {:id, :scale} in *@WEIGHT_BONES
+		for _, {:id, :scale} in ipairs @WEIGHT_BONES
 			delta = 1 + (@weight * @scale - 1) * scale
-			ent\ManipulateBoneScale2Safe(id, Vector(delta, delta, delta))
+			ent\ManipulateBoneScale2Safe(id, LVector(delta, delta, delta))
 
 	Remove: =>
 		@isValid = false

@@ -52,7 +52,7 @@ hook.Add 'DrawOverlay', 'PPM2.ReflectionsUpdate', (a, b) ->
 	return if lastReflectionFrame == FrameNumberL()
 	lastReflectionFrame = FrameNumberL()
 	PPM2.__RENDERING_REFLECTIONS = true
-	for task in *reflectTasks
+	for _, task in ipairs reflectTasks
 		pcall task.ctrl.UpdateEyeReflections, task.ctrl, task.ent
 	PPM2.__RENDERING_REFLECTIONS = false
 	reflectTasks = {}
@@ -92,7 +92,7 @@ PPM2.GetTextureSize = (texSize) ->
 	delta = 9999
 	nsize = texSize
 
-	for size in *RT_SIZES
+	for _, size in ipairs RT_SIZES
 		ndelta = math.abs(size - texSize)
 		if ndelta < delta
 			delta = ndelta
@@ -106,9 +106,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
-	@UPPER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.UPPER_MANE_DETAILS}
-	@LOWER_MANE_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.LOWER_MANE_DETAILS}
-	@TAIL_DETAIL_MATERIALS = {i, [val1 for val1 in *val] for i, val in pairs _M.TAIL_DETAILS}
+	@UPPER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs _M.UPPER_MANE_DETAILS}
+	@LOWER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs _M.LOWER_MANE_DETAILS}
+	@TAIL_DETAIL_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs _M.TAIL_DETAILS}
 
 	@HAIR_MATERIAL_COLOR = _M.HAIR_MATERIAL_COLOR
 	@TAIL_MATERIAL_COLOR = _M.TAIL_MATERIAL_COLOR
@@ -153,7 +153,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		'SeparateTailPhong': true
 	}
 
-	for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
+	for _, ttype in ipairs {'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongTint'] = true
@@ -163,7 +163,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@PHONG_UPDATE_TRIGGER[ttype .. 'Lightwarp'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
 
-	for publicName in *{'', 'Left', 'Right'}
+	for _, publicName in ipairs {'', 'Left', 'Right'}
 		@EYE_UPDATE_TRIGGER["EyeType#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["HoleWidth#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
@@ -232,7 +232,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@COMPILE_QUEUE = {}
 	@COMPILE_TEXTURES = ->
 		return if #@COMPILE_QUEUE == 0
-		for data in *@COMPILE_QUEUE
+		for _, data in ipairs @COMPILE_QUEUE
 			if data.self\IsValid()
 				data.run(data.self, unpack(data.args))
 				data.self.lastMaterialUpdate = 0
@@ -306,7 +306,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			callback(@FAILED_TO_DOWNLOAD[width][height][url].texture, nil, @FAILED_TO_DOWNLOAD[width][height][url].material)
 			return
 		if @ALREADY_DOWNLOADING[width][height][url]
-			for data in *@HTML_MATERIAL_QUEUE
+			for _, data in ipairs @HTML_MATERIAL_QUEUE
 				if data.url == url
 					table.insert(data.callbacks, callback)
 					break
@@ -408,7 +408,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 				@ALREADY_DOWNLOADING[data.width][data.height][data.url] = false
 
-				for callback in *data.callbacks
+				for _, callback in ipairs data.callbacks
 					callback(texture, panel, newMat)
 				timer.Simple 0, -> panel\Remove() if IsValid(panel)
 			return
@@ -441,7 +441,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 					material: newMat
 				}
 
-				for callback in *data.callbacks
+				for _, callback in ipairs data.callbacks
 					callback(newMat\GetTexture('$basetexture'), nil, newMat)
 
 				table.remove(@HTML_MATERIAL_QUEUE, 1)
@@ -829,7 +829,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	UpdatePhongData: =>
 		proceed = {}
 		@GetBodyPhongMaterials(proceed)
-		for mat in *proceed
+		for _, mat in ipairs proceed
 			@ApplyPhongData(mat[1], 'Body', mat[2], mat[3])
 
 		if @GrabData('SeparateHornPhong') and @HornMaterial
@@ -997,7 +997,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, bodysize, bodysize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -1084,7 +1084,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -1164,7 +1164,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			PPM2.DebugPrint('Compiled new socks texture for ', @ent, ' as part of ', @)
 		else
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
-				for tex in *{@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
+				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
 					tex\SetVector('$color', Vector(1, 1, 1))
 					tex\SetVector('$color2', Vector(1, 1, 1))
 					tex\SetTexture('$basetexture', texture)
@@ -1326,7 +1326,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -1391,7 +1391,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			maneTypeUpper = @GetManeType()
 			if @@UPPER_MANE_MATERIALS[maneTypeUpper]
 				i = 1
-				for mat in *@@UPPER_MANE_MATERIALS[maneTypeUpper]
+				for _, mat in ipairs @@UPPER_MANE_MATERIALS[maneTypeUpper]
 					continue if type(mat) == 'number'
 					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -1413,7 +1413,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			maneTypeLower = @GetManeTypeLower()
 			if @@LOWER_MANE_MATERIALS[maneTypeLower]
 				i = 1
-				for mat in *@@LOWER_MANE_MATERIALS[maneTypeLower]
+				for _, mat in ipairs @@LOWER_MANE_MATERIALS[maneTypeLower]
 					continue if type(mat) == 'number'
 					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -1436,7 +1436,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat
@@ -1497,7 +1497,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			tailType = @GetTailType()
 			if @@TAIL_DETAIL_MATERIALS[tailType]
 				i = 1
-				for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
+				for _, mat in ipairs @@TAIL_DETAIL_MATERIALS[tailType]
 					continue if type(mat) == 'number'
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -1517,7 +1517,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			if @@TAIL_DETAIL_MATERIALS[tailType]
 				i = 1
-				for mat in *@@TAIL_DETAIL_MATERIALS[tailType]
+				for _, mat in ipairs @@TAIL_DETAIL_MATERIALS[tailType]
 					continue if type(mat) == 'number'
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -1539,7 +1539,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			left += 1
 			{detailURL, i}
 
-		for {url, i} in *validURLS
+		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
 				left -= 1
 				urlTextures[i] = mat

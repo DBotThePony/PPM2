@@ -32,9 +32,9 @@ class ExpressionSequence extends PPM2.SequenceBase
 
 		@flexStates = {}
 		@bonesNames = @bonesNames or {}
-		@bonesFuncsPos = ['SetModifier' .. boneName .. 'Position' for boneName in *@bonesNames]
-		@bonesFuncsScale = ['SetModifier' .. boneName .. 'Scale' for boneName in *@bonesNames]
-		@bonesFuncsAngles = ['SetModifier' .. boneName .. 'Angles' for boneName in *@bonesNames]
+		@bonesFuncsPos = ['SetModifier' .. boneName .. 'Position' for _, boneName in ipairs @bonesNames]
+		@bonesFuncsScale = ['SetModifier' .. boneName .. 'Scale' for _, boneName in ipairs @bonesNames]
+		@bonesFuncsAngles = ['SetModifier' .. boneName .. 'Angles' for _, boneName in ipairs @bonesNames]
 		@ponydata = @controller.renderController\GetData()
 		@ponydataID = @ponydata\GetModifierID(@name .. '_emote')
 		@RestartChildren()
@@ -50,19 +50,19 @@ class ExpressionSequence extends PPM2.SequenceBase
 			if flexController = @controller.renderController\GetFlexController()
 				@flexController = flexController
 				if type(@flexSequence) == 'table'
-					for seq in *@flexSequence
+					for _, seq in ipairs @flexSequence
 						flexController\StartSequence(seq, @time)\SetInfinite(@GetInfinite())
 				else
 					flexController\StartSequence(@flexSequence, @time)\SetInfinite(@GetInfinite())
 				if @flexNames
-					@flexStates = [{flexController\GetFlexState(flex), flexController\GetFlexState(flex)\GetModifierID(@name .. '_emote')} for flex in *@flexNames]
+					@flexStates = [{flexController\GetFlexState(flex), flexController\GetFlexState(flex)\GetModifierID(@name .. '_emote')} for _, flex in ipairs @flexNames]
 
 		@knownBonesSequences = {}
 		if bones = @ent\PPMBonesModifier()
 			@bonesController = bones
 			if @bonesSequence
 				if type(@bonesSequence) == 'table'
-					for seq in *@bonesSequence
+					for _, seq in ipairs @bonesSequence
 						bones\StartSequence(seq, @time)\SetInfinite(@GetInfinite())
 						table.insert(@knownBonesSequences, seq)
 				else
@@ -87,13 +87,13 @@ class ExpressionSequence extends PPM2.SequenceBase
 		if @flexController
 			if @flexSequence
 				if type(@flexSequence) == 'table'
-					for id in *@flexSequence
+					for _, id in ipairs @flexSequence
 						@flexController\EndSequence(id)
 				else
 					@flexController\EndSequence(@flexSequence)
-			flex\ResetModifiers(id) for {flex, id} in *@flexStates
+			flex\ResetModifiers(id) for _, {flex, id} in ipairs @flexStates
 		if @bonesController
-			for id in *@knownBonesSequences
+			for _, id in ipairs @knownBonesSequences
 				@bonesController\EndSequence(id)
 
 	SetBonePosition: (id = 1, val = Vector(0, 0, 0)) => @controller[@bonesFuncsPos[id]] and @controller[@bonesFuncsPos[id]](@controller, @bonesModifierID, val)
@@ -475,7 +475,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 
 	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
 		return if ply\GetEntity() ~= @ent\GetEntity()
-		for {:sequence} in *PPM2.AVALIABLE_EMOTES
+		for _, {:sequence} in ipairs PPM2.AVALIABLE_EMOTES
 			if shouldStop or sequence ~= emote
 				@EndSequence(sequence)
 

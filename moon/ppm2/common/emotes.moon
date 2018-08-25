@@ -174,7 +174,7 @@ PPM2.AVALIABLE_EMOTES = {
 
 }
 
-AvaliableFiles = {fil, true for fil in *file.Find('materials/gui/ppm2/emotes/*', 'GAME')} if CLIENT
+AvaliableFiles = {fil, true for _, fil in ipairs file.Find('materials/gui/ppm2/emotes/*', 'GAME')} if CLIENT
 
 for i, data in pairs PPM2.AVALIABLE_EMOTES
 	data.id = i
@@ -182,5 +182,5 @@ for i, data in pairs PPM2.AVALIABLE_EMOTES
 	data.filecrop = "gui/ppm2/emotes/#{data.sequence}.png"
 	data.fexists = AvaliableFiles["#{data.sequence}.png"] or false if CLIENT
 
-PPM2.AVALIABLE_EMOTES_BY_NAME = {data.name, data for data in *PPM2.AVALIABLE_EMOTES}
-PPM2.AVALIABLE_EMOTES_BY_SEQUENCE = {data.sequence, data for data in *PPM2.AVALIABLE_EMOTES}
+PPM2.AVALIABLE_EMOTES_BY_NAME = {data.name, data for _, data in ipairs PPM2.AVALIABLE_EMOTES}
+PPM2.AVALIABLE_EMOTES_BY_SEQUENCE = {data.sequence, data for _, data in ipairs PPM2.AVALIABLE_EMOTES}

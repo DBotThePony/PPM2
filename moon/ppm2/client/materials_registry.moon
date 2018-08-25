@@ -22,7 +22,7 @@ RELOADABLE_MATERIALS = {}
 PPM2.RELOADABLE_MATERIALS = RELOADABLE_MATERIALS
 concommand.Add 'ppm2_reload_materials', ->
 	cTime = SysTime()
-	for mat in *RELOADABLE_MATERIALS
+	for _, mat in ipairs RELOADABLE_MATERIALS
 		if texname = mat\GetString('$basetexture')
 			mat\SetTexture('$basetexture', texname)
 		if texture = mat\GetTexture('$basetexture')
@@ -201,17 +201,17 @@ additionTable = (...) ->
 		tab[key] = val
 	return tab
 
-module.SOCKS_MATERIALS = [Material(id) for id in *module.SOCKS_PATCHS]
-module.SOCKS_DETAILS = [Material(id) for id in *module.SOCKS_DETAILS_PATCHS]
-module.CUTIEMARKS = [Material("models/ppm2/cmarks/#{mark}.png") for mark in *PPM2.DefaultCutiemarks]
-module.SUITS = [Material("models/ppm2/texclothes/#{mat}.png") for mat in *{
+module.SOCKS_MATERIALS = [Material(id) for _, id in ipairs module.SOCKS_PATCHS]
+module.SOCKS_DETAILS = [Material(id) for _, id in ipairs module.SOCKS_DETAILS_PATCHS]
+module.CUTIEMARKS = [Material("models/ppm2/cmarks/#{mark}.png") for _, mark in ipairs PPM2.DefaultCutiemarks]
+module.SUITS = [Material("models/ppm2/texclothes/#{mat}.png") for _, mat in ipairs {
 	'clothes_royalguard', 'clothes_sbs_full'
 	'clothes_sbs_light', 'clothes_wbs_full'
 	'clothes_wbs_light', 'spidermane_light'
 	'spidermane_full'
 }]
 
-module.TATTOOS = [Material("models/ppm2/partrender/tattoo/#{fil\lower()}.png") for fil in *PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
+module.TATTOOS = [Material("models/ppm2/partrender/tattoo/#{fil\lower()}.png") for _, fil in ipairs PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
 debugwhite = {
 	'$basetexture': 'models/debug/debugwhite'
 	'$ignorez': 1

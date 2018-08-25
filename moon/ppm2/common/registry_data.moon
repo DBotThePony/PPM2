@@ -81,19 +81,19 @@ PPM2.PonyDataRegistry = {
 	'race': {
 		default: -> PPM2.RACE_EARTH
 		getFunc: 'Race'
-		enum: [arg for arg in *PPM2.RACE_ENUMS]
+		enum: [arg for _, arg in ipairs PPM2.RACE_ENUMS]
 	}
 
 	'wings_type': {
 		default: -> 0
 		getFunc: 'WingsType'
-		enum: [arg for arg in *PPM2.AvaliablePonyWings]
+		enum: [arg for _, arg in ipairs PPM2.AvaliablePonyWings]
 	}
 
 	'gender': {
 		default: -> PPM2.GENDER_FEMALE
 		getFunc: 'Gender'
-		enum: [arg for arg in *PPM2.AGE_ENUMS]
+		enum: [arg for _, arg in ipairs PPM2.AGE_ENUMS]
 	}
 
 	'weight': {
@@ -147,49 +147,49 @@ PPM2.PonyDataRegistry = {
 	'eyelash': {
 		default: -> 0
 		getFunc: 'EyelashType'
-		enum: [arg for arg in *PPM2.EyelashTypes]
+		enum: [arg for _, arg in ipairs PPM2.EyelashTypes]
 	}
 
 	'tail': {
 		default: -> 0
 		getFunc: 'TailType'
-		enum: [arg for arg in *PPM2.AvaliableTails]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableTails]
 	}
 
 	'tail_new': {
 		default: -> 0
 		getFunc: 'TailTypeNew'
-		enum: [arg for arg in *PPM2.AvaliableTailsNew]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableTailsNew]
 	}
 
 	'mane': {
 		default: -> 0
 		getFunc: 'ManeType'
-		enum: [arg for arg in *PPM2.AvaliableUpperManes]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManes]
 	}
 
 	'mane_new': {
 		default: -> 0
 		getFunc: 'ManeTypeNew'
-		enum: [arg for arg in *PPM2.AvaliableUpperManesNew]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManesNew]
 	}
 
 	'manelower': {
 		default: -> 0
 		getFunc: 'ManeTypeLower'
-		enum: [arg for arg in *PPM2.AvaliableLowerManes]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManes]
 	}
 
 	'manelower_new': {
 		default: -> 0
 		getFunc: 'ManeTypeLowerNew'
-		enum: [arg for arg in *PPM2.AvaliableLowerManesNew]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManesNew]
 	}
 
 	'socks_texture': {
 		default: -> 0
 		getFunc: 'SocksTexture'
-		enum: [arg for arg in *PPM2.SocksTypes]
+		enum: [arg for _, arg in ipairs PPM2.SocksTypes]
 	}
 
 	'socks_texture_url': {
@@ -259,7 +259,7 @@ PPM2.PonyDataRegistry = {
 	'cmark_type': {
 		default: -> 4
 		getFunc: 'CMarkType'
-		enum: [arg for arg in *PPM2.DefaultCutiemarks]
+		enum: [arg for _, arg in ipairs PPM2.DefaultCutiemarks]
 	}
 
 	'cmark_url': {
@@ -449,7 +449,7 @@ PPM2.PonyDataRegistry = {
 	'suit': {
 		default: -> 0
 		getFunc: 'Bodysuit'
-		enum: [arg for arg in *PPM2.AvaliablePonySuits]
+		enum: [arg for _, arg in ipairs PPM2.AvaliablePonySuits]
 	}
 
 	'left_wing_size': {
@@ -653,7 +653,7 @@ PPM2.PonyDataRegistry = {
 	}
 }
 
-for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
+for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
 	PPM2.PonyDataRegistry["eye_url#{internal}"] = {
 		default: -> ''
 		getFunc: "EyeURL#{publicName}"
@@ -759,13 +759,13 @@ for {internal, publicName} in *{{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}
 	PPM2.PonyDataRegistry["eye_type#{internal}"] = {
 		default: -> 0
 		getFunc: "EyeType#{publicName}"
-		enum: [arg for arg in *PPM2.AvaliableEyeTypes]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableEyeTypes]
 	}
 
 	PPM2.PonyDataRegistry["eye_reflection_type#{internal}"] = {
 		default: -> 0
 		getFunc: "EyeReflectionType#{publicName}"
-		enum: [arg for arg in *PPM2.AvaliableEyeReflections]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableEyeReflections]
 	}
 
 	PPM2.PonyDataRegistry["hole_width#{internal}"] = {
@@ -1009,7 +1009,7 @@ for i = 1, PPM2.MAX_BODY_DETAILS
 	PPM2.PonyDataRegistry["body_detail_#{i}"] = {
 		default: -> 0
 		getFunc: "BodyDetail#{i}"
-		enum: [arg for arg in *PPM2.BodyDetailsEnum]
+		enum: [arg for _, arg in ipairs PPM2.BodyDetailsEnum]
 	}
 
 	PPM2.PonyDataRegistry["body_detail_url_#{i}"] = {
@@ -1042,7 +1042,7 @@ for i = 1, PPM2.MAX_TATTOOS
 	PPM2.PonyDataRegistry["tattoo_type_#{i}"] = {
 		default: -> 0
 		getFunc: "TattooType#{i}"
-		enum: [arg for arg in *PPM2.TATTOOS_REGISTRY]
+		enum: [arg for _, arg in ipairs PPM2.TATTOOS_REGISTRY]
 	}
 
 	PPM2.PonyDataRegistry["tattoo_posx_#{i}"] = {
@@ -1112,7 +1112,7 @@ for i = 1, PPM2.MAX_TATTOOS
 		type: 'COLOR'
 	}
 
-for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes', 'Mouth', 'Teeth', 'Tongue'}
+for _, ttype in ipairs {'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes', 'Mouth', 'Teeth', 'Tongue'}
 	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
 		default: -> 3
 		getFunc: ttype .. 'PhongExponent'
@@ -1162,7 +1162,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
 	PPM2.PonyDataRegistry[ttype\lower() .. '_lightwarp_texture'] = {
 		default: -> 0
 		getFunc: ttype .. 'Lightwarp'
-		enum: [arg for arg in *PPM2.AvaliableLightwarps]
+		enum: [arg for _, arg in ipairs PPM2.AvaliableLightwarps]
 	}
 
 	PPM2.PonyDataRegistry[ttype\lower() .. '_lightwarp_texture_url'] = {
@@ -1177,7 +1177,7 @@ for ttype in *{'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail',
 		type: 'URL'
 	}
 
-for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 	continue if not active
 	PPM2.PonyDataRegistry["flex_disable_#{flex\lower()}"] = {
 		default: -> false

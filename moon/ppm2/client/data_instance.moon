@@ -19,7 +19,7 @@ file.CreateDir('ppm2')
 file.CreateDir('ppm2/backups')
 file.CreateDir('ppm2/thumbnails')
 
-for ffind in *file.Find('ppm2/*.txt', 'DATA')
+for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 	fTarget = ffind\sub(1, -5)
 	-- maybe joined server with old ppm2 and new clear _current was generated
 	if not file.Exists('ppm2/' .. fTarget .. '.dat', 'DATA')
@@ -53,11 +53,11 @@ class PonyDataInstance
 	@DATA_DIR_BACKUP = "ppm2/backups/"
 
 	@FindFiles = =>
-		output = [str\sub(1, #str - 4) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
+		output = [str\sub(1, #str - 4) for _, str in ipairs file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
 		return output
 
 	@FindInstances = =>
-		output = [@(str\sub(1, #str - 4)) for str in *file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
+		output = [@(str\sub(1, #str - 4)) for _, str in ipairs file.Find(@DATA_DIR .. '*', 'DATA') when not str\find('.bak.dat')]
 		return output
 
 	@PONY_DATA = PPM2.PonyDataRegistry
@@ -67,11 +67,11 @@ class PonyDataInstance
 
 	for key, data in pairs @PONY_DATA
 		continue unless data.enum
-		data.enum = [arg\upper() for arg in *data.enum]
+		data.enum = [arg\upper() for _, arg in ipairs data.enum]
 		data.enumMapping = {}
 		data.enumMappingBackward = {}
 		i = -1
-		for enumVal in *data.enum
+		for _, enumVal in ipairs data.enum
 			i += 1
 			data.enumMapping[i] = enumVal
 			data.enumMappingBackward[enumVal] = i
@@ -102,7 +102,7 @@ class PonyDataInstance
 			@ValueChanges(key, oldVal, newVal, ...)
 
 	WriteNetworkData: =>
-		for {:strName, :writeFunc, :getName, :defValue} in *PPM2.NetworkedPonyData.NW_Vars
+		for _, {:strName, :writeFunc, :getName, :defValue} in ipairs PPM2.NetworkedPonyData.NW_Vars
 			if @["Get#{getName}"]
 				writeFunc(@["Get#{getName}"](@))
 			else

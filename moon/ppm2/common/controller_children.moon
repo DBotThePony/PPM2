@@ -20,11 +20,11 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	@MODELS = {}
 	@__inherited: (child) =>
 		super(child)
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
+		child.MODELS_HASH = {mod, true for _, mod in ipairs child.MODELS}
 		child.NEXT_OBJ_ID = 0
 		return if not child.AVALIABLE_CONTROLLERS
-		child.MODELS_HASH = {mod, true for mod in *child.MODELS}
-		child.AVALIABLE_CONTROLLERS[mod] = child for mod in *child.MODELS
+		child.MODELS_HASH = {mod, true for _, mod in ipairs child.MODELS}
+		child.AVALIABLE_CONTROLLERS[mod] = child for _, mod in ipairs child.MODELS
 
 	@SelectController = (model = 'models/ppm/player_default_base.mdl') => @AVALIABLE_CONTROLLERS[model\lower()] or @
 

@@ -35,7 +35,7 @@ list.Set('PlayerOptionsModel', 'pony_cppm', 'models/cppm/player_default_base.mdl
 player_manager.AddValidModel('ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 
-player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for model in *{'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
+player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for _, model in ipairs {'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
 
 PPM2.MIN_WEIGHT = 0.7
 PPM2.MAX_WEIGHT = 1.5
@@ -192,7 +192,7 @@ PPM2.AvaliableLightwarps = {
 
 PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
 
-PPM2.AvaliableLightwarpsPaths = ['models/ppm2/lightwarps/' .. mat\lower() for mat in *PPM2.AvaliableLightwarps]
+PPM2.AvaliableLightwarpsPaths = ['models/ppm2/lightwarps/' .. mat\lower() for _, mat in ipairs PPM2.AvaliableLightwarps]
 
 PPM2.DefaultCutiemarks = {
 	'8ball', 'dice', 'magichat',
@@ -255,7 +255,7 @@ PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOL
 
 do
 	i = -1
-	for mark in *PPM2.DefaultCutiemarks
+	for _, mark in ipairs PPM2.DefaultCutiemarks
 		i += 1
 		PPM2["CMARK_#{mark\upper()}"] = i
 

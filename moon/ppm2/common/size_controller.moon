@@ -113,7 +113,7 @@ class PonySizeController extends PPM2.ControllerChildren
 
 		@validSkeleton = true
 
-		for name in *mapping
+		for _, name in ipairs mapping
 			@[name] = @ent\LookupBone(@@[name])
 			@validSkeleton = false if not @[name]
 
@@ -209,26 +209,26 @@ class PonySizeController extends PPM2.ControllerChildren
 		return if not IsValid(@ent)
 		return if not @validSkeleton
 		with ent
-			\ManipulateBoneScale2Safe(@NECK_BONE_1, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@NECK_BONE_2, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@NECK_BONE_3, Vector(1, 1, 1))
-			\ManipulateBoneScale2Safe(@NECK_BONE_4, Vector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_1, LVector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_2, LVector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_3, LVector(1, 1, 1))
+			\ManipulateBoneScale2Safe(@NECK_BONE_4, LVector(1, 1, 1))
 			\ManipulateBoneAngles2Safe(@NECK_BONE_1, Angle(0, 0, 0))
 			\ManipulateBoneAngles2Safe(@NECK_BONE_2, Angle(0, 0, 0))
 			\ManipulateBoneAngles2Safe(@NECK_BONE_3, Angle(0, 0, 0))
 			\ManipulateBoneAngles2Safe(@NECK_BONE_4, Angle(0, 0, 0))
-			\ManipulateBonePosition2Safe(@NECK_BONE_1, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@NECK_BONE_2, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@NECK_BONE_3, Vector(0, 0, 0))
-			\ManipulateBonePosition2Safe(@NECK_BONE_4, Vector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_1, LVector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_2, LVector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_3, LVector(0, 0, 0))
+			\ManipulateBonePosition2Safe(@NECK_BONE_4, LVector(0, 0, 0))
 
 	ResetLegs: (ent = @ent) =>
 		return if not CLIENT
 		return if not IsValid(ent)
 		return if not @validSkeleton
 
-		vec1 = Vector(1, 1, 1)
-		vec2 = Vector(0, 0, 0)
+		vec1 = LVector(1, 1, 1)
+		vec2 = LVector(0, 0, 0)
 		ang = Angle(0, 0, 0)
 
 		with ent
@@ -362,9 +362,9 @@ class PonySizeController extends PPM2.ControllerChildren
 				currscale = (ent\GetModelScale() * 100)\floor() / 100
 				if currscale ~= newscale
 					if type(ent) == 'NPC' or type(NPC) == 'NextBot'
-						ent\SetPreventTransmit(ply, true) for ply in *player.GetAll()
+						ent\SetPreventTransmit(ply, true) for _, ply in ipairs player.GetAll()
 						ent\SetModelScale(newscale)
-						ent\SetPreventTransmit(ply, false) for ply in *player.GetAll()
+						ent\SetPreventTransmit(ply, false) for _, ply in ipairs player.GetAll()
 					else
 						ent\SetModelScale(newscale)
 			return
@@ -395,16 +395,16 @@ class PonySizeController extends PPM2.ControllerChildren
 		return if not @AllowResize()
 		return if not @validSkeleton
 		size = (@GetNeckSize() - 1) * 3
-		vec = Vector(size, -size, 0)
+		vec = LVector(size, -size, 0)
 
 		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
-		emptyVector = Vector(0, 0, 0)
+		emptyLVector = LVector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition2Safe(@NECK_BONE_1, vec + (boneAnimTable[@NECK_BONE_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@NECK_BONE_2, vec + (boneAnimTable[@NECK_BONE_2] or emptyVector))
-			\ManipulateBonePosition2Safe(@NECK_BONE_3, vec + (boneAnimTable[@NECK_BONE_3] or emptyVector))
-			\ManipulateBonePosition2Safe(@NECK_BONE_4, vec + (boneAnimTable[@NECK_BONE_4] or emptyVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_1, vec + (boneAnimTable[@NECK_BONE_1] or emptyLVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_2, vec + (boneAnimTable[@NECK_BONE_2] or emptyLVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_3, vec + (boneAnimTable[@NECK_BONE_3] or emptyLVector))
+			\ManipulateBonePosition2Safe(@NECK_BONE_4, vec + (boneAnimTable[@NECK_BONE_4] or emptyLVector))
 
 	ModifyLegs: (ent = @ent) =>
 		return if not IsValid(ent)
@@ -414,28 +414,28 @@ class PonySizeController extends PPM2.ControllerChildren
 		size = realSizeModify * 3
 
 		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
-		emptyVector = Vector(0, 0, 0)
+		emptyLVector = LVector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition2Safe(@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + \GetManipulateBonePosition2Safe(@LEGS_BONE_ROOT))
+			\ManipulateBonePosition2Safe(@LEGS_BONE_ROOT, LVector(0, 0, size * 5) + \GetManipulateBonePosition2Safe(@LEGS_BONE_ROOT))
 
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_1, LVector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_1] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_2, LVector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_2] or emptyLVector))
 
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_3, Vector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_3] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_4, Vector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_4] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_3, LVector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_3] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_4, LVector(size, 0, 0) + (boneAnimTable[@LEGS_FRONT_4] or emptyLVector))
 
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_5] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_6] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_5, LVector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_5] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_FRONT_6, LVector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_6] or emptyLVector))
 
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_1, LVector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_1] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_1_2, LVector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_2] or emptyLVector))
 
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_1, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_2, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_1, LVector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_1] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_2_2, LVector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_2] or emptyLVector))
 
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_1] or emptyVector))
-			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_2] or emptyVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_1, LVector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_1] or emptyLVector))
+			\ManipulateBonePosition2Safe(@LEGS_BEHIND_3_2, LVector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_2] or emptyLVector))
 
 -- 0    LrigPelvis
 -- 1    Lrig_LEG_BL_Femur
@@ -527,7 +527,7 @@ hook.Add 'PPM2.SetupBones', 'PPM2.Size', (ent, data) ->
 		sizes.lastPAC3BoneReset = RealTimeL() + 1
 
 ppm2_sv_allow_resize = ->
-	for ply in *player.GetAll()
+	for _, ply in ipairs player.GetAll()
 		if data = ply\GetPonyData()
 			if scale = data\GetSizeController()
 				scale\Reset()

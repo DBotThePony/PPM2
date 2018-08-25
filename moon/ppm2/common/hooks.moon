@@ -20,7 +20,7 @@ DLib.nw.PoolBoolean('PPM2.InEditor', false)
 do
 	import GetModel, IsDormant, GetPonyData, IsValid from FindMetaTable('Entity')
 	callback = ->
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			if not IsDormant(ply)
 				model = GetModel(ply)
 				ply.__ppm2_lastmodel = ply.__ppm2_lastmodel or model
@@ -31,7 +31,7 @@ do
 						ply.__ppm2_lastmodel = model
 						data\ModelChanges(oldModel, model)
 
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			ply = task.ent
 			if IsValid(ply) and not IsDormant(ply)
 				model = GetModel(ply)
@@ -50,21 +50,21 @@ do
 	import GetModel, IsDormant, GetPonyData, IsValid, IsPonyCached from FindMetaTable('Entity')
 
 	hook.Add 'Think', 'PPM2.PonyDataThink', ->
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			if not IsDormant(ply) and IsPonyCached(ply)
 				data = GetPonyData(ply)
 				data\Think() if data and data.Think
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			ply = task.ent
 			if IsValid(ply) and not IsDormant(ply) and IsPonyCached(ply) and task.Think
 				task\Think()
 
 	hook.Add 'RenderScreenspaceEffects', 'PPM2.PonyDataRenderScreenspaceEffects', ->
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			if not IsDormant(ply) and IsPonyCached(ply)
 				data = GetPonyData(ply)
 				data\RenderScreenspaceEffects() if data and data.RenderScreenspaceEffects
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			ply = task.ent
 			if IsValid(ply) and not IsDormant(ply) and IsPonyCached(ply) and task.RenderScreenspaceEffects
 				task\RenderScreenspaceEffects()
@@ -77,11 +77,11 @@ do
 	import Alive from FindMetaTable('Player')
 	import IsPonyCached, IsDormant, GetPonyData from FindMetaTable('Entity')
 	timer.Create 'PPM2.SlowUpdate', CLIENT and 0.5 or 5, 0, ->
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			if not IsDormant(ply) and Alive(ply) and IsPonyCached(ply) and GetPonyData(ply)
 				data = GetPonyData(ply)
 				xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			if IsValid(task.ent) and task.ent\IsPony()
 				xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
 

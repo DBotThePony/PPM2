@@ -62,7 +62,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 	CreateLegs: =>
 		return NULL if not @isValid
 		return NULL if @ent ~= LocalPlayer()
-		for ent in *ents.GetAll()
+		for _, ent in ipairs ents.GetAll()
 			if ent.isPonyLegsModel
 				ent\Remove()
 
@@ -116,7 +116,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 			if @legBGSetup < ctime
 				@legBGSetup = ctime + 1
-				for group in *ply\GetBodyGroups()
+				for _, group in ipairs ply\GetBodyGroups()
 					\SetBodygroup(group.id, ply\GetBodygroup(group.id))
 
 			\FrameAdvance(ctime - @lastLegUpdate)
@@ -361,7 +361,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			local last
 			max = 300
 			local lastpos
-			for ply in *player.GetAll()
+			for _, ply in ipairs player.GetAll()
 				if @ent ~= ply
 					epos = ply\EyePos()
 					dist = epos\Distance(lpos)
@@ -429,7 +429,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if ent and not @armsWeightSetup
 			@armsWeightSetup = true
 			weight = @GetData()\GetWeight()
-			vec = Vector(weight, weight, weight)
+			vec = LVector(weight, weight, weight)
 			ent\ManipulateBoneScale2Safe(i, vec) for i = 1, 13
 		render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
 	PostDrawArms: (ent) =>

@@ -139,10 +139,10 @@ for i = 2, 6
 PPM2.ReadFromOldData = (filename = '_current') ->
 	read = file.Read("ppm/#{filename}.txt", 'DATA')
 	return false if read == ''
-	split = [str\Trim() for str in *string.Explode('\n', read\Replace('\r', ''))]
+	split = [str\Trim() for _, str in ipairs string.Explode('\n', read\Replace('\r', ''))]
 	outputData = {}
 
-	for line in *split
+	for _, line in ipairs split
 		varID = line\match('([a-zA-Z0-9_]+)')
 		continue if not varID or varID == ''
 		continue if not IMPORT_TABLE[varID]
@@ -152,7 +152,7 @@ PPM2.ReadFromOldData = (filename = '_current') ->
 			outputData[dt.name] = dt.func(value)
 		else
 			get = dt.func(value)
-			outputData[name] = get for name in *dt.name
+			outputData[name] = get for _, name in ipairs dt.name
 
 	data = PPM2.PonyDataInstance("#{filename}_imported", nil, false)
 	for key, value in pairs outputData

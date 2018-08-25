@@ -208,7 +208,7 @@ MODEL_BOX_PANEL = {
 	GetParentTarget: => @parentTarget
 	SetParentTarget: (val) => @parentTarget = val
 
-	DoUpdate: => panel\DoUpdate() for panel in *@updatePanels when panel\IsValid()
+	DoUpdate: => panel\DoUpdate() for _, panel in ipairs @updatePanels when panel\IsValid()
 
 	UpdateMenu: (menu, goingToDelete = false) =>
 		if @InMenu2() and not goingToDelete
@@ -244,7 +244,7 @@ MODEL_BOX_PANEL = {
 								targetPanel = menuPanel if menu.selectmenu == menuName
 						-- god i hate gmod
 						if targetPanel
-							for item in *\GetItems()
+							for _, item in ipairs \GetItems()
 								if item.Panel == targetPanel
 									\SetActiveTab(item.Tab)
 				else
@@ -490,7 +490,7 @@ MODEL_BOX_PANEL = {
 
 		if type(menu.points) == 'table'
 			@drawPoints = true
-			@pointsData = for point in *menu.points
+			@pointsData = for _, point in ipairs menu.points
 				vecpos = point.getpos(@model, @controller\GetPonySize())
 				position = vecpos\ToScreen()
 				{position, point, vecpos\Distance(drawpos)}
@@ -507,7 +507,7 @@ MODEL_BOX_PANEL = {
 			local drawnSelected
 			min = 9999
 
-			for pointdata in *@pointsData
+			for _, pointdata in ipairs @pointsData
 				{:x, :y} = pointdata[1]
 				x, y = x - lx, y - ly
 				pointdata[1].x, pointdata[1].y = x, y
@@ -519,7 +519,7 @@ MODEL_BOX_PANEL = {
 
 			@selectPoint = drawnSelected and drawnSelected[2] or false
 
-			for pointdata in *@pointsData
+			for _, pointdata in ipairs @pointsData
 				{:x, :y} = pointdata[1]
 
 				if pointdata == drawnSelected
@@ -541,7 +541,7 @@ MODEL_BOX_PANEL = {
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
 		@buildingModel\Remove() if IsValid(@buildingModel)
-		panel\Remove() for panel in *@menuPanelsCache when panel\IsValid()
+		panel\Remove() for _, panel in ipairs @menuPanelsCache when panel\IsValid()
 }
 
 vgui.Register('PPM2Model2Panel', MODEL_BOX_PANEL, 'EditablePanel')
@@ -715,7 +715,7 @@ EDIT_TREE = {
 			@CheckBox('gui.ppm2.editor.misc.no_flexes2', 'NoFlex')
 			@Label('gui.ppm2.editor.misc.no_flexes_desc')
 			flexes = @Spoiler('gui.ppm2.editor.misc.flexes')
-			for {:flex, :active} in *PPM2.PonyFlexController.FLEX_LIST
+			for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 				@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
 			flexes\SizeToContents()
 
@@ -1386,7 +1386,7 @@ patchSubtree = (node) ->
 			patchSubtree(child)
 
 	if type(node.points) == 'table'
-		for point in *node.points
+		for _, point in ipairs node.points
 			point.addvector = point.addvector or Vector()
 
 			switch point.type

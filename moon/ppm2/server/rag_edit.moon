@@ -86,6 +86,6 @@ duplicator.RegisterEntityModifier 'ppm2_ragdolledit', (ply = NULL, ent = NULL, s
 		data = PPM2.NetworkedPonyData(nil, ent)
 
 	data = ent\GetPonyData()
-	data["Set#{key}"](data, value, false) for {key, value} in *storeddata when data["Set#{key}"]
+	data["Set#{key}"](data, value, false) for _, {key, value} in ipairs storeddata when data["Set#{key}"]
 	data\ReBroadcast()
 	timer.Simple 0.5, -> data\Create() if not data\IsNetworked()

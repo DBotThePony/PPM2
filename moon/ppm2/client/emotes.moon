@@ -73,12 +73,12 @@ CONSOLE_EMOTES_COMMAND = (ply = LocalPlayer(), cmd = '', args = {}) ->
 		net.SendToServer()
 		hook.Call('PPM2_EmoteAnimation', nil, LocalPlayer(), emoteID, PPM2.AVALIABLE_EMOTES_BY_SEQUENCE[emoteID].time)
 
-CONSOLE_DEF_LIST = ['ppm2_emote "' .. sequence .. '"' for {:sequence} in *PPM2.AVALIABLE_EMOTES]
+CONSOLE_DEF_LIST = ['ppm2_emote "' .. sequence .. '"' for _, {:sequence} in ipairs PPM2.AVALIABLE_EMOTES]
 CONSOLE_EMOTES_AUTOCOMPLETE = (cmd = '', args = '') ->
 	args = args\Trim()
 	return CONSOLE_DEF_LIST if args == ''
 	output = {}
-	for {:sequence} in *PPM2.AVALIABLE_EMOTES
+	for _, {:sequence} in ipairs PPM2.AVALIABLE_EMOTES
 		if string.find(sequence, '^' .. args)
 			table.insert(output, 'ppm2_emote "' .. sequence .. '"')
 	return output
@@ -132,7 +132,7 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 		\SetSize(200, 300)
 		.Paint = ->
 		\SetMouseInputEnabled(true)
-	@buttons = for {:name, :id, :sequence, :time, :fexists, :filecrop} in *PPM2.AVALIABLE_EMOTES
+	@buttons = for _, {:name, :id, :sequence, :time, :fexists, :filecrop} in ipairs PPM2.AVALIABLE_EMOTES
 		with btn = vgui.Create('DButton', @scroll)
 			.id = id
 			.time = time
@@ -178,7 +178,7 @@ PPM2.CreateEmotesPanel = (parent, target = LocalPlayer(), sendToServer = true) -
 						.parent = image
 					.OnRemove = -> .hoverPnl\Remove() if IsValid(.hoverPnl)
 			btn
-	@scroll\AddItem(btn) for btn in *@buttons
+	@scroll\AddItem(btn) for _, btn in ipairs @buttons
 	@SetVisible(false)
 	@SetMouseInputEnabled(false)
 	return @

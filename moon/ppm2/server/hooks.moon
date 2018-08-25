@@ -55,7 +55,7 @@ do
 		REQUIRE_CLIENTS[ply] = {}
 		target = REQUIRE_CLIENTS[ply]
 
-		for ent in *ents.GetAll()
+		for _, ent in ipairs ents.GetAll()
 			if ent ~= ply
 				data = ent\GetPonyData()
 				if data
@@ -165,4 +165,4 @@ PlayerSpawnBot = =>
 			data\Create()
 
 hook.Add 'PlayerSpawn', 'PPM2.Bots', PlayerSpawnBot
-timer.Simple 0, -> PlayerSpawnBot(ply) for ply in *player.GetAll()
+timer.Simple 0, -> PlayerSpawnBot(ply) for _, ply in ipairs player.GetAll()

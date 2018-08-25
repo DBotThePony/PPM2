@@ -75,7 +75,7 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	MARKED_FOR_DRAW = {}
 
 	if not ALTERNATIVE_RENDER\GetBool()
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			if not IsDormant(ply)
 				p = IsPony(ply)
 				ply.__cachedIsPony = p
@@ -107,7 +107,7 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
-		for draw in *MARKED_FOR_DRAW
+		for _, draw in ipairs MARKED_FOR_DRAW
 			draw\PostDraw()
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
@@ -124,7 +124,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	return if bDrawingDepth or bDrawingSkybox
 
 	if not TASK_RENDER_TYPE\GetBool()
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			ent = task.ent
 			if IsValid(ent)
 				if ent.__cachedIsPony
@@ -143,7 +143,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 						task\Reset()
 
 	if not ENABLE_NEW_RAGDOLLS\GetBool()
-		for ply in *player.GetAll()
+		for _, ply in ipairs player.GetAll()
 			alive = ply\Alive()
 			ply.__ppm2_last_dead = RealTimeL() + 2 if not alive
 			if ply.__cachedIsPony
@@ -170,7 +170,7 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 Think = ->
 	if TASK_RENDER_TYPE\GetBool()
-		for task in *PPM2.NetworkedPonyData.RenderTasks
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
 			ent = task.ent
 			if IsValid(ent) and ent.__cachedIsPony
 				if ent.__ppm2_task_hit
