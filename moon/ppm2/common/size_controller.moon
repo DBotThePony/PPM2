@@ -490,6 +490,8 @@ class PonySizeController extends PPM2.ControllerChildren
 -- 50   wing_open_l
 -- 51   wing_open_r
 
+PPM2.PonySizeController = PonySizeController
+
 class NewPonySizeContoller extends PonySizeController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
@@ -518,6 +520,8 @@ class NewPonySizeContoller extends PonySizeController
 
 	new: (...) =>
 		super(...)
+
+PPM2.NewPonySizeContoller = NewPonySizeContoller
 
 hook.Add 'PPM2.SetupBones', 'PPM2.Size', (ent, data) ->
 	if sizes = data\GetSizeController()
