@@ -8,7 +8,7 @@ Addon extends the original PonyPlayerModels idea about customizable ponies for p
 ## The addon is part of [Ponyscape](http://steamcommunity.com/groups/Ponyscape) server project! You can connect to [Ponyscape here](steam://connect/ps.ponyscape.com)!
 ![Ponyscape logo](https://dbot.serealia.ca/sharex/2017/05/Ponyscape%27s%20PPMv2%20Text.png)
 
-## The code is licensed under [Apache software foundation License 2.0](LICENSE) ([web version](https://www.apache.org/licenses/LICENSE-2.0))
+## The code is licensed under MIT License
 ## New models are licensed under [Microsoft Game Content License](http://www.xbox.com/en-us/developers/rules)
 
 # Features
