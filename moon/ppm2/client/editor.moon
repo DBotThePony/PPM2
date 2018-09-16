@@ -649,6 +649,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 						surface.DrawRect(x, y, 512, 512)
 						DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
 	@rebuildFileList()
+	list.rebuildFileList = @rebuildFileList
 
 PPM2.EditorBuildOldFilesPanel = =>
 	@Label('gui.ppm2.editor.io.warn.oldfile')
@@ -721,6 +722,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 					surface.DrawRect(x, y, 512, 512)
 					DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
 	@rebuildFileList()
+	list.rebuildFileList = @rebuildFileList
 
 PPM2.EditorFileManipFuncs = (list, prefix, openFile) ->
 	list.DoDoubleClick = (pnl, rowID, line) ->
@@ -733,7 +735,7 @@ PPM2.EditorFileManipFuncs = (list, prefix, openFile) ->
 		menu\AddOption('Delete', ->
 			confirm = ->
 				file.Delete("#{prefix}/#{fil}.dat")
-				@rebuildFileList()
+				list\rebuildFileList()
 			Derma_Query(
 				'gui.ppm2.editor.io.delete.confirm',
 				'gui.ppm2.editor.io.delete.title',
