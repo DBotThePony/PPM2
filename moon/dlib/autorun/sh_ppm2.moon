@@ -23,51 +23,49 @@
 export PPM2
 PPM2 = PPM2 or {}
 
-DLib.manifest({
-	name: 'PPM/2'
-	prefix: 'ppm2'
+shared = (filein) ->
+	AddCSLuaFile(filein) if SERVER
+	include(filein)
 
-	shared: {
-		'common/modifier_base.lua'
-		'common/sequence_base.lua'
-		'common/sequence_holder.lua'
-		'common/controller_children.lua'
-		'common/registry.lua'
-		'common/functions.lua'
-		'common/bodygroup_controller.lua'
-		'common/weight_controller.lua'
-		'common/pony_expressions_controller.lua'
-		'common/emotes.lua'
-		'common/flex_controller.lua'
-		'common/registry_data.lua'
-		'common/ponydata.lua'
-		'common/bones_modifier.lua'
-		'common/ponyfly.lua'
-		'common/size_controller.lua'
-		'common/hooks.lua'
-	}
+server = (filein) -> include(filein) if SERVER
+client = (filein) ->
+	AddCSLuaFile(filein) if SERVER
+	include(filein) if CLIENT
 
-	client: {
-		'client/data_instance.lua'
-		'client/materials_registry.lua'
-		'client/texture_controller.lua'
-		'client/new_texture_controller.lua'
-		'client/hooks.lua'
-		'client/functions.lua'
-		'client/render_controller.lua'
-		'client/emotes.lua'
-		'client/player_menu.lua'
-		'client/editor.lua'
-		'client/editor3.lua'
-		'client/rag_edit.lua'
-		'client/render.lua'
-	}
+shared('common/modifier_base.lua')
+shared('common/sequence_base.lua')
+shared('common/sequence_holder.lua')
+shared('common/controller_children.lua')
+shared('common/registry.lua')
+shared('common/functions.lua')
+shared('common/bodygroup_controller.lua')
+shared('common/weight_controller.lua')
+shared('common/pony_expressions_controller.lua')
+shared('common/emotes.lua')
+shared('common/flex_controller.lua')
+shared('common/registry_data.lua')
+shared('common/ponydata.lua')
+shared('common/bones_modifier.lua')
+shared('common/ponyfly.lua')
+shared('common/size_controller.lua')
+shared('common/hooks.lua')
 
-	server: {
-		'server/misc.lua'
-		'server/hooks.lua'
-		'server/emotes.lua'
-		'server/hitgroups.lua'
-		'server/rag_edit.lua'
-	}
-})
+client('client/data_instance.lua')
+client('client/materials_registry.lua')
+client('client/texture_controller.lua')
+client('client/new_texture_controller.lua')
+client('client/hooks.lua')
+client('client/functions.lua')
+client('client/render_controller.lua')
+client('client/emotes.lua')
+client('client/player_menu.lua')
+client('client/editor.lua')
+client('client/editor3.lua')
+client('client/rag_edit.lua')
+client('client/render.lua')
+
+server('server/misc.lua')
+server('server/hooks.lua')
+server('server/emotes.lua')
+server('server/hitgroups.lua')
+server('server/rag_edit.lua')
