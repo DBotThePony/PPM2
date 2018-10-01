@@ -342,11 +342,11 @@ do
 
 				if not data\GetSeparateMagicColor()
 					if not data\GetSeparateEyes()
-						.color = DLib.LerpColor(0.5, data\GetEyeIrisTop(), data\GetEyeIrisBottom())
+						.color = data\GetEyeIrisTop()\Lerp(0.5, data\GetEyeIrisBottom())
 					else
-						lerpLeft = DLib.LerpColor(0.5, data\GetEyeIrisTopLeft(), data\GetEyeIrisBottomLeft())
-						lerpRight = DLib.LerpColor(0.5, data\GetEyeIrisTopRight(), data\GetEyeIrisBottomRight())
-						.color = DLib.LerpColor(0.5, lerpLeft, lerpRight)
+						lerpLeft = data\GetEyeIrisTopLeft()\Lerp(0.5, data\GetEyeIrisBottomLeft())
+						lerpRight = data\GetEyeIrisTopRight()\Lerp(0.5, data\GetEyeIrisBottomRight())
+						.color = lerpLeft\Lerp(0.5, lerpRight)
 		else
 			with hornGlowStatus[@]
 				.frame = FrameNumberL()
