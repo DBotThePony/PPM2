@@ -252,7 +252,7 @@ do
 		for ent, status in pairs hornGlowStatus
 			if IsValid(ent) and status.frame == frame and IsValid(status.target)
 				additional = math.sin(cTime / 2 + status.haloSeed * 3) * 40
-				newCol = DLib.AddColor(status.color, Color(additional, additional, additional))
+				newCol = status.color + Color(additional, additional, additional)
 				halo.Add({status.target}, newCol, math.sin(cTime + status.haloSeed) * 4 + 8, math.cos(cTime + status.haloSeed) * 4 + 8, 2)
 
 	hook.Add 'Think', 'PPM2.HornEffects', =>
