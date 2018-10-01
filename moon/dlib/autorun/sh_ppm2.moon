@@ -24,13 +24,13 @@ export PPM2
 PPM2 = PPM2 or {}
 
 shared = (filein) ->
-	AddCSLuaFile(filein) if SERVER
-	include(filein)
+	AddCSLuaFile('ppm2/' .. filein) if SERVER
+	include('ppm2/' .. filein)
 
-server = (filein) -> include(filein) if SERVER
+server = (filein) -> include('ppm2/' .. filein) if SERVER
 client = (filein) ->
-	AddCSLuaFile(filein) if SERVER
-	include(filein) if CLIENT
+	AddCSLuaFile('ppm2/' .. filein) if SERVER
+	include('ppm2/' .. filein) if CLIENT
 
 shared('common/modifier_base.lua')
 shared('common/sequence_base.lua')
