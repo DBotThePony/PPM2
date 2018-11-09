@@ -33,7 +33,7 @@ for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 		if json
 			TagCompound = DLib.NBT.TagCompound()
 			for key, value in pairs json
-				switch type(value)
+				switch luatype(value)
 					when 'string'
 						TagCompound\AddString(key, value)
 					when 'number'
@@ -44,7 +44,7 @@ for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 						-- assume color
 						TagCompound\AddByteArray(key, {value.r - 128, value.g - 128, value.b - 128, value.a - 128}) if value.r and value.g and value.b and value.a
 					else
-						error(type(value))
+						error(luatype(value))
 			buf = DLib.BytesBuffer()
 			TagCompound\WriteFile(buf)
 			stream = file.Open('ppm2/' .. fTarget .. '.dat', 'wb', 'DATA')
@@ -98,7 +98,7 @@ class PonyDataInstance
 			@__base["GetEnum#{getFunc}"] = @__base["Get#{getFunc}Enum"]
 		@__base["Reset#{getFunc}"] = => @["Set#{getFunc}"](@, default())
 		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
-			if type(val) == 'string' and enumMappingBackward
+			if luatype(val) == 'string' and enumMappingBackward
 				newVal = enumMappingBackward[val\upper()]
 				val = newVal if newVal
 			newVal = fix(val)
@@ -116,7 +116,7 @@ class PonyDataInstance
 	Copy: (fileName = @filename) =>
 		copyOfData = {}
 		for key, val in pairs @dataTable
-			switch type(val)
+			switch luatype(val)
 				when 'number'
 					copyOfData[key] = val
 				when 'string'
@@ -172,7 +172,7 @@ class PonyDataInstance
 	SaveOnChange: => @saveOnChange
 	SetSaveOnChange: (val = true) => @saveOnChange = val
 	GetValueFromNBT: (mapData, value) =>
-		if mapData.enum and type(value) == 'string'
+		if mapData.enum and luatype(value) == 'string'
 			mapData.fix(mapData.enumMappingBackward[value\upper()])
 		elseif mapData.type == 'COLOR'
 			if value.r and value.g and value.b and value.a
@@ -180,7 +180,7 @@ class PonyDataInstance
 			else
 				mapData.fix(Color(value[1] + 128, value[2] + 128, value[3] + 128, value[4] + 128))
 		elseif mapData.type == 'BOOLEAN'
-			if type(value) == 'boolean'
+			if luatype(value) == 'boolean'
 				mapData.fix(value)
 			else
 				mapData.fix(value == 1)
@@ -188,7 +188,7 @@ class PonyDataInstance
 			mapData.fix(value)
 
 	SetupData: (data = @NBTTagCompound, force = false, doBackup = false) =>
-		if type(data) == 'NBTCompound'
+		if luatype(data) == 'NBTCompound'
 			data = data\GetValue()
 		if doBackup or not force
 			makeBackup = false
@@ -199,7 +199,7 @@ class PonyDataInstance
 					mapData = @@PONY_DATA[map]
 					value = @GetValueFromNBT(mapData, value2)
 					if mapData.enum
-						if type(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or type(value) == 'number' and not mapData.enumMapping[value]
+						if luatype(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or luatype(value) == 'number' and not mapData.enumMapping[value]
 							return @@ERR_MISSING_CONTENT if not force
 							makeBackup = true
 							break
