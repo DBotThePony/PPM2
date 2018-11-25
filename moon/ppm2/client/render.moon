@@ -20,8 +20,7 @@
 -- DEALINGS IN THE SOFTWARE.
 
 
-import FrameNumberL, RealTimeL, StrongEntity, PPM2 from _G
-import ALTERNATIVE_RENDER from PPM2
+import FrameNumberL, RealTimeL, PPM2 from _G
 import GetPonyData, IsDormant, PPMBonesModifier, IsPony from FindMetaTable('Entity')
 
 RENDER_HORN_GLOW = CreateConVar('ppm2_horn_glow', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn glow when player uses physgun')
@@ -79,18 +78,17 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 	MARKED_FOR_DRAW = {}
 
-	if not ALTERNATIVE_RENDER\GetBool()
-		for _, ply in ipairs player.GetAll()
-			if not IsDormant(ply)
-				p = IsPony(ply)
-				ply.__cachedIsPony = p
-				if p
-					data = GetPonyData(ply)
-					if data
-						renderController = data\GetRenderController()
-						if renderController
-							renderController\PreDraw()
-							table.insert(MARKED_FOR_DRAW, renderController)
+	for _, ply in ipairs player.GetAll()
+		if not IsDormant(ply)
+			p = IsPony(ply)
+			ply.__cachedIsPony = p
+			if p
+				data = GetPonyData(ply)
+				if data
+					renderController = data\GetRenderController()
+					if renderController
+						renderController\PreDraw()
+						table.insert(MARKED_FOR_DRAW, renderController)
 
 	if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
 		with LocalPlayer()
@@ -111,7 +109,7 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					IN_DRAW = false
 
 PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
-	if not ALTERNATIVE_RENDER\GetBool() and not bDrawingDepth and not bDrawingSkybox
+	if not bDrawingDepth and not bDrawingSkybox
 		for _, draw in ipairs MARKED_FOR_DRAW
 			draw\PostDraw()
 
@@ -183,7 +181,7 @@ Think = ->
 					ent\SetNoDraw(false)
 
 				if not ent.__ppm2RenderOverride
-					ent = ent\GetEntity()
+					ent = ent
 					ent.__ppm2_oldRenderOverride = ent.RenderOverride
 					ent.__ppm2RenderOverride = ->
 						renderController = task\GetRenderController()
@@ -195,45 +193,25 @@ Think = ->
 
 PPM2.PrePlayerDraw = =>
 	return if PPM2.__RENDERING_REFLECTIONS
-	if ALTERNATIVE_RENDER\GetBool()
-		with data = GetPonyData(@)
-			return if not data
-			@__cachedIsPony = IsPony(@)
-			return if not @__cachedIsPony
-			f = FrameNumberL()
-			return if @__ppm2_last_draw == f
-			@__ppm2_last_draw = f
-			@__ppm2_last_dead = @__ppm2_last_dead or 0
-			return if @__ppm2_last_dead > RealTimeL()
-			bones = PPMBonesModifier(@)
-			if data and bones\CanThink()
-				@ResetBoneManipCache()
-				bones\ResetBones()
-				hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-				bones\Think()
-				@ApplyBoneManipulations()
-				@_ppmBonesModified = true
-			renderController = data\GetRenderController()
-			status = renderController\PreDraw() if renderController
-	else
-		with data = GetPonyData(@)
-			return if not data
-			@__cachedIsPony = IsPony(@)
-			return if not @__cachedIsPony
-			f = FrameNumberL()
-			return if @__ppm2_last_draw == f
-			@__ppm2_last_draw = f
-			bones = PPMBonesModifier(@)
-			if data and bones\CanThink()
-				@ResetBoneManipCache()
-				bones\ResetBones()
-				hook.Call('PPM2.SetupBones', nil, StrongEntity(@), data) if data
-				bones\Think()
-				@ApplyBoneManipulations()
-				@_ppmBonesModified = true
+
+	with data = GetPonyData(@)
+		return if not data
+		@__cachedIsPony = IsPony(@)
+		return if not @__cachedIsPony
+		f = FrameNumberL()
+		return if @__ppm2_last_draw == f
+		@__ppm2_last_draw = f
+		bones = PPMBonesModifier(@)
+		if data and bones\CanThink()
+			@ResetBoneManipCache()
+			bones\ResetBones()
+			hook.Call('PPM2.SetupBones', nil, @, data) if data
+			bones\Think()
+			@ApplyBoneManipulations()
+			@_ppmBonesModified = true
 
 PPM2.PostPlayerDraw = =>
-	return if not ALTERNATIVE_RENDER\GetBool() or PPM2.__RENDERING_REFLECTIONS
+	return if PPM2.__RENDERING_REFLECTIONS
 	with data = GetPonyData(@)
 		return if not data or not @__cachedIsPony
 		renderController = data\GetRenderController()

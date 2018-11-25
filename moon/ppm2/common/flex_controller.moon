@@ -73,7 +73,6 @@ class FlexState extends PPM2.ModifierBase
 	new: (controller, flexName = '', flexID = 0, scale = 1, speed = 1, active = true, min = 0, max = 1, useModifiers = true) =>
 		super()
 		@controller = controller
-		@ent = controller.ent
 		@name = flexName
 		@flexName = flexName
 		@flexID = flexID
@@ -106,7 +105,7 @@ class FlexState extends PPM2.ModifierBase
 	GetLerpModify: => @lerpMultiplier
 	LerpModify: => @lerpMultiplier
 
-	GetEntity: => @ent
+	GetEntity: => @controller\GetEntity()
 	GetData: => @controller
 	GetController: => @controller
 	GetValue: => @current
@@ -133,7 +132,7 @@ class FlexState extends PPM2.ModifierBase
 
 	AddValue: (val = 0) => @SetValue(@current + val)
 	AddRealValue: (val = 0) => @SetRealValue(@target + val)
-	Think: (ent = @ent, delta = 0) =>
+	Think: (ent = @GetEntity(), delta = 0) =>
 		return if not @active
 
 		if @useModifiers
@@ -148,10 +147,6 @@ class FlexState extends PPM2.ModifierBase
 			@scale += modif for _, modif in ipairs @ScaleModifiers
 			@speed += modif for _, modif in ipairs @SpeedModifiers
 			@current = math.Clamp(@current, @min, @max) * @scale
-
-		if not IsValid(@ent)
-			@ent = @controller.ent
-			ent = @ent
 
 		ent\SetFlexWeight(@flexID, @current)
 	DataChanges: (state) =>
@@ -169,7 +164,7 @@ class FlexState extends PPM2.ModifierBase
 		@speed = @originalspeed * @speedModify
 		@target = 0
 		@current = 0
-		@ent\SetFlexWeight(@flexID, 0) if IsValid(@ent)
+		@GetEntity()\SetFlexWeight(@flexID, 0) if IsValid(@GetEntity())
 
 PPM2.FlexState = FlexState
 
@@ -195,25 +190,21 @@ class FlexSequence extends PPM2.SequenceBase
 			@flexIDS[i] = num
 			i += 1
 
-		@ent = controller.ent
 		@controller = controller
 		@Launch()
 
 	GetController: => @controller
-	GetEntity: => @ent
 	GetModifierID: (id = '') => @flexIDS[id]
 	GetFlexState: (id = '') => @flexStates[id]
 
 	Think: (delta = 0) =>
-		@ent = @controller.ent
-		return false if not IsValid(@ent)
+		return false if not IsValid(@GetEntity())
 		super(delta)
 
 	Stop: =>
 		super()
-		if @parent
-			for _, id in ipairs @flexIDsIterable
-				@parent\GetFlexState(id)\ResetModifiers(@name)
+		return unless @parent
+		@parent\GetFlexState(id)\ResetModifiers(@name) for _, id in ipairs @flexIDsIterable
 
 	SetModifierWeight: (id = '', val = 0) => @GetFlexState(id)\SetModifierWeight(@GetModifierID(id), val)
 	SetModifierSpeed: (id = '', val = 0) => @GetFlexState(id)\SetModifierSpeed(@GetModifierID(id), val)
@@ -422,7 +413,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
-				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
 				value = math.abs(math.sin(CurTimeL() * .5) * .15)
 				@SetModifierWeight(1, value)
 				@SetModifierWeight(2, value)
@@ -435,7 +426,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
 			'func': (delta, timeOfAnim) =>
-				return if not @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				return if not @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
 				@SetModifierWeight(1, 1)
 				@SetModifierWeight(2, 1)
 				@SetModifierWeight(3, 0.5)
@@ -448,7 +439,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 2
 			'ids': {'Stomach_Out', 'Stomach_In'}
 			'func': (delta, timeOfAnim) =>
-				return false if @ent\GetNWBool('PPM2.IsDeathRagdoll')
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
 				In, Out = @GetModifierID(1), @GetModifierID(2)
 				InState, OutState = @GetFlexState(1), @GetFlexState(2)
 				abs = math.abs(0.5 - timeOfAnim)
@@ -463,7 +454,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
 			'func': (delta, timeOfAnim) =>
-				return false if not @ent\IsPlayer() and not @ent\IsNPC() and @ent.Type ~= 'nextbot'
+				return false if not @GetEntity()\IsPlayer() and not @GetEntity()\IsNPC() and @GetEntity().Type ~= 'nextbot'
 				frown = @GetModifierID(1)
 				frownState = @GetFlexState(1)
 				left, right = @GetModifierID(2), @GetModifierID(3)
@@ -472,7 +463,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				Scrunch = @GetModifierID(4)
 				ScrunchState = @GetFlexState(4)
 
-				hp, mhp = @ent\Health(), @ent\GetMaxHealth()
+				hp, mhp = @GetEntity()\Health(), @GetEntity()\GetMaxHealth()
 				mhp = 1 if mhp == 0
 				div = hp / mhp
 				strength = math.Clamp(1.5 - div * 1.5, 0, 1)
@@ -724,7 +715,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				data = @talkAnim[cPos]
 				return if not data
 				{jaw, out, up, down} = data
-				volume = @ent\VoiceVolume() * 6
+				volume = @GetEntity()\VoiceVolume() * 6
 				jaw *= volume
 				out *= volume
 				up *= volume
@@ -956,7 +947,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
 		@ResetSequences()
-		PPM2.DebugPrint('Created new flex controller for ', @ent, ' as part of ', data, '; internal ID is ', @fid)
+		PPM2.DebugPrint('Created new flex controller for ', @GetEntity(), ' as part of ', data, '; internal ID is ', @fid)
 
 	IsValid: => @isValid
 
@@ -971,22 +962,23 @@ class PonyFlexController extends PPM2.ControllerChildren
 			flex\SetUseLerp(state\GetValue()) for _, flex in ipairs @states
 		if state\GetKey() == 'FlexLerpMultiplier'
 			flex\SetLerpModify(state\GetValue()) for _, flex in ipairs @states
-	GetEntity: => @ent
+
+	GetEntity: => @controller\GetEntity()
 	GetData: => @controller
 	GetController: => @controller
 
 	PlayerStartVoice: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		@StartSequence('talk_endless')
 	PlayerEndVoice: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		@EndSequence('talk_endless')
 
 	ResetSequences: =>
 		super()
 		state\Reset(false) for _, state in ipairs @statesIterable
 
-	Think: (ent = @ent) =>
+	Think: (ent = @GetEntity()) =>
 		return if DISABLE_FLEXES\GetBool()
 		delta = super(ent)
 		return if not delta

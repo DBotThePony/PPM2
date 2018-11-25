@@ -43,6 +43,7 @@ class PPM2.SequenceBase
 		@finish = @start + @time
 		@parent = parent
 
+	GetEntity: => @parent\GetEntity()
 	Launch: =>
 		@valid = true
 		@createfunc() if @createfunc

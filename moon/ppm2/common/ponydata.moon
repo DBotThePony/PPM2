@@ -19,9 +19,6 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-
-checkForEntity = (ent) -> isentity(ent) or type(ent) == 'table' and ent.GetEntity and isentity(ent\GetEntity())
-
 class PPM2.NetworkChangeState
 	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
 		@key = key
@@ -92,8 +89,6 @@ rFloat = (min = 0, max = 255) ->
 	return -> math.Clamp(net.ReadFloat(), min, max)
 
 wFloat = net.WriteFloat
-rSEnt = net.ReadStrongEntity
-wSEnt = net.WriteStrongEntity
 rBool = net.ReadBool
 wBool = net.WriteBool
 rColor = net.ReadColor
@@ -112,38 +107,42 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
 		@__base[strName] = defFunc()
+
 		@__base["Get#{getName}"] = => @[strName]
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
 			oldVal = @[strName]
-			@[strName] = val
 			nevVal = onSet(@, val)
+			@[strName] = nevVal
 			state = PPM2.NetworkChangeState(strName, getName, nevVal, @)
 			state.networkChange = false
 			@SetLocalChange(state)
-			if networkNow and @NETWORKED and (CLIENT and @@NW_ClientsideCreation and @GetOwner() == LocalPlayer() or SERVER)
-				net.Start(@@NW_Modify)
-				net.WriteUInt(@GetNetworkID(), 16)
-				net.WriteUInt(id, 16)
-				writeFunc(nevVal)
-				if CLIENT
-					net.SendToServer()
-				else
-					net.Broadcast()
+			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
+			net.Start(@@NW_Modify)
+			net.WriteUInt(@GetNetworkID(), 16)
+			net.WriteUInt(id, 16)
+			writeFunc(nevVal)
+			net.SendToServer() if CLIENT
+			net.Broadcast() if SERVER
+
 	@NetworkVar = (...) => @AddNetworkVar(...)
+	@GetSet = (fname, fvalue) =>
+		@__base["Get#{fname}"] = => @[fvalue]
+		@__base["Set#{fname}"] = (fnewValue = @[fvalue]) =>
+			oldVal = @[fvalue]
+			@[fvalue] = fnewValue
+			state = PPM2.NetworkChangeState(fvalue, fname, fnewValue, @)
+			state.networkChange = false
+			@SetLocalChange(state)
 
 	@OnNetworkedCreated = (ply = NULL, len = 0, nwobj) =>
-		return if SERVER and not @NW_ClientsideCreation
 		if CLIENT
-			netID = net.ReadUInt(16)
-			creator = NULL
-			creator = net.ReadStrongEntity() if net.ReadBool()
-			obj = @NW_Objects[netID] or @(netID)
-			obj.NW_Player = creator
+			netID = net.ReadUInt16()
+			ent = net.ReadEntity()
+			obj = @NW_Objects[netID] or @(netID, ent)
 			obj.NETWORKED = true
 			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
-			@OnNetworkedCreatedCallback(obj, ply, len)
 		else
 			ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
 			ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
@@ -161,9 +160,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 					ply[@NW_CooldownMessage] = RealTimeL() + 1
 				return
 
-			waitID = net.ReadUInt(16)
-			obj = @()
-			obj.NW_Player = ply
+			waitID = net.ReadUInt16()
+			obj = @(nil, ply)
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
 			obj\Create()
@@ -173,21 +171,26 @@ class NetworkedPonyData extends PPM2.ModifierBase
 				net.WriteUInt(waitID, 16)
 				net.WriteUInt(obj.netID, 16)
 				net.Send(ply)
-			@OnNetworkedCreatedCallback(obj, ply, len)
-	@OnNetworkedCreatedCallback = (obj, ply = NULL, len = 0) => -- Override
 
 	@OnNetworkedModify = (ply = NULL, len = 0) =>
-		return if not @NW_ClientsideCreation and IsValid(ply)
-		id = net.ReadUInt(16)
+		id = net.ReadUInt16()
 		obj = @NW_Objects[id]
+
 		unless obj
-			if SERVER
-				net.Start(@NW_Rejected)
-				net.WriteUInt(id, 16)
-				net.Send(ply)
+			return if CLIENT
+			net.Start(@NW_Rejected)
+			net.WriteUInt(id, 16)
+			net.Send(ply)
 			return
-		return if IsValid(ply) and obj.NW_Player ~= ply
-		varID = net.ReadUInt(16)
+
+		if IsValid(ply) and obj.ent ~= ply
+			error('Invalid realm for player being specified. If you are running on your own net.* library, check up your code') if CLIENT
+			net.Start(@NW_Rejected)
+			net.WriteUInt(id, 16)
+			net.Send(ply)
+			return
+
+		varID = net.ReadUInt16()
 		varData = @NW_VarsTable[varID]
 		return unless varData
 		{:strName, :getName, :readFunc, :writeFunc, :onSet} = varData
@@ -202,24 +205,17 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			net.WriteUInt(varID, 16)
 			writeFunc(newVal)
 			net.SendOmit(ply)
-		@OnNetworkedModifyCallback(state)
-	@OnNetworkedModifyCallback = (state) => -- Override
 
 	@OnNetworkedDelete = (ply = NULL, len = 0) =>
-		return if not @NW_ClientsideCreation and IsValid(ply)
-		id = net.ReadUInt(16)
+		id = net.ReadUInt16()
 		obj = @NW_Objects[id]
 		return unless obj
 		obj\Remove(true)
-		@OnNetworkedDeleteCallback(obj, ply, len)
-	@OnNetworkedDeleteCallback = (obj, ply = NULL, len = 0) => -- Override
 
 	@ReadNetworkData = =>
 		output = {strName, {getName, readFunc()} for _, {:getName, :strName, :readFunc} in ipairs @NW_Vars}
 		return output
 
-	@NW_RemoveOnPlayerLeave = true
-	@NW_ClientsideCreation = true
 	@RenderTasks = {}
 
 	@NW_Vars = {}
@@ -227,18 +223,18 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@NW_Objects = {}
 	@NW_Waiting = {}
 	@NW_WaitID = -1
-	@NW_NextVarID = -1 if @NW_NextVarID == nil
-	@NW_Create = "PPM2.NW.Created.#{@__name}"
-	@NW_Modify = "PPM2.NW.Modified.#{@__name}"
-	@NW_Broadcast = "PPM2.NW.ModifiedBroadcast.#{@__name}"
-	@NW_Remove = "PPM2.NW.Removed.#{@__name}"
-	@NW_Rejected = "PPM2.NW.Rejected.#{@__name}"
-	@NW_ReceiveID = "PPM2.NW.ReceiveID.#{@__name}"
-	@NW_CooldownTimerCount = "ppm2_NW_CooldownTimerCount_#{@__name}"
-	@NW_CooldownTimer = "ppm2_NW_CooldownTimer_#{@__name}"
-	@NW_CooldownMessage = "ppm2_NW_CooldownMessage_#{@__name}"
+	@NW_NextVarID = -1
+	@NW_Create = 'PPM2.NW.Created'
+	@NW_Modify = 'PPM2.NW.Modified'
+	@NW_Broadcast = 'PPM2.NW.ModifiedBroadcast'
+	@NW_Remove = 'PPM2.NW.Removed'
+	@NW_Rejected = 'PPM2.NW.Rejected'
+	@NW_ReceiveID = 'PPM2.NW.ReceiveID'
+	@NW_CooldownTimerCount = 'ppm2_NW_CooldownTimerCount'
+	@NW_CooldownTimer = 'ppm2_NW_CooldownTimer'
+	@NW_CooldownMessage = 'ppm2_NW_CooldownMessage'
 	@NW_NextObjectID = 0
-	@NW_NextObjectID_CL = 2 ^ 28
+	@NW_NextObjectID_CL = 0x60000
 
 	if SERVER
 		net.pool(@NW_Create)
@@ -251,10 +247,11 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	net.Receive @NW_Create, (len = 0, ply = NULL, obj) -> @OnNetworkedCreated(ply, len, obj)
 	net.Receive @NW_Modify, (len = 0, ply = NULL, obj) -> @OnNetworkedModify(ply, len, obj)
 	net.Receive @NW_Remove, (len = 0, ply = NULL, obj) -> @OnNetworkedDelete(ply, len, obj)
+
 	net.Receive @NW_ReceiveID, (len = 0, ply = NULL) ->
 		return if SERVER
-		waitID = net.ReadUInt(16)
-		netID = net.ReadUInt(16)
+		waitID = net.ReadUInt16()
+		netID = net.ReadUInt16()
 		obj = @NW_Waiting[waitID]
 		@NW_Waiting[waitID] = nil
 		return unless obj
@@ -263,28 +260,29 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		obj.netID = netID
 		obj.waitID = nil
 		@NW_Objects[netID] = obj
+
 	net.Receive @NW_Rejected, (len = 0, ply = NULL) ->
 		return if SERVER
-		netID = net.ReadUInt(16)
+		netID = net.ReadUInt16()
 		obj = @NW_Objects[netID]
 		return unless obj
 		return if obj.__LastReject and obj.__LastReject > RealTimeL()
 		obj.__LastReject = RealTimeL() + 3
 		obj.NETWORKED = false
 		obj\Create()
+
 	net.Receive @NW_Broadcast, (len = 0, ply = NULL) ->
 		return if SERVER
-		netID = net.ReadUInt(16)
+		netID = net.ReadUInt16()
 		obj = @NW_Objects[netID]
 		return unless obj
 		obj\ReadNetworkData(len, ply)
 
-	@NetworkVar('Entity',           rSEnt, wSEnt, StrongEntity(-1), ((newValue) => IsValid(@GetOwner()) and StrongEntity(@GetOwner()\EntIndex()) or newValue))
-	@NetworkVar('UpperManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
-	@NetworkVar('LowerManeModel',   rSEnt, wSEnt, StrongEntity(-1), nil, false)
-	@NetworkVar('TailModel',        rSEnt, wSEnt, StrongEntity(-1), nil, false)
-	@NetworkVar('SocksModel',       rSEnt, wSEnt, StrongEntity(-1), nil, false)
-	@NetworkVar('NewSocksModel',    rSEnt, wSEnt, StrongEntity(-1), nil, false)
+	@GetSet('UpperManeModel', 'm_upperManeModel')
+	@GetSet('LowerManeModel', 'm_lowerManeModel')
+	@GetSet('TailModel', 'm_tailModel')
+	@GetSet('SocksModel', 'm_socksModel')
+	@GetSet('NewSocksModel', 'm_newSocksModel')
 
 	@NetworkVar('Fly',                  rBool,   wBool,                 false)
 	@NetworkVar('DisableTask',          rBool,   wBool,                 false)
@@ -306,6 +304,13 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	new: (netID, ent) =>
 		super()
+
+		@m_upperManeModel = Entity(-1)
+		@m_lowerManeModel = Entity(-1)
+		@m_tailModel = Entity(-1)
+		@m_socksModel = Entity(-1)
+		@m_newSocksModel = Entity(-1)
+
 		@recomputeTextures = true
 		@isValid = true
 		@valid = true
@@ -322,15 +327,16 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			@netID = netID
 
 		@@NW_Objects[@netID] = @
-		@NW_Player = NULL if SERVER
-		@NW_Player = LocalPlayer() if CLIENT
-		@isLocal = localObject
-		@NW_Player = LocalPlayer() if localObject
-		if ent
-			@modelCached = ent\GetModel()
-			@SetEntity(ent)
-			@SetupEntity(ent)
 
+		if ent
+			@ent = ent
+			@modelCached = ent\GetModel()
+			@SetupEntity(ent)
+		else
+			@ent = NULL if SERVER
+			@ent = LocalPlayer() if CLIENT
+
+	GetEntity: => @ent
 	IsValid: => @isValid
 	GetModel: => @modelCached
 	EntIndex: => @entID
@@ -342,14 +348,13 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	SetupEntity: (ent) =>
 		if ent.__PPM2_PonyData
-			return if ent.__PPM2_PonyData\GetOwner() and IsValid(ent.__PPM2_PonyData\GetOwner()) and StrongEntity(ent.__PPM2_PonyData\GetOwner()) ~= StrongEntity(@GetOwner())
+			return if ent.__PPM2_PonyData\GetOwner() and IsValid(ent.__PPM2_PonyData\GetOwner()) and ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
 			ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
+
 		ent.__PPM2_PonyData = @
-		@ent = ent
 		@entTable = @ent\GetTable()
 		return unless IsValid(ent)
 		@modelCached = ent\GetModel()
-		@ent = ent
 		ent\PPMBonesModifier()
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
@@ -369,8 +374,6 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	GenericDataChange: (state) =>
 		hook.Run 'PPM2_PonyDataChanges', @ent, @, state
-		if state\GetKey() == 'Entity' and IsValid(@GetEntity())
-			@SetupEntity(@GetEntity())
 
 		if state\GetKey() == 'Fly' and @flightController
 			@flightController\Switch(state\GetValue())
@@ -567,7 +570,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	__tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
-	GetOwner: => @NW_Player
+	GetOwner: => @ent
 	IsNetworked: => @NETWORKED
 	IsGoingToNetwork: => @NETWORKED_PREDICT
 	SetIsGoingToNetwork: (val = @NETWORKED) => @NETWORKED_PREDICT = val
@@ -587,12 +590,11 @@ class NetworkedPonyData extends PPM2.ModifierBase
 				@NetworkDataChanges(state) unless silent
 
 	NetworkedIterable: (grabEntities = true) =>
-		data = [{getName, @[strName]} for _, {:strName, :getName} in ipairs @@NW_Vars when grabEntities or not checkForEntity(@[strName])]
+		data = [{getName, @[strName]} for _, {:strName, :getName} in ipairs @@NW_Vars when grabEntities or not isentity(@[strName])]
 		return data
 
 	ApplyDataToObject: (target, applyEntities = false) =>
-		for _, {key, value} in ipairs @NetworkedIterable(applyEntities)
-			target["Set#{key}"](target, value) if target["Set#{key}"]
+		target["Set#{key}"](target, value) for {key, value} in *@NetworkedIterable(applyEntities) when target["Set#{key}"]
 		return target
 
 	WriteNetworkData: => writeFunc(@[strName]) for _, {:strName, :writeFunc} in ipairs @@NW_Vars
@@ -601,42 +603,45 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return false if not @NETWORKED
 		return false if CLIENT
 		net.Start(@@NW_Broadcast)
-		net.WriteUInt(@netID, 16)
+		net.WriteUInt16(@netID)
 		@WriteNetworkData()
 		net.Broadcast()
 		return true
 
 	Create: =>
 		return if @NETWORKED
-		return if CLIENT and (not @@NW_ClientsideCreation or @CREATED_BY_SERVER)
+		return if CLIENT and @CREATED_BY_SERVER -- wtf
 		@NETWORKED = true if SERVER
 		@NETWORKED_PREDICT = true
+
 		if SERVER
 			net.Start(@@NW_Create)
-			net.WriteUInt(@netID, 16)
-			net.WriteBool(IsValid(@NW_Player))
-			net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
+			net.WriteUInt16(@netID)
+			net.WriteEntity(@ent)
 			@WriteNetworkData()
 			filter = RecipientFilter()
 			filter\AddAllPlayers()
-			filter\RemovePlayer(@NW_Player) if IsValid(@NW_Player)
+			filter\RemovePlayer(@ent) if IsValid(@ent) and @ent\IsPlayer()
 			net.Send(filter)
 		else
 			@@NW_WaitID += 1
 			@waitID = @@NW_WaitID
+
 			net.Start(@@NW_Create)
 			before = net.BytesWritten()
-			net.WriteUInt(@waitID, 16)
+
+			net.WriteUInt16(@waitID)
 			@WriteNetworkData()
 			after = net.BytesWritten()
+
 			net.SendToServer()
 			@@NW_Waiting[@waitID] = @
 			return after - before
+
 	NetworkTo: (targets = {}) =>
 		net.Start(@@NW_Create)
-		net.WriteUInt(@netID, 16)
-		net.WriteBool(IsValid(@NW_Player))
-		net.WriteStrongEntity(@NW_Player) if IsValid(@NW_Player)
+		net.WriteUInt16(@netID)
+		net.WriteEntity(@ent)
 		@WriteNetworkData()
 		net.Send(targets)
 
@@ -644,21 +649,16 @@ PPM2.NetworkedPonyData = NetworkedPonyData
 
 if CLIENT
 	net.Receive 'PPM2.NotifyDisconnect', ->
-		netID = net.ReadUInt(16)
+		netID = net.ReadUInt16()
 		data = NetworkedPonyData.NW_Objects[netID]
 		return if not data
 		data\Remove()
 
 	net.Receive 'PPM2.PonyDataRemove', ->
-		netID = net.ReadUInt(16)
+		netID = net.ReadUInt16()
 		data = NetworkedPonyData.NW_Objects[netID]
 		return if not data
 		data\Remove()
-
-	hook.Add 'StrongEntityLinkUpdates', 'PPM2.NetworkedObjectCheck', =>
-		if @__PPM2_PonyData
-			@__PPM2_PonyData\SetEntity(@GetEntity())
-			@__PPM2_PonyData\SetupEntity(@)
 else
 	hook.Add 'PlayerJoinTeam', 'PPM2.TeamWaypoint', (ply, new) ->
 		ply.__ppm2_modified_jump = false
@@ -670,7 +670,7 @@ entMeta.GetPonyData = =>
 	self2 = @
 	self = entMeta.GetTable(@)
 	return if not @
-	if @__PPM2_PonyData and StrongEntity(@__PPM2_PonyData\GetEntity()) ~= StrongEntity(self2)
-		@__PPM2_PonyData\SetEntity(self2)
+	if @__PPM2_PonyData and @__PPM2_PonyData.ent ~= self2
+		@__PPM2_PonyData.ent = self2
 		@__PPM2_PonyData\SetupEntity(self2) if CLIENT
 	return @__PPM2_PonyData

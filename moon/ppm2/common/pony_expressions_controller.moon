@@ -31,7 +31,6 @@ class ExpressionSequence extends PPM2.SequenceBase
 			'flexes': @flexNames
 		} = data
 
-		@ent = controller.ent
 		@knownBonesSequences = {}
 		@controller = controller
 
@@ -46,7 +45,6 @@ class ExpressionSequence extends PPM2.SequenceBase
 		@Launch()
 
 	GetController: => @controller
-	GetEntity: => @ent
 
 	SetControllerModifier: (name = '', val) => @ponydata['SetModifier' .. name](@ponydata, @ponydataID, val)
 
@@ -63,7 +61,7 @@ class ExpressionSequence extends PPM2.SequenceBase
 					@flexStates = [{flexController\GetFlexState(flex), flexController\GetFlexState(flex)\GetModifierID(@name .. '_emote')} for _, flex in ipairs @flexNames]
 
 		@knownBonesSequences = {}
-		if bones = @ent\PPMBonesModifier()
+		if bones = @GetEntity()\PPMBonesModifier()
 			@bonesController = bones
 			if @bonesSequence
 				if type(@bonesSequence) == 'table'
@@ -82,8 +80,7 @@ class ExpressionSequence extends PPM2.SequenceBase
 		return @bonesController\StartSequence(name, time)
 
 	Think: (delta = 0) =>
-		@ent = @controller.ent
-		return false if not IsValid(@ent)
+		return false if not IsValid(@GetEntity())
 		super(delta)
 
 	Stop: =>
@@ -427,25 +424,25 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
 		@Hook('OnPlayerChat', @OnPlayerChat)
 		@ResetSequences()
-		PPM2.DebugPrint('Created new PonyExpressionsController for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
+		PPM2.DebugPrint('Created new PonyExpressionsController for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @objID)
 
 	PPM2_HurtAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		@RestartSequence('hurt')
 		@EndSequence('kill_grin')
 
 	PPM2_KillAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		@RestartSequence('kill_grin')
 		@EndSequence('anger')
 
 	PPM2_AngerAnimation: (ply = NULL) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		@EndSequence('kill_grin')
 		@RestartSequence('anger')
 
 	OnPlayerChat: (ply = NULL, text = '', teamOnly = false, isDead = false) =>
-		return if ply\GetEntity() ~= @ent\GetEntity() or teamOnly or isDead
+		return if ply ~= @GetEntity() or teamOnly or isDead
 		text = text\lower()
 		switch text
 			when 'o', ':o', 'о', 'О', ':о', ':О'
@@ -479,7 +476,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 					@RestartSequence('talk')
 
 	PPM2_EmoteAnimation: (ply = NULL, emote = '', time, isEndless = false, shouldStop = false) =>
-		return if ply\GetEntity() ~= @ent\GetEntity()
+		return if ply ~= @GetEntity()
 		for _, {:sequence} in ipairs PPM2.AVALIABLE_EMOTES
 			if shouldStop or sequence ~= emote
 				@EndSequence(sequence)

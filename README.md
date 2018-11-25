@@ -57,7 +57,6 @@ ppm2_sv_ragdoll_toolgun                  : 1        : , "sv", "nf", "rep", "demo
 ```
 cvar list
 --------------
-ppm2_alternative_render                  : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Enable alternative render mode. This decreases FPS, enables compability with third-party BROKEN addons.
 ppm2_cl_hires_body                       : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)
 ppm2_cl_hires_generic                    : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Create 1024x1024 textures instead of 512x512 on texture compiling
 ppm2_cl_no_hoofsound                     : 0        : , "demo", "server_can_execute", "clientcmd_can_execute", "cl", "lua_client" : Disable hoofstep sound play time

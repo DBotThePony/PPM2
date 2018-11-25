@@ -76,7 +76,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	@NEXT_OBJ_ID = 0
 
 	Remap: =>
-		@WEIGHT_BONES = [{id: @ent\LookupBone(id), scale: scale} for _, {:id, :scale} in ipairs @@WEIGHT_BONES]
+		@WEIGHT_BONES = [{id: @GetEntity()\LookupBone(id), scale: scale} for _, {:id, :scale} in ipairs @@WEIGHT_BONES]
 
 		@validSkeleton = true
 		for _, {:id} in ipairs @WEIGHT_BONES
@@ -84,25 +84,24 @@ class PonyWeightController extends PPM2.ControllerChildren
 				@validSkeleton = false
 				break
 
-	new: (data, applyWeight = true) =>
+	new: (controller, applyWeight = true) =>
 		@isValid = true
-		@networkedData = data
-		@ent = data.ent
+		@controller = controller
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 		@scale = 1
-		@SetWeight(data\GetWeight())
+		@SetWeight(controller\GetWeight())
 		@Remap()
-		@UpdateWeight() if IsValid(@ent) and applyWeight
-		PPM2.DebugPrint('Created new weight controller for ', @ent, ' as part of ', data, '; internal ID is ', @objID)
+		@UpdateWeight() if IsValid(@GetEntity()) and applyWeight
+		PPM2.DebugPrint('Created new weight controller for ', @GetEntity(), ' as part of ', data, '; internal ID is ', @objID)
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
-	IsValid: => IsValid(@ent) and @isValid
-	GetEntity: => @ent
-	GetData: => @networkedData
-	GetController: => @networkedData
-	GetModel: => @networkedData\GetModel()
+	IsValid: => IsValid(@GetEntity()) and @isValid
+	GetEntity: => @controller\GetEntity()
+	GetData: => @controller
+	GetController: => @controller
+	GetModel: => @controller\GetModel()
 
 	PlayerDeath: =>
 		@ResetBones()
@@ -147,7 +146,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	table.insert(@WEIGHT_BONES, {id: name, scale: 1}) for _, name in ipairs extrabones
 
 	DataChanges: (state) =>
-		return if not IsValid(@ent) or not @isValid
+		return if not IsValid(@GetEntity()) or not @isValid
 		@Remap()
 
 		if state\GetKey() == 'Weight'
@@ -160,7 +159,7 @@ class PonyWeightController extends PPM2.ControllerChildren
 	SetSize: (scale = 1) => @scale = math.Clamp(math.sqrt(scale), @@HARD_LIMIT_MINIMAL, @@HARD_LIMIT_MAXIMAL)
 	SlowUpdate: =>
 
-	ResetBones: (ent = @ent) =>
+	ResetBones: (ent = @GetEntity()) =>
 		return if not IsValid(ent) or not @isValid
 		return if not @validSkeleton
 		for _, {:id} in ipairs @WEIGHT_BONES
@@ -168,10 +167,10 @@ class PonyWeightController extends PPM2.ControllerChildren
 
 	Reset: => @ResetBones()
 
-	UpdateWeight: (ent = @ent) =>
+	UpdateWeight: (ent = @GetEntity()) =>
 		return if not IsValid(ent) or not @isValid
-		return if not @ent\IsPony()
-		return if @ent.Alive and not @ent\Alive()
+		return if not @GetEntity()\IsPony()
+		return if @GetEntity().Alive and not @GetEntity()\Alive()
 		return if not @validSkeleton
 
 		for _, {:id, :scale} in ipairs @WEIGHT_BONES

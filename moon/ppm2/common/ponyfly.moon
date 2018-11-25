@@ -26,9 +26,8 @@ SUPPRESS_CLIENTSIDE_CHECK = CreateConVar('ppm2_sv_flight_nocheck', '0', {FCVAR_R
 FLIGHT_DAMAGE = CreateConVar('ppm2_sv_flightdmg', '1', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Damage players in flight')
 
 class PonyflyController
-	new: (data) =>
-		@controller = data
-		@ent = data.ent
+	new: (controller) =>
+		@controller = controller
 		@speedMult = 0.5
 		@speedMultDirections = 1.25
 		@dragMult = 0.95
@@ -44,32 +43,31 @@ class PonyflyController
 		@lastVelocity = Vector(0, 0, 0)
 		@lastState = false
 
-	GetEntity: => @ent
+	GetEntity: => @controller\GetEntity()
 	GetData: => @controller
 	GetController: => @controller
 
 	Switch: (status = false) =>
-		@ent = @controller.ent
-		return if not IsValid(@ent) or not @ent\IsPlayer()
+		return if not IsValid(@GetEntity()) or not @GetEntity()\IsPlayer()
 		return if @lastState == status
 		@lastState = status
 		if not status
-			{:p, :y, :r} = @ent\EyeAngles()
+			{:p, :y, :r} = @GetEntity()\EyeAngles()
 			newAng = Angle(p, y, 0)
-			@ent\SetEyeAngles(newAng)
-			@ent\SetMoveType(MOVETYPE_WALK)
+			@GetEntity()\SetEyeAngles(newAng)
+			@GetEntity()\SetMoveType(MOVETYPE_WALK)
 			@roll = 0
 			@pitch = 0
 			@yaw = 0
-			@ent\SetVelocity(@lastVelocity * 50)
+			@GetEntity()\SetVelocity(@lastVelocity * 50)
 			@lastVelocity = Vector(0, 0, 0)
 		else
 			@lastVelocity = Vector(0, 0, 0)
-			@ent\SetVelocity(-@ent\GetVelocity() * .97)
-			@ent\SetMoveType(MOVETYPE_CUSTOM)
-			@obbCenter = @ent\OBBCenter()
-			@obbMins = @ent\OBBMins()
-			@obbMaxs = @ent\OBBMaxs()
+			@GetEntity()\SetVelocity(-@GetEntity()\GetVelocity() * .97)
+			@GetEntity()\SetMoveType(MOVETYPE_CUSTOM)
+			@obbCenter = @GetEntity()\OBBCenter()
+			@obbMins = @GetEntity()\OBBMins()
+			@obbMaxs = @GetEntity()\OBBMaxs()
 			@roll = 0
 			@pitch = 0
 			@yaw = 0
@@ -146,7 +144,7 @@ class PonyflyController
 			y += @yaw
 			r = @roll + math.sin(RealTimeL()) * 2
 			newAng = Angle(p, y, r)
-			@ent\SetEyeAngles(newAng)
+			@GetEntity()\SetEyeAngles(newAng)
 
 		if not hit
 			velocity.x *= dragCalc
@@ -169,7 +167,7 @@ class PonyflyController
 		cmd\SetButtons(cmd\GetButtons() - IN_JUMP) if cmd\KeyDown(IN_JUMP)
 
 	FinishMove: (movedata) =>
-		nativeEntity = @ent\GetEntity()
+		nativeEntity = @GetEntity()
 		mvPos = movedata\GetOrigin()
 		pos = nativeEntity\GetPos()
 		rpos = pos

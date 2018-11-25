@@ -119,27 +119,21 @@ class PonySizeController extends PPM2.ControllerChildren
 		@validSkeleton = true
 
 		for _, name in ipairs mapping
-			@[name] = @ent\LookupBone(@@[name])
+			@[name] = @GetEntity()\LookupBone(@@[name])
 			@validSkeleton = false if not @[name]
 
 	new: (controller) =>
+		super(controller)
 		@isValid = true
-		@ent = controller.ent
-		@entID = controller.entID
-		@controller = controller
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 		@Remap()
-		PPM2.DebugPrint('Created new size controller for ', @ent, ' as part of ', controller, '; internal ID is ', @objID)
-		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
+		PPM2.DebugPrint('Created new size controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @objID)
+		@GetEntity()\SetModelScale(1) if not @GetEntity()\IsPlayer() and @GetEntity()\GetModelScale() ~= 1
 
-	__tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
 	IsValid: => @controller\IsValid()
-	GetData: => @controller
-	GetEntity: => @ent
-	GetEntityID: => @entID
-	GetDataID: => @entID
+	GetEntity: => @controller\GetEntity()
 	IsNetworked: => @controller\IsNetworked()
 	AllowResize: => not @controller\IsNetworked() or ALLOW_TO_MODIFY_SCALE\GetBool()
 
@@ -155,10 +149,10 @@ class PonySizeController extends PPM2.ControllerChildren
 	@DEF_SCALE = Vector(1, 1, 1)
 
 	DataChanges: (state) =>
-		return if not IsValid(@ent)
-		return if not @ent\IsPony()
+		return if not IsValid(@GetEntity())
+		return if not @GetEntity()\IsPony()
 		@Remap()
-		@ent\SetModelScale(1) if not @ent\IsPlayer() and @ent\GetModelScale() ~= 1
+		@GetEntity()\SetModelScale(1) if not @GetEntity()\IsPlayer() and @GetEntity()\GetModelScale() ~= 1
 
 		if state\GetKey() == 'PonySize'
 			@ModifyScale()
@@ -172,23 +166,23 @@ class PonySizeController extends PPM2.ControllerChildren
 			@ModifyHull()
 			@ModifyViewOffset()
 
-	ResetViewOffset: (ent = @ent) =>
+	ResetViewOffset: (ent = @GetEntity()) =>
 		ent\SetViewOffset(PPM2.PLAYER_VIEW_OFFSET_ORIGINAL) if ent.SetViewOffset
 		ent\SetViewOffsetDucked(PPM2.PLAYER_VIEW_OFFSET_DUCK_ORIGINAL) if ent.SetViewOffsetDucked
 
-	ResetHulls: (ent = @ent) =>
+	ResetHulls: (ent = @GetEntity()) =>
 		ent\ResetHull() if ent.ResetHull
 		ent\SetStepSize(@@STEP_SIZE) if ent.SetStepSize
 		ent.__ppm2_modified_hull = false
 
-	ResetJumpHeight: (ent = @ent) =>
+	ResetJumpHeight: (ent = @GetEntity()) =>
 		return if CLIENT
 		return if not ent.SetJumpPower
 		return if not ent.__ppm2_modified_jump
 		ent\SetJumpPower(ent\GetJumpPower() / PPM2.PONY_JUMP_MODIFIER)
 		ent.__ppm2_modified_jump = false
 
-	ResetModelScale: (ent = @ent) =>
+	ResetModelScale: (ent = @GetEntity()) =>
 		if SERVER
 			--ent\SetModelScale(1)
 			return
@@ -196,7 +190,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		mat\Scale(@@DEF_SCALE)
 		ent\EnableMatrix('RenderMultiply', mat)
 
-	ResetScale: (ent = @ent) =>
+	ResetScale: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 
 		if USE_NEW_HULL\GetBool() or ent.__ppm2_modified_hull
@@ -209,9 +203,9 @@ class PonySizeController extends PPM2.ControllerChildren
 			@ResetNeck(ent)
 			@ResetLegs(ent)
 
-	ResetNeck: (ent = @ent) =>
+	ResetNeck: (ent = @GetEntity()) =>
 		return if not CLIENT
-		return if not IsValid(@ent)
+		return if not IsValid(@GetEntity())
 		return if not @validSkeleton
 		with ent
 			\ManipulateBoneScale2Safe(@NECK_BONE_1, LVector(1, 1, 1))
@@ -227,7 +221,7 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition2Safe(@NECK_BONE_3, LVector(0, 0, 0))
 			\ManipulateBonePosition2Safe(@NECK_BONE_4, LVector(0, 0, 0))
 
-	ResetLegs: (ent = @ent) =>
+	ResetLegs: (ent = @GetEntity()) =>
 		return if not CLIENT
 		return if not IsValid(ent)
 		return if not @validSkeleton
@@ -296,7 +290,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		@Remap()
 		@ModifyScale()
 
-	ModifyHull: (ent = @ent) =>
+	ModifyHull: (ent = @GetEntity()) =>
 		ent.__ppm2_modified_hull = true
 		size = @GetPonySize()
 		legssize = @GetLegsModifier()
@@ -327,9 +321,9 @@ class PonySizeController extends PPM2.ControllerChildren
 				newsize = @@STEP_SIZE * size * @GetLegsModifier(1.2)
 				\SetStepSize(newsize) if \GetStepSize() ~= newsize
 
-	ModifyJumpHeight: (ent = @ent) =>
+	ModifyJumpHeight: (ent = @GetEntity()) =>
 		return if CLIENT
-		return if not @ent.SetJumpPower
+		return if not @GetEntity().SetJumpPower
 		return if ent.__ppm2_modified_jump
 		ent\SetJumpPower(ent\GetJumpPower() * PPM2.PONY_JUMP_MODIFIER)
 		ent.__ppm2_modified_jump = true
@@ -340,7 +334,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		else
 			1
 
-	ModifyViewOffset: (ent = @ent) =>
+	ModifyViewOffset: (ent = @GetEntity()) =>
 		size = @GetPonySize()
 		necksize = 1 + (@GetNeckSize() - 1) * .3
 		legssize = @GetLegsModifier()
@@ -358,7 +352,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		ent\SetViewOffset(PLAYER_VIEW_OFFSET) if ent.SetViewOffset
 		ent\SetViewOffsetDucked(PLAYER_VIEW_OFFSET_DUCK) if ent.SetViewOffsetDucked
 
-	ModifyModelScale: (ent = @ent) =>
+	ModifyModelScale: (ent = @GetEntity()) =>
 		return if not @AllowResize()
 		-- https://github.com/Facepunch/garrysmod-issues/issues/2193
 		if SERVER
@@ -379,7 +373,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		mat\Scale(@@DEF_SCALE * @GetPonySize())
 		ent\EnableMatrix('RenderMultiply', mat)
 
-	ModifyScale: (ent = @ent) =>
+	ModifyScale: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 		return if not ent\IsPony()
 		return if ent.Alive and not ent\Alive()
@@ -395,7 +389,7 @@ class PonySizeController extends PPM2.ControllerChildren
 			@ModifyNeck(ent)
 			@ModifyLegs(ent)
 
-	ModifyNeck: (ent = @ent) =>
+	ModifyNeck: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 		return if not @AllowResize()
 		return if not @validSkeleton
@@ -411,7 +405,7 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition2Safe(@NECK_BONE_3, vec + (boneAnimTable[@NECK_BONE_3] or emptyLVector))
 			\ManipulateBonePosition2Safe(@NECK_BONE_4, vec + (boneAnimTable[@NECK_BONE_4] or emptyLVector))
 
-	ModifyLegs: (ent = @ent) =>
+	ModifyLegs: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 		return if not @AllowResize()
 		return if not @validSkeleton

@@ -263,7 +263,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 						obj.ent\ResetBoneManipCache()
 						resetBones(obj.ent)
 						data = obj.ent\GetPonyData()
-						hook.Call('PPM2.SetupBones', nil, StrongEntity(obj.ent), data) if data
+						hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
 						obj\Think()
 						obj.ent.__ppmBonesModified = true
 						obj.ent\ApplyBoneManipulations()

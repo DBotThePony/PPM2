@@ -204,7 +204,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			HairColor2Material\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled mane textures for ', @ent, ' as part of ', @)
+			PPM2.DebugPrint('Compiled mane textures for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()
 		validURLS = for i = 1, 6
@@ -287,7 +287,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@BatWingsMaterial\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled Bat Wings texture for ', @ent, ' as part of ', @)
+			PPM2.DebugPrint('Compiled Bat Wings texture for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()
 		validURLS = for i = 1, 3
@@ -349,7 +349,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@BatWingsSkinMaterial\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @ent, ' as part of ', @)
+			PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()
 		validURLS = for i = 1, 3
@@ -420,7 +420,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		@UpdatePhongData()
-		PPM2.DebugPrint('Compiled mouth textures for ', @ent, ' as part of ', @)
+		PPM2.DebugPrint('Compiled mouth textures for ', @GetEntity(), ' as part of ', @)
 
 		return @TeethMaterial, @MouthMaterial, @TongueMaterial
 
@@ -464,7 +464,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		else
 			return @LowerManeColor1Name
 
-	UpdateUpperMane: (ent = @ent, entMane) =>
+	UpdateUpperMane: (ent = @GetEntity(), entMane) =>
 		return unless @isValid
 		return unless @compiled
 
@@ -475,7 +475,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
 
-	UpdateLowerMane: (ent = @ent, entMane) =>
+	UpdateLowerMane: (ent = @GetEntity(), entMane) =>
 		return unless @compiled
 		return unless @isValid
 
@@ -486,18 +486,18 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHairName(1))
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
 
-	UpdateTail: (ent = @ent, entTail) =>
+	UpdateTail: (ent = @GetEntity(), entTail) =>
 		return unless @compiled
 		return unless @isValid
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
 
-	PreDraw: (ent = @ent, drawingNewTask = false) =>
+	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return unless @compiled
 		return unless @isValid
 		@CheckReflections(ent)
 
-		if @lastMaterialUpdate < RealTimeL() or @lastMaterialUpdateEnt ~= ent or PPM2.ALTERNATIVE_RENDER\GetBool()
+		if @lastMaterialUpdate < RealTimeL() or @lastMaterialUpdateEnt ~= ent
 			@lastMaterialUpdateEnt = ent
 			@lastMaterialUpdate = RealTimeL() + 1
 			ent\SetSubMaterial(@@MAT_INDEX_EYE_LEFT, @GetEyeName(true))
@@ -513,7 +513,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT, @GetBatWingsName())
 			ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkinName())
 
-		if PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
+		if drawingNewTask
 			render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT, @GetEye(true))
 			render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT, @GetEye(false))
 			render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE, @GetTongue())
@@ -527,10 +527,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT, @GetBatWings())
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
 
-	PostDraw: (ent = @ent, drawingNewTask = false) =>
+	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return unless @compiled
 		return unless @isValid
-		return unless PPM2.ALTERNATIVE_RENDER\GetBool() or drawingNewTask
+		return unless drawingNewTask
 		render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
 		render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_RIGHT)
 		render.MaterialOverrideByIndex(@@MAT_INDEX_TONGUE)
@@ -544,7 +544,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT)
 		render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN)
 
-	ResetTextures: (ent = @ent) =>
+	ResetTextures: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 		@lastMaterialUpdateEnt = NULL
 		@lastMaterialUpdate = 0

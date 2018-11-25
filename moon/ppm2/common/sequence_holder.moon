@@ -108,9 +108,7 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 	Hook: (id, func) =>
 		return if not @isValid
 		newFunc = (...) ->
-			if not IsValid(@ent)
-				@ent = @GetData().ent
-			if not IsValid(@ent) or @GetData()\GetData() ~= @ent\GetPonyData()
+			if not IsValid(@GetEntity()) or @GetData()\GetData() ~= @GetEntity()\GetPonyData()
 				@RemoveHooks()
 				return
 			func(@, ...)
@@ -118,14 +116,11 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 		hook.Add id, @hookID, newFunc
 		table.insert(@hooks, id)
 
-	Think: (ent = @ent) =>
+	Think: (ent = @GetEntity()) =>
 		return if not @IsValid()
 		delta = RealTimeL() - @lastThink
 		@lastThink = RealTimeL()
 		@lastThinkDelta = delta
-		if @nwController and not IsValid(@ent)
-			@ent = @nwController.ent
-			ent = @ent
 		return if not IsValid(ent) or ent\IsDormant()
 		for _, seq in ipairs @currentSequencesIterable
 			if not seq\IsValid()

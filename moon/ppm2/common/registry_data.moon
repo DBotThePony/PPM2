@@ -36,8 +36,6 @@ rFloat = (min = 0, max = 255) ->
 	return -> math.Clamp(net.ReadFloat(), min, max)
 
 wFloat = net.WriteFloat
-rSEnt = net.ReadStrongEntity
-wSEnt = net.WriteStrongEntity
 rBool = net.ReadBool
 wBool = net.WriteBool
 rColor = net.ReadColor

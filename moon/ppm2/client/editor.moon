@@ -308,7 +308,7 @@ CALC_VIEW_PANEL = {
 
 			with ply\PPMBonesModifier()
 				\ResetBones()
-				hook.Call('PPM2.SetupBones', nil, StrongEntity(ply), data)
+				hook.Call('PPM2.SetupBones', nil, ply, data)
 				\Think(true)
 
 		return
@@ -1974,7 +1974,6 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
 	@Button 'Reload local data', 'ppm2_reload'
 	@Button 'Require data from server', 'ppm2_require'
 	@CheckBox 'Draw hooves as hands', 'ppm2_cl_draw_hands'
-	@CheckBox 'Alternative render', 'ppm2_alternative_render'
 	@CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
 	@CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
 	@CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'

@@ -37,27 +37,22 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 
 	new: (controller) =>
 		super()
+		assert(controller, 'You can not create a children without controller.')
 
-		if controller
-			@ent = controller.ent
-			@entID = controller.entID
-			@controller = controller
-			@nwController = controller
-		else
-			@ent = NULL
-			@entID = -1
-			@controller = nil
-			@nwController = nil
+		@entID = controller.entID
+		@controller = controller
+		@nwController = controller
+
 		@objID = @@NEXT_OBJ_ID
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 
-	__tostring: => "[#{@@__name}:#{@objID}|#{@ent}]"
+	__tostring: => "[#{@@__name}:#{@objID}|#{@GetEntity()}]"
 	-- IsValid: => @isValid
-	IsValid: => @isValid and IsValid(@ent)
+	IsValid: => @isValid and IsValid(@GetEntity())
 	GetData: => @nwController
 	GrabData: (str, ...) => @nwController['Get' .. str](@nwController, ...)
-	GetEntity: => @ent
+	GetEntity: => @controller\GetEntity()
 	GetEntityID: => @entID
 	GetDataID: => @entID
 
