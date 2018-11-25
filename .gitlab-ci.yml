@@ -1,10 +1,14 @@
 
+image: alpine:latest
+
+before_script:
+  - apt update
+  - apt install luarocks -y
+  - luarocks install moonscript
+
 ppm2:
   stage: build
   when: always
-  services:
-    - luarocks
-  image: alpine:latest
   script:
     - rm -rf ./lua
     - mkdir lua
