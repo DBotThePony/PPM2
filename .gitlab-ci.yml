@@ -1,5 +1,5 @@
 
-image: alpine:latest
+image: debian:latest
 
 before_script:
   - apt update
@@ -16,3 +16,4 @@ ppm2:
   artifacts:
     paths:
       - lua/*
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME-$CI_COMMIT_SHA"
