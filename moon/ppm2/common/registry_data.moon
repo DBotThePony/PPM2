@@ -33,9 +33,9 @@ rInt = (size = 8, min = -128, max = 127) ->
 	return -> math.Clamp(net.ReadInt(size), min, max)
 
 rFloat = (min = 0, max = 255) ->
-	return -> math.Clamp(net.ReadFloat(), min, max)
+	return -> math.Clamp(net.ReadDouble(), min, max)
 
-wFloat = net.WriteFloat
+wFloat = net.WriteDouble
 rBool = net.ReadBool
 wBool = net.WriteBool
 rColor = net.ReadColor
