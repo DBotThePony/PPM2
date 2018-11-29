@@ -314,10 +314,15 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@socksModel\DrawModel() if IsValid(@socksModel)
 		@newSocksModel\DrawModel() if IsValid(@newSocksModel)
 
-	HideModels: (status = true) =>
-		return if @hideModels == status
+	ShouldHideModels: => @hideModels or @GetEntity()\GetNoDraw()
+
+	DoHideModels: (status) =>
 		@socksModel\SetNoDraw(status) if IsValid(@socksModel)
 		@newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
+
+	HideModels: (status = true) =>
+		return if @hideModels == status
+		@DoHideModels(status)
 		@hideModels = status
 
 	CheckTarget: (epos, pos) =>
@@ -419,8 +424,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
 		else
-			@socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
-			@newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
+			@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
+			@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return if not @isValid
@@ -451,11 +456,11 @@ class PonyRenderController extends PPM2.ControllerChildren
 				@GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
 			when 'SocksModel'
 				@socksModel = @GetData()\GetSocksModel()
-				@socksModel\SetNoDraw(@hideModels) if IsValid(@socksModel)
+				@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 				@GetTextureController()\UpdateSocks(@GetEntity(), @socksModel) if @GetTextureController() and IsValid(@socksModel)
 			when 'NewSocksModel'
 				@newSocksModel = @GetData()\GetNewSocksModel()
-				@newSocksModel\SetNoDraw(@hideModels) if IsValid(@newSocksModel)
+				@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 				@GetTextureController()\UpdateNewSocks(@GetEntity(), @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
 			when 'NoFlex'
 				if state\GetValue()
@@ -501,9 +506,9 @@ class NewPonyRenderController extends PonyRenderController
 		@upperManeModel = data\GetUpperManeModel()
 		@lowerManeModel = data\GetLowerManeModel()
 		@tailModel = data\GetTailModel()
-		@upperManeModel\SetNoDraw(@hideModels) if IsValid(@upperManeModel)
-		@lowerManeModel\SetNoDraw(@hideModels) if IsValid(@lowerManeModel)
-		@tailModel\SetNoDraw(@hideModels) if IsValid(@tailModel)
+		@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
+		@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
+		@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 
 	DataChanges: (state) =>
@@ -512,15 +517,15 @@ class NewPonyRenderController extends PonyRenderController
 		switch state\GetKey()
 			when 'UpperManeModel'
 				@upperManeModel = @GetData()\GetUpperManeModel()
-				@upperManeModel\SetNoDraw(@hideModels) if IsValid(@upperManeModel)
+				@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
 				@GetTextureController()\UpdateUpperMane(@GetEntity(), @upperManeModel) if @GetTextureController() and IsValid(@upperManeModel)
 			when 'LowerManeModel'
 				@lowerManeModel = @GetData()\GetLowerManeModel()
-				@lowerManeModel\SetNoDraw(@hideModels) if IsValid(@lowerManeModel)
+				@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
 				@GetTextureController()\UpdateLowerMane(@GetEntity(), @lowerManeModel) if @GetTextureController() and IsValid(@lowerManeModel)
 			when 'TailModel'
 				@tailModel = @GetData()\GetTailModel()
-				@tailModel\SetNoDraw(@hideModels) if IsValid(@tailModel)
+				@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
 				@GetTextureController()\UpdateTail(@GetEntity(), @tailModel) if @GetTextureController() and IsValid(@tailModel)
 		super(state)
 
@@ -530,12 +535,11 @@ class NewPonyRenderController extends PonyRenderController
 		@tailModel\DrawModel() if IsValid(@tailModel)
 		super()
 
-	HideModels: (status = true) =>
-		return if @hideModels == status
+	DoHideModels: (status) =>
+		super(status)
 		@upperManeModel\SetNoDraw(status) if IsValid(@upperManeModel)
 		@lowerManeModel\SetNoDraw(status) if IsValid(@lowerManeModel)
 		@tailModel\SetNoDraw(status) if IsValid(@tailModel)
-		super(status)
 
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		super(ent, drawingNewTask)
@@ -552,9 +556,9 @@ class NewPonyRenderController extends PonyRenderController
 			@lowerManeModel\SetNoDraw(true) if IsValid(@lowerManeModel) and @GrabData('HideManesMane')
 			@tailModel\SetNoDraw(true) if IsValid(@tailModel) and @GrabData('HideManesTail')
 		else
-			@upperManeModel\SetNoDraw(@hideModels) if IsValid(@upperManeModel)
-			@lowerManeModel\SetNoDraw(@hideModels) if IsValid(@lowerManeModel)
-			@tailModel\SetNoDraw(@hideModels) if IsValid(@tailModel)
+			@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
+			@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
+			@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
 
 hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
 	if data = @GetPonyData()
