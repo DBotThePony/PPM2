@@ -401,9 +401,6 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		with @GetTextureController()
 			\PreDraw(ent, drawingNewTask)
-			if drawingNewTask
-				\UpdateSocks(@GetEntity(), @socksModel) if IsValid(@socksModel)
-				\UpdateNewSocks(@GetEntity(), @newSocksModel) if IsValid(@newSocksModel)
 
 		if drawingNewTask
 			with bones = ent\PPMBonesModifier()
@@ -429,7 +426,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return if not @isValid
-		@GetTextureController()\PostDraw(ent)
+		@GetTextureController()\PostDraw(ent, drawingNewTask)
 
 	@ARMS_MATERIAL_INDEX = 0
 	PreDrawArms: (ent) =>
@@ -543,13 +540,6 @@ class NewPonyRenderController extends PonyRenderController
 
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		super(ent, drawingNewTask)
-
-		if drawingNewTask
-			textures = @GetTextureController()
-			return if not textures
-			textures\UpdateUpperMane(@GetEntity(), @upperManeModel) if IsValid(@upperManeModel)
-			textures\UpdateLowerMane(@GetEntity(), @lowerManeModel) if IsValid(@lowerManeModel)
-			textures\UpdateTail(@GetEntity(), @tailModel) if IsValid(@tailModel)
 
 		if ent.RenderOverride and not ent.__ppm2RenderOverride and @GrabData('HideManes')
 			@upperManeModel\SetNoDraw(true) if IsValid(@upperManeModel) and @GrabData('HideManesMane')

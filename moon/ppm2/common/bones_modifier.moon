@@ -304,6 +304,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 
 	new: (ent = NULL) =>
 		super()
+		@fullBoneMove = SERVER or ent\GetClass() ~= 'prop_ragdoll'
 		@ent = ent
 		@bonesMappingID = {}
 		@bonesMappingName = {}
@@ -365,21 +366,24 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			calcBonesScale = {}
 
 			for id = 0, @boneCount - 1
-				calcBonesPos[id] = \GetManipulateBonePosition2Safe(id)
-				calcBonesAngles[id] = \GetManipulateBoneAngles2Safe(id)
+				calcBonesPos[id] = \GetManipulateBonePosition2Safe(id) if @fullBoneMove
+				calcBonesPos[id] = Vector() if not @fullBoneMove
+				calcBonesAngles[id] = \GetManipulateBoneAngles2Safe(id) if @fullBoneMove
+				calcBonesAngles[id] = Angle() if not @fullBoneMove
 				calcBonesScale[id] = \GetManipulateBoneScale2Safe(id)
 
 			for i, data in ipairs @bonesIterable
 				id = data[1]
-				calcBonesPos[id] += @[data[3]](@)
+				calcBonesPos[id] += @[data[3]](@) if @fullBoneMove
 				calcBonesScale[id] += @[data[4]](@)
 
-			calcBonesAngles[data[1]] += @[data[5]](@) for i, data in ipairs @bonesIterable
+			if @fullBoneMove
+				calcBonesAngles[data[1]] += @[data[5]](@) for i, data in ipairs @bonesIterable
 
 			for id = 0, @boneCount - 1
-				\ManipulateBonePosition2Safe(id, calcBonesPos[id]\ToNative())
+				\ManipulateBonePosition2Safe(id, calcBonesPos[id]\ToNative()) if @fullBoneMove
 				\ManipulateBoneScale2Safe(id, calcBonesScale[id]\ToNative())
-				\ManipulateBoneAngles2Safe(id, calcBonesAngles[id])
+				\ManipulateBoneAngles2Safe(id, calcBonesAngles[id]) if @fullBoneMove
 
 	ResetBones: =>
 		return if @defferReset and @defferReset > RealTimeL()
