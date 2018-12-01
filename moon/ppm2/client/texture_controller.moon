@@ -146,7 +146,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@MAT_INDEX_CMARK = 9
 	@MAT_INDEX_EYELASHES = 10
 
-	@NEXT_GENERATED_ID = 10000
+	@NEXT_GENERATED_ID = 100000
 
 	@MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
 	@TAIL_UPDATE_TRIGGER = {'TailType': true}
@@ -458,7 +458,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	new: (controller, compile = true) =>
 		super(controller\GetData())
 		@isValid = true
-		@cachedENT = controller.ent
+		@cachedENT = @GetEntity()
 		@id = @GetEntity()\EntIndex()
 		if @id == -1
 			@clientsideID = true
@@ -479,12 +479,15 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	GetID: =>
 		return @id if @clientsideID
+
 		if @GetEntity() ~= @cachedENT
 			@cachedENT = @GetEntity()
 			@id = @GetEntity()\EntIndex()
 			if @id == -1
 				@id = @@NEXT_GENERATED_ID
 				@@NEXT_GENERATED_ID += 1
+				@CompileTextures() if @compiled
+
 		return @id
 
 	GetBody: => @BodyMaterial
