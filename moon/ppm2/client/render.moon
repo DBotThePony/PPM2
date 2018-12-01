@@ -27,6 +27,7 @@ RENDER_HORN_GLOW = CreateConVar('ppm2_horn_glow', '1', {FCVAR_ARCHIVE, FCVAR_NOT
 HORN_PARTICLES = CreateConVar('ppm2_horn_particles', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn particles when player uses physgun')
 HORN_FP = CreateConVar('ppm2_horn_firstperson', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Visual horn effetcs in first person')
 HORN_HIDE_BEAM = CreateConVar('ppm2_horn_nobeam', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Hide physgun beam')
+TASK_RENDER_TYPE = CreateConVar('ppm2_task_render_type', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Task rendering type (e.g. pony ragdolls and NPCs). 1 - better render; less conflicts; more FPS. 0 - "old-style" render; possible conflicts;')
 DRAW_LEGS_DEPTH = CreateConVar('ppm2_render_legsdepth', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Render legs in depth pass. Useful with Boken DoF enabled')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
@@ -125,6 +126,25 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 
 	return if bDrawingDepth or bDrawingSkybox
 
+	if not TASK_RENDER_TYPE\GetBool()
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
+			ent = task.ent
+			if IsValid(ent)
+				if ent.__cachedIsPony
+					ent\SetNoDraw(true)
+					ent.__ppm2_task_hit = true
+					renderController = task\GetRenderController()
+					renderController\PreDraw(ent)
+					IN_DRAW = true
+					ent\DrawModel()
+					IN_DRAW = false
+					renderController\PostDraw(ent)
+				else
+					if ent.__ppm2_task_hit
+						ent.__ppm2_task_hit = false
+						ent\SetNoDraw(false)
+						task\Reset()
+
 	if not ENABLE_NEW_RAGDOLLS\GetBool()
 		for _, ply in ipairs player.GetAll()
 			alive = ply\Alive()
@@ -150,6 +170,26 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					IN_DRAW = true
 					data\GetRenderController()\DrawLegs()
 					IN_DRAW = false
+
+Think = ->
+	if TASK_RENDER_TYPE\GetBool()
+		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
+			ent = task.ent
+			if IsValid(ent) and ent.__cachedIsPony
+				if ent.__ppm2_task_hit
+					ent.__ppm2_task_hit = false
+					ent\SetNoDraw(false)
+
+				if not ent.__ppm2RenderOverride
+					ent = ent
+					ent.__ppm2_oldRenderOverride = ent.RenderOverride
+					ent.__ppm2RenderOverride = ->
+						renderController = task\GetRenderController()
+						renderController\PreDraw(ent, true)
+						ent\DrawModel()
+						renderController\PostDraw(ent, true)
+						ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
+					ent.RenderOverride = ent.__ppm2RenderOverride
 
 PPM2.PrePlayerDraw = =>
 	return if PPM2.__RENDERING_REFLECTIONS
@@ -304,5 +344,6 @@ do
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, -2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, -2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, -2
+hook.Add 'Think', 'PPM2.UpdateRenderTasks', Think, -2
 hook.Add 'PreDrawOpaqueRenderables', 'PPM2.PreDrawOpaqueRenderables', PPM2.PreDrawOpaqueRenderables, -2
 hook.Add 'PostDrawTranslucentRenderables', 'PPM2.PostDrawTranslucentRenderables', PPM2.PostDrawTranslucentRenderables, -2
