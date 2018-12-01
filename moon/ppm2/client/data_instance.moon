@@ -185,6 +185,8 @@ class PonyDataInstance
 		else
 			mapData.fix(value)
 
+	GetExtraBackupPath: => "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
+
 	SetupData: (data = @NBTTagCompound, force = false, doBackup = false) =>
 		if luatype(data) == 'NBTCompound'
 			data = data\GetValue()
@@ -202,9 +204,8 @@ class PonyDataInstance
 							makeBackup = true
 							break
 			if doBackup and makeBackup and @exists
-				bkName = "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
 				fRead = file.Read(@fpath, 'DATA')
-				file.Write(bkName, fRead)
+				file.Write(@GetExtraBackupPath(), fRead)
 
 		for key, value2 in pairs(data)
 			key = key\lower()
@@ -222,7 +223,6 @@ class PonyDataInstance
 		@filenameFull = "#{filename}.dat"
 		@fpath = "#{@@DATA_DIR}#{filename}.dat"
 		@preview = "#{@@DATA_DIR}thumbnails/#{filename}.png"
-		@fpathBackup = "#{@@DATA_DIR}#{filename}.bak.dat"
 		@fpathFull = "data/#{@@DATA_DIR}#{filename}.dat"
 		@isOpen = @filename ~= nil
 		@exists = file.Exists(@fpath, 'DATA')
@@ -373,9 +373,7 @@ class PonyDataInstance
 			render.PopRenderTarget()
 
 	Save: (doBackup = true, preview = true) =>
-		if doBackup and @exists
-			fRead = file.Read(@fpath, 'DATA')
-			file.Write(@fpathBackup, fRead)
+		file.Write(@GetExtraBackupPath(), file.Read(@fpath, 'DATA')) if doBackup and @exists
 		buf = @SaveAs(@fpath)
 		@SavePreview(@preview) if preview
 		@exists = true
