@@ -328,7 +328,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		@@NW_Objects[@netID] = @
 
-		if ent
+		if ent and ent\IsValid()
 			@ent = ent
 			@modelCached = ent\GetModel()
 			@SetupEntity(ent)
