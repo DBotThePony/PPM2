@@ -429,3 +429,5 @@ gui.ppm2.editor.intro.text = "Welcome to my new... Robosurgeon for Ponies! It al
 	"No refunds."
 gui.ppm2.editor.intro.title = 'Welcome here, Human!'
 gui.ppm2.editor.intro.okay = "Ok, i will never read this license anyway"
+
+message.ppm2.debug.race_condition = 'Received NetworkedPonyData before entity were created on client! Waiting...'

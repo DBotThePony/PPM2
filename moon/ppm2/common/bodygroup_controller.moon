@@ -34,7 +34,7 @@ ents_GetAll = ->
 
 if CLIENT
 	for _, ent in ipairs ents.GetAll()
-		if ent.isPonyLegsModel
+		if ent.isPonyLegsModel or ent.isPonyPropModel
 			ent\Remove()
 
 PPM2.BODYGROUP_SKELETON = 0

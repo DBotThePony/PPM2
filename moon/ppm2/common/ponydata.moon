@@ -134,11 +134,64 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			state.networkChange = false
 			@SetLocalChange(state)
 
+	@NW_WAIT = {}
+
+	if CLIENT
+		hook.Add 'OnEntityCreated', 'PPM2.NW_WAIT', (ent) -> timer.Simple 0, ->
+			return if not IsValid(ent)
+
+			dirty = false
+			entid = ent\EntIndex()
+			ttl = RealTimeL()
+
+			for controller in *@NW_WAIT
+				if controller.removed
+					controller.isNWWaiting = false
+					dirty = true
+				elseif controller.waitEntID == entid
+					controller.isNWWaiting = false
+					controller.ent = ent
+					controller.modelCached = ent\GetModel()
+					controller\SetupEntity(ent)
+					--print('FOUND', ent)
+					dirty = true
+				elseif controller.waitTTL < ttl
+					dirty = true
+					controller.isNWWaiting = false
+
+			if dirty
+				@NW_WAIT = [controller for controller in *@NW_WAIT when controller.isNWWaiting]
+
+		hook.Add 'NotifyShouldTransmit', 'PPM2.NW_WAIT', (ent, should) -> timer.Simple 0, ->
+			return if not IsValid(ent)
+
+			dirty = false
+			entid = ent\EntIndex()
+			ttl = RealTimeL()
+
+			for controller in *@NW_WAIT
+				if controller.removed
+					controller.isNWWaiting = false
+					dirty = true
+				elseif controller.waitEntID == entid
+					controller.isNWWaiting = false
+					controller.ent = ent
+					controller.modelCached = ent\GetModel()
+					controller\SetupEntity(ent)
+					--print('FOUND', ent)
+					dirty = true
+				elseif controller.waitTTL < ttl
+					dirty = true
+					controller.isNWWaiting = false
+
+			if dirty
+				@NW_WAIT = [controller for controller in *@NW_WAIT when controller.isNWWaiting]
+
 	@OnNetworkedCreated = (ply = NULL, len = 0, nwobj) =>
 		if CLIENT
 			netID = net.ReadUInt16()
-			ent = net.ReadEntity()
-			obj = @NW_Objects[netID] or @(netID, ent)
+			entid = net.ReadUInt16()
+			obj = @NW_Objects[netID] or @(netID, entid)
 			obj.NETWORKED = true
 			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
@@ -313,6 +366,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		@recomputeTextures = true
 		@isValid = true
+		@removed = false
 		@valid = true
 		@NETWORKED = false
 		@NETWORKED_PREDICT = false
@@ -328,13 +382,26 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		@@NW_Objects[@netID] = @
 
-		if ent and ent\IsValid()
-			@ent = ent
-			@modelCached = ent\GetModel()
-			@SetupEntity(ent)
-		else
-			@ent = NULL if SERVER
-			@ent = LocalPlayer() if CLIENT
+		@isNWWaiting = false
+
+		if type(ent) == 'number'
+			entid = ent
+			@waitEntID = entid
+			ent = Entity(entid)
+			--print(ent, entid)
+
+			if not IsValid(ent)
+				@isNWWaiting = true
+				@waitTTL = RealTimeL() + 60
+				table.insert(@@NW_WAIT, @)
+				PPM2.LMessage('message.ppm2.debug.race_condition')
+				--print('WAITING ON ', entid)
+				return
+
+		return if not IsValid(ent)
+		@ent = ent
+		@modelCached = ent\GetModel() if IsValid(ent)
+		@SetupEntity(ent)
 
 	GetEntity: => @ent
 	IsValid: => @isValid
@@ -401,9 +468,9 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		if scale = @GetSizeController()
 			scale\Reset()
 		if CLIENT
-			@GetWeightController()\Reset() if @GetWeightController().Reset
-			@GetRenderController()\Reset() if @GetRenderController().Reset
-			@GetBodygroupController()\Reset() if @GetBodygroupController().Reset
+			@GetWeightController()\Reset() if @GetWeightController() and @GetWeightController().Reset
+			@GetRenderController()\Reset() if @GetRenderController() and @GetRenderController().Reset
+			@GetBodygroupController()\Reset() if @GetBodygroupController() and @GetBodygroupController().Reset
 
 	PlayerRespawn: =>
 		return if not IsValid(@ent)
@@ -552,6 +619,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return @bodygroups
 
 	Remove: (byClient = false) =>
+		@removed = true
 		@@NW_Objects[@netID] = nil if @NETWORKED
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
