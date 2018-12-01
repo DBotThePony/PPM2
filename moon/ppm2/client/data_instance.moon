@@ -117,13 +117,9 @@ class PonyDataInstance
 		copyOfData = {}
 		for key, val in pairs @dataTable
 			switch luatype(val)
-				when 'number'
+				when 'number', 'string', 'boolean'
 					copyOfData[key] = val
-				when 'string'
-					copyOfData[key] = val
-				when 'boolean'
-					copyOfData[key] = val
-				when 'table'
+				when 'table', 'Color'
 					{:r, :g, :b} = val
 					if r and g and b
 						copyOfData[key] = Color(r, g, b)
@@ -170,15 +166,15 @@ class PonyDataInstance
 	SaveOnChange: => @saveOnChange
 	SetSaveOnChange: (val = true) => @saveOnChange = val
 	GetValueFromNBT: (mapData, value) =>
-		if mapData.enum and luatype(value) == 'string'
+		if mapData.enum and type(value) == 'string'
 			mapData.fix(mapData.enumMappingBackward[value\upper()])
 		elseif mapData.type == 'COLOR'
-			if value.r and value.g and value.b and value.a
+			if IsColor(value)
 				mapData.fix(Color(value))
 			else
 				mapData.fix(Color(value[1] + 128, value[2] + 128, value[3] + 128, value[4] + 128))
 		elseif mapData.type == 'BOOLEAN'
-			if luatype(value) == 'boolean'
+			if type(value) == 'boolean'
 				mapData.fix(value)
 			else
 				mapData.fix(value == 1)
