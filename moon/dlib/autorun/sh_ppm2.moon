@@ -69,3 +69,5 @@ server('server/hooks.lua')
 server('server/emotes.lua')
 server('server/hitgroups.lua')
 server('server/rag_edit.lua')
+
+return nil
