@@ -6,7 +6,7 @@ PPM/2 Is a Garry's mod addon that allows you to play as customizable pony!
 Addon extends the original PonyPlayerModels idea about customizable ponies for player; by full code rewrite and new models!
 
 ## The addon is part of [Ponyscape](http://steamcommunity.com/groups/Ponyscape) server project! You can connect to [Ponyscape here](steam://connect/ps.ponyscape.com)!
-![Ponyscape logo](https://dbot.serealia.ca/sharex/2017/05/Ponyscape%27s%20PPMv2%20Text.png)
+![Ponyscape logo](https://i.dbotthepony.ru/2017/05/Ponyscape%27s%20PPMv2%20Text.png)
 
 ## The code is licensed under MIT License
 ## New models are licensed under [Microsoft Game Content License](http://www.xbox.com/en-us/developers/rules)
@@ -245,19 +245,19 @@ ppm2_task_render_type                    : 1        : , "nf", "demo", "server_ca
 
 # Screenshots
 ## New Models
-![Example](https://dbot.serealia.ca/sharex/2017/05/a977f87da5_2017-05-23_08-09-40.png)
-![They finally can talk!](https://dbot.serealia.ca/sharex/2017/05/20170521090424_1.jpg)
-![It hurts](https://dbot.serealia.ca/sharex/2017/05/b13d6fcbfa_2017-05-21_08-20-42.png)
-![xd](https://dbot.serealia.ca/sharex/2017/05/20170520074818_1.jpg)
-![SFM feel](https://dbot.serealia.ca/sharex/2017/05/20170521083924_1.jpg)
-![funny](https://dbot.serealia.ca/sharex/2017/05/GeYkSCu.jpg)
-![angry](https://dbot.serealia.ca/sharex/2017/05/ebd7a24102_2017-05-25_19-15-55.png)
-![more angry](https://dbot.serealia.ca/sharex/2017/05/20170525191559_1.jpg)
+![Example](https://i.dbotthepony.ru/2017/05/a977f87da5_2017-05-23_08-09-40.png)
+![They finally can talk!](https://i.dbotthepony.ru/2017/05/20170521090424_1.jpg)
+![It hurts](https://i.dbotthepony.ru/2017/05/b13d6fcbfa_2017-05-21_08-20-42.png)
+![xd](https://i.dbotthepony.ru/2017/05/20170520074818_1.jpg)
+![SFM feel](https://i.dbotthepony.ru/2017/05/20170521083924_1.jpg)
+![funny](https://i.dbotthepony.ru/2017/05/GeYkSCu.jpg)
+![angry](https://i.dbotthepony.ru/2017/05/ebd7a24102_2017-05-25_19-15-55.png)
+![more angry](https://i.dbotthepony.ru/2017/05/20170525191559_1.jpg)
 ## Editor
 ### Overview
-![Editor](https://dbot.serealia.ca/sharex/2017/05/8691f15316_2017-05-26_20-31-56.png)
-![Eyes](https://dbot.serealia.ca/sharex/2017/05/c7ab9c6eae_2017-05-26_20-32-17.png)
-![Emote](https://dbot.serealia.ca/sharex/2017/05/217f6b13cc_2017-05-26_20-32-33.png)
-![Customizable body details](https://dbot.serealia.ca/sharex/2017/05/64d1329e56_2017-05-26_20-32-52.png)
-![Cutiemark by URL](https://dbot.serealia.ca/sharex/2017/05/0297035e88_2017-05-26_20-34-56.png)
-![Import old files](https://dbot.serealia.ca/sharex/2017/05/171457f9b3_2017-05-26_20-35-18.png)
+![Editor](https://i.dbotthepony.ru/2017/05/8691f15316_2017-05-26_20-31-56.png)
+![Eyes](https://i.dbotthepony.ru/2017/05/c7ab9c6eae_2017-05-26_20-32-17.png)
+![Emote](https://i.dbotthepony.ru/2017/05/217f6b13cc_2017-05-26_20-32-33.png)
+![Customizable body details](https://i.dbotthepony.ru/2017/05/64d1329e56_2017-05-26_20-32-52.png)
+![Cutiemark by URL](https://i.dbotthepony.ru/2017/05/0297035e88_2017-05-26_20-34-56.png)
+![Import old files](https://i.dbotthepony.ru/2017/05/171457f9b3_2017-05-26_20-35-18.png)
