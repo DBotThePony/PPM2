@@ -1964,20 +1964,20 @@ CreateContextMenu() if IsValid(g_ContextMenu)
 hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption 'Utilities', 'User', 'PPM2.Posing', 'PPM2', '', '', =>
 	return if not @IsValid()
 	@Clear()
-	@Button 'Spawn new model', 'gm_spawn', 'models/ppm/player_default_base_new.mdl'
-	@Button 'Spawn new nj model', 'gm_spawn', 'models/ppm/player_default_base_new_nj.mdl'
-	@Button 'Spawn old model', 'gm_spawn', 'models/ppm/player_default_base.mdl'
-	@Button 'Spawn old nj model', 'gm_spawn', 'models/ppm/player_default_base_nj.mdl'
-	@Button 'Spawn CPPM model', 'gm_spawn', 'models/cppm/player_default_base.mdl'
-	@Button 'Spawn CPPM nj model', 'gm_spawn', 'models/cppm/player_default_base_nj.mdl'
-	@Button 'Cleanup unused models', 'ppm2_cleanup'
-	@Button 'Reload local data', 'ppm2_reload'
-	@Button 'Require data from server', 'ppm2_require'
-	@CheckBox 'Draw hooves as hands', 'ppm2_cl_draw_hands'
-	@CheckBox 'No hoofsounds', 'ppm2_cl_no_hoofsound'
-	@CheckBox 'Disable flexes (emotes)', 'ppm2_disable_flexes'
-	@CheckBox 'Enable PPM2 editor advanced mode', 'ppm2_editor_advanced'
-	@CheckBox 'Enable real time eyes reflections', 'ppm2_cl_reflections'
-	@NumSlider 'Reflections draw distance', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
-	@NumSlider 'Reflections render distance', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
-	@CheckBox 'Double jump activate flight', 'ppm2_flight_djump'
+	@Button 'gui.ppm2.spawnmenu.newmodel', 'gm_spawn', 'models/ppm/player_default_base_new.mdl'
+	@Button 'gui.ppm2.spawnmenu.newmodelnj', 'gm_spawn', 'models/ppm/player_default_base_new_nj.mdl'
+	@Button 'gui.ppm2.spawnmenu.oldmodel', 'gm_spawn', 'models/ppm/player_default_base.mdl'
+	@Button 'gui.ppm2.spawnmenu.oldmodelnj', 'gm_spawn', 'models/ppm/player_default_base_nj.mdl'
+	@Button 'gui.ppm2.spawnmenu.cppmmodel', 'gm_spawn', 'models/cppm/player_default_base.mdl'
+	@Button 'gui.ppm2.spawnmenu.cppmmodelnj', 'gm_spawn', 'models/cppm/player_default_base_nj.mdl'
+	@Button 'gui.ppm2.spawnmenu.cleanup', 'ppm2_cleanup'
+	@Button 'gui.ppm2.spawnmenu.reload', 'ppm2_reload'
+	@Button 'gui.ppm2.spawnmenu.require', 'ppm2_require'
+	@CheckBox 'gui.ppm2.spawnmenu.drawhooves', 'ppm2_cl_draw_hands'
+	@CheckBox 'gui.ppm2.spawnmenu.nohoofsounds', 'ppm2_cl_no_hoofsound'
+	@CheckBox 'gui.ppm2.spawnmenu.noflexes', 'ppm2_disable_flexes'
+	@CheckBox 'gui.ppm2.spawnmenu.advancedmode', 'ppm2_editor_advanced'
+	@CheckBox 'gui.ppm2.spawnmenu.reflections', 'ppm2_cl_reflections'
+	@NumSlider 'gui.ppm2.spawnmenu.reflections_drawdist', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
+	@NumSlider 'gui.ppm2.spawnmenu.reflections_renderdist', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
+	@CheckBox 'gui.ppm2.spawnmenu.doublejump', 'ppm2_flight_djump'

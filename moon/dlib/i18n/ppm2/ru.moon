@@ -431,3 +431,21 @@ gui.ppm2.editor.intro.title = 'Добро пожаловать, Биологич
 gui.ppm2.editor.intro.okay = "к, я все равно это никогда не читаю"
 
 message.ppm2.debug.race_condition = 'У NetworkedPonyData состояние гонки с движком игры. Ожидаю...'
+
+gui.ppm2.spawnmenu.newmodel = 'Создать новую модель'
+gui.ppm2.spawnmenu.newmodelnj = 'Создать новую модель NJ'
+gui.ppm2.spawnmenu.oldmodel = 'Создать старую модель'
+gui.ppm2.spawnmenu.oldmodelnj = 'Создать старую модель NJ'
+gui.ppm2.spawnmenu.cppmmodel = 'Создать CPPM модель'
+gui.ppm2.spawnmenu.cppmmodelnj = 'Создать CPPM модель NJ'
+gui.ppm2.spawnmenu.cleanup = 'Принудительно собрать мусор'
+gui.ppm2.spawnmenu.reload = 'Перезагрузить вашу пони'
+gui.ppm2.spawnmenu.require = 'Запросить данные с сервера'
+gui.ppm2.spawnmenu.drawhooves = 'Отрисовывать копыта как руки'
+gui.ppm2.spawnmenu.nohoofsounds = 'Отключить звуки копыт'
+gui.ppm2.spawnmenu.noflexes = 'Отключить flexes (эмоции)'
+gui.ppm2.spawnmenu.advancedmode = 'Включить расширенный режим редактора'
+gui.ppm2.spawnmenu.reflections = 'Включить отражения в реальном времени'
+gui.ppm2.spawnmenu.reflections_drawdist = 'Дистанция для отрисовки'
+gui.ppm2.spawnmenu.reflections_renderdist = 'Точность отражений'
+gui.ppm2.spawnmenu.doublejump = 'Двойной прыжок включает режим полета'
