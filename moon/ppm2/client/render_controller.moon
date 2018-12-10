@@ -436,10 +436,10 @@ class PonyRenderController extends PPM2.ControllerChildren
 			weight = @GetData()\GetWeight()
 			vec = LVector(weight, weight, weight)
 			ent\ManipulateBoneScale2Safe(i, vec) for i = 1, 13
-		render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBody())
+		ent\SetSubMaterial(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBodyName())
 	PostDrawArms: (ent) =>
 		return if not @isValid
-		render.MaterialOverrideByIndex(@@ARMS_MATERIAL_INDEX)
+		ent\SetSubMaterial(@@ARMS_MATERIAL_INDEX, '')
 
 	DataChanges: (state) =>
 		return if not @isValid
