@@ -291,21 +291,25 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 					return
 
 				if obj.ent\IsPony() and obj\CanThink()
-					obj.ent\ResetBoneManipCache()
-					resetBones(obj.ent)
-					data = obj.ent\GetPonyData()
-					hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
-					obj\Think()
-					obj.ent.__ppmBonesModified = true
-					obj.ent\ApplyBoneManipulations()
+					PPM2.EntityBonesModifier.ThinkObject(obj)
 				elseif obj.ent.__ppmBonesModified
 					resetBones(obj.ent)
 					obj.ent.__ppmBonesModified = false
+
+	@ThinkObject = (obj) ->
+		obj.ent\ResetBoneManipCache()
+		resetBones(obj.ent)
+		data = obj.ent\GetPonyData()
+		hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
+		obj\Think()
+		obj.ent.__ppmBonesModified = true
+		obj.ent\ApplyBoneManipulations()
 
 	new: (ent = NULL) =>
 		super()
 		@fullBoneMove = SERVER or ent\GetClass() ~= 'prop_ragdoll'
 		@ent = ent
+		@isLocalPlayer = CLIENT and ent == LocalPlayer()
 		@bonesMappingID = {}
 		@bonesMappingName = {}
 		@bonesMapping = {}
@@ -321,6 +325,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	Setup: (ent = @ent) =>
 		return false if not IsValid(ent)
 		@lastModel = ent\GetModel()
+		@isLocalPlayer = CLIENT and ent == LocalPlayer()
 		@ClearModifiers()
 		@isValid = true
 		@ent = ent
@@ -351,6 +356,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 
 	CanThink: =>
 		return true if SERVER
+		return false if @isLocalPlayer and not @ent\ShouldDrawLocalPlayer()
 		return @callFrame ~= FrameNumberL() and (not @defferReset or @defferReset < RealTimeL())
 
 	Think: (force = false) =>

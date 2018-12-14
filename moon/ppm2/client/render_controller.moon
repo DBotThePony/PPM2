@@ -108,6 +108,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		legsModel = @legsModel
 
 		with @legsModel
+			PPM2.EntityBonesModifier.ThinkObject(ply.__ppmBonesModifiers) if ply.__ppmBonesModifiers
+
 			for boneid = 0, ply\GetBoneCount() - 1
 				\ManipulateBonePosition(0, ply\GetManipulateBonePosition(0))
 				\ManipulateBoneAngles(0, ply\GetManipulateBoneAngles(0))
@@ -197,10 +199,13 @@ class PonyRenderController extends PPM2.ControllerChildren
 	DrawLegs: (start3D = false) =>
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
+		return if not @GetEntity()\Alive()
+		return if EyeAngles().p < 60
 		@CreateLegs() unless IsValid(@legsModel)
 		return unless IsValid(@legsModel)
 		return if @GetEntity()\ShouldDrawLocalPlayer()
 		return if (@GetEntity()\GetPos() + @GetEntity()\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+
 		if USE_RENDER_OVERRIDE\GetBool()
 			@legsModel\SetNoDraw(false)
 			rTime = RealTimeL()
@@ -213,6 +218,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			return
 		else
 			@legsModel\SetNoDraw(true)
+
 		@UpdateLegs()
 
 		oldClip = render.EnableClipping(true)
@@ -242,6 +248,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
 		return if not @GetEntity()\Alive()
+		return if EyeAngles().p < 60
 		return if @GetEntity()\ShouldDrawLocalPlayer()
 		return if (@GetEntity()\GetPos() + @GetEntity()\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
 		@UpdateLegs()
@@ -259,6 +266,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 	DrawLegsDepth: (start3D = false) =>
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
+		return if not @GetEntity()\Alive()
+		return if EyeAngles().p < 60
 		@CreateLegs() unless IsValid(@legsModel)
 		return unless IsValid(@legsModel)
 		return if @GetEntity()\ShouldDrawLocalPlayer()
