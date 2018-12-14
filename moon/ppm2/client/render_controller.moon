@@ -442,7 +442,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		if ent and not @armsWeightSetup
 			@armsWeightSetup = true
-			weight = @GetData()\GetWeight()
+			weight = 1 + (@GetData()\GetWeight() - 1) * 0.4
 			vec = LVector(weight, weight, weight)
 			ent\ManipulateBoneScale2Safe(i, vec) for i = 1, 13
 		ent\SetSubMaterial(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBodyName())
