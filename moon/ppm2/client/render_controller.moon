@@ -200,7 +200,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
 		return if not @GetEntity()\Alive()
-		return if EyeAngles().p < 60
+		return if @GetEntity()\InVehicle() and EyeAngles().p < 30
+		return if not @GetEntity()\InVehicle() and EyeAngles().p < 60
 		@CreateLegs() unless IsValid(@legsModel)
 		return unless IsValid(@legsModel)
 		return if @GetEntity()\ShouldDrawLocalPlayer()
@@ -248,7 +249,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
 		return if not @GetEntity()\Alive()
-		return if EyeAngles().p < 60
+		return if @GetEntity()\InVehicle() and EyeAngles().p < 30
+		return if not @GetEntity()\InVehicle() and EyeAngles().p < 60
 		return if @GetEntity()\ShouldDrawLocalPlayer()
 		return if (@GetEntity()\GetPos() + @GetEntity()\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
 		@UpdateLegs()
@@ -267,7 +269,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		return if not ENABLE_LEGS\GetBool()
 		return if not @GetEntity()\Alive()
-		return if EyeAngles().p < 60
+		return if @GetEntity()\InVehicle() and EyeAngles().p < 30
+		return if not @GetEntity()\InVehicle() and EyeAngles().p < 60
 		@CreateLegs() unless IsValid(@legsModel)
 		return unless IsValid(@legsModel)
 		return if @GetEntity()\ShouldDrawLocalPlayer()
