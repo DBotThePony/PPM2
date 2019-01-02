@@ -115,14 +115,16 @@ class PonyDataInstance
 
 	Copy: (fileName = @filename) =>
 		copyOfData = {}
+
 		for key, val in pairs @dataTable
 			switch luatype(val)
 				when 'number', 'string', 'boolean'
 					copyOfData[key] = val
 				when 'table', 'Color'
-					{:r, :g, :b} = val
-					if r and g and b
-						copyOfData[key] = Color(r, g, b)
+					if IsColor(val)
+						copyOfData[key] = Color(val)
+					else
+						copyOfData[key] = Color(255, 255, 255)
 		newData = @@(fileName, copyOfData, false)
 		return newData
 	CreateCustomNetworkObject: (goingToNetwork = false, ply = LocalPlayer(), ...) =>

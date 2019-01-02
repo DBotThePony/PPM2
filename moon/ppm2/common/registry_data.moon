@@ -45,7 +45,7 @@ wString = net.WriteString
 
 COLOR_FIXER = (r = 255, g = 255, b = 255, a = 255) ->
 	func = (arg = Color(r, g, b, a)) ->
-		if type(arg) ~= 'table'
+		if not IsColor(arg)
 			return Color(255, 255, 255)
 		else
 			{:r, :g, :b, :a} = arg
