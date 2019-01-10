@@ -21,7 +21,7 @@
 
 ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options. Keep in mind Editor3 acts different with this option.')
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
-DISTANCE_LIMIT = CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Distance limit in PPM/2 Editor/2')
+DISTANCE_LIMIT = CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Distance limit in PPM/2 Editor/2. 0 - means default (400)')
 
 BackgroundColors = {
 	Color(200, 200, 200)
@@ -276,6 +276,8 @@ CALC_VIEW_PANEL = {
 		@right = false
 		@up = false
 		@down = false
+		@lastPosSend = 0
+		@prevPos = Vector()
 
 		@realX, @realY = 0, 0
 		@realW, @realH = ScrW(), ScrH()
@@ -293,7 +295,7 @@ CALC_VIEW_PANEL = {
 	CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
 		return hook.Remove('CalcView', @) if not @IsValid()
 		return if not @IsVisible()
-		origin, angles = LocalToWorld(@drawPos, @drawAngle, LocalPlayer()\GetPos(), Angle(0, LocalPlayer()\EyeAngles().y, 0))
+		origin, angles = LocalToWorld(@drawPos, @drawAngle, LocalPlayer()\GetPos(), Angle(0, LocalPlayer()\EyeAnglesFixed().y, 0))
 		newData = {:angles, :origin, fov: @fov, :znear, :zfar, drawviewer: true}
 		return newData
 
@@ -372,7 +374,8 @@ CALC_VIEW_PANEL = {
 			{:pitch, :yaw, :roll} = @drawAngle
 			yaw -= deltaX * .3
 			pitch += deltaY * .3
-			@drawAngle = Angle(pitch, yaw, roll)
+			@drawAngle = Angle(pitch\clamp(-89, 89), yaw, roll)
+			@drawAngle\Normalize()
 
 		speedModifier = 1
 		speedModifier *= 2 if @fast
@@ -394,11 +397,20 @@ CALC_VIEW_PANEL = {
 			@drawPos += @drawAngle\Up() * speedModifier * delta * 100
 
 		limitDist = DISTANCE_LIMIT\GetFloat()
-		if limitDist > 0
-			lenDist = @drawPos\Length()
-			if lenDist > limitDist
-				@drawPos\Normalize()
-				@drawPos = @drawPos * limitDist
+		limitDist = 400 if limitDist <= 0
+		lenDist = @drawPos\Length()
+
+		if lenDist > limitDist
+			@drawPos\Normalize()
+			@drawPos = @drawPos * limitDist
+
+		if @drawPos ~= @prevPos and @lastPosSend < RealTimeL()
+			@lastPosSend = RealTimeL() + 0.1
+			@prevPos = Vector(@drawPos)
+			net.Start('PPM2.EditorCamPos')
+			net.WriteVector(@drawPos)
+			net.WriteAngle(@drawAngle)
+			net.SendToServer()
 
 		if @IsActive()
 			if not @resizedToScreen

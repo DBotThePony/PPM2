@@ -449,3 +449,6 @@ gui.ppm2.spawnmenu.reflections = 'Включить отражения в реа�
 gui.ppm2.spawnmenu.reflections_drawdist = 'Дистанция для отрисовки'
 gui.ppm2.spawnmenu.reflections_renderdist = 'Точность отражений'
 gui.ppm2.spawnmenu.doublejump = 'Двойной прыжок включает режим полета'
+
+tip.ppm2.in_editor = 'В редакторе PPM/2'
+tip.ppm2.camera = "PPM/2 камера игрока %s"

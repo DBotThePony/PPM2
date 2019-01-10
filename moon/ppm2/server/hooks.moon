@@ -66,10 +66,6 @@ do
 				if data
 					table.insert(target, ent)
 
-net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
-	return if not IsValid(ply)
-	ply\SetDLibVar('PPM2.InEditor', net.ReadBool())
-
 ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
 RAGDOLL_COLLISIONS = CreateConVar('ppm2_sv_ragdolls_collisions', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable ragdolls collisions')
 

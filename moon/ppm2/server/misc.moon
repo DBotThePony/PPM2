@@ -20,18 +20,42 @@
 -- DEALINGS IN THE SOFTWARE.
 
 
-util.AddNetworkString('PPM2.RequestPonyData')
-util.AddNetworkString('PPM2.PlayerRespawn')
-util.AddNetworkString('PPM2.PlayerDeath')
-util.AddNetworkString('PPM2.PostPlayerDeath')
-util.AddNetworkString('PPM2.Require')
-util.AddNetworkString('PPM2.EditorStatus')
-util.AddNetworkString('PPM2.NotifyDisconnect')
-util.AddNetworkString('PPM2.PonyDataRemove')
-util.AddNetworkString('PPM2.RagdollEdit')
-util.AddNetworkString('PPM2.RagdollEditFlex')
-util.AddNetworkString('PPM2.RagdollEditEmote')
+net.pool('PPM2.RequestPonyData')
+net.pool('PPM2.PlayerRespawn')
+net.pool('PPM2.PlayerDeath')
+net.pool('PPM2.PostPlayerDeath')
+net.pool('PPM2.Require')
+net.pool('PPM2.EditorStatus')
+net.pool('PPM2.NotifyDisconnect')
+net.pool('PPM2.PonyDataRemove')
+net.pool('PPM2.RagdollEdit')
+net.pool('PPM2.RagdollEditFlex')
+net.pool('PPM2.RagdollEditEmote')
+net.pool('PPM2.EditorCamPos')
 
 CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_ARCHIVE}, 'Distance limit in PPM/2 Editor/2')
+
 resource.AddWorkshop('933203381')
+
+net.receive 'PPM2.EditorCamPos', (len = 0, ply = NULL) ->
+	return if not ply\IsValid()
+	return if ply.__ppm2_lcpt and ply.__ppm2_lcpt > RealTime()
+	ply.__ppm2_lcpt = RealTime() + 0.1
+	camPos, camAng = net.ReadVector(), net.ReadAngle()
+
+	filter = RecipientFilter()
+	filter\AddPVS(ply\GetPos())
+	filter\RemovePlayer(ply)
+
+	return if filter\GetCount() == 0
+
+	net.Start('PPM2.EditorCamPos')
+	net.WritePlayer(ply)
+	net.WriteVector(camPos)
+	net.WriteAngle(camAng)
+	net.Send(filter)
+
+net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
+	return if not IsValid(ply)
+	ply\SetNWBool('PPM2.InEditor', net.ReadBool())
