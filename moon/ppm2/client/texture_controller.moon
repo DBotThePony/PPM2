@@ -475,9 +475,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@isValid = false
 		@ResetTextures()
 
-	IsValid: => IsValid(@GetEntity()) and @isValid and @compiled
+	IsValid: => IsValid(@GetEntity()) and @isValid and @compiled and @GetData()\IsValid()
 
 	GetID: =>
+		return @GetObjectSlot() if @GetObjectSlot()
 		return @id if @clientsideID
 
 		if @GetEntity() ~= @cachedENT
@@ -557,6 +558,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	GetWingsName: => @WingsMaterialName
 
 	CompileTextures: =>
+		return if not @GetData()\IsValid()
 		@CompileBody()
 		@CompileHair()
 		@CompileTail()

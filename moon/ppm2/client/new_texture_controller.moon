@@ -425,6 +425,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		return @TeethMaterial, @MouthMaterial, @TongueMaterial
 
 	CompileTextures: =>
+		return if not @GetData()\IsValid()
 		super()
 		@CompileMouth()
 		@CompileBatWingsSkin()

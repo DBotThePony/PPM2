@@ -274,6 +274,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@NW_Vars = {}
 	@NW_VarsTable = {}
 	@NW_Objects = {}
+	@O_Slots = {} if CLIENT
 	@NW_Waiting = {}
 	@NW_WaitID = -1
 	@NW_NextVarID = -1
@@ -382,6 +383,16 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		@@NW_Objects[@netID] = @
 
+		if CLIENT
+			for i = 1, 1024
+				if not @@O_Slots[i]
+					@slotID = i
+					@@O_Slots[i] = @
+					break
+
+			if not @slotID
+				error('dafuq? No empty slots are available')
+
 		@isNWWaiting = false
 
 		if type(ent) == 'number'
@@ -407,6 +418,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	IsValid: => @isValid
 	GetModel: => @modelCached
 	EntIndex: => @entID
+	ObjectSlot: => @slotID
+	GetObjectSlot: => @slotID
 
 	Clone: (target = @ent) =>
 		copy = @@(nil, target)
@@ -620,7 +633,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	Remove: (byClient = false) =>
 		@removed = true
-		@@NW_Objects[@netID] = nil if @NETWORKED
+		@@NW_Objects[@netID] = nil if SERVER or @NETWORKED
+		@@O_Slots[@slotID] = nil if @slotID
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
 		@entTable.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
