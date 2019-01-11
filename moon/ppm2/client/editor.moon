@@ -1452,10 +1452,10 @@ EditorPages = {
 				@ColorBox("gui.ppm2.editor.url_mane.color#{i}", "ManeURLColor#{i}")
 				@Hr()
 
-			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
-				@Label('gui.ppm2.editor.body.detail.url.desc' .. i)
-				@URLInput("BodyDetailURL#{i}")
-				@ColorBox('gui.ppm2.editor.body.detail.url.color' .. i, "BodyDetailURLColor#{i}")
+			for i = 1, ADVANCED_MODE\GetBool() and 6 or 1
+				@Label("gui.ppm2.editor.url_tail.desc#{i}")
+				@URLInput("TailURL#{i}")
+				@ColorBox("gui.ppm2.editor.url_tail.color#{i}", "TailURLColor#{i}")
 				@Hr()
 
 			@Label('gui.ppm2.editor.mane.newnotice')

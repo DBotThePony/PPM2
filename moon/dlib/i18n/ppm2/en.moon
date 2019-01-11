@@ -220,6 +220,9 @@ for i = 1, 6
 	gui.ppm2.editor.url_mane['desc' .. i] = "Mane URL Detail #{i} input field"
 	gui.ppm2.editor.url_mane['color' .. i] = "Mane URL detail color #{i}"
 
+	gui.ppm2.editor.url_tail['desc' .. i] = "Tail URL Detail #{i} input field"
+	gui.ppm2.editor.url_tail['color' .. i] = "Tail URL detail color #{i}"
+
 	gui.ppm2.editor.url_mane.sep.up['desc' .. i] = "Upper mane URL Detail #{i} input field"
 	gui.ppm2.editor.url_mane.sep.up['color' .. i] = "Upper Mane URL detail color #{i}"
 
