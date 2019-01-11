@@ -346,8 +346,7 @@ Um höher/niedriger zu skalieren, verwende die Hoch/Runter Pfeiltasten
 Um breiter/kleiner zu skalieren, verwende die Rechts/Links Pfeiltasten
 Um links/rechts zu Drehen, verwende die Q/E Tasten"
 
-for name, data in pairs PPM2.PonyDataRegistry
-	gui.ppm2.editor.reset[data.getFunc\lower()] = 'Zurücksetzen ' .. data.getFunc
+gui.ppm2.editor.reset_value = 'Zurücksetzen %s'
 
 gui.ppm2.editor.phong.info = 'Mehr Infos über Phong im Wiki'
 gui.ppm2.editor.phong.exponent = 'Phong Exponent - wie stark die reflektierende Eigenschaft\nvon der Ponyhaut ist\nSetze den Wert nahe Null, um dem Roboterlook zu bekommen\nPonyhaut'

@@ -349,8 +349,7 @@ To Scale higher/lower use Up/Down arrows
 To Scale wider/smaller use Right/Left arrows
 To rotate left/right use Q/E"
 
-for name, data in pairs PPM2.PonyDataRegistry
-	gui.ppm2.editor.reset[data.getFunc\lower()] = 'Reset ' .. data.getFunc
+gui.ppm2.editor.reset_value = 'Reset %s'
 
 gui.ppm2.editor.phong.info = 'More info about Phong on wiki'
 gui.ppm2.editor.phong.exponent = 'Phong Exponent - how strong reflective property\nof pony skin is\nSet near zero to get robotic looking of your\npony skin'

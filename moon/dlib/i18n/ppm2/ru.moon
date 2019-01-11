@@ -349,8 +349,7 @@ gui.ppm2.editor.tattoo.help = "Что бы выйти из режима реда
 Правая и левая стрелки отвечают за размер по горизонтали
 Q/E отвечают за поворот"
 
-for name, data in pairs PPM2.PonyDataRegistry
-	gui.ppm2.editor.reset[data.getFunc\lower()] = 'Сбросить ' .. data.getFunc
+gui.ppm2.editor.reset_value = 'Сбросить %s'
 
 gui.ppm2.editor.phong.info = 'Больше информации про Фонг на вики'
 gui.ppm2.editor.phong.exponent = 'Фонговая экспонента - насолько сильна отражающая способность\nЗначение около нуля делает почти зеркальную\nповерхность кожи (робот глянцевой краской)'

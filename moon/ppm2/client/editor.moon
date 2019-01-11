@@ -801,7 +801,7 @@ PANEL_SETTINGS_BASE = {
 				\SetParent(@resetCollapse)
 				\Dock(TOP)
 				\DockMargin(2, 0, 2, 0)
-				\SetText('gui.ppm2.editor.reset.' .. option\lower())
+				\SetText('gui.ppm2.editor.reset_value', DLib.i18n.localize(option))
 				.DoClick = ->
 					dt = @GetTargetData()
 					dt['Reset' .. option](dt)
@@ -811,7 +811,7 @@ PANEL_SETTINGS_BASE = {
 			with button = vgui.Create('DButton', parent)
 				\SetParent(parent)
 				\DockMargin(0, 0, 0, 0)
-				\SetText('Reset ' .. name)
+				\SetText('gui.ppm2.editor.reset_value', DLib.i18n.localize(option))
 				\SetSize(0, 0)
 				\SetTextColor(Color(255, 255, 255))
 				.Paint = (w, h) =>
