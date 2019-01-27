@@ -49,6 +49,7 @@ shared('common/bones_modifier.lua')
 shared('common/ponyfly.lua')
 shared('common/size_controller.lua')
 shared('common/hooks.lua')
+shared('common/hoofsteps.lua')
 
 client('client/data_instance.lua')
 client('client/materials_registry.lua')

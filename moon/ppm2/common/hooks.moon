@@ -90,33 +90,6 @@ do
 			if IsValid(task.ent) and task.ent\IsPony()
 				xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
 
-DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
-DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
-
-hook.Add 'PlayerStepSoundTime', 'PPM2.Hooks', (stepType = STEPSOUNDTIME_NORMAL, isWalking = false) =>
-	return if not IsValid(@) or not @IsPonyCached() or CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
-	rate = @GetPlaybackRate() * .5
-	if @Crouching()
-		switch stepType
-			when STEPSOUNDTIME_NORMAL
-				return not isWalking and (300 / rate) or (600 / rate)
-			when STEPSOUNDTIME_ON_LADDER
-				return 500 / rate
-			when STEPSOUNDTIME_WATER_KNEE
-				return not isWalking and (400 / rate) or (800 / rate)
-			when STEPSOUNDTIME_WATER_FOOT
-				return not isWalking and (350 / rate) or (700 / rate)
-	else
-		switch stepType
-			when STEPSOUNDTIME_NORMAL
-				return not isWalking and (150 / rate) or (300 / rate)
-			when STEPSOUNDTIME_ON_LADDER
-				return 500 / rate
-			when STEPSOUNDTIME_WATER_KNEE
-				return not isWalking and (250 / rate) or (500 / rate)
-			when STEPSOUNDTIME_WATER_FOOT
-				return not isWalking and (175 / rate) or (350 / rate)
-
 ENABLE_TOOLGUN = CreateConVar('ppm2_sv_ragdoll_toolgun', '0', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow toolgun usage on player death ragdolls')
 ENABLE_PHYSGUN = CreateConVar('ppm2_sv_ragdoll_physgun', '1', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow physgun usage on player death ragdolls')
 
