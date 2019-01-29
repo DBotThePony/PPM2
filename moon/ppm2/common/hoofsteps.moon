@@ -105,6 +105,7 @@ class PPM2.MaterialSoundEntry
 
 AddSoundString('player/ppm2/hooves' .. i .. '.ogg') for i = 1, 3
 AddSoundString('player/ppm2/falldown.ogg')
+AddSoundString('player/ppm2/jump.ogg')
 
 LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	if CLIENT
@@ -160,10 +161,10 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@RandHoof(), 50, 0.8, 75)
+				@EmitSound(@@RandHoof(), 50, 0.8, 75)
 				return
 
-			@EmitSound(@RandHoof(), 50, 0.8, 75) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 50, 0.8, 75) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetWalkSound()
 			return if not sound
 			@EmitSound(sound, 40, 0.8, 75)
@@ -174,10 +175,10 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@RandHoof(), 60, 1, 95)
+				@EmitSound(@@RandHoof(), 60, 1, 95)
 				return
 
-			@EmitSound(@RandHoof(), 60, 1, 95) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 60, 1, 95) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetRunSound()
 			return if not sound
 			@EmitSound(sound, 40, 0.7, 95)
@@ -191,7 +192,7 @@ class PPM2.PlayerFootstepsListener
 		@lastMatType = newMatType
 		@lastEntry = PPM2.MaterialSoundEntry\Ask(@lastMatType)
 
-	RandHoof: => 'player/ppm2/hooves' .. math.random(1, 3) .. '.ogg'
+	@RandHoof: => 'player/ppm2/hooves' .. math.random(1, 3) .. '.ogg'
 
 	EmitSound: (name, level = 75, volume = 1, levelIfOnServer = level) => LEmitSound(@ply, name, level, volume, levelIfOnServer)
 
@@ -216,19 +217,19 @@ class PPM2.PlayerFootstepsListener
 
 	TraceNow: => @@TraceNow(@ply)
 
-	@TraceNow: (ply) =>
+	@TraceNow: (ply, dropToGround) =>
 		mins, maxs = ply\GetHull()
 
 		trData = {
 			start: ply\GetPos()
-			endpos: ply\GetPos() - Vector(0, 0, 5)
+			endpos: ply\GetPos() - Vector(0, 0, not dropToGround and 5 or 15)
 			:mins, :maxs
 			filter: ply
 		}
 
 		return util.TraceHull(trData)
 
-	PlayerFootstep: (ply, pos, foot, sound, volume, filter) =>
+	PlayerFootstep: (ply) =>
 		return if ply ~= @ply
 		return true if CLIENT and @ply ~= LocalPlayer()
 		@lastTrace = @TraceNow()
@@ -269,7 +270,7 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return if CLIENT and game.SinglePlayer()
 	return if not @IsPonyCached() or CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 	return if @__ppm2_walkc
-	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@, pos, foot, sound, volume, filter)
+	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 ProcessFalldownEvents = (cmd) =>
 	self2 = @GetTable()
@@ -285,6 +286,12 @@ ProcessFalldownEvents = (cmd) =>
 		if entry
 			if sound = entry\GetLandSound()
 				LEmitSound(@, sound, 85, 1, 105)
+			elseif not @__ppm2_walkc
+				if sound = entry\GetWalkSound()
+					LEmitSound(@, sound, 45, 0.2, 55)
+					timer.Simple 0.04, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
+					timer.Simple 0.07, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
+					timer.Simple 0.1, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
 
 			if not entry\ShouldPlayHoofclap()
 				return
@@ -292,5 +299,15 @@ ProcessFalldownEvents = (cmd) =>
 		LEmitSound(@, 'player/ppm2/falldown.ogg', 85, 1, 105)
 	elseif jump and not ground and not @__ppm2_jump
 		@__ppm2_jump = true
+		LEmitSound(@, 'player/ppm2/jump.ogg', 75, 1, 85)
+
+		tr = PPM2.PlayerFootstepsListener\TraceNow(@, true)
+		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
+
+		if not entry or entry\ShouldPlayHoofclap()
+			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
+			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
+			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
+			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
 
 hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents
