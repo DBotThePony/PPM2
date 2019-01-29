@@ -274,7 +274,7 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 
 ProcessFalldownEvents = (cmd) =>
 	if @GetMoveType() ~= MOVETYPE_WALK
-		@@__ppm2_jump = false
+		@__ppm2_jump = false
 		return
 
 	self2 = @GetTable()
