@@ -273,6 +273,10 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 ProcessFalldownEvents = (cmd) =>
+	if @GetMoveType() ~= MOVETYPE_WALK
+		@@__ppm2_jump = false
+		return
+
 	self2 = @GetTable()
 	ground = @OnGround()
 	jump = cmd\KeyDown(IN_JUMP)
