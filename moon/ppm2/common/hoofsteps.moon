@@ -104,6 +104,32 @@ class PPM2.MaterialSoundEntry
 		return @
 
 AddSoundString('player/ppm2/hooves' .. i .. '.ogg') for i = 1, 3
+AddSoundString('player/ppm2/falldown.ogg')
+
+LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
+	if CLIENT
+		ply\EmitSound(name, level, 100, volume) if not game.SinglePlayer() -- Some mods fix this globally (PAC3 for example)
+		-- so lets try to avoid problems
+		return
+
+	if game.SinglePlayer()
+		ply\EmitSound(name, level, 100, volume)
+		return
+
+	error('Tried to play unpooled sound: ' .. name) if not SOUND_STRINGS_POOL[name]
+
+	filter = RecipientFilter()
+	filter\AddPAS(ply\GetPos())
+	filter\RemovePlayer(ply)
+
+	return if filter\GetCount() == 0
+
+	net.Start('ppm2_workaround_emitsound')
+	net.WritePlayer(ply)
+	net.WriteUInt8(SOUND_STRINGS_POOL[name])
+	net.WriteUInt8(levelIfOnServer)
+	net.WriteUInt8((volume * 100)\floor())
+	net.Send(filter)
 
 class PPM2.PlayerFootstepsListener
 	new: (ply) =>
@@ -167,30 +193,7 @@ class PPM2.PlayerFootstepsListener
 
 	RandHoof: => 'player/ppm2/hooves' .. math.random(1, 3) .. '.ogg'
 
-	EmitSound: (name, level = 75, volume = 1, levelIfOnServer = level) =>
-		if CLIENT
-			@ply\EmitSound(name, level, 100, volume) if not game.SinglePlayer() -- Some mods fix this globally (PAC3 for example)
-			-- so lets try to avoid problems
-			return
-
-		if game.SinglePlayer()
-			@ply\EmitSound(name, level, 100, volume)
-			return
-
-		error('Tried to play unpooled sound: ' .. name) if not SOUND_STRINGS_POOL[name]
-
-		filter = RecipientFilter()
-		filter\AddPAS(@ply\GetPos())
-		filter\RemovePlayer(@ply)
-
-		return if filter\GetCount() == 0
-
-		net.Start('ppm2_workaround_emitsound')
-		net.WritePlayer(@ply)
-		net.WriteUInt8(SOUND_STRINGS_POOL[name])
-		net.WriteUInt8(levelIfOnServer)
-		net.WriteUInt8((volume * 100)\floor())
-		net.Send(filter)
+	EmitSound: (name, level = 75, volume = 1, levelIfOnServer = level) => LEmitSound(@ply, name, level, volume, levelIfOnServer)
 
 	PlayWalk: =>
 		timer.Simple 0.13, @lambdaEmitWalk
@@ -211,14 +214,16 @@ class PPM2.PlayerFootstepsListener
 		--timer.Simple 0.17, @lambdaEmitRun
 		return @lambdaEmitRun()
 
-	TraceNow: =>
-		mins, maxs = @ply\GetHull()
+	TraceNow: => @@TraceNow(@ply)
+
+	@TraceNow: (ply) =>
+		mins, maxs = ply\GetHull()
 
 		trData = {
-			start: @ply\GetPos()
-			endpos: @ply\GetPos() - Vector(0, 0, 5)
+			start: ply\GetPos()
+			endpos: ply\GetPos() - Vector(0, 0, 5)
 			:mins, :maxs
-			filter: @ply
+			filter: ply
 		}
 
 		return util.TraceHull(trData)
@@ -265,3 +270,27 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return if not @IsPonyCached() or CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 	return if @__ppm2_walkc
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@, pos, foot, sound, volume, filter)
+
+ProcessFalldownEvents = (cmd) =>
+	self2 = @GetTable()
+	ground = @OnGround()
+	jump = cmd\KeyDown(IN_JUMP)
+
+	if @__ppm2_jump and ground
+		@__ppm2_jump = false
+
+		tr = PPM2.PlayerFootstepsListener\TraceNow(@)
+		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
+
+		if entry
+			if sound = entry\GetLandSound()
+				LEmitSound(@, sound, 85, 1, 105)
+
+			if not entry\ShouldPlayHoofclap()
+				return
+
+		LEmitSound(@, 'player/ppm2/falldown.ogg', 85, 1, 105)
+	elseif jump and not ground and not @__ppm2_jump
+		@__ppm2_jump = true
+
+hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents
