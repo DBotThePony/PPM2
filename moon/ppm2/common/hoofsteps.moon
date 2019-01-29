@@ -309,9 +309,9 @@ ProcessFalldownEvents = (cmd) =>
 		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
 
 		if not entry or entry\ShouldPlayHoofclap()
-			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
-			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
-			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
-			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 75, 1, 85)
+			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
+			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
+			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
+			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
 
 hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents
