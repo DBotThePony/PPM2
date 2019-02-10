@@ -18,7 +18,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if CLIENT
+DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_USERINFO}, 'Disable hoofstep sound play time') if CLIENT
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
 
 hook.Remove('PlayerStepSoundTime', 'PPM2.Hooks')
@@ -122,6 +122,10 @@ LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	filter = RecipientFilter()
 	filter\AddPAS(ply\GetPos())
 	filter\RemovePlayer(ply)
+
+	for ply2 in *filter\GetPlayers()
+		if ply2\GetInfoBool('ppm2_cl_no_hoofsound', false)
+			filter\RemovePlayer(ply2)
 
 	return if filter\GetCount() == 0
 
@@ -273,6 +277,8 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 ProcessFalldownEvents = (cmd) =>
+	return if CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
+
 	if @GetMoveType() ~= MOVETYPE_WALK
 		@__ppm2_jump = false
 		return
