@@ -277,6 +277,7 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 ProcessFalldownEvents = (cmd) =>
+	return if not @IsPonyCached()
 	return if CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 
 	if @GetMoveType() ~= MOVETYPE_WALK
