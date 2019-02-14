@@ -265,10 +265,12 @@ PPM2.MaterialSoundEntry('sand', MAT_SAND, 11, 11, 0)\DisableHoofclap()
 PPM2.MaterialSoundEntry('snow', MAT_SNOW, 11, 11, 5)\DisableHoofclap()
 PPM2.MaterialSoundEntry('squeakywood', MAT_WOOD, 11, 0, 7)
 
-net.receive 'ppm2_workaround_emitsound', ->
-	ply, sound, level, volume = net.ReadPlayer(), SOUND_STRINGS_POOL_INV[net.ReadUInt8()], net.ReadUInt8(), net.ReadUInt8() / 100
-	return if not IsValid(ply)
-	ply\EmitSound(sound, level, 100, volume)
+if CLIENT
+	net.receive 'ppm2_workaround_emitsound', ->
+		return if DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool()
+		ply, sound, level, volume = net.ReadPlayer(), SOUND_STRINGS_POOL_INV[net.ReadUInt8()], net.ReadUInt8(), net.ReadUInt8() / 100
+		return if not IsValid(ply)
+		ply\EmitSound(sound, level, 100, volume)
 
 hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =>
 	return if CLIENT and game.SinglePlayer()
