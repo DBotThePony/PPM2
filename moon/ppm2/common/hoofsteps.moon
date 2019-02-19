@@ -165,13 +165,13 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 50, 0.8, 75)
+				@EmitSound(@@RandHoof(), 50, 0.8, 65)
 				return
 
-			@EmitSound(@@RandHoof(), 50, 0.8, 75) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 50, 0.8, 65) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetWalkSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.8, 75)
+			@EmitSound(sound, 40, 0.8, 55)
 			return true
 
 		@lambdaEmitRun = ->
@@ -179,13 +179,13 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 60, 1, 95)
+				@EmitSound(@@RandHoof(), 60, 1, 70)
 				return
 
-			@EmitSound(@@RandHoof(), 60, 1, 95) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 60, 1, 70) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetRunSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.7, 95)
+			@EmitSound(sound, 40, 0.7, 60)
 			return true
 
 	IsValid: => @ply\IsValid() and not @playedWanderSound
@@ -298,7 +298,7 @@ ProcessFalldownEvents = (cmd) =>
 
 		if entry
 			if sound = entry\GetLandSound()
-				LEmitSound(@, sound, 85, 1, 105)
+				LEmitSound(@, sound, 60, 1, 75)
 			elseif not @__ppm2_walkc
 				if sound = entry\GetWalkSound()
 					LEmitSound(@, sound, 45, 0.2, 55)
@@ -309,18 +309,18 @@ ProcessFalldownEvents = (cmd) =>
 			if not entry\ShouldPlayHoofclap()
 				return
 
-		LEmitSound(@, 'player/ppm2/falldown.ogg', 85, 1, 105)
+		LEmitSound(@, 'player/ppm2/falldown.ogg', 60, 1, 75)
 	elseif jump and not ground and not @__ppm2_jump
 		@__ppm2_jump = true
-		LEmitSound(@, 'player/ppm2/jump.ogg', 75, 1, 85)
+		LEmitSound(@, 'player/ppm2/jump.ogg', 50, 1, 65)
 
 		tr = PPM2.PlayerFootstepsListener\TraceNow(@, true)
 		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
 
 		if not entry or entry\ShouldPlayHoofclap()
-			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
-			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
-			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
-			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 75)
+			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
+			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
+			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
+			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
 
 hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents
