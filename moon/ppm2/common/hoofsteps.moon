@@ -18,12 +18,18 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_USERINFO}, 'Disable hoofstep sound play time') if CLIENT
+local DISABLE_HOOFSTEP_SOUND_CLIENT
+
+if game.SinglePlayer()
+	DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE}, 'Disable hoofstep sound play time') if SERVER
+else
+	DISABLE_HOOFSTEP_SOUND_CLIENT = CreateConVar('ppm2_cl_no_hoofsound', '0', {FCVAR_ARCHIVE, FCVAR_USERINFO}, 'Disable hoofstep sound play time') if CLIENT
+
 DISABLE_HOOFSTEP_SOUND = CreateConVar('ppm2_no_hoofsound', '0', {FCVAR_REPLICATED}, 'Disable hoofstep sound play time')
 
 hook.Remove('PlayerStepSoundTime', 'PPM2.Hooks')
 hook.Add 'PlayerStepSoundTime', 'PPM2.Hoofstep', (stepType = STEPSOUNDTIME_NORMAL, isWalking = false) =>
-	return if not @IsPonyCached() or CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
+	return if not @IsPonyCached() or DISABLE_HOOFSTEP_SOUND_CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 	rate = @GetPlaybackRate() * .5
 	if @Crouching()
 		switch stepType
@@ -274,13 +280,13 @@ if CLIENT
 
 hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =>
 	return if CLIENT and game.SinglePlayer()
-	return if not @IsPonyCached() or CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
+	return if not @IsPonyCached() or DISABLE_HOOFSTEP_SOUND_CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 	return if @__ppm2_walkc
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 ProcessFalldownEvents = (cmd) =>
 	return if not @IsPonyCached()
-	return if CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
+	return if DISABLE_HOOFSTEP_SOUND_CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 
 	if @GetMoveType() ~= MOVETYPE_WALK
 		@__ppm2_jump = false
