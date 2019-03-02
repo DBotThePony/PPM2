@@ -207,7 +207,7 @@ additionTable = (...) ->
 	return tab
 
 module.SOCKS_MATERIALS = [Material(id) for _, id in ipairs module.SOCKS_PATCHS]
-module.SOCKS_DETAILS = [Material(id) for _, id in ipairs module.SOCKS_DETAILS_PATCHS]
+module.SOCKS_DETAILS = {i, [Material(path) for path in *data] for i, data in pairs module.SOCKS_DETAILS_PATCHS}
 module.CUTIEMARKS = [Material("models/ppm2/cmarks/#{mark}.png") for _, mark in ipairs PPM2.DefaultCutiemarks]
 module.SUITS = [Material("models/ppm2/texclothes/#{mat}.png") for _, mat in ipairs {
 	'clothes_royalguard', 'clothes_sbs_full'
