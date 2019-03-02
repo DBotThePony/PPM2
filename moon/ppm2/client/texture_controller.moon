@@ -235,13 +235,30 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
 	@COMPILE_QUEUE = {}
+	@COMPILE_WAIT_UNTIL = 0
+	@COMPILE_THREAD = coroutine.create () ->
+		while true
+			if #@COMPILE_QUEUE == 0
+				coroutine.yield()
+			else
+				if #@COMPILE_QUEUE > 40 and #@COMPILE_QUEUE % 20 == 0
+					PPM2.Message('message.ppm2.queue_notify', #@COMPILE_QUEUE)
+
+				data = table.remove(@COMPILE_QUEUE)
+
+				if data.self\IsValid()
+					data.run(data.self, unpack(data.args))
+					data.self.lastMaterialUpdate = 0
+					coroutine.yield()
+
 	@COMPILE_TEXTURES = ->
 		return if #@COMPILE_QUEUE == 0
-		for _, data in ipairs @COMPILE_QUEUE
-			if data.self\IsValid()
-				data.run(data.self, unpack(data.args))
-				data.self.lastMaterialUpdate = 0
-		@COMPILE_QUEUE = {}
+
+		if @COMPILE_WAIT_UNTIL < RealTimeL()
+			@COMPILE_WAIT_UNTIL = RealTimeL() + 0.2
+			coroutine.resume(@COMPILE_THREAD)
+
+		return
 
 	hook.Add 'PreRender', 'PPM2.CompileTextures', @COMPILE_TEXTURES, -1
 
@@ -249,7 +266,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return if not @[func]
 		args = {...}
 		for i, val in ipairs(@@COMPILE_QUEUE)
-			if val.func == func and val.self == @ and (#val.args == 0 or #args == 0)
+			if val.func == func and val.self == @
 				val.args = args
 				return
 		table.insert(@@COMPILE_QUEUE, {self: @, :func, :args, run: @[func]})
@@ -288,8 +305,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				elseif @@TAIL_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileEye', true)
-					@DelayCompile('CompileEye', false)
+					@DelayCompile('CompileLeftEye')
+					@DelayCompile('CompileRightEye')
 				elseif @@BODY_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
@@ -558,18 +575,19 @@ class PonyTextureController extends PPM2.ControllerChildren
 	GetWingsName: => @WingsMaterialName
 
 	CompileTextures: =>
+		--return if @compiled
 		return if not @GetData()\IsValid()
-		@CompileBody()
-		@CompileHair()
-		@CompileTail()
-		@CompileHorn()
-		@CompileWings()
-		@CompileCMark()
-		@CompileSocks()
-		@CompileNewSocks()
-		@CompileEyelashes()
-		@CompileEye(false)
-		@CompileEye(true)
+		@DelayCompile('CompileBody')
+		@DelayCompile('CompileHair')
+		@DelayCompile('CompileTail')
+		@DelayCompile('CompileHorn')
+		@DelayCompile('CompileWings')
+		@DelayCompile('CompileCMark')
+		@DelayCompile('CompileSocks')
+		@DelayCompile('CompileNewSocks')
+		@DelayCompile('CompileEyelashes')
+		@DelayCompile('CompileLeftEye')
+		@DelayCompile('CompileRightEye')
 		@compiled = true
 
 	--@RT_SIZES = [math.pow(2, i) for i = 1, 24]
@@ -654,7 +672,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@ResetEyeReflections()
 
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		@CheckReflections(ent)
 
@@ -687,7 +705,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			render.MaterialOverrideByIndex(@@MAT_INDEX_EYELASHES, @Eyelashes)
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		return unless drawingNewTask
 		render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)
@@ -718,7 +736,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 
 	PreDrawLegs: (ent = @GetEntity()) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		render.MaterialOverrideByIndex(@@MAT_INDEX_BODY, @GetBody())
 		render.MaterialOverrideByIndex(@@MAT_INDEX_HORN, @GetHorn())
@@ -726,7 +744,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.MaterialOverrideByIndex(@@MAT_INDEX_CMARK, @GetCMark())
 
 	PostDrawLegs: (ent = @GetEntity()) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		render.MaterialOverrideByIndex(@@MAT_INDEX_BODY)
 		render.MaterialOverrideByIndex(@@MAT_INDEX_HORN)
@@ -736,12 +754,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@MAT_INDEX_SOCKS = 0
 
 	UpdateSocks: (ent = @GetEntity(), socksEnt) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
 
 	UpdateNewSocks: (ent = @GetEntity(), socksEnt) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		socksEnt\SetSubMaterial(0, @NewSocksColor2Name)
 		socksEnt\SetSubMaterial(1, @NewSocksColor1Name)
@@ -1680,6 +1698,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		render.SetViewPort(0, 0, oldW, oldH)
 		@EyeMaterialR\SetTexture('$iris', rtright)
+
+	CompileLeftEye: => @CompileEye(true)
+	CompileRightEye: => @CompileEye(false)
 	CompileEye: (left = false) =>
 		return unless @isValid
 		prefix = left and 'l' or 'r'

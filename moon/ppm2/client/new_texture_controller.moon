@@ -425,11 +425,12 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		return @TeethMaterial, @MouthMaterial, @TongueMaterial
 
 	CompileTextures: =>
+		--return if @compiled
 		return if not @GetData()\IsValid()
 		super()
-		@CompileMouth()
-		@CompileBatWingsSkin()
-		@CompileBatWings()
+		@DelayCompile('CompileMouth')
+		@DelayCompile('CompileBatWingsSkin')
+		@DelayCompile('CompileBatWings')
 
 	GetTeeth: => @TeethMaterial
 	GetMouth: => @MouthMaterial
@@ -467,7 +468,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 	UpdateUpperMane: (ent = @GetEntity(), entMane) =>
 		return unless @isValid
-		return unless @compiled
+		--return unless @compiled
 
 		if not @GetData()\GetSeparateMane()
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
@@ -477,7 +478,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
 
 	UpdateLowerMane: (ent = @GetEntity(), entMane) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 
 		if not @GetData()\GetSeparateMane()
@@ -488,13 +489,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
 
 	UpdateTail: (ent = @GetEntity(), entTail) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
 
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		@CheckReflections(ent)
 
@@ -529,7 +530,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			render.MaterialOverrideByIndex(@@MAT_INDEX_WINGS_BAT_SKIN, @GetBatWingsSkin())
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
-		return unless @compiled
+		--return unless @compiled
 		return unless @isValid
 		return unless drawingNewTask
 		render.MaterialOverrideByIndex(@@MAT_INDEX_EYE_LEFT)

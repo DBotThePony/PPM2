@@ -459,3 +459,5 @@ gui.ppm2.spawnmenu.doublejump = 'Двойной прыжок включает р
 
 tip.ppm2.in_editor = 'В редакторе PPM/2'
 tip.ppm2.camera = "PPM/2 камера игрока %s"
+
+message.ppm2.queue_notify = '%i текстур ожидают отрисовки'
