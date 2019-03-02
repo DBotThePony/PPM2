@@ -55,10 +55,18 @@ hook.Add 'PlayerStepSoundTime', 'PPM2.Hoofstep', (stepType = STEPSOUNDTIME_NORMA
 net.pool('ppm2_workaround_emitsound') if SERVER
 
 SOUND_STRINGS_POOL = {}
+SOUND_STRINGS_POOL_EXCP = {}
 SOUND_STRINGS_POOL_INV = {}
+
 AddSoundString = (sound) ->
 	nextid = #SOUND_STRINGS_POOL_INV + 1
 	SOUND_STRINGS_POOL[sound] = nextid
+	SOUND_STRINGS_POOL_INV[nextid] = sound
+
+AddSoundStringEx = (sound) ->
+	nextid = #SOUND_STRINGS_POOL_INV + 1
+	SOUND_STRINGS_POOL[sound] = nextid
+	SOUND_STRINGS_POOL_EXCP[sound] = nextid
 	SOUND_STRINGS_POOL_INV[nextid] = sound
 
 class PPM2.MaterialSoundEntry
@@ -111,7 +119,7 @@ class PPM2.MaterialSoundEntry
 
 AddSoundString('player/ppm2/hooves' .. i .. '.ogg') for i = 1, 3
 AddSoundString('player/ppm2/falldown.ogg')
-AddSoundString('player/ppm2/jump.ogg')
+AddSoundStringEx('player/ppm2/jump.ogg')
 
 LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	if CLIENT
@@ -142,6 +150,18 @@ LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	net.WriteUInt8((volume * 100)\floor())
 	net.Send(filter)
 
+if CLIENT
+	EntityEmitSound = (data) ->
+		ply = data.Entity
+		return if not IsValid(ply) or not ply\IsPlayer()
+		pdata = ply\GetPonyData()
+		return if not pdata or not pdata\ShouldMuffleHoosteps()
+		return if not SOUND_STRINGS_POOL[data.OriginalSoundName] or SOUND_STRINGS_POOL_EXCP[data.OriginalSoundName]
+		data.DSP = 31
+		return true
+
+	hook.Add 'EntityEmitSound', 'PPM2.Hoofsteps', EntityEmitSound, -2
+
 class PPM2.PlayerFootstepsListener
 	new: (ply) =>
 		ply.__ppm2_walkc = @
@@ -164,20 +184,20 @@ class PPM2.PlayerFootstepsListener
 			return if not @lastEntry
 			sound = @lastEntry\GetWanderSound()
 			return if not sound
-			@EmitSound(sound, 50, 1, 70)
+			@EmitSound(sound, 50, @GetVolume(), 70)
 
 		@lambdaEmitWalk = ->
 			return if not @ply\IsValid()
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 50, 0.8, 65)
+				@EmitSound(@@RandHoof(), 50, 0.8 * @GetVolume(), 65)
 				return
 
-			@EmitSound(@@RandHoof(), 50, 0.8, 65) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 50, 0.8 * @GetVolume(), 65) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetWalkSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.8, 55)
+			@EmitSound(sound, 40, 0.8 * @GetVolume(), 55)
 			return true
 
 		@lambdaEmitRun = ->
@@ -185,16 +205,24 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 60, 1, 70)
+				@EmitSound(@@RandHoof(), 60, @GetVolume(), 70)
 				return
 
-			@EmitSound(@@RandHoof(), 60, 1, 70) if @lastEntry\ShouldPlayHoofclap()
+			@EmitSound(@@RandHoof(), 60, @GetVolume(), 70) if @lastEntry\ShouldPlayHoofclap()
 			sound = @lastEntry\GetRunSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.7, 60)
+			@EmitSound(sound, 40, 0.7 * @GetVolume(), 60)
 			return true
 
 	IsValid: => @ply\IsValid() and not @playedWanderSound
+
+	GetVolume: =>
+		modifier = 1
+
+		if data = @ply\GetPonyData()
+			modifier = data\GetHoofstepVolume()
+
+		return modifier
 
 	Validate: =>
 		newMatType = @lastTrace.MatType == 0 and MAT_DEFAULT or @lastTrace.MatType
@@ -296,6 +324,11 @@ ProcessFalldownEvents = (cmd) =>
 	ground = @OnGround()
 	jump = cmd\KeyDown(IN_JUMP)
 
+	modifier = 1
+
+	if data = @GetPonyData()
+		modifier = data\GetHoofstepVolume()
+
 	if @__ppm2_jump and ground
 		@__ppm2_jump = false
 
@@ -304,13 +337,13 @@ ProcessFalldownEvents = (cmd) =>
 
 		if entry
 			if sound = entry\GetLandSound()
-				LEmitSound(@, sound, 60, 1, 75)
+				LEmitSound(@, sound, 60, modifier, 75)
 			elseif not @__ppm2_walkc
 				if sound = entry\GetWalkSound()
-					LEmitSound(@, sound, 45, 0.2, 55)
-					timer.Simple 0.04, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
-					timer.Simple 0.07, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
-					timer.Simple 0.1, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.2, 55)
+					LEmitSound(@, sound, 45, 0.2 * modifier, 55)
+					timer.Simple 0.04, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.3 * modifier, 55)
+					timer.Simple 0.07, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.3 * modifier, 55)
+					timer.Simple 0.1, -> LEmitSound(@, entry\GetWalkSound(), 45, 0.3 * modifier, 55)
 
 			if not entry\ShouldPlayHoofclap()
 				return
@@ -324,9 +357,9 @@ ProcessFalldownEvents = (cmd) =>
 		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
 
 		if not entry or entry\ShouldPlayHoofclap()
-			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
-			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
-			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
-			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4, 65)
+			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
+			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
+			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
+			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
 
 hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents

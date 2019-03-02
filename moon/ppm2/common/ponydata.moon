@@ -485,6 +485,13 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			@GetRenderController()\Reset() if @GetRenderController() and @GetRenderController().Reset
 			@GetBodygroupController()\Reset() if @GetBodygroupController() and @GetBodygroupController().Reset
 
+	GetHoofstepVolume: =>
+		return 0.8 if @ShouldMuffleHoosteps()
+		return 1
+
+	ShouldMuffleHoosteps: =>
+		return @GetSocksAsModel() or @GetSocksAsNewModel()
+
 	PlayerRespawn: =>
 		return if not IsValid(@ent)
 		@entTable.__cachedIsPony = @ent\IsPony()
