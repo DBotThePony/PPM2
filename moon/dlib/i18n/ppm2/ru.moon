@@ -283,6 +283,14 @@ gui.ppm2.editor.body.body_phong = 'Фонг параметрый тела'
 gui.ppm2.editor.body.spine_length = 'Длинна спины'
 gui.ppm2.editor.body.url_desc = 'URL детали тела\nДолжны быть в формате PNG или JPEG (работает так же\nкак и PAC3 URL текстуры)'
 
+gui.ppm2.editor.body.disable_hoofsteps = 'Отключить звук копыт'
+gui.ppm2.editor.body.disable_wander_sounds = 'Отключить звуки остановки'
+gui.ppm2.editor.body.disable_new_step_sounds = 'Отключить звуки ходьбы'
+gui.ppm2.editor.body.disable_jump_sound = 'Отключить звуки прыжков'
+gui.ppm2.editor.body.disable_falldown_sound = 'Отключить звуки приземления'
+gui.ppm2.editor.body.call_playerfootstep = 'Вызывать PlayerFootstep на каждом звуке'
+gui.ppm2.editor.body.call_playerfootstep_desc = 'Данная опция ползволяет вызывать PlayerFootstep хук при каждом физически слышымом звуке.\nВключение данной опции должно увеличить погружение путем взаимодействия с другими\nаддонами, которые работают с данным хуком.\nВы можете отключить данную опцию если вы получаете нежелаемый результат от других аддонов\nили ваш FPS уходит в минус из-за плохо накоженых аддонов.'
+
 for i = 1, PPM2.MAX_BODY_DETAILS
 	gui.ppm2.editor.body.detail['desc' .. i] = "Деталь #{i}"
 	gui.ppm2.editor.body.detail['color' .. i] = "Цвет детали #{i}"
