@@ -1141,6 +1141,10 @@ EditorPages = {
 				@CheckBox('gui.ppm2.editor.body.disable_jump_sound', 'DisableJumpSound')
 				@CheckBox('gui.ppm2.editor.body.disable_falldown_sound', 'DisableFalldownSound')
 
+				@Hr()
+				@CheckBox('gui.ppm2.editor.body.call_playerfootstep', 'CallPlayerFootstepHook')
+				@Label('gui.ppm2.editor.body.call_playerfootstep_desc')
+
 			@Hr()
 			@CheckBox('gui.ppm2.editor.legs.socks.simple', 'Socks') if ADVANCED_MODE\GetBool()
 			@CheckBox('gui.ppm2.editor.legs.socks.model', 'SocksAsModel')

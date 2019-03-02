@@ -291,6 +291,8 @@ gui.ppm2.editor.body.disable_wander_sounds = 'Disable wander sounds'
 gui.ppm2.editor.body.disable_new_step_sounds = 'Disable custom step sounds'
 gui.ppm2.editor.body.disable_jump_sound = 'Disable jump sound'
 gui.ppm2.editor.body.disable_falldown_sound = 'Disable falldown sound'
+gui.ppm2.editor.body.call_playerfootstep = 'Call PlayerFootstep on each sound'
+gui.ppm2.editor.body.call_playerfootstep_desc = 'Call PlayerFootstep hook on each actual sound you hear.\nUsing this option will allow other addons installed to rely on PPM2\'s immersion\nwhich listen PlayerFootstep hook. This should be disabled only when you get unreliable result from other addons\nor your FPS drop to low values since one of addons installed is badly coded.'
 
 for i = 1, PPM2.MAX_BODY_DETAILS
 	gui.ppm2.editor.body.detail['desc' .. i] = "Detail #{i}"

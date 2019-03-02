@@ -1345,6 +1345,10 @@ EDIT_TREE = {
 						@CheckBox('gui.ppm2.editor.body.disable_new_step_sounds', 'DisableStepSounds')
 						@CheckBox('gui.ppm2.editor.body.disable_jump_sound', 'DisableJumpSound')
 						@CheckBox('gui.ppm2.editor.body.disable_falldown_sound', 'DisableFalldownSound')
+
+						@Hr()
+						@CheckBox('gui.ppm2.editor.body.call_playerfootstep', 'CallPlayerFootstepHook')
+						@Label('gui.ppm2.editor.body.call_playerfootstep_desc')
 				}
 
 				legs_generic: {

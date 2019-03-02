@@ -121,6 +121,13 @@ AddSoundString('player/ppm2/hooves' .. i .. '.ogg') for i = 1, 3
 AddSoundString('player/ppm2/falldown.ogg')
 AddSoundStringEx('player/ppm2/jump.ogg')
 
+RECALL = false
+
+RecallPlayerFootstep = (ply, pos, foot, sound, volume, filter) ->
+	RECALL = true
+	ProtectedCall () -> hook.Run('PlayerFootstep', ply, pos, foot, sound, volume, filter)
+	RECALL = false
+
 LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	if CLIENT
 		ply\EmitSound(name, level, 100, volume) if not game.SinglePlayer() -- Some mods fix this globally (PAC3 for example)
@@ -150,6 +157,8 @@ LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 	net.WriteUInt8((volume * 100)\floor())
 	net.Send(filter)
 
+	return filter
+
 if CLIENT
 	EntityEmitSound = (data) ->
 		ply = data.Entity
@@ -162,7 +171,68 @@ if CLIENT
 
 	hook.Add 'EntityEmitSound', 'PPM2.Hoofsteps', EntityEmitSound, -2
 
+-- 0    LrigPelvis
+-- 1    Lrig_LEG_BL_Femur
+-- 2    Lrig_LEG_BL_Tibia
+-- 3    Lrig_LEG_BL_LargeCannon
+-- 4    Lrig_LEG_BL_PhalanxPrima
+-- 5    Lrig_LEG_BL_RearHoof
+-- 6    Lrig_LEG_BR_Femur
+-- 7    Lrig_LEG_BR_Tibia
+-- 8    Lrig_LEG_BR_LargeCannon
+-- 9    Lrig_LEG_BR_PhalanxPrima
+-- 10   Lrig_LEG_BR_RearHoof
+-- 11   LrigSpine1
+-- 12   LrigSpine2
+-- 13   LrigRibcage
+-- 14   Lrig_LEG_FL_Scapula
+-- 15   Lrig_LEG_FL_Humerus
+-- 16   Lrig_LEG_FL_Radius
+-- 17   Lrig_LEG_FL_Metacarpus
+-- 18   Lrig_LEG_FL_PhalangesManus
+-- 19   Lrig_LEG_FL_FrontHoof
+-- 20   Lrig_LEG_FR_Scapula
+-- 21   Lrig_LEG_FR_Humerus
+-- 22   Lrig_LEG_FR_Radius
+-- 23   Lrig_LEG_FR_Metacarpus
+-- 24   Lrig_LEG_FR_PhalangesManus
+-- 25   Lrig_LEG_FR_FrontHoof
+-- 26   LrigNeck1
+-- 27   LrigNeck2
+-- 28   LrigNeck3
+-- 29   LrigScull
+-- 30   Jaw
+-- 31   Ear_L
+-- 32   Ear_R
+-- 33   Mane02
+-- 34   Mane03
+-- 35   Mane03_tip
+-- 36   Mane04
+-- 37   Mane05
+-- 38   Mane06
+-- 39   Mane07
+-- 40   Mane01
+-- 41   Lrigweaponbone
+-- 42   right_hand
+-- 43   wing_l
+-- 44   wing_r
+-- 45   Tail01
+-- 46   Tail02
+-- 47   Tail03
+-- 48   wing_l_bat
+-- 49   wing_r_bat
+-- 50   wing_open_l
+-- 51   wing_open_r
+
+
 class PPM2.PlayerFootstepsListener
+	@soundBones = {
+		Vector(8.112172, 3.867798, 0)
+		Vector(8.111097, -3.863072, 0)
+		Vector(-14.863633, 4.491844, 0)
+		Vector(-14.863256, -4.487118, 0)
+	}
+
 	new: (ply) =>
 		ply.__ppm2_walkc = @
 		@ply = ply
@@ -178,6 +248,10 @@ class PPM2.PlayerFootstepsListener
 		hook.Add 'PlayerFootstep', @, @PlayerFootstep, 8
 		hook.Add 'Think', @, @Think
 
+		@nextWanderPos = 0
+		@nextWalkPos = 0
+		@nextRunPos = 0
+
 		@lambdaEmitWander = ->
 			return if not @ply\IsValid()
 			return if @ParentCall('GetDisableWanderSounds', false)
@@ -185,21 +259,40 @@ class PPM2.PlayerFootstepsListener
 			return if not @lastEntry
 			sound = @lastEntry\GetWanderSound()
 			return if not sound
-			@EmitSound(sound, 50, @GetVolume(), 70)
+			filter = @EmitSound(sound, 50, @GetVolume(), 70)
+			return if not @ParentCall('GetCallPlayerFootstepHook', true)
+			@nextWanderPos += 1
+			@nextWanderPos %= 4
+			RecallPlayerFootstep(@ply, @@GetPosForSide(@nextWanderPos, @ply), @nextWanderPos, sound, @GetVolume(), filter)
 
 		@lambdaEmitWalk = ->
 			return if not @ply\IsValid()
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 50, 0.8 * @GetVolume(), 65) if not @ParentCall('GetDisableHoofsteps', false)
+				if not @ParentCall('GetDisableHoofsteps', false)
+					sound = @@RandHoof()
+					filter = @EmitSound(sound, 50, 0.8 * @GetVolume(), 65)
+
+					return if not @ParentCall('GetCallPlayerFootstepHook', true)
+					@nextWalkPos += 1
+					@nextWalkPos %= 4
+					RecallPlayerFootstep(@ply, @@GetPosForSide(@nextWalkPos, @ply), @nextWalkPos, sound, 0.8 * @GetVolume(), filter)
+
 				return
 
 			@EmitSound(@@RandHoof(), 50, 0.8 * @GetVolume(), 65) if @lastEntry\ShouldPlayHoofclap() and not @ParentCall('GetDisableHoofsteps', false)
 			return if @ParentCall('GetDisableStepSounds', false)
 			sound = @lastEntry\GetWalkSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.8 * @GetVolume(), 55)
+
+			filter = @EmitSound(sound, 40, 0.8 * @GetVolume(), 55)
+
+			return true if not @ParentCall('GetCallPlayerFootstepHook', true)
+			@nextWalkPos += 1
+			@nextWalkPos %= 4
+			RecallPlayerFootstep(@ply, @@GetPosForSide(@nextWalkPos, @ply), @nextWalkPos, sound, 0.8 * @GetVolume(), filter)
+
 			return true
 
 		@lambdaEmitRun = ->
@@ -207,15 +300,37 @@ class PPM2.PlayerFootstepsListener
 			return if not @onGround
 
 			if not @lastEntry
-				@EmitSound(@@RandHoof(), 60, @GetVolume(), 70) if not @ParentCall('GetDisableHoofsteps', false)
+				if not @ParentCall('GetDisableHoofsteps', false)
+					sound = @@RandHoof()
+					filter = @EmitSound(sound, 60, @GetVolume(), 70)
+
+					return if not @ParentCall('GetCallPlayerFootstepHook', true)
+					@nextRunPos += 1
+					@nextRunPos %= 4
+					RecallPlayerFootstep(@ply, @@GetPosForSide(@nextRunPos, @ply), @nextRunPos, sound, @GetVolume(), filter)
+
 				return
 
 			@EmitSound(@@RandHoof(), 60, @GetVolume(), 70) if @lastEntry\ShouldPlayHoofclap() and not @ParentCall('GetDisableHoofsteps', false)
 			return if @ParentCall('GetDisableStepSounds', false)
 			sound = @lastEntry\GetRunSound()
 			return if not sound
-			@EmitSound(sound, 40, 0.7 * @GetVolume(), 60)
+			filter = @EmitSound(sound, 40, 0.7 * @GetVolume(), 60)
+
+			return true if not @ParentCall('GetCallPlayerFootstepHook', true)
+			@nextRunPos += 1
+			@nextRunPos %= 4
+			RecallPlayerFootstep(@ply, @@GetPosForSide(@nextRunPos, @ply), @nextRunPos, sound, 0.7 * @GetVolume(), filter)
+
 			return true
+
+	@GetPosForSide = (side = 0, ply) =>
+		if data = ply\GetPonyData()
+			return ply\GetPos() if not @soundBones[side + 1]
+			return ply\GetPos() + @soundBones[side + 1] * data\GetPonySize()
+
+		return ply\GetPos() if not @soundBones[side + 1]
+		return ply\GetPos() + @soundBones[side + 1]
 
 	IsValid: => @ply\IsValid() and not @playedWanderSound
 
@@ -271,6 +386,7 @@ class PPM2.PlayerFootstepsListener
 		return util.TraceHull(trData)
 
 	PlayerFootstep: (ply) =>
+		return if RECALL
 		return if ply ~= @ply
 		return true if CLIENT and @ply ~= LocalPlayer()
 		@lastTrace = @TraceNow()
@@ -310,10 +426,16 @@ if CLIENT
 		ply\EmitSound(sound, level, 100, volume)
 
 hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =>
+	return if RECALL
 	return if CLIENT and game.SinglePlayer()
 	return if not @IsPonyCached() or DISABLE_HOOFSTEP_SOUND_CLIENT and DISABLE_HOOFSTEP_SOUND_CLIENT\GetBool() or DISABLE_HOOFSTEP_SOUND\GetBool()
 	return if @__ppm2_walkc
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
+
+LEmitSoundRecall = (sound, level, volume, levelIfOnServer = level, side) =>
+	filter = LEmitSound(@, sound, level, volume, levelIfOnServer)
+	RecallPlayerFootstep(@, PPM2.PlayerFootstepsListener\GetPosForSide(side, @), side, sound, volume, filter)
+	return filter
 
 ProcessFalldownEvents = (cmd) =>
 	return if not @IsPonyCached()
@@ -351,15 +473,18 @@ ProcessFalldownEvents = (cmd) =>
 				LEmitSound(@, sound, 60, modifier, 75) if not disableFalldown
 			elseif not @__ppm2_walkc and not disableWalkSounds
 				if sound = entry\GetWalkSound()
-					LEmitSound(@, sound, 45, 0.2 * modifier, 55)
-					timer.Simple 0.04, -> LEmitSound(@, sound, 45, 0.3 * modifier, 55)
-					timer.Simple 0.07, -> LEmitSound(@, sound, 45, 0.3 * modifier, 55)
-					timer.Simple 0.1, -> LEmitSound(@, sound, 45, 0.3 * modifier, 55)
+					LEmitSoundRecall(@, sound, 45, 0.2 * modifier, 55, 0)
+					timer.Simple 0.04, -> LEmitSoundRecall(@, sound, 45, 0.3 * modifier, 55, 1)
+					timer.Simple 0.07, -> LEmitSoundRecall(@, sound, 45, 0.3 * modifier, 55, 2)
+					timer.Simple 0.1, -> LEmitSoundRecall(@, sound, 45, 0.3 * modifier, 55, 3)
 
 			if not entry\ShouldPlayHoofclap()
 				return
 
-		LEmitSound(@, 'player/ppm2/falldown.ogg', 60, 1, 75) if not disableFalldown
+		if not disableFalldown
+			filter = LEmitSound(@, 'player/ppm2/falldown.ogg', 60, 1, 75)
+			for i = 0, 3
+				timer.Simple i * 0.1, -> RecallPlayerFootstep(@, PPM2.PlayerFootstepsListener\GetPosForSide(i, @), i, 'player/ppm2/falldown.ogg', 1, filter)
 	elseif jump and not ground and not @__ppm2_jump
 		@__ppm2_jump = true
 		LEmitSound(@, 'player/ppm2/jump.ogg', 50, 1, 65) if not disableJumpSound
@@ -368,9 +493,9 @@ ProcessFalldownEvents = (cmd) =>
 		entry = PPM2.MaterialSoundEntry\Ask(tr.MatType == 0 and MAT_DEFAULT or tr.MatType)
 
 		if (not entry or entry\ShouldPlayHoofclap()) and not disableHoofsteps
-			LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
-			timer.Simple 0.04, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
-			timer.Simple 0.07, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
-			timer.Simple 0.1, -> LEmitSound(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65)
+			LEmitSoundRecall(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65, 0)
+			timer.Simple 0.04, -> LEmitSoundRecall(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65, 1)
+			timer.Simple 0.07, -> LEmitSoundRecall(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65, 2)
+			timer.Simple 0.1, -> LEmitSoundRecall(@, PPM2.PlayerFootstepsListener.RandHoof(), 55, 0.4 * modifier, 65, 3)
 
 hook.Add 'StartCommand', 'PPM2.Hoofsteps', ProcessFalldownEvents

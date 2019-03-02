@@ -389,6 +389,12 @@ PPM2.PonyDataRegistry = {
 		type: 'BOOLEAN'
 	}
 
+	'call_playerfootstep': {
+		default: -> true
+		getFunc: 'CallPlayerFootstepHook'
+		type: 'BOOLEAN'
+	}
+
 	'disable_hoofsteps': {
 		default: -> false
 		getFunc: 'DisableHoofsteps'
