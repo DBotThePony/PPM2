@@ -389,6 +389,36 @@ PPM2.PonyDataRegistry = {
 		type: 'BOOLEAN'
 	}
 
+	'disable_hoofsteps': {
+		default: -> false
+		getFunc: 'DisableHoofsteps'
+		type: 'BOOLEAN'
+	}
+
+	'disable_wander_sounds': {
+		default: -> false
+		getFunc: 'DisableWanderSounds'
+		type: 'BOOLEAN'
+	}
+
+	'disable_new_step_sounds': {
+		default: -> false
+		getFunc: 'DisableStepSounds'
+		type: 'BOOLEAN'
+	}
+
+	'disable_jump_sound': {
+		default: -> false
+		getFunc: 'DisableJumpSound'
+		type: 'BOOLEAN'
+	}
+
+	'disable_falldown_sound': {
+		default: -> false
+		getFunc: 'DisableFalldownSound'
+		type: 'BOOLEAN'
+	}
+
 	'socks': {
 		default: -> false
 		getFunc: 'Socks'

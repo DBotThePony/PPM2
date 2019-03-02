@@ -286,6 +286,12 @@ gui.ppm2.editor.body.body_phong = 'Body phong parameters'
 gui.ppm2.editor.body.spine_length = 'Spine length'
 gui.ppm2.editor.body.url_desc = 'Body detail URL image input fields\nShould be PNG or JPEG (works same as\nPAC3 URL texture)'
 
+gui.ppm2.editor.body.disable_hoofsteps = 'Disable hoofsteps'
+gui.ppm2.editor.body.disable_wander_sounds = 'Disable wander sounds'
+gui.ppm2.editor.body.disable_new_step_sounds = 'Disable custom step sounds'
+gui.ppm2.editor.body.disable_jump_sound = 'Disable jump sound'
+gui.ppm2.editor.body.disable_falldown_sound = 'Disable falldown sound'
+
 for i = 1, PPM2.MAX_BODY_DETAILS
 	gui.ppm2.editor.body.detail['desc' .. i] = "Detail #{i}"
 	gui.ppm2.editor.body.detail['color' .. i] = "Detail color #{i}"

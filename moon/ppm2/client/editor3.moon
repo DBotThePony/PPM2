@@ -1338,6 +1338,13 @@ EDIT_TREE = {
 					populate: =>
 						@CheckBox('gui.ppm2.editor.hoof.fluffers', 'HoofFluffers')
 						@NumSlider('gui.ppm2.editor.hoof.fluffers', 'HoofFluffersStrength', 2)
+
+						@Hr()
+						@CheckBox('gui.ppm2.editor.body.disable_hoofsteps', 'DisableHoofsteps')
+						@CheckBox('gui.ppm2.editor.body.disable_wander_sounds', 'DisableWanderSounds')
+						@CheckBox('gui.ppm2.editor.body.disable_new_step_sounds', 'DisableStepSounds')
+						@CheckBox('gui.ppm2.editor.body.disable_jump_sound', 'DisableJumpSound')
+						@CheckBox('gui.ppm2.editor.body.disable_falldown_sound', 'DisableFalldownSound')
 				}
 
 				legs_generic: {
