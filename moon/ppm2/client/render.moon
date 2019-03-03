@@ -37,6 +37,11 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
 	return if PPM2.__RENDERING_REFLECTIONS
 	return unless IsValid(arms)
 	return unless ply.__cachedIsPony
+	observer = ply\GetObserverTarget()
+
+	if IsValid(observer)
+		return unless observer.__cachedIsPony
+
 	return true unless SV_SHOULD_DRAW_VIEWMODEL\GetBool()
 	return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
 	return unless ply\Alive()
