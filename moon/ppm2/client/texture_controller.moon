@@ -242,7 +242,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				coroutine.yield()
 			else
 				if #@COMPILE_QUEUE > 40 and #@COMPILE_QUEUE % 20 == 0
-					PPM2.Message('message.ppm2.queue_notify', #@COMPILE_QUEUE)
+					PPM2.LMessage('message.ppm2.queue_notify', #@COMPILE_QUEUE)
 
 				data = table.remove(@COMPILE_QUEUE)
 
