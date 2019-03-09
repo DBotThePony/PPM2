@@ -263,7 +263,7 @@ gui.ppm2.editor.wings.bat_skin = 'Vleermuis vleugels huid'
 gui.ppm2.editor.wings.left.size = 'Linker vleugel grootte'
 gui.ppm2.editor.wings.left.fwd = 'Linker vleugel voor'
 gui.ppm2.editor.wings.left.up = 'Linker vleugel boven'
-gui.ppm2.editor.wings.left.inside = 'Linker vleugel binnen
+gui.ppm2.editor.wings.left.inside = 'Linker vleugel binnen'
 
 gui.ppm2.editor.wings.right.size = 'Rechter vleugel grootte'
 gui.ppm2.editor.wings.right.fwd = 'Rechter vleugel voor'
