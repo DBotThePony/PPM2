@@ -129,6 +129,7 @@ RecallPlayerFootstep = (ply, pos, foot, sound, volume, filter) ->
 	RECALL = false
 
 LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
+	return if not IsValid(ply)
 	if CLIENT
 		ply\EmitSound(name, level, 100, volume) if not game.SinglePlayer() -- Some mods fix this globally (PAC3 for example)
 		-- so lets try to avoid problems
@@ -433,6 +434,7 @@ hook.Add 'PlayerFootstep', 'PPM2.Hoofstep', (pos, foot, sound, volume, filter) =
 	return PPM2.PlayerFootstepsListener(@)\PlayerFootstep(@)
 
 LEmitSoundRecall = (sound, level, volume, levelIfOnServer = level, side) =>
+	return if not @IsValid()
 	filter = LEmitSound(@, sound, level, volume, levelIfOnServer)
 	RecallPlayerFootstep(@, PPM2.PlayerFootstepsListener\GetPosForSide(side, @), side, sound, volume, filter)
 	return filter
