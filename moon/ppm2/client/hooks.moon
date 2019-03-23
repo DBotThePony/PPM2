@@ -114,20 +114,22 @@ PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
 net.receive 'PPM2.EditorCamPos', ->
 	ply = net.ReadPlayer()
 	return if not ply\IsValid()
-	ply.__ppm2_campos, ply.__ppm2_camang = LocalToWorld(net.ReadVector(), net.ReadAngle(), ply\GetPos(), ply\EyeAngles())
+	pVector, pAngle = net.ReadVector(), net.ReadAngle()
 
 	if not IsValid(ply.__ppm2_cam)
 		ply.__ppm2_cam = ClientsideModel('models/tools/camera/camera.mdl', RENDERGROUP_BOTH)
 		ply.__ppm2_cam\SetModelScale(0.4)
 		ply.__ppm2_cam.RenderOverride = =>
+			return if not ply.__ppm2_campos_lerp
 			render.DrawLine(ply.__ppm2_campos_lerp, ply\EyePos(), color_white, true)
 			@DrawModel()
 
 		hook.Add 'Think', ply.__ppm2_cam, =>
 			return @Remove() if not IsValid(ply) or not ply\GetNWBool('PPM2.InEditor')
-			ply.__ppm2_campos_lerp = Lerp(RealFrameTime() * 22, ply.__ppm2_campos_lerp or ply.__ppm2_campos, ply.__ppm2_campos)
+			findPos, findAng = LocalToWorld(pVector, pAngle, ply\GetPos(), ply\EyeAngles())
+			ply.__ppm2_campos_lerp = Lerp(RealFrameTime() * 22, ply.__ppm2_campos_lerp or findPos, findPos)
 			@SetPos(ply.__ppm2_campos_lerp)
-			@SetAngles(ply.__ppm2_camang)
+			@SetAngles(findAng)
 
 hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
 	lply = LocalPlayer()
