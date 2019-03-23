@@ -1579,8 +1579,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return val
 
 	ResetEyeReflections: =>
-		@EyeMaterialL\SetTexture('$iris', @EyeTextureL)
-		@EyeMaterialR\SetTexture('$iris', @EyeTextureR)
+		@EyeMaterialL\SetTexture('$iris', @EyeTextureL) if @EyeTextureL
+		@EyeMaterialR\SetTexture('$iris', @EyeTextureR) if @EyeTextureR
 
 	UpdateEyeReflections: (ent = @GetEntity()) =>
 		@AttachID = @AttachID or @GetEntity()\LookupAttachment('eyes')
