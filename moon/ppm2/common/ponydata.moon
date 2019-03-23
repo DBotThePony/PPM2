@@ -270,6 +270,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return output
 
 	@RenderTasks = {}
+	@CheckTasks = {}
 
 	@NW_Vars = {}
 	@NW_VarsTable = {}
@@ -444,6 +445,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		timer.Simple(0, -> @GetRenderController()\CompileTextures() if @GetRenderController()) if CLIENT
 		PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
+		@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
 
 	ModelChanges: (old = @ent\GetModel(), new = old) =>
 		@modelCached = new
@@ -460,6 +462,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		if state\GetKey() == 'DisableTask'
 			@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
+			@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
 
 		@GetSizeController()\DataChanges(state) if @ent and @GetBodygroupController()
 		@GetBodygroupController()\DataChanges(state) if @ent and @GetBodygroupController()
@@ -656,6 +659,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@GetSizeController()\Remove() if @GetSizeController()
 		@flightController\Switch(false) if @flightController
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
+		@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
 
 	__tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 

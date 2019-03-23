@@ -49,18 +49,24 @@ REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
 PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
 REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
 
-reflectTasks = {}
 lastReflectionFrame = 0
 
-hook.Add 'DrawOverlay', 'PPM2.ReflectionsUpdate', (a, b) ->
+hook.Remove 'DrawOverlay', 'PPM2.ReflectionsUpdate'
+
+hook.Add 'PreRender', 'PPM2.ReflectionsUpdate', (a, b) ->
 	return if PPM2.__RENDERING_REFLECTIONS
 	return if lastReflectionFrame == FrameNumberL()
 	lastReflectionFrame = FrameNumberL()
+
 	PPM2.__RENDERING_REFLECTIONS = true
-	for _, task in ipairs reflectTasks
-		pcall task.ctrl.UpdateEyeReflections, task.ctrl, task.ent
+
+	for i, task in ipairs PPM2.NetworkedPonyData.CheckTasks
+		if task.GetRenderController
+			if render = task\GetRenderController()
+				if textures = render\GetTextureController()
+					ProtectedCall(textures.CheckReflectionsClosure)
+
 	PPM2.__RENDERING_REFLECTIONS = false
-	reflectTasks = {}
 
 hook.Add 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
 hook.Add 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
@@ -485,6 +491,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
 		@delayCompilation = {}
+		@CheckReflectionsClosure = -> @CheckReflections()
 		@CompileTextures() if compile
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
 
@@ -666,7 +673,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	CheckReflections: (ent = @GetEntity()) =>
 		if REAL_TIME_EYE_REFLECTIONS\GetBool()
 			@isInRealTimeLReflections = true
-			table.insert(reflectTasks, {ctrl: @, ent: ent})
+			@UpdateEyeReflections()
 		elseif @isInRealTimeLReflections
 			@isInRealTimeLReflections = false
 			@ResetEyeReflections()
@@ -674,7 +681,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		--return unless @compiled
 		return unless @isValid
-		@CheckReflections(ent)
 
 		if @lastMaterialUpdate < RealTimeL() or @lastMaterialUpdateEnt ~= ent
 			@lastMaterialUpdateEnt = ent
@@ -1583,6 +1589,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@EyeMaterialR\SetTexture('$iris', @EyeTextureR) if @EyeTextureR
 
 	UpdateEyeReflections: (ent = @GetEntity()) =>
+		return if not @EyeMaterialDrawL or not @EyeMaterialDrawR
 		@AttachID = @AttachID or @GetEntity()\LookupAttachment('eyes')
 		local Pos
 		local Ang
@@ -1599,19 +1606,26 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@reflectRTMat = nil
 
 		texName = "PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyesReflect_#{scale}"
-		reflectrt = @reflectRT or GetRenderTargetEx(
+		--reflectrt = @reflectRT or GetRenderTargetEx(
+		--  texName,
+		--  scale,
+		--  scale,
+		--  RT_SIZE_DEFAULT,
+		--  MATERIAL_RT_DEPTH_NONE,
+		--  1 + 32768 + 2048 + 8388608 + 512 + 256,
+		--  CREATERENDERTARGETFLAGS_UNFILTERABLE_OK,
+		--  IMAGE_FORMAT_RGB888
+		--)
+
+		reflectrt = @@reflectRT or GetRenderTarget(
 			texName,
 			scale,
 			scale,
-			RT_SIZE_DEFAULT,
-			MATERIAL_RT_DEPTH_NONE,
-			1 + 32768 + 2048 + 8388608 + 512 + 256,
-			CREATERENDERTARGETFLAGS_UNFILTERABLE_OK,
-			IMAGE_FORMAT_RGB888
+			false
 		)
 
 		reflectrt\Download()
-		@reflectRT = reflectrt
+		@@reflectRT = reflectrt
 		@reflectRTMat = @reflectRTMat or CreateMaterial(texName .. '_Mat', 'UnlitGeneric', {
 			'$basetexture': 'models/debug/debugwhite'
 			'$ignorez': 1
@@ -1645,10 +1659,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.RenderView(viewData)
 		render.PopRenderTarget()
 
-		oldW, oldH = ScrW(), ScrH()
-
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
-		render.SetViewPort(0, 0, texSize, texSize)
 
 		surface.DisableClipping(true)
 		rtleft = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_LeftReflect_#{scale}", texSize, texSize, false)
@@ -1662,9 +1673,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 		prefixData = ''
 		prefixData = 'Left' if separated
 
-		cam.Start2D()
 		render.PushRenderTarget(rtleft)
 		render.Clear(0, 0, 0, 255, true, true)
+		cam.Start2D()
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(@EyeMaterialDrawL)
@@ -1680,9 +1691,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		prefixData = 'Right' if separated
 
-		cam.Start2D()
 		render.PushRenderTarget(rtright)
 		render.Clear(0, 0, 0, 255, true, true)
+		cam.Start2D()
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(@EyeMaterialDrawR)
@@ -1696,7 +1707,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.PopRenderTarget()
 		surface.DisableClipping(false)
 
-		render.SetViewPort(0, 0, oldW, oldH)
 		@EyeMaterialR\SetTexture('$iris', rtright)
 
 	CompileLeftEye: => @CompileEye(true)
