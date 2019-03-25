@@ -360,6 +360,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@lastStareUpdate = ctime + 0.2
 		lpos = @GetEntity()\EyePos()
 
+		@staringAt = NULL if IsValid(@staringAt) and @staringAt\IsPlayer() and not @staringAt\Alive()
+
 		if IsValid(@staringAt)
 			trNew = util.TraceLine({
 				start: lpos,
@@ -382,7 +384,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			max = 300
 			local lastpos
 			for _, ply in ipairs player.GetAll()
-				if @GetEntity() ~= ply
+				if @GetEntity() ~= ply and ply\Alive()
 					epos = ply\EyePos()
 					dist = epos\Distance(lpos)
 					if dist < max and DLib.combat.inPVS(@GetEntity(), ply) and @CheckTarget(lpos, epos)
