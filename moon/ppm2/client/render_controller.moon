@@ -312,7 +312,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if @emotes
 			@emotes\Remove()
 			@emotes = nil
-		@HideModels(true)
+		@HideModels(true) if PPM2.ENABLE_NEW_RAGDOLLS\GetBool()
 		@GetTextureController()\ResetTextures() if @GetTextureController() and @GetEntity()\IsPony()
 
 	PlayerRespawn: =>

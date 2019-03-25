@@ -551,6 +551,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return if @deathRagdollMerged
 		bgController = @GetBodygroupController()
 		rag = @ent\GetRagdollEntity()
+
 		if not bgController.MergeModels
 			@deathRagdollMerged = true
 		elseif IsValid(rag)

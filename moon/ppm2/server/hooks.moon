@@ -66,7 +66,8 @@ do
 				if data
 					table.insert(target, ent)
 
-ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+PPM2.ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS
 RAGDOLL_COLLISIONS = CreateConVar('ppm2_sv_ragdolls_collisions', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable ragdolls collisions')
 
 createPlayerRagdoll = =>
@@ -121,12 +122,13 @@ hook.Add 'PostPlayerDeath', 'PPM2.Hooks', =>
 	net.Broadcast()
 	if ENABLE_NEW_RAGDOLLS\GetBool() and @IsPony()
 		createPlayerRagdoll(@)
+	return
 
 hook.Add 'PlayerDeath', 'PPM2.Hooks', =>
 	return if not @GetPonyData()
 	if ENABLE_NEW_RAGDOLLS\GetBool() and @IsPony()
 		createPlayerRagdoll(@)
-	return nil
+	return
 
 hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
 	return if @IsPlayer()
@@ -136,6 +138,7 @@ hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
 		net.WriteUInt(.netID, 16)
 		net.Broadcast()
 		\Remove()
+	return
 
 hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
 	@__ppm2_ragdoll\Remove() if IsValid(@__ppm2_ragdoll)
