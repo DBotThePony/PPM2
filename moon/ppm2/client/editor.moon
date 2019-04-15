@@ -1435,6 +1435,8 @@ EditorPages = {
 		'func': (sheet) =>
 			@ScrollPanel()
 
+			@NumSlider('gui.ppm2.editor.body.bump', 'BodyBumpStrength', 2)
+
 			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
 				@ComboBox('gui.ppm2.editor.body.detail.desc' .. i, "BodyDetail#{i}")
 				@ColorBox('gui.ppm2.editor.body.detail.color' .. i, "BodyDetailColor#{i}")

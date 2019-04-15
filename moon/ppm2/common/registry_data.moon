@@ -278,7 +278,7 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'body_bump': {
-		default: -> 1
+		default: -> 0.5
 		getFunc: 'BodyBumpStrength'
 		type: 'FLOAT'
 		min: 0

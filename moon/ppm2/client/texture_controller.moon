@@ -293,7 +293,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@DelayCompile('CompileHorn')
 			when 'EyelashesColor'
 				@DelayCompile('CompileEyelashes')
-			when 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor', 'GlowingEyebrows', 'EyebrowsGlowStrength'
+			when 'BodyBumpStrength', 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor', 'GlowingEyebrows', 'EyebrowsGlowStrength'
 				@DelayCompile('CompileBody')
 			when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
 				@DelayCompile('CompileCMark')
@@ -987,7 +987,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			@BodyMaterial\SetTexture('$basetexture', @EndRT())
 
-			@StartRTOpaque("Body_rtBump", bodysize, 255, 255, 255)
+			@StartRTOpaque("Body_rtBump", bodysize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(_M.BODY_BUMP)

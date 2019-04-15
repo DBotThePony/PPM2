@@ -461,3 +461,5 @@ tip.ppm2.in_editor = 'В редакторе PPM/2'
 tip.ppm2.camera = "PPM/2 камера игрока %s"
 
 message.ppm2.queue_notify = '%i текстур ожидают отрисовки'
+
+gui.ppm2.editor.body.bump = 'Непрозрачность Bumpmap'
