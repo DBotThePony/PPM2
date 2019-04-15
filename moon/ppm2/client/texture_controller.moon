@@ -138,7 +138,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@PONY_SOCKS = _M.PONY_SOCKS
 
 	--@SessionID = math.random(1, 1000)
-	@SessionID = 1
+	@SessionID = 6
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
@@ -776,10 +776,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_CMARK = 512
 	@QUAD_SIZE_CONST = 512
 	@QUAD_SIZE_WING = 64
-	@QUAD_SIZE_HORN = 128
+	@QUAD_SIZE_HORN = 512
 	@QUAD_SIZE_HAIR = 256
 	@QUAD_SIZE_TAIL = 256
-	@QUAD_SIZE_BODY = 1024
+	@QUAD_SIZE_BODY = 2048
 	@TATTOO_DEF_SIZE = 128
 
 	@GetBodySize = => PPM2.GetTextureSize(@QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1))
@@ -905,12 +905,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$halflambert': '1'
 				'$selfillum': '1'
 				'$selfillummask': 'models/ppm2/partrender/null'
+				'$bumpmap': 'models/ppm2/partrender/null'
 
 				'$color': '{255 255 255}'
 				'$color2': '{255 255 255}'
 				'$model': '1'
 				'$phong': '1'
-				'$basemapalphaphongmask': '1'
 				'$phongexponent': '3'
 				'$phongboost': '0.15'
 				'$phongalbedotint': '1'
@@ -987,7 +987,15 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			@BodyMaterial\SetTexture('$basetexture', @EndRT())
 
-			@StartRTOpaque("Body_rtIllum_#{USE_HIGHRES_BODY\GetBool() and 'hd' or USE_HIGHRES_TEXTURES\GetBool() and 'hq' or 'normal'}", bodysize)
+			@StartRTOpaque("Body_rtBump", bodysize, 255, 255, 255)
+
+			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
+			surface.SetMaterial(_M.BODY_BUMP)
+			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
+			@BodyMaterial\SetTexture('$bumpmap', @EndRT())
+
+			@StartRTOpaque("Body_rtIllum", bodysize)
 			surface.SetDrawColor(255, 255, 255)
 
 			if @GrabData('GlowingEyebrows')
@@ -1381,7 +1389,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
-				'$basemapalphaphongmask': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
 				'$phongalbedotint': '1'
@@ -1485,7 +1492,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
-				'$basemapalphaphongmask': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
 				'$phongalbedotint': '1'

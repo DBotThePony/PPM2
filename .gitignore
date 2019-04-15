@@ -6,3 +6,4 @@ tools/temp/
 tools/target/
 socks_src/output/
 *.swp
+/materials/models/ppm2/partrender/horn_detail_hq.png

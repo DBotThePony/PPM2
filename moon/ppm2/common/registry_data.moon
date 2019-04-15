@@ -277,6 +277,14 @@ PPM2.PonyDataRegistry = {
 		type: 'COLOR'
 	}
 
+	'body_bump': {
+		default: -> 1
+		getFunc: 'BodyBumpStrength'
+		type: 'FLOAT'
+		min: 0
+		max: 1
+	}
+
 	'eyebrows': {
 		default: -> Color(0, 0, 0)
 		getFunc: 'EyebrowsColor'
