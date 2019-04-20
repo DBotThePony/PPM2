@@ -322,6 +322,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@URL_MATERIAL_CACHE = {}
 	@ALREADY_DOWNLOADING = {}
 	@FAILED_TO_DOWNLOAD = {}
+
+	hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
+		@HTML_MATERIAL_QUEUE = {}
+		@URL_MATERIAL_CACHE = {}
+		@ALREADY_DOWNLOADING = {}
+		@FAILED_TO_DOWNLOAD = {}
+
 	@LoadURL: (url, width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST), callback = (->)) =>
 		error('Must specify URL') if not url or url == ''
 		@URL_MATERIAL_CACHE[width] = @URL_MATERIAL_CACHE[width] or {}
@@ -493,7 +500,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@delayCompilation = {}
 		@CheckReflectionsClosure = -> @CheckReflections()
 		@CompileTextures() if compile
+		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
+
+	InvalidateMaterialCache: =>
+		timer.Simple 0, -> @CompileTextures()
 
 	Remove: =>
 		@isValid = false
