@@ -70,8 +70,18 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
-for _, ent in ipairs ents.GetAll()
-	ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData
+do
+	nullify = ->
+		ProtectedCall ->
+			for _, ent in ipairs ents.GetAll()
+				ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData
+
+		for _, ent in ipairs ents.GetAll()
+			ent.__PPM2_PonyData = nil
+
+	nullify()
+	timer.Simple 0, -> timer.Simple 0, -> timer.Simple 0, nullify
+	hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', nullify
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)
