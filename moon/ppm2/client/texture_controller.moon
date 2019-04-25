@@ -240,8 +240,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
-	@COMPILE_QUEUE = {}
+	@COMPILE_QUEUE = {IN_PLACE: false}
 	@COMPILE_WAIT_UNTIL = 0
+
 	@COMPILE_THREAD = coroutine.create () ->
 		while true
 			if #@COMPILE_QUEUE == 0
@@ -250,9 +251,18 @@ class PonyTextureController extends PPM2.ControllerChildren
 				if #@COMPILE_QUEUE > 40 and #@COMPILE_QUEUE % 20 == 0
 					PPM2.LMessage('message.ppm2.queue_notify', #@COMPILE_QUEUE)
 
+				if @COMPILE_QUEUE.IN_PLACE
+					for _, data in ipairs(@COMPILE_QUEUE)
+						if data.self\IsValid() and data.now
+							data.run(data.self, unpack(data.args))
+							data.self.lastMaterialUpdate = 0
+
+					@COMPILE_QUEUE = [data for _, data in ipairs(@COMPILE_QUEUE) when data.self\IsValid() and not data.now]
+					@COMPILE_QUEUE.IN_PLACE = false
+
 				data = table.remove(@COMPILE_QUEUE)
 
-				if data.self\IsValid()
+				if data and data.self\IsValid()
 					data.run(data.self, unpack(data.args))
 					data.self.lastMaterialUpdate = 0
 					coroutine.yield()
@@ -260,7 +270,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@COMPILE_TEXTURES = ->
 		return if #@COMPILE_QUEUE == 0
 
-		if @COMPILE_WAIT_UNTIL < RealTimeL()
+		if @COMPILE_WAIT_UNTIL < RealTimeL() or @COMPILE_QUEUE.IN_PLACE
 			@COMPILE_WAIT_UNTIL = RealTimeL() + 0.2
 			coroutine.resume(@COMPILE_THREAD)
 
@@ -271,11 +281,27 @@ class PonyTextureController extends PPM2.ControllerChildren
 	DelayCompile: (func = '', ...) =>
 		return if not @[func]
 		args = {...}
+
 		for i, val in ipairs(@@COMPILE_QUEUE)
 			if val.func == func and val.self == @
 				val.args = args
+				val.now = false
 				return
-		table.insert(@@COMPILE_QUEUE, {self: @, :func, :args, run: @[func]})
+
+		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: false, :args, run: @[func]})
+
+	DelayCompileNow: (func = '', ...) =>
+		return if not @[func]
+		args = {...}
+		@@COMPILE_QUEUE.IN_PLACE = true
+
+		for i, val in ipairs(@@COMPILE_QUEUE)
+			if val.func == func and val.self == @
+				val.args = args
+				val.now = true
+				return
+
+		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: true, :args, run: @[func]})
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -311,8 +337,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				elseif @@TAIL_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileLeftEye')
-					@DelayCompile('CompileRightEye')
+					@DelayCompileNow('CompileLeftEye')
+					@DelayCompileNow('CompileRightEye')
 				elseif @@BODY_UPDATE_TRIGGER[key]
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
