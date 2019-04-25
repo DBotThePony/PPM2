@@ -697,6 +697,8 @@ EDIT_TREE = {
 					data\SetFilename("new_pony-#{math.random(1, 100000)}")
 					data\Reset()
 					@ValueChanges()
+					@frame.DoUpdate()
+
 				Derma_Query('gui.ppm2.editor.io.newfile.confirm', 'gui.ppm2.editor.io.newfile.toptext', 'gui.ppm2.editor.generic.yes', confirmed, 'gui.ppm2.editor.generic.no')
 
 			@Button 'gui.ppm2.editor.io.random', ->
@@ -705,6 +707,8 @@ EDIT_TREE = {
 				confirmed = ->
 					PPM2.Randomize(data, false)
 					@ValueChanges()
+					@frame.DoUpdate()
+
 				Derma_Query('Really want to randomize?', 'Randomize', 'gui.ppm2.editor.generic.yes', confirmed, 'gui.ppm2.editor.generic.no')
 
 			@ComboBox('gui.ppm2.editor.misc.race', 'Race')
