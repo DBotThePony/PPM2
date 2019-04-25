@@ -424,13 +424,19 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 		return @TeethMaterial, @MouthMaterial, @TongueMaterial
 
-	CompileTextures: =>
+	CompileTextures: (now = false) =>
 		--return if @compiled
 		return if not @GetData()\IsValid()
-		super()
-		@DelayCompile('CompileMouth')
-		@DelayCompile('CompileBatWingsSkin')
-		@DelayCompile('CompileBatWings')
+		super(now)
+
+		if now
+			@CompileMouth()
+			@CompileBatWingsSkin()
+			@CompileBatWings()
+		else
+			@DelayCompile('CompileMouth')
+			@DelayCompile('CompileBatWingsSkin')
+			@DelayCompile('CompileBatWings')
 
 	GetTeeth: => @TeethMaterial
 	GetMouth: => @MouthMaterial

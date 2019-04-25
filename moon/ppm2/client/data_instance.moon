@@ -335,6 +335,9 @@ class PonyDataInstance
 				data = .__PPM2_PonyData
 				ctrl = data\GetRenderController()
 
+				if textures = ctrl\GetTextureController()
+					textures\CompileTextures(true)
+
 				if bg = data\GetBodygroupController()
 					bg\ApplyBodygroups()
 

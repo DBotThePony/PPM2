@@ -618,20 +618,34 @@ class PonyTextureController extends PPM2.ControllerChildren
 	GetWings: => @WingsMaterial
 	GetWingsName: => @WingsMaterialName
 
-	CompileTextures: =>
+	CompileTextures: (now = false) =>
 		--return if @compiled
 		return if not @GetData()\IsValid()
-		@DelayCompile('CompileBody')
-		@DelayCompile('CompileHair')
-		@DelayCompile('CompileTail')
-		@DelayCompile('CompileHorn')
-		@DelayCompile('CompileWings')
-		@DelayCompile('CompileCMark')
-		@DelayCompile('CompileSocks')
-		@DelayCompile('CompileNewSocks')
-		@DelayCompile('CompileEyelashes')
-		@DelayCompile('CompileLeftEye')
-		@DelayCompile('CompileRightEye')
+
+		if now
+			@CompileBody()
+			@CompileHair()
+			@CompileTail()
+			@CompileHorn()
+			@CompileWings()
+			@CompileCMark()
+			@CompileSocks()
+			@CompileNewSocks()
+			@CompileEyelashes()
+			@CompileLeftEye()
+			@CompileRightEye()
+		else
+			@DelayCompile('CompileBody')
+			@DelayCompile('CompileHair')
+			@DelayCompile('CompileTail')
+			@DelayCompile('CompileHorn')
+			@DelayCompile('CompileWings')
+			@DelayCompile('CompileCMark')
+			@DelayCompile('CompileSocks')
+			@DelayCompile('CompileNewSocks')
+			@DelayCompile('CompileEyelashes')
+			@DelayCompile('CompileLeftEye')
+			@DelayCompile('CompileRightEye')
 		@compiled = true
 
 	--@RT_SIZES = [math.pow(2, i) for i = 1, 24]
