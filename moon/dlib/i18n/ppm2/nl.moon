@@ -464,3 +464,5 @@ tip.ppm2.in_editor = 'In PPM/2 Editor'
 tip.ppm2.camera = "%s's PPM/2 Camera"
 
 message.ppm2.queue_notify = '%i texturen staan in de rij om te worden weergegeven'
+
+gui.ppm2.editor.body.bump = 'Bumpmap sterkte'
