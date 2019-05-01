@@ -436,21 +436,28 @@ class PonyTextureController extends PPM2.ControllerChildren
 		return if @SHOULD_WAIT_WEB
 		data = @HTML_MATERIAL_QUEUE[1]
 		return if not data
+
 		if IsValid(data.panel)
 			panel = data.panel
 			return if panel\IsLoading()
+
 			if data.timerid
 				timer.Remove(data.timerid)
 				data.timerid = nil
+
 			return if data.frame < 20
+
 			@SHOULD_WAIT_WEB = true
+
 			timer.Simple 1, ->
 				@SHOULD_WAIT_WEB = false
 				table.remove(@HTML_MATERIAL_QUEUE, 1)
 				return unless IsValid(panel)
+
 				panel\UpdateHTMLTexture()
 				htmlmat = panel\GetHTMLMaterial()
 				return if not htmlmat
+
 				texture = htmlmat\GetTexture('$basetexture')
 				texture\Download()
 				newMat = CreateMaterial("PPM2.URLMaterial.#{texture\GetName()}_#{math.random(1, 100000)}", 'UnlitGeneric', {
@@ -462,6 +469,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				})
 
 				newMat\SetTexture('$basetexture', texture)
+
 				@URL_MATERIAL_CACHE[data.width][data.height][data.url] = {
 					texture: texture
 					material: newMat
@@ -473,17 +481,21 @@ class PonyTextureController extends PPM2.ControllerChildren
 					callback(texture, panel, newMat)
 				timer.Simple 0, -> panel\Remove() if IsValid(panel)
 			return
+
 		data.frame = 0
 		panel = vgui.Create('DHTML')
 		panel\SetVisible(false)
 		panel\SetSize(data.width, data.height)
 		panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
 		panel\Refresh()
+
 		panel.ConsoleMessage = (pnl, msg) ->
 			if msg == 'FRAME'
 				data.frame += 1
+
 		data.panel = panel
 		data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
+
 		timer.Create data.timerid, 8, 1, ->
 			return unless IsValid(panel)
 			panel\Remove()
