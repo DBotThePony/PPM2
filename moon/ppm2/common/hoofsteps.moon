@@ -486,7 +486,7 @@ ProcessFalldownEvents = (cmd) =>
 		if not disableFalldown
 			filter = LEmitSound(@, 'player/ppm2/falldown.ogg', 60, 1, 75)
 			for i = 0, 3
-				timer.Simple i * 0.1, -> RecallPlayerFootstep(@, PPM2.PlayerFootstepsListener\GetPosForSide(i, @), i, 'player/ppm2/falldown.ogg', 1, filter)
+				timer.Simple i * 0.1, -> RecallPlayerFootstep(@, PPM2.PlayerFootstepsListener\GetPosForSide(i, @), i, 'player/ppm2/falldown.ogg', 1, filter) if @IsValid()
 	elseif jump and not ground and not @__ppm2_jump
 		@__ppm2_jump = true
 		LEmitSound(@, 'player/ppm2/jump.ogg', 50, 1, 65) if not disableJumpSound
