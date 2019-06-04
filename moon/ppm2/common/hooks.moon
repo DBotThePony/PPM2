@@ -93,7 +93,7 @@ do
 ENABLE_TOOLGUN = CreateConVar('ppm2_sv_ragdoll_toolgun', '0', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow toolgun usage on player death ragdolls')
 ENABLE_PHYSGUN = CreateConVar('ppm2_sv_ragdoll_physgun', '1', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow physgun usage on player death ragdolls')
 
-hook.Add 'CanTool', 'PPM2.DeathRagdoll', (ply = NULL, tr = {Entity: NULL}, tool = '') -> false if IsValid(tr.Entity) and tr.Entity\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool()
+hook.Add 'CanTool', 'PPM2.DeathRagdoll', (ply = NULL, tr = {Entity: NULL}, tool = '') -> false if IsValid(tr.Entity) and tr.Entity\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool() and tool ~= 'rope'
 hook.Add 'PhysgunPickup', 'PPM2.DeathRagdoll', (ply = NULL, ent = NULL) -> false if IsValid(ent) and ent\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_PHYSGUN\GetBool()
 hook.Add 'CanProperty', 'PPM2.DeathRagdoll', (ply = NULL, mode = '', ent = NULL) -> false if IsValid(ent) and ent\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool()
 hook.Add 'CanDrive', 'PPM2.DeathRagdoll', (ply = NULL, ent = NULL) -> false if IsValid(ent) and ent\GetNWBool('PPM2.IsDeathRagdoll') and not ENABLE_TOOLGUN\GetBool()
