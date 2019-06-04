@@ -201,6 +201,7 @@ PPM2.PostPlayerDraw = =>
 		return if not data or not @__cachedIsPony
 		renderController = data\GetRenderController()
 		renderController\PostDraw() if renderController
+		return
 
 do
 	hornGlowStatus = {}
