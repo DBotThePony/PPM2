@@ -287,7 +287,7 @@ if SERVER
 			can = hook.Run('PlayerNoClip', @, false) or hook.Run('PPM2Fly', @, false)
 			data\SetFly(false) if can
 		else
-			return if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
+			return if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
 			return data\SetFly(true) if FORCE_ALLOW_FLIGHT\GetBool()
 			can = hook.Run('PlayerNoClip', @, true) or hook.Run('PPM2Fly', @, true)
 			data\SetFly(true) if can
@@ -306,11 +306,13 @@ else
 			return if not @IsPonyCached()
 			data = @GetPonyData()
 			return if not data
-			if data\GetRace() ~= PPM2.RACE_PEGASUS and data\GetRace() ~= PPM2.RACE_ALICORN
+
+			if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
 				if lastMessage < RealTimeL()
 					lastMessage = RealTimeL() + 1
 					PPM2.LChatPrint('info.ppm2.fly.pegasus')
 				return
+
 			if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
 				can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
 				if not can
@@ -318,6 +320,7 @@ else
 						lastMessage2 = RealTimeL() + 1
 						PPM2.LChatPrint('info.ppm2.fly.cannot', data\GetFly() and 'land' or 'fly')
 					return
+
 			RunConsoleCommand('ppm2_fly')
 			lastDouble = 0
 			return
