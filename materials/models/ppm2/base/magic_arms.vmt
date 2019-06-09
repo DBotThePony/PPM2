@@ -1,0 +1,69 @@
+"VertexLitGeneric"
+{
+	"$basetexture" 					"models/ppm2/base/magic_arms" 
+	"$lightwarptexture"				"models/ppm2/lightwarps/sfm_pony"
+	"$phong" 						"1" 
+	"$phongexponent" 				"0.6"
+	"$phongboost" 					"0.5"
+	"$phongalbedotint" 				"1"
+	"$phongtint" 					"[1 .95 .95]"
+	"$phongfresnelranges"			"[0.5 6 10]"
+	"$rimlight"             		"1"
+	"$rimlightexponent"       		"2"
+	"$rimlightboost"          		"1"
+	"$halflambert"					"1"
+	"$blendtintbybasealpha"			"0"
+	"$blendtintcoloroverbase"		"1.000000"
+	"$colortint_base"				"{ 126 186 124 }"
+	"$color2"						"{ 126 186 124 }"
+	"$colortint_tmp"				"[0 0 0]"
+	"$bumpmapalphaphongmask"		"1"
+	"$additive"						"1"
+	"$translucent"					"1"
+	"$alphatest"					"0"
+	"$cloakPassEnabled"				"1"
+	"$detail"						"effects/tiledfire/fireLayeredSlowTiled512"
+	"$detailscale"					"5"
+	"$detailblendfactor"			"0"
+	"$detailblendmode"				"6"
+	"$yellow"						"0"
+	"$selfillum"					"1"
+	//"$selfillummask"				"models/debug/debugwhite"
+	"$selfillummask"				"models/ppm2/base/hands_illum"
+	"Proxies"
+	{
+		"invis"
+		{
+		}
+		"AnimatedTexture"
+		{
+			"animatedtexturevar"				"$detail"
+			"animatedtextureframenumvar"		"$detailframe"
+			"animatedtextureframerate"			"30"
+		}
+		"BurnLevel"
+		{
+			"resultVar"		"$detailblendfactor"
+		}
+		"ItemTintColor"
+		{
+			"resultVar"		"$colortint_tmp"
+		}
+		"SelectFirstIfNonZero"
+		{
+			"srcVar1"		"$colortint_tmp"
+			"srcVar2"		"$colortint_base"
+			"resultVar"		"$color2"
+		}
+		"YellowLevel"
+		{
+			"resultVar"		"$yellow"
+		}
+		"Multiply"
+		{
+			"srcVar1"		"$color2"
+			"srcVar2"		"$yellow"
+			"resultVar"		"$color2"
+		}
+	}
+}

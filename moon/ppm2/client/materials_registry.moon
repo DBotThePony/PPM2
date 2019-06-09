@@ -267,5 +267,7 @@ module.EYE_EXTRA2 = Material('models/ppm2/eyes/eye_extra2')
 module.EYE_LIGHTWARP = Material('models/ppm2/eyes/eye_lightwarp')
 module.EYE_REFLECTION2 = Material('models/ppm2/eyes/eye_reflection')
 
+module.MAGIC_HANDS_MATERIAL = Material('models/ppm2/base/magic_arms')
+
 PPM2.MaterialsRegistry = module
 return module

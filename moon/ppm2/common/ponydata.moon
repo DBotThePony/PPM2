@@ -684,6 +684,19 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	NetworkID: => @netID
 	NetID: => @netID
 
+	ComputeMagicColor: =>
+		color = @GetHornMagicColor()
+
+		if not @GetSeparateMagicColor()
+			if not @GetSeparateEyes()
+				color = @GetEyeIrisTop()\Lerp(0.5, @GetEyeIrisBottom())
+			else
+				lerpLeft = @GetEyeIrisTopLeft()\Lerp(0.5, @GetEyeIrisBottomLeft())
+				lerpRight = @GetEyeIrisTopRight()\Lerp(0.5, @GetEyeIrisBottomRight())
+				color = lerpLeft\Lerp(0.5, lerpRight)
+
+		return color
+
 	ReadNetworkData: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)

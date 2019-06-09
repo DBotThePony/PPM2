@@ -34,7 +34,10 @@ ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS
 SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_cl_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 SV_SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
 
-VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '1', {FCVAR_ARCHIVE}, 'Modify viewmodel when pony has horn for more immersion')
+VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '0', {FCVAR_ARCHIVE}, 'Modify viewmodel when pony has horn for more immersion. Has no effect when ppm2_cl_vm_magic_hands is on')
+VM_MAGIC_HANDS = CreateConVar('ppm2_cl_vm_magic_hands', '1', {FCVAR_ARCHIVE}, 'Use magic hands when pony has horn')
+
+validHands = (hands) -> hands == 'models/cppm/pony_arms.mdl' or hands == 'models/ppm/c_arms_magic.mdl'
 
 hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
 	return if PPM2.__RENDERING_REFLECTIONS or not IsValid(arms) or not ply.__cachedIsPony
@@ -51,12 +54,24 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
 	wep = ply\GetActiveWeapon()
 
 	return true if IsValid(wep) and wep.UseHands == false
-	return if arms\GetModel() ~= 'models/cppm/pony_arms.mdl'
+	amodel = arms\GetModel()
+	return if not validHands(amodel)
 
 	data = ply\GetPonyData()
 	return unless data
-	return true if (IsValid(observer) and observer or ply)\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0
-	status = data\GetRenderController()\PreDrawArms(arms)
+
+	if (IsValid(observer) and observer or ply)\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0
+		return true if not VM_MAGIC_HANDS\GetBool() and VM_MAGIC\GetBool()
+
+		if VM_MAGIC_HANDS\GetBool()
+			arms\SetModel('models/ppm/c_arms_magic.mdl') if amodel ~= 'models/ppm/c_arms_magic.mdl'
+			PPM2.MaterialsRegistry.MAGIC_HANDS_MATERIAL\SetVector('$colortint_base', data\ComputeMagicColor()\ToVector())
+		else
+			arms\SetModel('models/cppm/pony_arms.mdl') if amodel ~= 'models/cppm/pony_arms.mdl'
+	else
+		arms\SetModel('models/cppm/pony_arms.mdl') if amodel ~= 'models/cppm/pony_arms.mdl'
+
+	status = data\GetRenderController()\PreDrawArms(arms, amodel == 'models/cppm/pony_arms.mdl')
 	return status if status ~= nil
 	arms.__ppm2_draw = true
 
@@ -66,13 +81,13 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 	return unless arms.__ppm2_draw
 	data = ply\GetPonyData()
 	return unless data
-	data\GetRenderController()\PostDrawArms(arms)
+	data\GetRenderController()\PostDrawArms(arms, arms\GetModel() == 'models/cppm/pony_arms.mdl')
 	arms.__ppm2_draw = false
 
 local lastPos, lastAng
 
 CalcViewModelView = (weapon, vm, oldPos, oldAng, pos, ang) ->
-	return if not VM_MAGIC\GetBool()
+	return if not VM_MAGIC\GetBool() or VM_MAGIC_HANDS\GetBool()
 	ply = LocalPlayer()
 	return if PPM2.__RENDERING_REFLECTIONS or not IsValid(vm) or not ply.__cachedIsPony
 	observer = ply\GetObserverTarget()
@@ -121,7 +136,7 @@ hook.Add 'CalcViewModelView', 'PPM2.ViewModel', CalcViewModelView, -3
 
 -- hook.Add 'PostDrawViewModel', 'PPM2.ViewModel', (vm, ply, weapon) ->
 --  return if indraw
---  return if not VM_MAGIC\GetBool()
+--  return if not VM_MAGIC\GetBool() or VM_MAGIC_HANDS\GetBool()
 --  return if not IsValid(vm) or not IsValid(ply) or not IsValid(weapon)
 --  return if PPM2.__RENDERING_REFLECTIONS or not IsValid(vm) or not ply.__cachedIsPony
 --  observer = ply\GetObserverTarget()
@@ -139,15 +154,7 @@ hook.Add 'CalcViewModelView', 'PPM2.ViewModel', CalcViewModelView, -3
 --  return if not data
 --
 --  indraw = true
---  color = data\GetHornMagicColor()
---
---  if not data\GetSeparateMagicColor()
---      if not data\GetSeparateEyes()
---          color = data\GetEyeIrisTop()\Lerp(0.5, data\GetEyeIrisBottom())
---      else
---          lerpLeft = data\GetEyeIrisTopLeft()\Lerp(0.5, data\GetEyeIrisBottomLeft())
---          lerpRight = data\GetEyeIrisTopRight()\Lerp(0.5, data\GetEyeIrisBottomRight())
---          color = lerpLeft\Lerp(0.5, lerpRight)
+--  color = data\ComputeMagicColor()
 --
 --  magicMat\SetVector('$color2', color\ToVector())
 --  render.MaterialOverride(magicMat)
@@ -403,16 +410,8 @@ do
 					.emmiter = ParticleEmitter(EyePos())
 					.emmiterProp = ParticleEmitter(EyePos())
 
-				.color = data\GetHornMagicColor()
+				.color = data\ComputeMagicColor()
 				.haloSeed = math.rad(math.random(-1000, 1000))
-
-				if not data\GetSeparateMagicColor()
-					if not data\GetSeparateEyes()
-						.color = data\GetEyeIrisTop()\Lerp(0.5, data\GetEyeIrisBottom())
-					else
-						lerpLeft = data\GetEyeIrisTopLeft()\Lerp(0.5, data\GetEyeIrisBottomLeft())
-						lerpRight = data\GetEyeIrisTopRight()\Lerp(0.5, data\GetEyeIrisBottomRight())
-						.color = lerpLeft\Lerp(0.5, lerpRight)
 		else
 			with hornGlowStatus[@]
 				.frame = FrameNumberL()
