@@ -459,6 +459,7 @@ gui.ppm2.spawnmenu.reflections = 'Enable real time eyes reflections'
 gui.ppm2.spawnmenu.reflections_drawdist = 'Reflections draw distance'
 gui.ppm2.spawnmenu.reflections_renderdist = 'Reflections render distance'
 gui.ppm2.spawnmenu.doublejump = 'Double jump activate flight'
+gui.ppm2.spawnmenu.vm_magic = 'ViewModel unicorn alignment'
 
 tip.ppm2.in_editor = 'In PPM/2 Editor'
 tip.ppm2.camera = "%s's PPM/2 Camera"

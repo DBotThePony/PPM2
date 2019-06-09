@@ -34,25 +34,28 @@ ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS
 SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_cl_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 SV_SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
 
+VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '1', {FCVAR_ARCHIVE}, 'Modify viewmodel when pony has horn for more immersion')
+
 hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
-	return if PPM2.__RENDERING_REFLECTIONS
-	return unless IsValid(arms)
-	return unless ply.__cachedIsPony
+	return if PPM2.__RENDERING_REFLECTIONS or not IsValid(arms) or not ply.__cachedIsPony
 	observer = ply\GetObserverTarget()
+	return if IsValid(observer) and not observer.__cachedIsPony
+	return true if not SV_SHOULD_DRAW_VIEWMODEL\GetBool() or not SHOULD_DRAW_VIEWMODEL\GetBool()
 
 	if IsValid(observer)
-		return unless observer.__cachedIsPony
+		return if not observer\Alive()
+	else
+		return if not ply\Alive()
 
-	return true unless SV_SHOULD_DRAW_VIEWMODEL\GetBool()
-	return true unless SHOULD_DRAW_VIEWMODEL\GetBool()
-	return unless ply\Alive()
 	arms\SetPos(ply\EyePos() + Vector(0, 0, 100))
 	wep = ply\GetActiveWeapon()
-	if IsValid(wep) and wep.UseHands == false
-		return true -- Dafuck?
+
+	return true if IsValid(wep) and wep.UseHands == false
 	return if arms\GetModel() ~= 'models/cppm/pony_arms.mdl'
+
 	data = ply\GetPonyData()
 	return unless data
+	return true if (IsValid(observer) and observer or ply)\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0
 	status = data\GetRenderController()\PreDrawArms(arms)
 	return status if status ~= nil
 	arms.__ppm2_draw = true
@@ -65,6 +68,105 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 	return unless data
 	data\GetRenderController()\PostDrawArms(arms)
 	arms.__ppm2_draw = false
+
+local lastPos, lastAng
+
+CalcViewModelView = (weapon, vm, oldPos, oldAng, pos, ang) ->
+	return if not VM_MAGIC\GetBool()
+	ply = LocalPlayer()
+	return if PPM2.__RENDERING_REFLECTIONS or not IsValid(vm) or not ply.__cachedIsPony
+	observer = ply\GetObserverTarget()
+	return if IsValid(observer) and not observer.__cachedIsPony
+	return if not SV_SHOULD_DRAW_VIEWMODEL\GetBool() or not SHOULD_DRAW_VIEWMODEL\GetBool()
+
+	if IsValid(observer)
+		return if not observer\Alive()
+	else
+		return if not ply\Alive()
+
+	return if ply\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) == 0
+	return if IsValid(weapon) and weapon.UseHands == false
+	shouldShift = not (weapon.IsTFA and weapon\IsTFA() and weapon.IronSightsProgress > 0.6)
+	-- since pos and ang never get refreshed, i would modify those to get desired results
+	-- with other addons installed
+
+	if shouldShift
+		fwd = ply\EyeAngles()\Forward()
+		right = ply\EyeAngles()\Right()
+		pos2 = pos + fwd * math.sin(CurTimeL()) + right * math.cos(CurTimeL() + 1.2) + right * 4 - fwd * 2
+		ang2 = Angle(ang)
+		pos.z -= 4
+		ang2\RotateAroundAxis(ang\Forward(), -30)
+		lastPos = pos2
+		lastAng = ang2
+	else
+		lastPos = LerpVector(FrameTime() * 11, lastPos or pos, pos)
+		lastAng = LerpAngle(FrameTime() * 11, lastAng or ang, ang)
+
+	pos.x, pos.y, pos.z = lastPos.x, lastPos.y, lastPos.z
+	ang.p, ang.y, ang.r = lastAng.p, lastAng.y, lastAng.r
+
+hook.Add 'CalcViewModelView', 'PPM2.ViewModel', CalcViewModelView, -3
+
+-- indraw = false
+--
+-- magicMat = CreateMaterial('ppm2_magic_material', 'UnlitGeneric', {
+--  '$basetexture': 'models/debug/debugwhite'
+--  '$ignorez': 1
+--  '$vertexcolor': 1
+--  '$vertexalpha': 1
+--  '$nolod': 1
+--  '$color2': '{255 255 255}'
+-- })
+
+-- hook.Add 'PostDrawViewModel', 'PPM2.ViewModel', (vm, ply, weapon) ->
+--  return if indraw
+--  return if not VM_MAGIC\GetBool()
+--  return if not IsValid(vm) or not IsValid(ply) or not IsValid(weapon)
+--  return if PPM2.__RENDERING_REFLECTIONS or not IsValid(vm) or not ply.__cachedIsPony
+--  observer = ply\GetObserverTarget()
+--  return if IsValid(observer) and not observer.__cachedIsPony
+--  return if not SV_SHOULD_DRAW_VIEWMODEL\GetBool() or not SHOULD_DRAW_VIEWMODEL\GetBool()
+--  return if IsValid(weapon) and weapon.UseHands == false
+--
+--  if IsValid(observer)
+--      return if not observer\Alive()
+--  else
+--      return if not ply\Alive()
+--
+--  return if ply\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) == 0
+--  data = ply\GetPonyData()
+--  return if not data
+--
+--  indraw = true
+--  color = data\GetHornMagicColor()
+--
+--  if not data\GetSeparateMagicColor()
+--      if not data\GetSeparateEyes()
+--          color = data\GetEyeIrisTop()\Lerp(0.5, data\GetEyeIrisBottom())
+--      else
+--          lerpLeft = data\GetEyeIrisTopLeft()\Lerp(0.5, data\GetEyeIrisBottomLeft())
+--          lerpRight = data\GetEyeIrisTopRight()\Lerp(0.5, data\GetEyeIrisBottomRight())
+--          color = lerpLeft\Lerp(0.5, lerpRight)
+--
+--  magicMat\SetVector('$color2', color\ToVector())
+--  render.MaterialOverride(magicMat)
+--  render.ModelMaterialOverride(magicMat)
+--
+--  cam.IgnoreZ(true)
+--
+--  mat = Matrix()
+--  mat\Scale(Vector(1.1, 1.1, 1.1))
+--  vm\EnableMatrix('RenderMultiply', mat)
+--
+--  ply\DrawModel()
+--  vm\DisableMatrix('RenderMultiply')
+--
+--  cam.IgnoreZ(false)
+--
+--  render.MaterialOverride()
+--  render.ModelMaterialOverride()
+--  indraw = false
 
 mat_dxlevel = GetConVar('mat_dxlevel')
 
