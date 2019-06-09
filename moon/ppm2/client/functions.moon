@@ -163,3 +163,8 @@ PPM2.ReadFromOldData = (filename = '_current') ->
 	for key, value in pairs outputData
 		data["Set#{key}"](data, value, false)
 	return data, outputData
+
+_G.LocalPonyData = ->
+	ply = LocalPlayer()
+	return false if not ply
+	return ply\GetPonyData() or false
