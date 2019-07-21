@@ -418,12 +418,10 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		if drawingNewTask
 			with bones = ent\PPMBonesModifier()
-				ent\ResetBoneManipCache()
 				\ResetBones()
 				hook.Call('PPM2.SetupBones', nil, ent, @controller)
 				\Think(true)
 				ent.__ppmBonesModified = true
-				ent\ApplyBoneManipulations()
 
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes

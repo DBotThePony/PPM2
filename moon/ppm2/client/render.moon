@@ -297,11 +297,9 @@ PPM2.PrePlayerDraw = =>
 		@__ppm2_last_draw = f
 		bones = PPMBonesModifier(@)
 		if data and bones\CanThink()
-			@ResetBoneManipCache()
 			bones\ResetBones()
 			hook.Call('PPM2.SetupBones', nil, @, data) if data
 			bones\Think()
-			@ApplyBoneManipulations()
 			@_ppmBonesModified = true
 
 PPM2.PostPlayerDraw = =>

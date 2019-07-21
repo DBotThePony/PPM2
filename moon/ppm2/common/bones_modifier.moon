@@ -260,13 +260,11 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 
 				if obj.ent\IsPony() and (not obj.ent\IsPlayer() and not obj.ent.__ppm2RenderOverride or obj.ent == LocalPlayer())
 					if obj\CanThink() and not obj.ent\IsDormant() and not obj.ent\GetNoDraw()
-						obj.ent\ResetBoneManipCache()
 						resetBones(obj.ent)
 						data = obj.ent\GetPonyData()
 						hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
 						obj\Think()
 						obj.ent.__ppmBonesModified = true
-						obj.ent\ApplyBoneManipulations()
 				elseif obj.ent.__ppmBonesModified and not obj.ent\IsPlayer() and not obj.ent.__ppm2RenderOverride
 					resetBones(obj.ent)
 					obj.ent.__ppmBonesModified = false
@@ -297,13 +295,11 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 					obj.ent.__ppmBonesModified = false
 
 	@ThinkObject = (obj) ->
-		obj.ent\ResetBoneManipCache()
 		resetBones(obj.ent)
 		data = obj.ent\GetPonyData()
 		hook.Call('PPM2.SetupBones', nil, obj.ent, data) if data
 		obj\Think()
 		obj.ent.__ppmBonesModified = true
-		obj.ent\ApplyBoneManipulations()
 
 	new: (ent = NULL) =>
 		super()
@@ -418,11 +414,9 @@ if CLIENT
 	hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 		return if not @IsPony()
 		data = @GetPonyData()
-		--@ResetBoneManipCache()
 		hook.Call('PPM2.SetupBones', nil, data.ent, data) if data
 		if @__ppmBonesModifiers
 			@__ppmBonesModifiers\Think(true)
 			@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
-		--@ApplyBoneManipulations()
 
 ent.__ppmBonesModifiers = nil for _, ent in ipairs ents.GetAll()
