@@ -49,7 +49,7 @@ class BonesSequence extends PPM2.SequenceBase
 		super()
 		@controller\ResetModifiers(@name .. '_sequence')
 
-	SetBonePosition: (id = 1, val = LVector(0, 0, 0)) => @controller[@bonesFuncsPos[id]] and @controller[@bonesFuncsPos[id]](@controller, @modifierID, val)
+	SetBonePosition: (id = 1, val = Vector(0, 0, 0)) => @controller[@bonesFuncsPos[id]] and @controller[@bonesFuncsPos[id]](@controller, @modifierID, val)
 	SetBoneScale: (id = 1, val = 0) => @controller[@bonesFuncsScale[id]] and @controller[@bonesFuncsScale[id]](@controller, @modifierID, val)
 	SetBoneAngles: (id = 1, val = Angle(0, 0, 0)) => @controller[@bonesFuncsAngles[id]] and @controller[@bonesFuncsAngles[id]](@controller, @modifierID, val)
 
@@ -108,14 +108,14 @@ PPM2.BonesSequence = BonesSequence
 -- 50   wing_open_l
 -- 51   wing_open_r
 
-RESET_BONE_POS = LVector(0, 0, 0)
+RESET_BONE_POS = Vector(0, 0, 0)
 RESET_BONE_ANGLES = Angle(0, 0, 0)
-RESET_BONE_SCALE = LVector(1, 1, 1)
+RESET_BONE_SCALE = Vector(1, 1, 1)
 resetBones = (ent) ->
 	for i = 0, ent\GetBoneCount() - 1
-		ent\ManipulateBonePosition2Safe(i, RESET_BONE_POS)
-		ent\ManipulateBoneScale2Safe(i, RESET_BONE_SCALE)
-		ent\ManipulateBoneAngles2Safe(i, RESET_BONE_ANGLES)
+		ent\ManipulateBonePosition(i, RESET_BONE_POS)
+		ent\ManipulateBoneScale(i, RESET_BONE_SCALE)
+		ent\ManipulateBoneAngles(i, RESET_BONE_ANGLES)
 
 for _, ent in ipairs ents.GetAll()
 	ent.__ppmBonesModifiers = nil
@@ -342,8 +342,8 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			@bonesMappingForName[i] = name
 			@bonesMappingForID[name] = i
 			@bonesMappingForID[i] = i
-			@RegisterModifier(name .. 'Position', (-> LVector(0, 0, 0)), (-> LVector(0, 0, 0)))
-			@RegisterModifier(name .. 'Scale', (-> LVector(0, 0, 0)), (-> LVector(0, 0, 0)))
+			@RegisterModifier(name .. 'Position', (-> Vector(0, 0, 0)), (-> Vector(0, 0, 0)))
+			@RegisterModifier(name .. 'Scale', (-> Vector(0, 0, 0)), (-> Vector(0, 0, 0)))
 			@RegisterModifier(name .. 'Angles', (-> Angle(0, 0, 0)), (-> Angle(0, 0, 0)))
 			@SetupLerpTables(name .. 'Position')
 			@SetupLerpTables(name .. 'Scale')
@@ -372,11 +372,11 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			calcBonesScale = {}
 
 			for id = 0, @boneCount - 1
-				calcBonesPos[id] = \GetManipulateBonePosition2Safe(id) if @fullBoneMove
+				calcBonesPos[id] = \GetManipulateBonePosition(id) if @fullBoneMove
 				calcBonesPos[id] = Vector() if not @fullBoneMove
-				calcBonesAngles[id] = \GetManipulateBoneAngles2Safe(id) if @fullBoneMove
+				calcBonesAngles[id] = \GetManipulateBoneAngles(id) if @fullBoneMove
 				calcBonesAngles[id] = Angle() if not @fullBoneMove
-				calcBonesScale[id] = \GetManipulateBoneScale2Safe(id)
+				calcBonesScale[id] = \GetManipulateBoneScale(id)
 
 			for i, data in ipairs @bonesIterable
 				id = data[1]
@@ -387,9 +387,9 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 				calcBonesAngles[data[1]] += @[data[5]](@) for i, data in ipairs @bonesIterable
 
 			for id = 0, @boneCount - 1
-				\ManipulateBonePosition2Safe(id, calcBonesPos[id]\ToNative()) if @fullBoneMove
-				\ManipulateBoneScale2Safe(id, calcBonesScale[id]\ToNative())
-				\ManipulateBoneAngles2Safe(id, calcBonesAngles[id]) if @fullBoneMove
+				\ManipulateBonePosition(id, calcBonesPos[id]\ToNative()) if @fullBoneMove
+				\ManipulateBoneScale(id, calcBonesScale[id]\ToNative())
+				\ManipulateBoneAngles(id, calcBonesAngles[id]) if @fullBoneMove
 
 	ResetBones: =>
 		return if @defferReset and @defferReset > RealTimeL()
@@ -418,11 +418,11 @@ if CLIENT
 	hook.Add 'PAC3ResetBones', 'PPM2.EntityBonesModifier', =>
 		return if not @IsPony()
 		data = @GetPonyData()
-		@ResetBoneManipCache()
+		--@ResetBoneManipCache()
 		hook.Call('PPM2.SetupBones', nil, data.ent, data) if data
 		if @__ppmBonesModifiers
 			@__ppmBonesModifiers\Think(true)
 			@__ppmBonesModifiers.defferReset = RealTimeL() + 0.2
-		@ApplyBoneManipulations()
+		--@ApplyBoneManipulations()
 
 ent.__ppmBonesModifiers = nil for _, ent in ipairs ents.GetAll()

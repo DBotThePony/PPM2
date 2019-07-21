@@ -112,7 +112,7 @@ MODEL_BOX_PANEL = {
 		@lfixedDistanceToPony = 100
 
 		@vectorPos = Vector(@fixedDistanceToPony, 0, 0)
-		@lvectorPos = Vector(@fixedDistanceToPony, 0, 0)
+		@VectorPos = Vector(@fixedDistanceToPony, 0, 0)
 		@targetPos = Vector(0, 0, @PONY_VEC_Z * .7)
 		@ldrawAngle = Angle()
 
@@ -385,7 +385,7 @@ MODEL_BOX_PANEL = {
 		@ldistToPony = Lerp(lerp, @ldistToPony, @distToPony)
 		@vectorPos = Vector(@lfixedDistanceToPony, 0, 0)
 		@vectorPos\Rotate(@angle)
-		@lvectorPos = LerpVector(lerp, @lvectorPos, @vectorPos)
+		@VectorPos = LerpVector(lerp, @VectorPos, @vectorPos)
 		@drawAngle = Angle(-@angle.p, @angle.y - 180)
 		@ldrawAngle = LerpAngle(lerp, @ldrawAngle, @drawAngle)
 
@@ -410,7 +410,7 @@ MODEL_BOX_PANEL = {
 		surface.DrawRect(0, 0, w, h)
 		return if not IsValid(@model)
 		x, y = @LocalToScreen(0, 0)
-		drawpos = @lvectorPos + @GetTrackedPosition()
+		drawpos = @VectorPos + @GetTrackedPosition()
 		cam.Start3D(drawpos, @ldrawAngle, @ldistToPony, x, y, w, h)
 
 		if @holdRightClick
