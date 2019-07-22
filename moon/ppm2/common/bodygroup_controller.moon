@@ -47,6 +47,13 @@ PPM2.BODYGROUP_TAIL = 6
 PPM2.BODYGROUP_CMARK = 7
 PPM2.BODYGROUP_EYELASH = 8
 
+diff = (num) ->
+	num = num\abs()
+	num < 0.99 or num > 1.01
+
+vector_one = Vector(1, 1, 1)
+empty = {}
+
 -- 0    LrigPelvis
 -- 1    LrigSpine1
 -- 2    LrigSpine2
@@ -257,31 +264,33 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not CLIENT
 		return if not @validSkeleton
 		with @GetEntity()
-			\ManipulateBoneScale(@BONE_TAIL_1, Vector(1, 1, 1))
-			\ManipulateBoneScale(@BONE_TAIL_2, Vector(1, 1, 1))
-			\ManipulateBoneScale(@BONE_TAIL_3, Vector(1, 1, 1))
+			\ManipulateBoneScale(@BONE_TAIL_1, vector_one)
+			\ManipulateBoneScale(@BONE_TAIL_2, vector_one)
+			\ManipulateBoneScale(@BONE_TAIL_3, vector_one)
 			\ManipulateBoneAngles(@BONE_TAIL_1, Angle(0, 0, 0))
 			\ManipulateBoneAngles(@BONE_TAIL_2, Angle(0, 0, 0))
 			\ManipulateBoneAngles(@BONE_TAIL_3, Angle(0, 0, 0))
-			\ManipulateBonePosition(@BONE_TAIL_1, Vector(0, 0, 0))
-			\ManipulateBonePosition(@BONE_TAIL_2, Vector(0, 0, 0))
-			\ManipulateBonePosition(@BONE_TAIL_3, Vector(0, 0, 0))
+			\ManipulateBonePosition(@BONE_TAIL_1, vector_origin)
+			\ManipulateBonePosition(@BONE_TAIL_2, vector_origin)
+			\ManipulateBonePosition(@BONE_TAIL_3, vector_origin)
 
 	ResetBack: =>
 		return if not CLIENT
 		return if not @validSkeleton
 		with @GetEntity()
-			\ManipulateBoneScale(@BONE_SPINE_ROOT, Vector(1, 1, 1))
-			\ManipulateBoneScale(@BONE_SPINE, Vector(1, 1, 1))
+			\ManipulateBoneScale(@BONE_SPINE_ROOT, vector_one)
+			\ManipulateBoneScale(@BONE_SPINE, vector_one)
 			\ManipulateBoneAngles(@BONE_SPINE_ROOT, Angle(0, 0, 0))
 			\ManipulateBoneAngles(@BONE_SPINE, Angle(0, 0, 0))
-			\ManipulateBonePosition(@BONE_SPINE_ROOT, Vector(0, 0, 0))
-			\ManipulateBonePosition(@BONE_SPINE, Vector(0, 0, 0))
+			\ManipulateBonePosition(@BONE_SPINE_ROOT, vector_origin)
+			\ManipulateBonePosition(@BONE_SPINE, vector_origin)
 
 	ResetMane: =>
 		return if not CLIENT
 		return if not @validSkeleton
-		vec1, ang, vec2 = Vector(1, 1, 1), Angle(0, 0, 0), Vector(0, 0, 0)
+
+		vec1, ang, vec2 = vector_one, Angle(0, 0, 0), vector_origin
+
 		with @GetEntity()
 			for i = 1, 7
 				\ManipulateBoneScale(@['BONE_MANE_' .. i], vec1)
@@ -313,21 +322,20 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not @validSkeleton
 		size = @GetData()\GetTailSize()
 		size *= @GetData()\GetPonySize() if not ent\IsRagdoll() and not ent\IsNJPony()
-		vec = Vector(1, 1, 1)
-		vecTail = vec * size
+		return if not diff(size)
+		vecTail = vector_one * size
 		vecTailPos = Vector((size - 1) * 8, 0, 0)
 
-		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
-		emptyVector = Vector(0, 0, 0)
+		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or empty
 
 		with ent
 			\ManipulateBoneScale(@BONE_TAIL_1, vecTail)
 			\ManipulateBoneScale(@BONE_TAIL_2, vecTail)
 			\ManipulateBoneScale(@BONE_TAIL_3, vecTail)
 
-			--\ManipulateBonePosition(@BONE_TAIL_1, vecTail + (boneAnimTable[@BONE_TAIL_1] or emptyVector))
-			\ManipulateBonePosition(@BONE_TAIL_2, vecTailPos + (boneAnimTable[@BONE_TAIL_2] or emptyVector))
-			\ManipulateBonePosition(@BONE_TAIL_3, vecTailPos + (boneAnimTable[@BONE_TAIL_3] or emptyVector))
+			--\ManipulateBonePosition(@BONE_TAIL_1, vecTail + (boneAnimTable[@BONE_TAIL_1] or vector_origin))
+			\ManipulateBonePosition(@BONE_TAIL_2, vecTailPos + (boneAnimTable[@BONE_TAIL_2] or vector_origin))
+			\ManipulateBonePosition(@BONE_TAIL_3, vecTailPos + (boneAnimTable[@BONE_TAIL_3] or vector_origin))
 
 	UpdateManeSize: (ent = @GetEntity()) =>
 		return if not CLIENT
@@ -336,10 +344,10 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if @GetEntity().Alive and not @GetEntity()\Alive()
 		return if not @validSkeleton
 		size = @GetData()\GetPonySize()
-		vecMane = Vector(1, 1, 1) * size
+		return if not diff(size)
+		vecMane = vector_one * size
 
-		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
-		emptyVector = Vector(0, 0, 0)
+		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or empty
 
 		with ent
 			\ManipulateBoneScale(@BONE_MANE_1, vecMane)
@@ -351,13 +359,13 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			\ManipulateBoneScale(@BONE_MANE_7, vecMane)
 			\ManipulateBoneScale(@BONE_MANE_8, vecMane)
 
-			\ManipulateBonePosition(@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0) + (boneAnimTable[@BONE_MANE_1] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1) + (boneAnimTable[@BONE_MANE_2] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_3, Vector((size - 1) * 2, 0, 0) +               (boneAnimTable[@BONE_MANE_3] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size) + (boneAnimTable[@BONE_MANE_4] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@BONE_MANE_5] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_6] or emptyVector))
-			\ManipulateBonePosition(@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_7] or emptyVector))
+			\ManipulateBonePosition(@BONE_MANE_1, Vector(-(size - 1) * 4, (1 - size) * 3, 0) + (boneAnimTable[@BONE_MANE_1] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_2, Vector(-(size - 1) * 4, (size - 1) * 2, 1) + (boneAnimTable[@BONE_MANE_2] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_3, Vector((size - 1) * 2, 0, 0) +               (boneAnimTable[@BONE_MANE_3] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_4, Vector(1 - size, (1 - size) * 4, 1 - size) + (boneAnimTable[@BONE_MANE_4] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_5, Vector((size - 1) * 4, (1 - size) * 2, (size - 1) * 3) + (boneAnimTable[@BONE_MANE_5] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_6, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_6] or vector_origin))
+			\ManipulateBonePosition(@BONE_MANE_7, Vector(0, 0, -(size - 1) * 2) +              (boneAnimTable[@BONE_MANE_7] or vector_origin))
 
 	UpdateBack: (ent = @GetEntity()) =>
 		return if not CLIENT
@@ -365,16 +373,16 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if ent\IsNJPony()
 		return if @GetEntity().Alive and not @GetEntity()\Alive()
 		return if not @validSkeleton
+		return if not diff(@GetData()\GetBackSize())
 
 		vecModify = Vector(-(@GetData()\GetBackSize() - 1) * 2, 0, 0)
 		vecModify2 = Vector((@GetData()\GetBackSize() - 1) * 5, 0, 0)
 
-		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
-		emptyVector = Vector(0, 0, 0)
+		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or empty
 
 		with ent
-			\ManipulateBonePosition(@BONE_SPINE_ROOT, vecModify + (boneAnimTable[@BONE_SPINE_ROOT] or emptyVector))
-			\ManipulateBonePosition(@BONE_SPINE, vecModify2 + (boneAnimTable[@BONE_SPINE] or emptyVector))
+			\ManipulateBonePosition(@BONE_SPINE_ROOT, vecModify + (boneAnimTable[@BONE_SPINE_ROOT] or vector_origin))
+			\ManipulateBonePosition(@BONE_SPINE, vecModify2 + (boneAnimTable[@BONE_SPINE] or vector_origin))
 
 	SlowUpdate: (createModels = CLIENT, ent = @GetEntity(), force = false) =>
 		return if not IsValid(ent)
@@ -725,7 +733,7 @@ class NewBodygroupController extends DefaultBodygroupController
 	ResetWings: =>
 		return if SERVER
 		return if not @validSkeleton
-		ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
+		ang, vec1, vec2 = Angle(0, 0, 0), vector_one, vector_origin
 		for _, wing in ipairs {@WING_LEFT_1, @WING_LEFT_2, @WING_RIGHT_1, @WING_RIGHT_2, @WING_OPEN_LEFT, @WING_OPEN_RIGHT}
 			with @GetEntity()
 				\ManipulateBoneAngles(wing, ang)
@@ -736,39 +744,60 @@ class NewBodygroupController extends DefaultBodygroupController
 		return if SERVER
 		return if not @validSkeleton
 		return if @GetEntity().Alive and not @GetEntity()\Alive()
-		left = @GetData()\GetLWingSize() * Vector(1, 1, 1)
+		left = @GetData()\GetLWingSize()
+
+		if diff(left)
+			left = left * vector_one
+		else
+			left = nil
+
 		leftX = @GetData()\GetLWingX()
 		leftY = @GetData()\GetLWingY()
 		leftZ = @GetData()\GetLWingZ()
-		right = @GetData()\GetRWingSize() * Vector(1, 1, 1)
+		right = @GetData()\GetRWingSize()
+
+		if diff(right)
+			right = right * vector_one
+		else
+			right = nil
+
 		rightX = @GetData()\GetRWingX()
 		rightY = @GetData()\GetRWingY()
 		rightZ = @GetData()\GetRWingZ()
-		leftPos = Vector(leftX, leftY, leftZ)
-		rightPos = Vector(rightX, rightY, rightZ)
+
+		leftPos = Vector(leftX, leftY, leftZ) if diff(leftX) or diff(leftY) or diff(leftZ)
+		rightPos = Vector(rightX, rightY, rightZ) if diff(rightX) or diff(rightY) or diff(rightZ)
 
 		with @GetEntity()
-			\ManipulateBoneScale(@WING_LEFT_1, left)
-			\ManipulateBoneScale(@WING_LEFT_2, left)
-			\ManipulateBoneScale(@WING_OPEN_LEFT, left)
-			\ManipulateBoneScale(@WING_RIGHT_1, right)
-			\ManipulateBoneScale(@WING_RIGHT_2, right)
-			\ManipulateBoneScale(@WING_OPEN_RIGHT, right)
+			if left
+				\ManipulateBoneScale(@WING_LEFT_1, left)
+				\ManipulateBoneScale(@WING_LEFT_2, left)
+				\ManipulateBoneScale(@WING_OPEN_LEFT, left)
 
-			\ManipulateBonePosition(@WING_LEFT_1, leftPos)
-			\ManipulateBonePosition(@WING_LEFT_2, leftPos)
-			\ManipulateBonePosition(@WING_OPEN_LEFT, leftPos)
-			\ManipulateBonePosition(@WING_RIGHT_1, rightPos)
-			\ManipulateBonePosition(@WING_RIGHT_2, rightPos)
-			\ManipulateBonePosition(@WING_OPEN_RIGHT, rightPos)
+			if right
+				\ManipulateBoneScale(@WING_RIGHT_1, right)
+				\ManipulateBoneScale(@WING_RIGHT_2, right)
+				\ManipulateBoneScale(@WING_OPEN_RIGHT, right)
+
+			if leftPos
+				\ManipulateBonePosition(@WING_LEFT_1, leftPos)
+				\ManipulateBonePosition(@WING_LEFT_2, leftPos)
+				\ManipulateBonePosition(@WING_OPEN_LEFT, leftPos)
+
+			if rightPos
+				\ManipulateBonePosition(@WING_RIGHT_1, rightPos)
+				\ManipulateBonePosition(@WING_RIGHT_2, rightPos)
+				\ManipulateBonePosition(@WING_OPEN_RIGHT, rightPos)
 
 	UpdateEars: =>
-		vec = Vector(1, 1, 1) * @GrabData('EarsSize')
-		@GetEntity()\ManipulateBoneScale(@EAR_L, vec)
-		@GetEntity()\ManipulateBoneScale(@EAR_R, vec)
+		size = @GrabData('EarsSize')
+		if diff(size)
+			vec = vector_one * size
+			@GetEntity()\ManipulateBoneScale(@EAR_L, vec)
+			@GetEntity()\ManipulateBoneScale(@EAR_R, vec)
 
 	ResetEars: =>
-		ang, vec1, vec2 = Angle(0, 0, 0), Vector(1, 1, 1), Vector(0, 0, 0)
+		ang, vec1, vec2 = Angle(0, 0, 0), vector_one, vector_origin
 		for _, part in ipairs {@EAR_L, @EAR_R}
 			with @GetEntity()
 				\ManipulateBoneAngles(part, ang)
@@ -832,6 +861,7 @@ class NewBodygroupController extends DefaultBodygroupController
 		@maneModelLower\Remove() if IsValid(@maneModelLower)
 		@tailModel\Remove() if IsValid(@tailModel)
 		super()
+
 	ApplyBodygroups: (createModels = CLIENT, force = false) =>
 		return unless @isValid
 		return if not IsValid(@GetEntity())

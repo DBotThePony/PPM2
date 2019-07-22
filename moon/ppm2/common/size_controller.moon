@@ -394,6 +394,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		return if not @AllowResize()
 		return if not @validSkeleton
 		size = (@GetNeckSize() - 1) * 3
+		return if size\abs() * 4 <= 0.05
 		vec = Vector(size, -size, 0)
 
 		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}
@@ -410,6 +411,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		return if not @AllowResize()
 		return if not @validSkeleton
 		realSizeModify = @GetLegsSize() - 1
+		return if realSizeModify\abs() * 4 <= 0.05
 		size = realSizeModify * 3
 
 		boneAnimTable = ent.pac_boneanim and ent.pac_boneanim.positions or {}

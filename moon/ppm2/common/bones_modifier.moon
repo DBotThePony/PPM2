@@ -367,25 +367,31 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 			calcBonesAngles = {}
 			calcBonesScale = {}
 
-			for id = 0, @boneCount - 1
-				calcBonesPos[id] = \GetManipulateBonePosition(id) if @fullBoneMove
-				calcBonesPos[id] = Vector() if not @fullBoneMove
-				calcBonesAngles[id] = \GetManipulateBoneAngles(id) if @fullBoneMove
-				calcBonesAngles[id] = Angle() if not @fullBoneMove
-				calcBonesScale[id] = \GetManipulateBoneScale(id)
-
-			for i, data in ipairs @bonesIterable
-				id = data[1]
-				calcBonesPos[id] += @[data[3]](@) if @fullBoneMove
-				calcBonesScale[id] += @[data[4]](@)
-
 			if @fullBoneMove
-				calcBonesAngles[data[1]] += @[data[5]](@) for i, data in ipairs @bonesIterable
+				for id = 0, @boneCount - 1
+					calcBonesPos[id] = \GetManipulateBonePosition(id)
+					calcBonesAngles[id] = \GetManipulateBoneAngles(id)
+					calcBonesScale[id] = \GetManipulateBoneScale(id)
 
-			for id = 0, @boneCount - 1
-				\ManipulateBonePosition(id, calcBonesPos[id]\ToNative()) if @fullBoneMove
-				\ManipulateBoneScale(id, calcBonesScale[id]\ToNative())
-				\ManipulateBoneAngles(id, calcBonesAngles[id]) if @fullBoneMove
+				for data in *@bonesIterable
+					id = data[1]
+					calcBonesAngles[id]\Add(@[data[5]](@))
+					calcBonesPos[id]\Add(@[data[3]](@))
+					calcBonesScale[id]\Add(@[data[4]](@))
+
+				for id = 0, @boneCount - 1
+					\ManipulateBonePosition(id, calcBonesPos[id])
+					\ManipulateBoneAngles(id, calcBonesAngles[id])
+					\ManipulateBoneScale(id, calcBonesScale[id])
+			else
+				for id = 0, @boneCount - 1
+					calcBonesScale[id] = \GetManipulateBoneScale(id)
+
+				for data in *@bonesIterable
+					calcBonesScale[data[1]] += @[data[4]](@)
+
+				for id = 0, @boneCount - 1
+					\ManipulateBoneScale(id, calcBonesScale[id])
 
 	ResetBones: =>
 		return if @defferReset and @defferReset > RealTimeL()
