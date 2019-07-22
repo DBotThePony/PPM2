@@ -1267,8 +1267,8 @@ EditorPages = {
 			@Hr()
 			@CheckBox('gui.ppm2.editor.tail.separate', 'SeparateTailPhong') if ADVANCED_MODE\GetBool()
 			PPM2.EditorPhongPanels(@, 'Tail', 'gui.ppm2.editor.tail.tail_phong') if ADVANCED_MODE\GetBool()
-			@ColorBox("gui.ppm2.editor.mane.detail_color#{i}", "ManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-			@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@ColorBox("gui.ppm2.editor.mane.detail_color#{i}", "ManeDetailColor#{i}") for i = 1, 6
+			@ColorBox('gui.ppm2.editor.tail.detail' .. i, "TailDetailColor#{i}") for i = 1, 6
 
 			return if not ADVANCED_MODE\GetBool()
 
@@ -1282,8 +1282,8 @@ EditorPages = {
 			@ColorBox("gui.ppm2.editor.mane.down.color#{i}", "LowerManeColor#{i}") for i = 1, 2
 
 			@Hr()
-			@ColorBox("gui.ppm2.editor.mane.up.detail_color#{i}", "UpperManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
-			@ColorBox("gui.ppm2.editor.mane.down.detail_color#{i}", "LowerManeDetailColor#{i}") for i = 1, ADVANCED_MODE\GetBool() and 6 or 4
+			@ColorBox("gui.ppm2.editor.mane.up.detail_color#{i}", "UpperManeDetailColor#{i}") for i = 1, 6
+			@ColorBox("gui.ppm2.editor.mane.down.detail_color#{i}", "LowerManeDetailColor#{i}") for i = 1, 6
 	}
 
 	{
