@@ -292,7 +292,7 @@ CALC_VIEW_PANEL = {
 	SetRealSize: (w = @realW, h = @realH) => @realW, @realH = w, h
 	SetRealPos: (x = @realX, y = @realY) => @realX, @realY = x, y
 
-	CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear = 0, zfar = 1000) =>
+	CalcView: (ply = LocalPlayer(), origin = Vector(0, 0, 0), angles = Angle(0, 0, 0), fov = @fov, znear, zfar) =>
 		return hook.Remove('CalcView', @) if not @IsValid()
 		return if not @IsVisible()
 		origin, angles = LocalToWorld(@drawPos, @drawAngle, LocalPlayer()\GetPos(), Angle(0, LocalPlayer()\EyeAnglesFixed().y, 0))
