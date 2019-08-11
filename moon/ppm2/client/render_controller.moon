@@ -380,7 +380,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 			if size < 140
 				@staringAtDirectly = trNew.Entity
-				@staringAtDirectlyLast = CurTimeL() + 1
+				@staringAtDirectlyLast = CurTimeL() + 2.5
 				@staringAtDirectlyTr = trNew
 
 		if IsValid(@staringAtDirectly) and (not @staringAtDirectly\IsPlayer() and not @staringAtDirectly\IsNPC())
