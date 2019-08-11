@@ -27,6 +27,7 @@ ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony le
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
 LEGS_RENDER_TYPE = CreateConVar('ppm2_render_legstype', '0', {FCVAR_ARCHIVE}, 'When render legs. 0 - Before Opaque renderables; 1 - after Translucent renderables')
 ENABLE_STARE = CreateConVar('ppm2_render_stare', '1', {FCVAR_ARCHIVE}, 'Make eyes follow players and move when idling')
+SLOW_STARE_UPDATE = CreateConVar('ppm2_render_stare_slow', '0', {FCVAR_ARCHIVE}, 'Lazy stare update to save a bit frames')
 
 class PonyRenderController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
@@ -46,10 +47,14 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
 		@lastStareUpdate = 0
 		@staringAt = NULL
+		@staringAtDirectly = NULL
+		@staringAtDirectlyLast = 0
+		@staringAtDirectlyTr = false
 		@rotatedHeadTarget = false
 		@idleEyes = true
 		@idleEyesActive = false
 		@nextRollEyes = 0
+		@rollEyesDelta = CurTimeL()
 		if @GetEntity()\IsValid()
 			@CreateFlexController()
 			@CreateEmotesController()
@@ -347,7 +352,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	UpdateStare: =>
 		ctime = RealTimeL()
-		return if @lastStareUpdate > ctime
+		return if @lastStareUpdate > ctime and SLOW_STARE_UPDATE\GetBool()
 
 		if (not @idleEyes or not ENABLE_STARE\GetBool()) and @idleEyesActive
 			@staringAt = NULL
@@ -359,23 +364,52 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@idleEyesActive = true
 		@lastStareUpdate = ctime + 0.2
 		lpos = @GetEntity()\EyePos()
+		lang = @GetEntity()\EyeAnglesFixed()
 
 		@staringAt = NULL if IsValid(@staringAt) and @staringAt\IsPlayer() and not @staringAt\Alive()
 
+		trNew = util.TraceLine({
+			start: lpos,
+			endpos: lpos + lang\Forward() * 270,
+			filter: @GetEntity(),
+		})
+
+		if IsValid(trNew.Entity)
+			mins, maxs = trNew.Entity\OBBMins(), trNew.Entity\OBBMaxs()
+			size = mins\Distance(maxs)
+
+			if size < 140
+				@staringAtDirectly = trNew.Entity
+				@staringAtDirectlyLast = CurTimeL() + 1
+				@staringAtDirectlyTr = trNew
+
+		if IsValid(@staringAtDirectly) and (not @staringAtDirectly\IsPlayer() and not @staringAtDirectly\IsNPC())
+			if @staringAtDirectlyLast > CurTimeL()
+				pos = @staringAtDirectlyTr.HitPos
+
+				if pos\Distance(lpos) < 300 and DLib.combat.inPVS(@GetEntity(), @staringAtDirectly) and @CheckTarget(lpos, pos)
+					@GetEntity()\SetEyeTarget(pos)
+					_lpos, _lang = WorldToLocal(pos, angle_zero, lpos, lang)
+					@prevRollTargetPos = _lpos
+					return
+
+				@staringAtDirectly = NULL
+				@staringAtDirectlyLast = 0
+				@GetEntity()\SetEyeTarget(vector_origin)
+			else
+				@staringAtDirectly = NULL
+
+		if trNew.Entity\IsValid() and (trNew.Entity\IsPlayer() or trNew.Entity\IsNPC())
+			@staringAt = trNew.Entity
+
 		if IsValid(@staringAt)
-			trNew = util.TraceLine({
-				start: lpos,
-				endpos: lpos + @GetEntity()\EyeAnglesFixed()\Forward() * 270,
-				filter: @GetEntity(),
-			})
-
-			if trNew.Entity\IsValid() and trNew.Entity\IsPlayer()
-				@staringAt = trNew.Entity
-
 			epos = @staringAt\EyePos()
+
 			if epos\Distance(lpos) < 300 and DLib.combat.inPVS(@GetEntity(), @staringAt) and @CheckTarget(lpos, epos)
 				@GetEntity()\SetEyeTarget(epos)
+				@prevRollTargetPos = epos
 				return
+
 			@staringAt = NULL
 			@GetEntity()\SetEyeTarget(vector_origin)
 
@@ -398,14 +432,16 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		return if @nextRollEyes > ctime
 		@nextRollEyes = ctime + math.random(4, 8) / 6
-		ang = @GetEntity()\EyeAnglesFixed()
 		@eyeRollTargetPos = Vector(math.random(200, 400), math.random(-80, 80), math.random(-20, 20))
 		@prevRollTargetPos = @prevRollTargetPos or @eyeRollTargetPos
 		-- @GetEntity()\SetEyeTarget(@prevRollTargetPos)
 
 	UpdateEyeRoll: =>
-		return if not ENABLE_STARE\GetBool() or not @idleEyes or not @eyeRollTargetPos or IsValid(@staringAt)
-		@prevRollTargetPos = LerpVector(FrameTime() * 6, @prevRollTargetPos, @eyeRollTargetPos)
+		return if not ENABLE_STARE\GetBool() or not @idleEyes or not @eyeRollTargetPos or IsValid(@staringAt) or IsValid(@staringAtDirectly)
+		ctime = CurTimeL()
+		delta = ctime - @rollEyesDelta
+		@rollEyesDelta = ctime
+		@prevRollTargetPos = LerpVector(delta * 25, @prevRollTargetPos, @eyeRollTargetPos)
 		roll = Vector(@prevRollTargetPos)
 		roll\Rotate(@GetEntity()\EyeAnglesFixed())
 		@GetEntity()\SetEyeTarget(@GetEntity()\EyePos() + roll)
