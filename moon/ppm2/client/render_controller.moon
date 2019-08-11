@@ -351,7 +351,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		if (not @idleEyes or not ENABLE_STARE\GetBool()) and @idleEyesActive
 			@staringAt = NULL
-			@GetEntity()\SetEyeTarget(Vector())
+			@GetEntity()\SetEyeTarget(vector_origin)
 			@idleEyesActive = false
 			return
 
@@ -377,7 +377,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 				@GetEntity()\SetEyeTarget(epos)
 				return
 			@staringAt = NULL
-			@GetEntity()\SetEyeTarget(Vector())
+			@GetEntity()\SetEyeTarget(vector_origin)
 
 		if player.GetCount() ~= 1
 			local last
@@ -397,7 +397,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 				return
 
 		return if @nextRollEyes > ctime
-		@nextRollEyes = ctime + math.random(4, 16) / 6
+		@nextRollEyes = ctime + math.random(4, 8) / 6
 		ang = @GetEntity()\EyeAnglesFixed()
 		@eyeRollTargetPos = Vector(math.random(200, 400), math.random(-80, 80), math.random(-20, 20))
 		@prevRollTargetPos = @prevRollTargetPos or @eyeRollTargetPos
