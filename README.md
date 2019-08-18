@@ -14,6 +14,8 @@ New models are licensed under [Microsoft Game Content License](http://www.xbox.c
 
 This project use assets from [Dynamic Surroundings](https://github.com/OreCruncher/DynamicSurroundings), especially it's [sounds](https://github.com/OreCruncher/DynamicSurroundings/blob/master/CREDITS.md#sounds)
 
+This project use assets from deviantart user [Digivee](https://www.deviantart.com/digivee)
+
 # Features
  * Fully customizable ponies! Even **more customizable than you think**! Just checkout advanced mode in editor!
  * Total code rewrite; now all functions are working on Event Oriented Programming; it means that PPM/2 can work much faster with more features included when compared to original PPM
