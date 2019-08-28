@@ -303,6 +303,15 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: true, :args, run: @[func]})
 
+	IsBeingProcessed: =>
+		return false if #@@COMPILE_QUEUE == 0
+
+		for data in *@@COMPILE_QUEUE
+			if data.self == @
+				return true
+
+		return @url_processes > 0
+
 	DataChanges: (state) =>
 		return unless @isValid
 		return if not @GetEntity()
@@ -536,6 +545,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
 		@delayCompilation = {}
+		@url_processes = 0
 		@CheckReflectionsClosure = -> @CheckReflections()
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
@@ -990,7 +1000,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('BodyColor')
 			@StartRTOpaque("Body_rt", bodysize, r, g, b)
@@ -1140,7 +1154,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
 			@StartRTOpaque('Horn', texSize, r, g, b)
@@ -1401,7 +1419,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
 			rt = @StartRTOpaque('Wings_rt', texSize, r, g, b)
@@ -1482,7 +1504,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		urlTextures = {}
 		left = 0
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('ManeColor1')
 			@StartRTOpaque('Mane_1', texSize, r, g, b)
@@ -1544,6 +1570,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		if left == 0
 			continueCompilation()
 		return @HairColor1Material, @HairColor2Material
+
 	CompileTail: =>
 		return unless @isValid
 		textureFirst = {
@@ -1585,7 +1612,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		urlTextures = {}
 		left = 0
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('TailColor1')
 
@@ -1932,9 +1963,14 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			PPM2.DebugPrint('Compiled eyes texture for ', @GetEntity(), ' as part of ', @)
 		else
+			@url_processes += 1
+
 			@@LoadURL EyeURL, texSize, texSize, (texture, panel, material) ->
+				@url_processes -= 1
 				@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
+
 		return @["EyeMaterial#{prefixUpper}"]
+
 	CompileCMark: =>
 		return unless @isValid
 		textureData = {
@@ -1990,7 +2026,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			PPM2.DebugPrint('Compiled cutiemark texture for ', @GetEntity(), ' as part of ', @)
 		else
+			@url_processes += 1
+
 			@@LoadURL URL, texSize, texSize, (texture, panel, material) ->
+				@url_processes -= 1
+
 				rt = @StartRT('CMark', texSize, 0, 0, 0, 0)
 
 				surface.SetDrawColor(@GrabData('CMarkColor'))

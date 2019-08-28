@@ -426,6 +426,37 @@ do
 					.maxs = center + (maxs - center) * 1.2
 		return false if HORN_HIDE_BEAM\GetBool() and IsValid(target)
 
+import ScrWL, ScrHL from _G
+import HUDCommons from DLib
+color_black = Color(color_black)
+
+hook.Add 'HUDPaint', 'PPM2.LoadingDisplay', ->
+	lply = LocalPlayer()
+	lpos = EyePos()
+
+	for task in *PPM2.NetworkedPonyData.CheckTasks
+		if ent = task\GetEntity()
+			if IsValid(ent) and ent\IsPony() and not ent\IsRagdoll() and (ent ~= lply or lply\ShouldDrawLocalPlayer())
+				if renderer = task\GetRenderController()
+					if textures = renderer\GetTextureController()
+						if textures\IsBeingProcessed()
+							pos = ent\GetPos()
+							pos\Add(ent\OBBCenter())
+							dist = pos\Distance(lpos)
+
+							if dist < 512
+								{:x, :y, :visible} = pos\ToScreen()
+
+								if visible and x > -100 and x < ScrWL() + 100 and y > -100 and y < ScrHL() + 100
+									color = task\ComputeMagicColor()
+									color.a = 255 - dist\progression(128, 512) * 255
+									color_black.a = color.a
+									size = (200 * (1 - dist\progression(0, 400))) * task\GetPonySize() * task\GetLegsSize() * task\GetNeckSize() * task\GetBackSize()
+									sizeh = size / 2
+
+									HUDCommons.DrawLoading(x + 2 - sizeh, y + 2 - sizeh, size, color_black)
+									HUDCommons.DrawLoading(x - sizeh, y - sizeh, size, color)
+
 hook.Add 'PrePlayerDraw', 'PPM2.PlayerDraw', PPM2.PrePlayerDraw, -2
 hook.Add 'PostPlayerDraw', 'PPM2.PostPlayerDraw', PPM2.PostPlayerDraw, -2
 hook.Add 'PostDrawOpaqueRenderables', 'PPM2.PostDrawOpaqueRenderables', PPM2.PostDrawOpaqueRenderables, -2

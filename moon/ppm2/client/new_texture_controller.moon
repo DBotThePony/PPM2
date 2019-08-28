@@ -160,7 +160,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		urlTextures = {}
 		left = 0
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			return unless @isValid
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
 			@StartRTOpaque("Mane_rt_1_#{prefix}", texSize, r, g, b)
@@ -275,7 +279,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
 			@StartRTOpaque('BatWings_rt', texSize, r, g, b)
@@ -337,7 +345,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
+		@url_processes += 1
+
 		continueCompilation = ->
+			@url_processes -= 1
+
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
 			@StartRTOpaque('BatWingsSkin_rt', texSize, r, g, b)
