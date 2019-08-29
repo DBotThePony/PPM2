@@ -578,6 +578,20 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		if scale = @GetSizeController()
 			scale\SlowUpdate()
 
+		if SERVER and IsValid(@ent) and @ent\IsPlayer()
+			arms = @ent\GetHands()
+
+			if IsValid(arms)
+				amodel = arms\GetModel()
+
+				if @GetRace()\band(PPM2.RACE_HAS_HORN) ~= 0
+					if @ent\GetInfoBool('ppm2_cl_vm_magic_hands', true)
+						arms\SetModel('models/ppm/c_arms_magic.mdl')
+					else
+						arms\SetModel('models/cppm/pony_arms.mdl')
+				else
+					arms\SetModel('models/cppm/pony_arms.mdl')
+
 	Think: =>
 	RenderScreenspaceEffects: =>
 		time = RealTimeL()
