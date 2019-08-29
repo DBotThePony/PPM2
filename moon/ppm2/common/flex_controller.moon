@@ -746,6 +746,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@min, @max = @nextBlink, @nextBlink + @nextBlinkLength
 
 			'func': (delta, timeOfAnim) =>
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
 				if @min > timeOfAnim or @max < timeOfAnim
 					if @blinkHit
 						@blinkHit = false
