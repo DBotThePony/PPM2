@@ -444,14 +444,14 @@ hook.Add 'HUDPaint', 'PPM2.LoadingDisplay', ->
 							pos\Add(ent\OBBCenter())
 							dist = pos\Distance(lpos)
 
-							if dist < 512
+							if dist < 384
 								{:x, :y, :visible} = pos\ToScreen()
 
 								if visible and x > -100 and x < ScrWL() + 100 and y > -100 and y < ScrHL() + 100
 									color = task\ComputeMagicColor()
-									color.a = 255 - dist\progression(128, 512) * 255
+									color.a = 255 - dist\progression(128, 384) * 255
 									color_black.a = color.a
-									size = (200 * (1 - dist\progression(0, 400))) * task\GetPonySize() * task\GetLegsSize() * task\GetNeckSize() * task\GetBackSize()
+									size = (200 * (1 - dist\progression(0, 300))) * task\GetPonySize() * task\GetLegsSize() * task\GetNeckSize() * task\GetBackSize()
 									sizeh = size / 2
 
 									HUDCommons.DrawLoading(x + 2 - sizeh, y + 2 - sizeh, size, color_black)
