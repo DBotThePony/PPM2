@@ -161,6 +161,8 @@ hook.Add 'HUDPaint', 'PPM2.EditorStatus', ->
 					draw.DrawText(text, 'HudHintTextLarge', x, y, Color(0, 0, 0, alpha), TEXT_ALIGN_CENTER)
 					draw.DrawText(text, 'HudHintTextLarge', x + 1, y + 1, Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER)
 
+hook.Add 'PACChooseDeathRagdoll', 'PPM2.DeathRagdoll', (ragdoll) => @GetNWEntity('PPM2.DeathRagdoll') if IsValid(@GetNWEntity('PPM2.DeathRagdoll'))
+
 concommand.Add 'ppm2_cleanup', ->
 	for _, ent in ipairs ents.GetAll()
 		if ent.isPonyPropModel and not IsValid(ent.manePlayer)

@@ -102,6 +102,7 @@ createPlayerRagdoll = =>
 			physobj\SetAngles(ang) if ang
 		copy = @GetPonyData()\Clone(@__ppm2_ragdoll)
 		copy\Create()
+		@SetNWEntity('PPM2.DeathRagdoll', @__ppm2_ragdoll)
 
 ALLOW_RAGDOLL_DAMAGE = CreateConVar('ppm2_sv_ragdoll_damage', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Should death ragdoll cause damage?')
 
