@@ -244,6 +244,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@COMPILE_WAIT_UNTIL = 0
 
 	@COMPILE_THREAD = coroutine.create () ->
+		handleError = (err) ->
+			PPM2.MessageError('There was a problem in compiling texture')
+			PPM2.MessageError(debug.traceback(err))
+
 		while true
 			if #@COMPILE_QUEUE == 0
 				coroutine.yield()
@@ -254,7 +258,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				if @COMPILE_QUEUE.IN_PLACE
 					for _, data in ipairs(@COMPILE_QUEUE)
 						if data.self\IsValid() and data.now
-							data.run(data.self, unpack(data.args))
+							xpcall(data.run, handleError, data.self, unpack(data.args))
 							data.self.lastMaterialUpdate = 0
 
 					@COMPILE_QUEUE = [data for _, data in ipairs(@COMPILE_QUEUE) when data.self\IsValid() and not data.now]
@@ -263,7 +267,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				data = table.remove(@COMPILE_QUEUE)
 
 				if data and data.self\IsValid()
-					data.run(data.self, unpack(data.args))
+					xpcall(data.run, handleError, data.self, unpack(data.args))
 					data.self.lastMaterialUpdate = 0
 					coroutine.yield()
 
@@ -938,7 +942,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		proceed = {}
 		@GetBodyPhongMaterials(proceed)
 		for _, mat in ipairs proceed
-			@ApplyPhongData(mat[1], 'Body', mat[2], mat[3])
+			@ApplyPhongData(mat[1], 'Body', mat[2], mat[3], mat[4])
 
 		if @GrabData('SeparateHornPhong') and @HornMaterial
 			@ApplyPhongData(@HornMaterial, 'Horn', false, true)
@@ -1540,13 +1544,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 				i = 1
 				for _, mat in ipairs @@LOWER_MANE_MATERIALS[maneTypeLower]
 					continue if type(mat) == 'number'
-					surface.SetDrawColor(@GrabData("GetManeDetailColor#{i}"))
+					surface.SetDrawColor(@GrabData("ManeDetailColor#{i}"))
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GrabData("GetManeURLColor#{i}"))
+				surface.SetDrawColor(@GrabData("ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -1661,12 +1665,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 				for _, mat in ipairs @@TAIL_DETAIL_MATERIALS[tailType]
 					continue if type(mat) == 'number'
 					surface.SetMaterial(mat)
-					surface.SetDrawColor(@GrabData("GetTailDetailColor#{i}"))
+					surface.SetDrawColor(@GrabData("TailDetailColor#{i}"))
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GrabData("GetTailURLColor#{i}"))
+				surface.SetDrawColor(@GrabData("TailURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 

@@ -51,7 +51,9 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	-- IsValid: => @isValid
 	IsValid: => @isValid and IsValid(@GetEntity())
 	GetData: => @nwController
-	GrabData: (str, ...) => @nwController['Get' .. str](@nwController, ...)
+	GrabData: (str, ...) =>
+		error('Get' .. str .. ' - no such a function') if not @nwController['Get' .. str]
+		@nwController['Get' .. str](@nwController, ...)
 	GetEntity: => @controller\GetEntity()
 	GetEntityID: => @entID
 	GetDataID: => @entID
