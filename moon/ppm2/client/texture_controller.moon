@@ -138,7 +138,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@PONY_SOCKS = _M.PONY_SOCKS
 
 	--@SessionID = math.random(1, 1000)
-	@SessionID = 6
+	@SessionID = 10
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
@@ -154,8 +154,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	@NEXT_GENERATED_ID = 100000
 
-	@MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
-	@TAIL_UPDATE_TRIGGER = {'TailType': true}
+	@MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true, 'ManeBumpStrength': true}
+	@TAIL_UPDATE_TRIGGER = {'TailType': true, 'TailBumpStrength': true}
 	@EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
 	@PHONG_UPDATE_TRIGGER = {
 		'SeparateHornPhong': true
@@ -272,7 +272,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		if @COMPILE_WAIT_UNTIL < RealTimeL() or @COMPILE_QUEUE.IN_PLACE
 			@COMPILE_WAIT_UNTIL = RealTimeL() + 0.2
-			coroutine.resume(@COMPILE_THREAD)
+			status, err = coroutine.resume(@COMPILE_THREAD)
+
+			if not status
+				PPM2.MessageError('There was a problem in compiling texture')
+				PPM2.MessageError(err)
 
 		return
 
@@ -851,7 +855,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_WING = 64
 	@QUAD_SIZE_HORN = 512
 	@QUAD_SIZE_HAIR = 256
+	@QUAD_SIZE_HAIR_BUMP = 1024
 	@QUAD_SIZE_TAIL = 256
+	@QUAD_SIZE_TAIL_BUMP = 1024
 	@QUAD_SIZE_BODY = 2048
 	@TATTOO_DEF_SIZE = 128
 
@@ -877,7 +883,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
-	ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false, noBump = false) =>
+	ApplyPhongData: (matTarget, prefix = 'Body', lightwarpsOnly = false, noBump = false, builtinBump = false) =>
 		return if not matTarget
 		PhongExponent = @GrabData(prefix .. 'PhongExponent')
 		PhongBoost = @GrabData(prefix .. 'PhongBoost')
@@ -911,7 +917,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		if not noBump
 			if BumpmapURL == '' or not BumpmapURL\find('^https?://')
-				matTarget\SetUndefined('$bumpmap')
+				matTarget\SetUndefined('$bumpmap') if not builtinBump
 			else
 				@@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
 					matTarget\SetTexture('$bumpmap', tex)
@@ -922,11 +928,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 		table.insert(output, {@WingsMaterial, false, false}) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
 		table.insert(output, {@Eyelashes, false, false}) if @Eyelashes and not @GrabData('SeparateEyelashesPhong')
 		if not @GrabData('SeparateManePhong')
-			table.insert(output, {@HairColor1Material, false, false}) if @HairColor1Material
-			table.insert(output, {@HairColor2Material, false, false}) if @HairColor2Material
+			table.insert(output, {@HairColor1Material, false, false, true}) if @HairColor1Material
+			table.insert(output, {@HairColor2Material, false, false, true}) if @HairColor2Material
 		if not @GrabData('SeparateTailPhong')
-			table.insert(output, {@TailColor1Material, false, false}) if @TailColor1Material
-			table.insert(output, {@TailColor2Material, false, false}) if @TailColor2Material
+			table.insert(output, {@TailColor1Material, false, false, true}) if @TailColor1Material
+			table.insert(output, {@TailColor2Material, false, false, true}) if @TailColor2Material
 
 	UpdatePhongData: =>
 		proceed = {}
@@ -949,12 +955,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@ApplyPhongData(@NewSocksBase, 'Socks') if @NewSocksBase
 
 		if @GrabData('SeparateManePhong')
-			@ApplyPhongData(@HairColor1Material, 'Mane')
-			@ApplyPhongData(@HairColor2Material, 'Mane')
+			@ApplyPhongData(@HairColor1Material, 'Mane', nil, nil, true)
+			@ApplyPhongData(@HairColor2Material, 'Mane', nil, nil, true)
 
 		if @GrabData('SeparateTailPhong')
-			@ApplyPhongData(@TailColor1Material, 'Tail')
-			@ApplyPhongData(@TailColor2Material, 'Tail')
+			@ApplyPhongData(@TailColor1Material, 'Tail', nil, nil, true)
+			@ApplyPhongData(@TailColor2Material, 'Tail', nil, nil, true)
 
 		if @GrabData('SeparateEyes')
 			@ApplyPhongData(@EyeMaterialL, 'LEye', true)
@@ -986,7 +992,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '3'
 				'$phongboost': '0.15'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
@@ -1137,7 +1142,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '3'
 				'$phongboost': '0.05'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
@@ -1224,7 +1228,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'$phong': '1'
 			'$phongexponent': '6'
 			'$phongboost': '0.1'
-			'$phongalbedotint': '1'
 			'$phongtint': '[1 .95 .95]'
 			'$phongfresnelranges': '[1 5 10]'
 			'$rimlight': '1'
@@ -1304,7 +1307,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.1'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[1 5 10]'
 				'$rimlight': '1'
@@ -1343,7 +1345,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.1'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[1 5 10]'
 				'$rimlight': '1'
@@ -1402,7 +1403,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '3'
 				'$phongboost': '0.05'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
@@ -1470,13 +1470,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
+				'$bumpmap': 'null-bumpmap'
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
@@ -1540,18 +1540,31 @@ class PonyTextureController extends PPM2.ControllerChildren
 				i = 1
 				for _, mat in ipairs @@LOWER_MANE_MATERIALS[maneTypeLower]
 					continue if type(mat) == 'number'
-					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
-					surface.SetDrawColor(r, g, b, a)
+					surface.SetDrawColor(@GrabData("GetManeDetailColor#{i}"))
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
+				surface.SetDrawColor(@GrabData("GetManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@HairColor2Material\SetTexture('$basetexture', @EndRT())
+
+			texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR_BUMP)
+
+			@StartRTOpaque('Mane_Bump', texSize, 127, 127, 255)
+
+			surface.SetMaterial(_M.HAIR_BUMP)
+			_M.HAIR_BUMP\SetFloat('$alpha', @GrabData('ManeBumpStrength'))
+			surface.SetDrawColor(255, 255, 255)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			rt = @EndRT()
+			@HairColor1Material\SetTexture('$bumpmap', rt)
+			@HairColor2Material\SetTexture('$bumpmap', rt)
+
 			PPM2.DebugPrint('Compiled mane textures for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()
@@ -1584,7 +1597,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phong': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
@@ -1649,16 +1661,30 @@ class PonyTextureController extends PPM2.ControllerChildren
 				for _, mat in ipairs @@TAIL_DETAIL_MATERIALS[tailType]
 					continue if type(mat) == 'number'
 					surface.SetMaterial(mat)
-					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
+					surface.SetDrawColor(@GrabData("GetTailDetailColor#{i}"))
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
+				surface.SetDrawColor(@GrabData("GetTailURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@TailColor2Material\SetTexture('$basetexture', @EndRT())
+
+			texSize = PPM2.GetTextureSize(@@QUAD_SIZE_TAIL_BUMP)
+
+			@StartRTOpaque('Tail_Bump', texSize, 127, 127, 255)
+
+			surface.SetMaterial(_M.HAIR_BUMP)
+			_M.HAIR_BUMP\SetFloat('$alpha', @GrabData('TailBumpStrength'))
+			surface.SetDrawColor(255, 255, 255)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			rt = @EndRT()
+			@TailColor1Material\SetTexture('$bumpmap', rt)
+			@TailColor2Material\SetTexture('$bumpmap', rt)
+
 			PPM2.DebugPrint('Compiled tail textures for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()

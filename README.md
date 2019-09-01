@@ -16,6 +16,8 @@ This project use assets from [Dynamic Surroundings](https://github.com/OreCrunch
 
 This project use assets from deviantart user [Digivee](https://www.deviantart.com/digivee)
 
+This project use assets from deviantart user [fentonxd](https://www.deviantart.com/fentonxd)
+
 # Features
  * Fully customizable ponies! Even **more customizable than you think**! Just checkout advanced mode in editor!
  * Total code rewrite; now all functions are working on Event Oriented Programming; it means that PPM/2 can work much faster with more features included when compared to original PPM

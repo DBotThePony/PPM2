@@ -1003,6 +1003,8 @@ EDIT_TREE = {
 									@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
 									@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
 
+									@NumSlider('gui.ppm2.editor.mane.bump_strength', 'ManeBumpStrength', 2)
+
 									@Hr()
 									@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
 									PPM2.EditorPhongPanels(@, 'Mane', 'gui.ppm2.editor.mane.mane_phong') if ADVANCED_MODE\GetBool()
@@ -1258,6 +1260,7 @@ EDIT_TREE = {
 					@CheckBox('gui.ppm2.editor.misc.hide_tail', 'HideManesTail')
 
 					@NumSlider('gui.ppm2.editor.tail.size', 'TailSize', 2)
+					@NumSlider('gui.ppm2.editor.tail.bump_strength', 'TailBumpStrength', 2)
 
 					@ColorBox('gui.ppm2.editor.tail.color' .. i, "TailColor#{i}") for i = 1, 2
 

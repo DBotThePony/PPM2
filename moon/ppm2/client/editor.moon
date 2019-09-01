@@ -1259,6 +1259,10 @@ EditorPages = {
 			@NumSlider('gui.ppm2.editor.tail.size', 'TailSize', 2)
 
 			@Hr()
+			@NumSlider('gui.ppm2.editor.mane.bump_strength', 'ManeBumpStrength', 2)
+			@NumSlider('gui.ppm2.editor.tail.bump_strength', 'TailBumpStrength', 2)
+
+			@Hr()
 			@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
 			PPM2.EditorPhongPanels(@, 'Mane', 'gui.ppm2.editor.mane.mane_phong') if ADVANCED_MODE\GetBool()
 			@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
