@@ -1685,6 +1685,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	UpdateEyeReflections: (ent = @GetEntity()) =>
 		return if not @EyeMaterialDrawL or not @EyeMaterialDrawR
+		return if not ent\IsValid()
 		@AttachID = @AttachID or @GetEntity()\LookupAttachment('eyes')
 		local Pos
 		local Ang
