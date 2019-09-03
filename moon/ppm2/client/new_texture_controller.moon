@@ -132,7 +132,6 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$basemapalphaphongmask': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
@@ -263,7 +262,6 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$phong': '1'
 				'$phongexponent': '0.1'
 				'$phongboost': '0.1'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
@@ -329,7 +327,6 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$phong': '1'
 				'$phongexponent': '0.1'
 				'$phongboost': '0.1'
-				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
