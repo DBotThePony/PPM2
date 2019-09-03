@@ -439,3 +439,31 @@ gui.ppm2.editor.intro.text = "Grüße meinen neuen.... Robochirurgen für Ponys!
 	"Keine Rückerstattung."
 gui.ppm2.editor.intro.title = 'Willkommen hier, Mensch!'
 gui.ppm2.editor.intro.okay = "Ok, ich werde diese Lizenz sowieso nie lesen."
+
+message.ppm2.debug.race_condition = 'Empfange NetworkedPonyData bevor das Entity auf dem Client erstellt wurde! Warten...'
+
+gui.ppm2.spawnmenu.newmodel = 'Spawn neues Modell'
+gui.ppm2.spawnmenu.newmodelnj = 'Spawn neues nj Modell'
+gui.ppm2.spawnmenu.oldmodel = 'Spawn altes Modell'
+gui.ppm2.spawnmenu.oldmodelnj = 'Spawn altes nj Modell'
+gui.ppm2.spawnmenu.cppmmodel = 'Spawn CPPM Modell'
+gui.ppm2.spawnmenu.cppmmodelnj = 'Spawn CPPM nj Modell'
+gui.ppm2.spawnmenu.cleanup = 'Cleanup unused models'
+gui.ppm2.spawnmenu.reload = 'Lokale Daten neu laden'
+gui.ppm2.spawnmenu.require = 'Daten vom Server anfordern'
+gui.ppm2.spawnmenu.drawhooves = 'Stelle Hufe als Hände dar'
+gui.ppm2.spawnmenu.nohoofsounds = 'Keine Hufgeräusche'
+gui.ppm2.spawnmenu.noflexes = 'Deaktiviere Gesichtsausdrücke (emotes)'
+gui.ppm2.spawnmenu.advancedmode = 'PPM2-Editor Erweiterter Modus aktivieren'
+gui.ppm2.spawnmenu.reflections = 'Echtzeit Augenreflexionen aktivieren'
+gui.ppm2.spawnmenu.reflections_drawdist = 'Reflexions sichtweite'
+gui.ppm2.spawnmenu.reflections_renderdist = 'Reflexions render sichtweite'
+gui.ppm2.spawnmenu.doublejump = 'Doppelsprung aktiviert Flug'
+gui.ppm2.spawnmenu.vm_magic = 'ViewModel Einhorn ausrichtung'
+
+tip.ppm2.in_editor = 'In PPM/2 Editor'
+tip.ppm2.camera = "%s's PPM/2 Kamera"
+
+message.ppm2.queue_notify = '%i Texturen werden in die Warteschlange gestellt, um gerendert zu werden.'
+
+gui.ppm2.editor.body.bump = 'Bumpmap stärke'
