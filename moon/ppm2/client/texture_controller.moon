@@ -514,7 +514,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			panel\Remove()
 			if data.timeouts >= 4
 				newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
-					'$basetexture': 'models/ppm2/partrender/null'
+					'$basetexture': 'null'
 					'$ignorez': 1
 					'$vertexcolor': 1
 					'$vertexalpha': 1
@@ -981,7 +981,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$selfillum': '1'
-				'$selfillummask': 'models/ppm2/partrender/null'
+				'$selfillummask': 'null'
 				'$bumpmap': 'null-bumpmap'
 
 				'$color': '{255 255 255}'
@@ -1134,7 +1134,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$basetexture': 'models/ppm2/base/horn'
 				'$bumpmap': 'models/ppm2/base/horn_normal'
 				'$selfillum': '1'
-				'$selfillummask': 'models/ppm2/partrender/null'
+				'$selfillummask': 'null'
 
 				'$model': '1'
 				'$phong': '1'
@@ -1972,7 +1972,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
 			'shader': 'VertexLitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm2/partrender/null'
+				'$basetexture': 'null'
 				'$translucent': '1'
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
@@ -1983,7 +1983,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI"
 			'shader': 'UnlitGeneric'
 			'data': {
-				'$basetexture': 'models/ppm2/partrender/null'
+				'$basetexture': 'null'
 				'$translucent': '1'
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
@@ -1996,8 +1996,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
 		unless @GrabData('CMark')
-			@CMarkTexture\SetTexture('$basetexture', 'models/ppm2/partrender/null')
-			@CMarkTextureGUI\SetTexture('$basetexture', 'models/ppm2/partrender/null')
+			@CMarkTexture\SetTexture('$basetexture', 'null')
+			@CMarkTextureGUI\SetTexture('$basetexture', 'null')
 			return @CMarkTexture, @CMarkTextureGUI
 
 		URL = @GrabData('CMarkURL')
