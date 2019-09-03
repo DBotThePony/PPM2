@@ -19,10 +19,9 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
-
-_M = PPM2.MaterialsRegistry
 
 -- [ 1] = "models/ppm2/base/cmark",
 -- [ 2] = "models/ppm2/base/tongue",
@@ -126,13 +125,14 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
-				'$bumpmap': 'null-bumpmap'
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 				'$model': '1'
 				'$phong': '1'
+				'$basemapalphaphongmask': '1'
 				'$phongexponent': '6'
 				'$phongboost': '0.05'
+				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
@@ -154,9 +154,6 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		HairColor2MaterialName = "!#{textureSecond.name\lower()}"
 		HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
-
-		@_HairColor1Material = HairColor1Material
-		@_HairColor2Material = HairColor2Material
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
 
@@ -211,20 +208,6 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			HairColor2Material\SetTexture('$basetexture', @EndRT())
-
-			texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR_BUMP)
-
-			@StartRTOpaque('Mane_Bump', texSize, 127, 127, 255)
-
-			surface.SetMaterial(_M.HAIR_BUMP)
-			_M.HAIR_BUMP\SetFloat('$alpha', @GrabData('ManeBumpStrength'))
-			surface.SetDrawColor(255, 255, 255)
-			surface.DrawTexturedRect(0, 0, texSize, texSize)
-
-			rt = @EndRT()
-			HairColor1Material\SetTexture('$bumpmap', rt)
-			HairColor2Material\SetTexture('$bumpmap', rt)
-
 			PPM2.DebugPrint('Compiled mane textures for ', @GetEntity(), ' as part of ', @)
 
 		data = @GetData()
@@ -257,10 +240,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			@ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
 
 		if @GrabData('SeparateManePhong')
-			@ApplyPhongData(@UpperManeColor1, 'UpperMane', nil, nil, true)
-			@ApplyPhongData(@UpperManeColor2, 'UpperMane', nil, nil, true)
-			@ApplyPhongData(@LowerManeColor1, 'LowerMane', nil, nil, true)
-			@ApplyPhongData(@LowerManeColor2, 'LowerMane', nil, nil, true)
+			@ApplyPhongData(@UpperManeColor1, 'UpperMane')
+			@ApplyPhongData(@UpperManeColor2, 'UpperMane')
+			@ApplyPhongData(@LowerManeColor1, 'LowerMane')
+			@ApplyPhongData(@LowerManeColor2, 'LowerMane')
 
 		@ApplyPhongData(@TeethMaterial, 'Teeth') if @TeethMaterial
 		@ApplyPhongData(@MouthMaterial, 'Mouth') if @MouthMaterial
@@ -280,6 +263,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$phong': '1'
 				'$phongexponent': '0.1'
 				'$phongboost': '0.1'
+				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
@@ -345,6 +329,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$phong': '1'
 				'$phongexponent': '0.1'
 				'$phongboost': '0.1'
+				'$phongalbedotint': '1'
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 				'$alpha': '1'
@@ -417,6 +402,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'$phongboost': '.1'
 			'$phongfresnelranges': '[.3 1 8]'
 			'$halflambert': '0'
+			'$basemapalphaphongmask': '1'
 
 			'$rimlight': '1'
 			'$rimlightexponent': '4'

@@ -278,24 +278,8 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'body_bump': {
-		default: -> 0.25
-		getFunc: 'BodyBumpStrength'
-		type: 'FLOAT'
-		min: 0
-		max: 1
-	}
-
-	'mane_bump': {
-		default: -> 0.25
-		getFunc: 'ManeBumpStrength'
-		type: 'FLOAT'
-		min: 0
-		max: 1
-	}
-
-	'tail_bump': {
 		default: -> 0.5
-		getFunc: 'TailBumpStrength'
+		getFunc: 'BodyBumpStrength'
 		type: 'FLOAT'
 		min: 0
 		max: 1

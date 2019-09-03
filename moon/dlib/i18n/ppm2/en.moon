@@ -467,6 +467,3 @@ tip.ppm2.camera = "%s's PPM/2 Camera"
 message.ppm2.queue_notify = '%i textures are queued to be rendered'
 
 gui.ppm2.editor.body.bump = 'Bumpmap strength'
-
-gui.ppm2.editor.mane.bump_strength = 'Mane normalmap strength'
-gui.ppm2.editor.tail.bump_strength = 'Tail normalmap strength'

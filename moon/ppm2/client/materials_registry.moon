@@ -259,7 +259,6 @@ module.PONY_SOCKS = Material('models/ppm2/texclothes/pony_socks.png')
 module.LIPS = Material('models/ppm2/partrender/lips.png')
 module.NOSE = Material('models/ppm2/partrender/nose.png')
 module.BODY_BUMP = Material('models/ppm2/partrender/body_bump2.png')
-module.HAIR_BUMP = Material('models/ppm2/partrender/hairbump.png')
 
 module.EYE_CORNERA = Material('models/ppm2/eyes/eye_cornea')
 module.EYE_CORNERA_OVAL = Material('models/ppm2/eyes/eye_cornea_oval')
