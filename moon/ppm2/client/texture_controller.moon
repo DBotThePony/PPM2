@@ -982,7 +982,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$halflambert': '1'
 				'$selfillum': '1'
 				'$selfillummask': 'models/ppm2/partrender/null'
-				'$bumpmap': 'models/ppm2/partrender/null'
+				'$bumpmap': 'null-bumpmap'
 
 				'$color': '{255 255 255}'
 				'$color2': '{255 255 255}'
