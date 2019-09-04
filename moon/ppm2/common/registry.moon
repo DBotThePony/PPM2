@@ -40,7 +40,7 @@ list.Set('PlayerOptionsModel', 'pony_cppm', 'models/cppm/player_default_base.mdl
 player_manager.AddValidModel('ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 list.Set('PlayerOptionsModel', 'ponynj_cppm', 'models/cppm/player_default_base_nj.mdl')
 
-player_manager.AddValidHands(model, 'models/cppm/pony_arms.mdl', 0, '') for _, model in ipairs {'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
+player_manager.AddValidHands(model, 'models/ppm/c_arms_pony.mdl', 0, '') for model in *{'pony', 'pony_cppm', 'ponynj', 'ponynj_cppm', 'pony_old'}
 
 PPM2.MIN_WEIGHT = 0.7
 PPM2.MAX_WEIGHT = 1.5
@@ -89,6 +89,10 @@ PPM2.MAX_PUPIL_SIZE = 1
 
 PPM2.MIN_EYE_ROTATION = -180
 PPM2.MAX_EYE_ROTATION = 180
+
+PPM2.HAND_BODYGROUP_ID = 0
+PPM2.HAND_BODYGROUP_MAGIC = 0
+PPM2.HAND_BODYGROUP_HOOVES = 1
 
 PPM2.AvaliableTails = {
 	'MAILCALL'

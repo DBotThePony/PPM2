@@ -89,16 +89,7 @@ entMeta.GetPonyRaceFlags = =>
 	return 0 if not @IsPonyCached()
 	data = @GetPonyData()
 	return 0 if not data
-
-	switch data\GetRace()
-		when PPM2.RACE_EARTH
-			return 0
-		when PPM2.RACE_PEGASUS
-			return PPM2.RACE_HAS_WINGS
-		when PPM2.RACE_UNICORN
-			return PPM2.RACE_HAS_HORN
-		when PPM2.RACE_ALICORN
-			return PPM2.RACE_HAS_HORN + PPM2.RACE_HAS_WINGS
+	return data\GetPonyRaceFlags()
 
 entMeta.IsPony = =>
 	model = @GetModel()

@@ -37,7 +37,7 @@ SV_SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY
 VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '0', {FCVAR_ARCHIVE}, 'Modify viewmodel when pony has horn for more immersion. Has no effect when ppm2_cl_vm_magic_hands is on')
 VM_MAGIC_HANDS = CreateConVar('ppm2_cl_vm_magic_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Use magic hands when pony has horn. Due to gmod behavior, sometimes this does not work')
 
-validHands = (hands) -> hands == 'models/cppm/pony_arms.mdl' or hands == 'models/ppm/c_arms_magic.mdl'
+validHands = (hands) -> hands == 'models/ppm/c_arms_pony.mdl'
 
 hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL, ply = LocalPlayer(), weapon = NULL) ->
 	return if PPM2.__RENDERING_REFLECTIONS or not IsValid(arms) or not ply.__cachedIsPony
@@ -60,18 +60,7 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
 	data = ply\GetPonyData()
 	return unless data
 
-	if (IsValid(observer) and observer or ply)\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0
-		return true if not VM_MAGIC_HANDS\GetBool() and VM_MAGIC\GetBool()
-
-		if VM_MAGIC_HANDS\GetBool()
-			arms\SetModel('models/ppm/c_arms_magic.mdl') if amodel ~= 'models/ppm/c_arms_magic.mdl'
-			PPM2.MaterialsRegistry.MAGIC_HANDS_MATERIAL\SetVector('$colortint_base', data\ComputeMagicColor()\ToVector())
-		else
-			arms\SetModel('models/cppm/pony_arms.mdl') if amodel ~= 'models/cppm/pony_arms.mdl'
-	else
-		arms\SetModel('models/cppm/pony_arms.mdl') if amodel ~= 'models/cppm/pony_arms.mdl'
-
-	status = data\GetRenderController()\PreDrawArms(arms, amodel == 'models/cppm/pony_arms.mdl')
+	status = data\GetRenderController()\PreDrawArms(arms)
 	return status if status ~= nil
 	arms.__ppm2_draw = true
 
@@ -81,7 +70,7 @@ hook.Add 'PostDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL
 	return unless arms.__ppm2_draw
 	data = ply\GetPonyData()
 	return unless data
-	data\GetRenderController()\PostDrawArms(arms, arms\GetModel() == 'models/cppm/pony_arms.mdl')
+	data\GetRenderController()\PostDrawArms(arms)
 	arms.__ppm2_draw = false
 
 local lastPos, lastAng

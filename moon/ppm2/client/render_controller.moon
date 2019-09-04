@@ -22,6 +22,8 @@
 
 import PPM2 from _G
 
+vector_one = Vector(1, 1, 1)
+
 ENABLE_FLASHLIGHT_PASS = CreateConVar('ppm2_flashlight_pass', '1', {FCVAR_ARCHIVE}, 'Enable flashlight render pass. This kills FPS.')
 ENABLE_LEGS = CreateConVar('ppm2_draw_legs', '1', {FCVAR_ARCHIVE}, 'Draw pony legs.')
 USE_RENDER_OVERRIDE = CreateConVar('ppm2_legs_new', '1', {FCVAR_ARCHIVE}, 'Use RenderOverride function for legs drawing')
@@ -476,21 +478,27 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @isValid
 		@GetTextureController()\PostDraw(ent, drawingNewTask)
 
-	@ARMS_MATERIAL_INDEX = 0
+	@HANDS_MATERIAL_INDEX = 1
+	@MAGIC_ARMS_MATERIAL_INDEX = 0
 
-	PreDrawArms: (ent, hooves = true) =>
+	PreDrawArms: (ent) =>
 		return if not @isValid
-		return if not hooves
-		if ent and not @armsWeightSetup
-			@armsWeightSetup = true
-			weight = 1 + (@GetData()\GetWeight() - 1) * 0.4
+		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0
+
+		if ent and hooves
+			weight = 0.7 + (@GetData()\GetWeight() - 1) * 0.4
 			vec = Vector(weight, weight, weight)
-			ent\ManipulateBoneScale(i, vec) for i = 1, 13
-		ent\SetSubMaterial(@@ARMS_MATERIAL_INDEX, @GetTextureController()\GetBodyName())
+			ent\ManipulateBoneScale(i, vec) for i = 1, 43
+		elseif ent
+			ent\ManipulateBoneScale(i, vector_one) for i = 1, 13
 
-	PostDrawArms: (ent, hooves = true) =>
+		if hooves
+			ent\SetSubMaterial(@@HANDS_MATERIAL_INDEX, @GetTextureController()\GetBodyName())
+
+	PostDrawArms: (ent) =>
 		return if not @isValid
-		ent\SetSubMaterial(@@ARMS_MATERIAL_INDEX, '')
+		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0
+		ent\SetSubMaterial(@@HANDS_MATERIAL_INDEX, '') if hooves
 
 	DataChanges: (state) =>
 		return if not @isValid

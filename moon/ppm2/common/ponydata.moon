@@ -572,6 +572,17 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	SetLocalChange: (state) => @GenericDataChange(state)
 	NetworkDataChanges: (state) => @GenericDataChange(state)
 
+	GetPonyRaceFlags: =>
+		switch @GetRace()
+			when PPM2.RACE_EARTH
+				return 0
+			when PPM2.RACE_PEGASUS
+				return PPM2.RACE_HAS_WINGS
+			when PPM2.RACE_UNICORN
+				return PPM2.RACE_HAS_HORN
+			when PPM2.RACE_ALICORN
+				return PPM2.RACE_HAS_HORN + PPM2.RACE_HAS_WINGS
+
 	SlowUpdate: =>
 		@GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
 		@GetWeightController()\SlowUpdate() if @GetWeightController()
@@ -582,15 +593,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			arms = @ent\GetHands()
 
 			if IsValid(arms)
-				amodel = arms\GetModel()
-
-				if @GetRace()\band(PPM2.RACE_HAS_HORN) ~= 0
-					if @ent\GetInfoBool('ppm2_cl_vm_magic_hands', true)
-						arms\SetModel('models/ppm/c_arms_magic.mdl')
-					else
-						arms\SetModel('models/cppm/pony_arms.mdl')
-				else
-					arms\SetModel('models/cppm/pony_arms.mdl')
+				cond = @GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0 and @ent\GetInfoBool('ppm2_cl_vm_magic_hands', true) and PPM2.HAND_BODYGROUP_MAGIC or PPM2.HAND_BODYGROUP_HOOVES
+				arms\SetBodygroup(PPM2.HAND_BODYGROUP_ID, cond)
 
 	Think: =>
 	RenderScreenspaceEffects: =>
@@ -795,6 +799,9 @@ else
 		ply.__ppm2_modified_jump = false
 	hook.Add 'OnPlayerChangedTeam', 'PPM2.TeamWaypoint', (ply, old, new) ->
 		ply.__ppm2_modified_jump = false
+
+_G.LocalPonyData = () -> LocalPlayer()\GetPonyData()
+_G.LocalPonydata = () -> LocalPlayer()\GetPonyData()
 
 entMeta = FindMetaTable('Entity')
 entMeta.GetPonyData = =>
