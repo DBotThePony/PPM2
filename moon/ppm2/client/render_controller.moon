@@ -506,6 +506,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@GetTextureController()\DataChanges(state)
 		@flexes\DataChanges(state) if @flexes
 		@emotes\DataChanges(state) if @emotes
+		PPM2.MaterialsRegistry.MAGIC_HANDS_MATERIAL\SetVector('$colortint_base', @GetData()\ComputeMagicColor()\ToVector())
 		switch state\GetKey()
 			when 'Weight'
 				@armsWeightSetup = false
