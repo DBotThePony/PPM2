@@ -506,8 +506,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@GetTextureController()\DataChanges(state)
 		@flexes\DataChanges(state) if @flexes
 		@emotes\DataChanges(state) if @emotes
-		if @GetEntity() == LocalPlayer()
-			PPM2.MaterialsRegistry.MAGIC_HANDS_MATERIAL\SetVector('$colortint_base', @GetData()\ComputeMagicColor()\ToVector())
+
 		switch state\GetKey()
 			when 'Weight'
 				@armsWeightSetup = false
@@ -526,6 +525,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 					@flexes = nil
 				else
 					@CreateFlexController()
+			when 'EyeIrisBottom', 'EyeIrisBottomLeft', 'EyeIrisBottomRight', 'SeparateEyes', 'HornMagicColor', 'EyeIrisTop', 'EyeIrisTopLeft', 'EyeIrisTopRight'
+				if @GetEntity() == LocalPlayer()
+					PPM2.MaterialsRegistry.MAGIC_HANDS_MATERIAL\SetVector('$colortint_base', @GetData()\ComputeMagicColor()\ToVector())
 	GetTextureController: =>
 		return @renderController if not @isValid
 		if not @renderController
