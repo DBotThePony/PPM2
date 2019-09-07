@@ -755,7 +755,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 					return
 
 				len = (timeOfAnim - @min) / @nextBlinkLength
-				blink = math.tbezier(len, BLINK_CURVE)
+				blink = math.tbezier(len\clamp(0, 1), BLINK_CURVE)
 
 				@SetModifierWeight(1, blink)
 				-- print(len, blink)
