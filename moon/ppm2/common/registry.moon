@@ -135,6 +135,17 @@ PPM2.BodyDetails = {
 	'DASH-E', 'Eye Scar', 'Eye Wound', 'Scars', 'MGS Socks'
 	'Sharp Hooves', 'Sharp Hooves 2', 'Muzzle', 'Eye Scar Left'
 	'Eye Scar Right'
+
+	'Albedo Printed Plate Skin'
+	'Paintable Printed Plate Skin'
+	'Albedo Printed Plate Strip'
+	'Paintable Printed Plate Strip'
+	'Cow Details'
+	'Deer Details'
+	'Extended Deer Details'
+	'Demonic'
+	'Ear Inner Detail'
+	'Zebra Details'
 }
 
 PPM2.BodyDetailsEnum = {
@@ -144,6 +155,17 @@ PPM2.BodyDetailsEnum = {
 	'DASH_E', 'EYE_SCAR', 'EYE_WOUND', 'SCARS', 'MGS_SOCKS'
 	'SHARP_HOOVES', 'SHARP_HOOVES_2', 'MUZZLE', 'EYE_SCAR_LEFT'
 	'EYE_SCAR_RIGHT'
+
+	'ALBEDO_ANDROID'
+	'PAINT_ANDROID'
+	'ALBEDO_ANDROID_STRIP'
+	'PAINT_ANDROID_STRIP'
+	'COW'
+	'DEER'
+	'DEER_EXTENDED'
+	'DEMONIC'
+	'EAR_INNER'
+	'ZEBRA_DETAILS'
 }
 
 PPM2.SocksTypes = {

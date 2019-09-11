@@ -75,6 +75,16 @@ module = {
 		Material('models/ppm2/partrender/separated_muzzle.png')
 		Material('models/ppm2/partrender/eye_scar_left.png')
 		Material('models/ppm2/partrender/eye_scar_right.png')
+		Material('models/ppm2/partrender/android_albedo.png')
+		Material('models/ppm2/partrender/android_paint.png')
+		Material('models/ppm2/partrender/android_albedo_strip.png')
+		Material('models/ppm2/partrender/android_paint_strip.png')
+		Material('models/ppm2/partrender/cow_paint.png')
+		Material('models/ppm2/partrender/deer_paint.png')
+		Material('models/ppm2/partrender/deer_extended_paint.png')
+		Material('models/ppm2/partrender/demonic_paint.png')
+		Material('models/ppm2/partrender/ear_inner_paint.png')
+		Material('models/ppm2/partrender/zebra_detail_paint.png')
 	}
 
 	UPPER_MANE_DETAILS: {
