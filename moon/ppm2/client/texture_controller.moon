@@ -227,6 +227,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["BodyDetailURL#{i}"] = true
 		@BODY_UPDATE_TRIGGER["BodyDetailGlow#{i}"] = true
 		@BODY_UPDATE_TRIGGER["BodyDetailGlowStrength#{i}"] = true
+		@BODY_UPDATE_TRIGGER["BodyDetailFirst#{i}"] = true
+		@BODY_UPDATE_TRIGGER["BodyDetailURLFirst#{i}"] = true
 
 	for i = 1, PPM2.MAX_TATTOOS
 		@BODY_UPDATE_TRIGGER["TattooType#{i}"] = true
@@ -1014,6 +1016,21 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			surface.DrawRect(0, 0, bodysize, bodysize)
 
+			for i = 1, PPM2.MAX_BODY_DETAILS
+				if @GrabData('BodyDetailFirst' .. i)
+					if mat = _M.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
+						surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
+						surface.SetMaterial(mat)
+						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
+			surface.SetDrawColor(255, 255, 255)
+
+			for i, mat in pairs urlTextures
+				if @GrabData('BodyDetailURLFirst' .. i)
+					surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
+					surface.SetMaterial(mat)
+					surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+
 			surface.SetDrawColor(@GrabData('EyebrowsColor'))
 			surface.SetMaterial(_M.EYEBROWS)
 			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
@@ -1041,17 +1058,19 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
-				if mat = _M.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
-					surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
-					surface.SetMaterial(mat)
-					surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+				if not @GrabData('BodyDetailFirst' .. i)
+					if mat = _M.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
+						surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
+						surface.SetMaterial(mat)
+						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
 			surface.SetDrawColor(255, 255, 255)
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
-				surface.SetMaterial(mat)
-				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+				if not @GrabData('BodyDetailURLFirst' .. i)
+					surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
+					surface.SetMaterial(mat)
+					surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
 			@DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 

@@ -1443,9 +1443,12 @@ EditorPages = {
 			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 3
 				@ComboBox('gui.ppm2.editor.body.detail.desc' .. i, "BodyDetail#{i}")
 				@ColorBox('gui.ppm2.editor.body.detail.color' .. i, "BodyDetailColor#{i}")
+
 				if ADVANCED_MODE\GetBool()
+					@CheckBox('gui.ppm2.editor.body.detail.first', "BodyDetailFirst#{i}")
 					@CheckBox('gui.ppm2.editor.body.detail.glow' .. i, "BodyDetailGlow#{i}")
 					@NumSlider('gui.ppm2.editor.body.detail.glow_strength' .. i, "BodyDetailGlowStrength#{i}", 2)
+
 				@Hr()
 
 			@Label('gui.ppm2.editor.body.url_desc')
@@ -1454,6 +1457,7 @@ EditorPages = {
 			for i = 1, ADVANCED_MODE\GetBool() and PPM2.MAX_BODY_DETAILS or 2
 				@Label('gui.ppm2.editor.body.detail.url.desc' .. i)
 				@URLInput("BodyDetailURL#{i}")
+				@CheckBox('gui.ppm2.editor.body.detail.first', "BodyDetailURLFirst#{i}")
 				@ColorBox('gui.ppm2.editor.body.detail.url.color' .. i, "BodyDetailURLColor#{i}")
 				@Hr()
 	}

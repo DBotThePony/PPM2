@@ -1059,6 +1059,18 @@ for i = 1, PPM2.MAX_BODY_DETAILS
 		enum: [arg for _, arg in ipairs PPM2.BodyDetailsEnum]
 	}
 
+	PPM2.PonyDataRegistry["body_detail_#{i}_first"] = {
+		default: -> false
+		getFunc: "BodyDetailFirst#{i}"
+		type: 'BOOLEAN'
+	}
+
+	PPM2.PonyDataRegistry["body_url_detail_#{i}_first"] = {
+		default: -> false
+		getFunc: "BodyDetailURLFirst#{i}"
+		type: 'BOOLEAN'
+	}
+
 	PPM2.PonyDataRegistry["body_detail_url_#{i}"] = {
 		default: -> ''
 		getFunc: "BodyDetailURL#{i}"
