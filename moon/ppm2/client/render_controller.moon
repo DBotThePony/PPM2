@@ -483,7 +483,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	PreDrawArms: (ent) =>
 		return if not @isValid
-		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0
+		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0 or not PPM2.VM_MAGIC_HANDS\GetBool()
 
 		if ent and hooves
 			weight = 0.7 + (@GetData()\GetWeight() - 1) * 0.4

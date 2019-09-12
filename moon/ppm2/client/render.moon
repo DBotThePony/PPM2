@@ -34,8 +34,11 @@ ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS
 SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_cl_draw_hands', '1', {FCVAR_ARCHIVE}, 'Should draw hooves as viewmodel')
 SV_SHOULD_DRAW_VIEWMODEL = CreateConVar('ppm2_sv_draw_hands', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Should draw hooves as viewmodel')
 
-VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '0', {FCVAR_ARCHIVE}, 'Modify viewmodel when pony has horn for more immersion. Has no effect when ppm2_cl_vm_magic_hands is on')
-VM_MAGIC_HANDS = CreateConVar('ppm2_cl_vm_magic_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Use magic hands when pony has horn. Due to gmod behavior, sometimes this does not work')
+VM_MAGIC = CreateConVar('ppm2_cl_vm_magic', '0', {FCVAR_ARCHIVE, FCVAR_USERINFO}, 'Modify viewmodel when pony has horn for more immersion. Has no effect when ppm2_cl_vm_magic_hands is on')
+VM_MAGIC_HANDS = CreateConVar('ppm2_cl_vm_magic_hands', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_USERINFO}, 'Use magic hands when pony has horn. Due to gmod behavior, sometimes this does not work')
+
+PPM2.VM_MAGIC = VM_MAGIC
+PPM2.VM_MAGIC_HANDS = VM_MAGIC_HANDS
 
 validHands = (hands) -> hands == 'models/ppm/c_arms_pony.mdl'
 
@@ -59,6 +62,8 @@ hook.Add 'PreDrawPlayerHands', 'PPM2.ViewModel', (arms = NULL, viewmodel = NULL,
 
 	data = ply\GetPonyData()
 	return unless data
+
+	return true if data\GetPonyRaceFlags()\band(PPM2.RACE_HAS_HORN) ~= 0 and VM_MAGIC\GetBool() and not VM_MAGIC_HANDS\GetBool()
 
 	status = data\GetRenderController()\PreDrawArms(arms)
 	return status if status ~= nil
