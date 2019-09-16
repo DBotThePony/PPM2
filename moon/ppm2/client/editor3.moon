@@ -718,6 +718,21 @@ EDIT_TREE = {
 			@NumSlider('gui.ppm2.editor.misc.weight', 'Weight', 2)
 			@NumSlider('gui.ppm2.editor.misc.size', 'PonySize', 2)
 
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony', DLib.i18n.FormatHU(size\CalculatePonyHeight())))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony2', DLib.i18n.FormatHU(size\CalculatePonyHeightFull())))
+
+			@LabelFunc(size)
+
+
 			return if not ADVANCED_MODE\GetBool()
 
 			@CheckBox('gui.ppm2.editor.misc.hide_weapons', 'HideWeapons')
@@ -1186,6 +1201,26 @@ EDIT_TREE = {
 					defang: Angle(-7, -15, 0)
 					populate: =>
 						@NumSlider('gui.ppm2.editor.neck.height', 'NeckSize', 2)
+
+						size = (_, label) ->
+							size = @frame.controller\GetNeckSize() * 4.3 * @frame.controller\GetPonySize()
+							label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.neck', DLib.i18n.FormatHU(size)))
+
+						@LabelFunc(size)
+
+						size = (_, label) ->
+							size = @frame.controller\GetSizeController()
+							return if not size
+							label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony', DLib.i18n.FormatHU(size\CalculatePonyHeight())))
+
+						@LabelFunc(size)
+
+						size = (_, label) ->
+							size = @frame.controller\GetSizeController()
+							return if not size
+							label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony2', DLib.i18n.FormatHU(size\CalculatePonyHeightFull())))
+
+						@LabelFunc(size)
 				}
 
 				overall_body: {
@@ -1200,6 +1235,12 @@ EDIT_TREE = {
 
 						'gui.ppm2.editor.tabs.back': =>
 							@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)
+
+							size = (_, label) ->
+								size = @frame.controller\GetBackSize() * 7 * @frame.controller\GetPonySize()
+								label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.back', DLib.i18n.FormatHU(size)))
+
+							@LabelFunc(size)
 
 						'gui.ppm2.editor.tabs.details': =>
 							@NumSlider('gui.ppm2.editor.body.bump', 'BodyBumpStrength', 2)
