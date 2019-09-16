@@ -870,6 +870,38 @@ PANEL_SETTINGS_BASE = {
 			w, h = \GetSize()
 			\SetSize(w, h + 5)
 			@scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
+	SizeLabel: (phrase, startPos, endPos, parent = @scroll or @) =>
+		func = (_, label) ->
+			data = @frame.controller
+			return if not data
+			ent = data\GetEntity()
+			return if not IsValid(ent)
+
+			startPos = ent\LookupBone(startPos) if type(startPos) == 'string'
+			endPos = ent\LookupBone(endPos) if type(endPos) == 'string'
+
+			pos1 = ent\GetBonePosition(startPos) if startPos and startPos ~= -1
+			pos1 = ent\GetPos() if not pos1
+			pos2 = ent\GetBonePosition(endPos) if endPos and endPos ~= -1
+			pos2 = ent\GetPos() if not pos2
+
+			label\SetText(DLib.i18n.localize(phrase, DLib.i18n.FormatHU(pos1\Distance(pos2))))
+
+		@LabelFunc(phrase, func)
+	LabelFunc: (func, parent = @scroll or @) =>
+		@createdPanels += 1
+		with withPanel = vgui.Create('DLabel', parent)
+			\SetText('...')
+			\SetTooltip('...')
+			\Dock(TOP)
+			\DockMargin(2, 2, 2, 2)
+			\SetTextColor(color_white)
+			\SizeToContents()
+			\SetMouseInputEnabled(true)
+			w, h = \GetSize()
+			\SetSize(w, h + 5)
+			@scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
+			.Think = -> func(@, withPanel)
 	URLLabel: (text = '', url = '', parent = @scroll or @) =>
 		@createdPanels += 1
 		with withPanel = vgui.Create('DLabel', parent)
@@ -1104,6 +1136,27 @@ EditorPages = {
 			@NumSlider('gui.ppm2.editor.misc.weight', 'Weight', 2)
 			@NumSlider('gui.ppm2.editor.misc.size', 'PonySize', 2)
 
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony', DLib.i18n.FormatHU(size\CalculatePonyHeight())))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony_width', DLib.i18n.FormatHU(size\CalculatePonyWidth())))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony2', DLib.i18n.FormatHU(size\CalculatePonyHeightFull())))
+
+			@LabelFunc(size)
+
 			return if not ADVANCED_MODE\GetBool()
 			@CheckBox('gui.ppm2.editor.misc.hide_weapons', 'HideWeapons')
 
@@ -1135,6 +1188,32 @@ EditorPages = {
 			@NumSlider('gui.ppm2.editor.neck.height', 'NeckSize', 2)
 			@NumSlider('gui.ppm2.editor.legs.height', 'LegsSize', 2)
 			@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)
+
+			size = (_, label) ->
+				size = @frame.controller\GetBackSize() * 7 * @frame.controller\GetPonySize()
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.back', DLib.i18n.FormatHU(size)))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetNeckSize() * 4.3 * @frame.controller\GetPonySize()
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.neck', DLib.i18n.FormatHU(size)))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony', DLib.i18n.FormatHU(size\CalculatePonyHeight())))
+
+			@LabelFunc(size)
+
+			size = (_, label) ->
+				size = @frame.controller\GetSizeController()
+				return if not size
+				label\SetText(DLib.i18n.localize('gui.ppm2.editor.size.pony2', DLib.i18n.FormatHU(size\CalculatePonyHeightFull())))
+
+			@LabelFunc(size)
 
 			if ADVANCED_MODE\GetBool()
 				@Hr()
@@ -1926,9 +2005,9 @@ PPM2.OpenOldEditor = ->
 	controller = copy\CreateCustomController(ent)
 	controller\SetFlexLerpMultiplier(1.3)
 	copy\SetController(controller)
-	frame.controller = controller
-	frame.data = copy
-	frame.DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
+	@controller = controller
+	@data = copy
+	@DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
 
 	PPM2.EditorCreateTopButtons(@)
 

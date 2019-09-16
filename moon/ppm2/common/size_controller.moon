@@ -290,6 +290,10 @@ class PonySizeController extends PPM2.ControllerChildren
 		@Remap()
 		@ModifyScale()
 
+	CalculatePonyHeight: => (@@HULL_MAXS.z - @@HULL_MINS.z) * @GetLegsModifier() * @GetPonySize()
+	CalculatePonyHeightFull: => (@@HULL_MAXS.z - @@HULL_MINS.z) * @GetLegsModifier() * @GetPonySize() * @GetNeckModifier() * 1.17
+	CalculatePonyWidth: => (@@HULL_MAXS.x - @@HULL_MINS.x) * @GetLegsModifier() * @GetPonySize()
+
 	ModifyHull: (ent = @GetEntity()) =>
 		ent.__ppm2_modified_hull = true
 		size = @GetPonySize()
@@ -331,6 +335,12 @@ class PonySizeController extends PPM2.ControllerChildren
 	GetLegsModifier: (mult = 0.4) =>
 		if @AllowResize()
 			1 + (@GetLegsSize() - 1) * mult
+		else
+			1
+
+	GetNeckModifier: (mult = 0.6) =>
+		if @AllowResize()
+			1 + (@GetNeckSize() - 1) * mult
 		else
 			1
 

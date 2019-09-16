@@ -468,3 +468,9 @@ message.ppm2.queue_notify = '%i textures are queued to be rendered'
 
 gui.ppm2.editor.body.bump = 'Bumpmap strength'
 gui.ppm2.editor.body.detail.first = 'Render detail first-wise'
+
+gui.ppm2.editor.size.pony = 'Collision height of pony: %s'
+gui.ppm2.editor.size.pony2 = 'Visual height of pony: ~%s'
+gui.ppm2.editor.size.pony_width = 'Width of pony: %s'
+gui.ppm2.editor.size.back = 'Length of spine: ~%s'
+gui.ppm2.editor.size.neck = 'Length of neck: ~%s'
