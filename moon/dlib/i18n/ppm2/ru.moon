@@ -465,3 +465,9 @@ message.ppm2.queue_notify = '%i текстур ожидают отрисовки
 
 gui.ppm2.editor.body.bump = 'Непрозрачность Bumpmap'
 gui.ppm2.editor.body.detail.first = 'Отрисовывать деталь первой'
+
+gui.ppm2.editor.size.pony = 'Высота коллизий пони: %s'
+gui.ppm2.editor.size.pony2 = 'Визуальная высота пони: ~%s'
+gui.ppm2.editor.size.pony_width = 'Ширина коллизий пони: %s'
+gui.ppm2.editor.size.back = 'Длинна спины: ~%s'
+gui.ppm2.editor.size.neck = 'Длинна шеи: ~%s'
