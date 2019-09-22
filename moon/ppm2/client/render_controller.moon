@@ -486,7 +486,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0 or not PPM2.VM_MAGIC_HANDS\GetBool()
 
 		if ent and hooves
-			weight = 0.7 + (@GetData()\GetWeight() - 1) * 0.4
+			weight = 1 + (@GetData()\GetWeight() - 1)
 			vec = Vector(weight, weight, weight)
 			ent\ManipulateBoneScale(i, vec) for i = 1, 43
 		elseif ent
