@@ -28,7 +28,7 @@ util.AddNetworkString('PPM2.PlayEmote')
 hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
 	do
 		self = ent
-		if @GetPonyData()
+		if not @__ppm2_ragdoll_parent and @GetPonyData()
 			@__ppm2_last_hurt_anim = @__ppm2_last_hurt_anim or 0
 			if @__ppm2_last_hurt_anim < CurTimeL()
 				@__ppm2_last_hurt_anim = CurTimeL() + 1
