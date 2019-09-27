@@ -414,7 +414,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 			if not IsValid(ent)
 				@isNWWaiting = true
-				@waitTTL = RealTimeL() + 60
+				@waitTTL = RealTimeL() + 3600
 				table.insert(@@NW_WAIT, @)
 				PPM2.LMessage('message.ppm2.debug.race_condition')
 				--print('WAITING ON ', entid)
