@@ -430,7 +430,7 @@ hook.Add 'HUDPaint', 'PPM2.LoadingDisplay', ->
 
 	for task in *PPM2.NetworkedPonyData.CheckTasks
 		if ent = task\GetEntity()
-			if IsValid(ent) and ent\IsPony() and not ent\IsRagdoll() and (ent ~= lply or lply\ShouldDrawLocalPlayer())
+			if IsValid(ent) and ent\IsPony() and not ent\IsRagdoll() and (ent ~= lply or lply\ShouldDrawLocalPlayer()) and (not ent.Alive or ent\Alive())
 				if renderer = task\GetRenderController()
 					if textures = renderer\GetTextureController()
 						if textures\IsBeingProcessed()
