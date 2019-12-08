@@ -221,6 +221,14 @@ PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
 		for _, draw in ipairs MARKED_FOR_DRAW
 			draw\PostDraw()
 
+	if LEGS_RENDER_TYPE\GetBool()
+		with LocalPlayer()
+			if .__cachedIsPony and \Alive()
+				if data = \GetPonyData()
+					IN_DRAW = true
+					data\GetRenderController()\DrawLegs()
+					IN_DRAW = false
+
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
 
@@ -251,14 +259,6 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 							rag\DrawModel()
 							IN_DRAW = false
 							renderController\PostDraw(rag)
-
-	if LEGS_RENDER_TYPE\GetBool()
-		with LocalPlayer()
-			if .__cachedIsPony and \Alive()
-				if data = \GetPonyData()
-					IN_DRAW = true
-					data\GetRenderController()\DrawLegs()
-					IN_DRAW = false
 
 Think = ->
 	for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
