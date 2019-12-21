@@ -206,7 +206,11 @@ timer.Simple 0, ->
 
 					if IsValid(ent)
 						if data = LocalPonyData()
-							newdata = PPM2.NetworkedPonyData(nil, ent.Get and ent\Get() or ent)
+							ment = ent.Get and ent\Get() or ent
+							newdata = PPM2.NetworkedPonyData(nil, ment) if not ment\GetPonyData()
+							newdata = ment\GetPonyData() if ment\GetPonyData()
+							ment.__ppm2RenderOverride = nil
+							ment.__ppm2_oldRenderOverride = nil
 							data\ApplyDataToObject(newdata)
 							newdata\SetHideManes(false)
 							newdata\SetHideManesSocks(false)
