@@ -274,7 +274,12 @@ Think = ->
 				ent.__ppm2RenderOverride = ->
 					renderController = task\GetRenderController()
 					renderController\PreDraw(ent, true)
-					ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
+
+					if ent.__ppm2_oldRenderOverride
+						ent.__ppm2_oldRenderOverride(ent)
+					else
+						ent\DrawModel()
+
 					renderController\PostDraw(ent, true)
 				ent.RenderOverride = ent.__ppm2RenderOverride
 
