@@ -686,7 +686,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
-		surface.DisableClipping(true)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		cam.Start2D()
@@ -717,10 +716,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			PPM2.Message('Switching to fat ass render targets with full buffer')
 			@@RT_BUFFER_BROKEN = true
 			return @StartRT(name, texSize, r, g, b, a)
+
 		rt\Download()
 		render.PushRenderTarget(rt)
 		render.Clear(r, g, b, a, true, true)
-		surface.DisableClipping(true)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		cam.Start2D()
@@ -735,9 +734,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		render.PopFilterMin()
 		render.PopFilterMag()
 		cam.End2D()
-		--render.SetViewPort(0, 0, @oldW, @oldH)
 		render.PopRenderTarget()
-		surface.DisableClipping(false)
 		rt = @currentRT
 		@currentRT = nil
 
