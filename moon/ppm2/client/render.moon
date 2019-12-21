@@ -274,9 +274,8 @@ Think = ->
 				ent.__ppm2RenderOverride = ->
 					renderController = task\GetRenderController()
 					renderController\PreDraw(ent, true)
-					ent\DrawModel()
-					renderController\PostDraw(ent, true)
 					ent.__ppm2_oldRenderOverride(ent) if ent.__ppm2_oldRenderOverride
+					renderController\PostDraw(ent, true)
 				ent.RenderOverride = ent.__ppm2RenderOverride
 
 PPM2.PrePlayerDraw = =>

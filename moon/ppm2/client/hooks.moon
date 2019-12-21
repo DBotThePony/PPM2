@@ -195,4 +195,24 @@ cvars.AddChangeCallback('ppm2_cl_hires_body', (->
 	)
 ), 'ppm2')
 
+-- Jazztronauts cutscenes support
+timer.Simple 0, ->
+	if dialog and dialog.CreatePlayerProxy
+		if info = debug.getinfo(dialog.CreatePlayerProxy)
+			if info.short_src and (info.short_src\find('jazztronauts') or info.short_src\find('ppm2'))
+				dialog._PPM2_CreatePlayerProxy = dialog._PPM2_CreatePlayerProxy or dialog.CreatePlayerProxy
+				dialog.CreatePlayerProxy = (...) ->
+					ent = dialog._PPM2_CreatePlayerProxy(...)
+
+					if IsValid(ent)
+						if data = LocalPonyData()
+							newdata = PPM2.NetworkedPonyData(nil, ent.Get and ent\Get() or ent)
+							data\ApplyDataToObject(newdata)
+							newdata\SetHideManes(false)
+							newdata\SetHideManesSocks(false)
+
+
+
+					return ent
+
 return
