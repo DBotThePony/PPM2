@@ -131,5 +131,6 @@ class PPM2.SequenceHolder extends PPM2.ModifierBase
 		return delta
 
 	Remove: =>
+		seq\Stop() for _, seq in ipairs @currentSequencesIterable
 		@isValid = false
 		@RemoveHooks()
