@@ -45,6 +45,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@CreateLegs() if @GetEntity() == LocalPlayer()
 		@socksModel = controller\GetSocksModel()
 		@socksModel\SetNoDraw(false) if IsValid(@socksModel)
+		@hornModel = controller\GetSocksModel()
+		@hornModel\SetNoDraw(false) if IsValid(@hornModel)
 		@newSocksModel = controller\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
 		@lastStareUpdate = 0
@@ -332,12 +334,14 @@ class PonyRenderController extends PPM2.ControllerChildren
 	DrawModels: =>
 		@socksModel\DrawModel() if IsValid(@socksModel)
 		@newSocksModel\DrawModel() if IsValid(@newSocksModel)
+		@hornModel\DrawModel() if IsValid(@hornModel)
 
 	ShouldHideModels: => @hideModels or @GetEntity()\GetNoDraw()
 
 	DoHideModels: (status) =>
 		@socksModel\SetNoDraw(status) if IsValid(@socksModel)
 		@newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
+		@hornModel\SetNoDraw(status) if IsValid(@hornModel)
 
 	HideModels: (status = true) =>
 		return if @hideModels == status
@@ -470,9 +474,11 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if ent.RenderOverride and not ent.__ppm2RenderOverride and @GrabData('HideManes') and @GrabData('HideManesSocks')
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
+			@hornModel\SetNoDraw(true) if IsValid(@hornModel)
 		else
 			@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
+			@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return if not @isValid
@@ -519,6 +525,10 @@ class PonyRenderController extends PPM2.ControllerChildren
 				@newSocksModel = @GetData()\GetNewSocksModel()
 				@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 				@GetTextureController()\UpdateNewSocks(@GetEntity(), @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
+			when 'HornModel'
+				@hornModel = @GetData()\GetHornModel()
+				@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
+				@GetTextureController()\UpdateNewHorn(@GetEntity(), @hornModel) if @GetTextureController() and IsValid(@hornModel)
 			when 'NoFlex'
 				if state\GetValue()
 					@flexes\ResetSequences() if @flexes

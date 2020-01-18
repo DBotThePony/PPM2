@@ -189,6 +189,48 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@GetData()\SetSocksModel(@socksModel)
 		return @socksModel
 
+	CreateHornModel: (force = false) =>
+		return NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
+		return @hornModel if IsValid(@hornModel)
+		for _, ent in ipairs ents_GetAll()
+			if ent.isPonyPropModel and ent.isHornModel and ent.manePlayer == @GetEntity()
+				@hornModel = ent
+				@GetData()\SetSocksModel(@hornModel)
+				PPM2.DebugPrint('Resuing ', @hornModel, ' as horn model for ', @GetEntity())
+				return ent
+
+		modelID, bodygroupID = PPM2.TransformHornModelID(@GetData()\GetNewHornType())
+		modelID = "0" .. modelID if modelID < 10
+		with @hornModel = ClientsideModel("models/ppm/horns/ppm_hornset#{modelID}.mdl")
+			.isPonyPropModel = true
+			.isHornModel = true
+			.manePlayer = @GetEntity()
+			\DrawShadow(true)
+			\SetPos(@GetEntity()\EyePos())
+			\Spawn()
+			\Activate()
+			\SetNoDraw(true)
+			\SetParent(@GetEntity())
+			\AddEffects(EF_BONEMERGE)
+
+		PPM2.DebugPrint('Creating new horn model for ', @GetEntity(), ' as ', @hornModel)
+		@GetData()\SetHornModel(@hornModel)
+		return @hornModel
+
+	UpdateHornModel: (force = false) =>
+		return NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
+		@CreateHornModelIfNotExists(force)
+		return NULL if not IsValid(@hornModel)
+		modelID, bodygroupID = PPM2.TransformHornModelID(@GetData()\GetNewHornType())
+		modelID = "0" .. modelID if modelID < 10
+		model = "models/ppm/horns/ppm_hornset#{modelID}.mdl"
+		with @hornModel
+			\SetModel(model) if model ~= \GetModel()
+			\SetBodygroup(1, bodygroupID) if \GetBodygroup(1) ~= bodygroupID
+			\SetParent(@GetEntity()) if \GetParent() ~= @GetEntity() and IsValid(@GetEntity())
+		@GetData()\SetHornModel(@hornModel)
+		return @hornModel
+
 	CreateNewSocksModel: (force = false) =>
 		return NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
 		return @newSocksModel if IsValid(@newSocksModel)
@@ -231,6 +273,14 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@GetData()\SetSocksModel(@socksModel)
 		return @socksModel
 
+	CreateHornModelIfNotExists: (force = false) =>
+		return NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
+		@CreateHornModel(force) if not IsValid(@hornModel)
+		return NULL if not IsValid(@hornModel)
+		@hornModel\SetParent(@GetEntity()) if IsValid(@GetEntity())
+		@GetData()\SetHornModel(@hornModel)
+		return @hornModel
+
 	MergeModels: (targetEnt = NULL) =>
 		return if SERVER or not @isValid or not IsValid(targetEnt)
 		socks = @CreateSocksModelIfNotExists(true) if @GetData()\GetSocksAsModel()
@@ -254,10 +304,10 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
 					\SetBodygroup(@@BODYGROUP_WINGS, 0)
 				when PPM2.RACE_UNICORN
-					\SetBodygroup(@@BODYGROUP_HORN, 0)
+					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 					\SetBodygroup(@@BODYGROUP_WINGS, 1)
 				when PPM2.RACE_ALICORN
-					\SetBodygroup(@@BODYGROUP_HORN, 0)
+					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 					\SetBodygroup(@@BODYGROUP_WINGS, 0)
 
 	ResetTail: =>
@@ -396,6 +446,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 		@ApplyRace()
 		if createModels
+			@UpdateHornModel(force) if @GrabData('UseNewHorn')
 			@CreateSocksModelIfNotExists(force) if @GetData()\GetSocksAsModel()
 			@CreateNewSocksModelIfNotExists(force) if @GetData()\GetSocksAsNewModel()
 
@@ -434,6 +485,13 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 					@CreateSocksModelIfNotExists()
 				else
 					@socksModel\Remove() if IsValid(@socksModel)
+			when 'UseNewHorn'
+				if state\GetValue()
+					@CreateHornModelIfNotExists()
+				else
+					@hornModel\Remove() if IsValid(@hornModel)
+
+				@ApplyRace()
 			when 'SocksAsNewModel'
 				if state\GetValue()
 					@CreateNewSocksModelIfNotExists()
@@ -850,11 +908,12 @@ class NewBodygroupController extends DefaultBodygroupController
 
 		@ApplyRace()
 		if createModels
+			@UpdateHornModel(force) if @GrabData('UseNewHorn')
 			@UpdateUpperMane(force)
 			@UpdateLowerMane(force)
 			@UpdateTailModel(force)
-			@CreateSocksModelIfNotExists(force) if createModels and @GetData()\GetSocksAsModel()
-			@CreateNewSocksModelIfNotExists(force) if createModels and @GetData()\GetSocksAsNewModel()
+			@CreateSocksModelIfNotExists(force) if @GetData()\GetSocksAsModel()
+			@CreateNewSocksModelIfNotExists(force) if @GetData()\GetSocksAsNewModel()
 
 	RemoveModels: =>
 		@maneModelUP\Remove() if IsValid(@maneModelUP)
@@ -888,10 +947,10 @@ class NewBodygroupController extends DefaultBodygroupController
 				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 1)
 				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
 			when PPM2.RACE_UNICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 0)
+				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
 			when PPM2.RACE_ALICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 0)
+				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
 
 	DataChanges: (state) =>
@@ -949,6 +1008,13 @@ class NewBodygroupController extends DefaultBodygroupController
 				@UpdateTailSize()
 			when 'PonySize'
 				@UpdateTailSize()
+			when 'UseNewHorn'
+				if state\GetValue()
+					@CreateHornModelIfNotExists()
+				else
+					@hornModel\Remove() if IsValid(@hornModel)
+
+				@ApplyRace()
 			when 'Race'
 				@ApplyRace()
 			when 'WingsType'

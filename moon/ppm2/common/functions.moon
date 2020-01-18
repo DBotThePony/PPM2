@@ -39,6 +39,12 @@ PPM2.TransformNewModelID = (id = 0) ->
 	maneModelID = 1 if maneModelID == 0
 	return maneModelID, bgID
 
+PPM2.TransformHornModelID = (id = 0) ->
+	bgID = id % 16
+	hornModelID = math.floor(id / 16) + 1
+	hornModelID = 1 if hornModelID == 0
+	return hornModelID, bgID
+
 do
 	randomColor = (a = 255) -> Color(math.random(0, 255), math.random(0, 255), math.random(0, 255), a)
 	PPM2.Randomize = (object, ...) ->

@@ -239,6 +239,8 @@ gui.ppm2.editor.horn.magic = 'Цвет магии рога'
 gui.ppm2.editor.horn.separate_magic_color = 'Отделить цвет магии от цвета глаз'
 gui.ppm2.editor.horn.separate = 'Отделить цвет рога от тела'
 gui.ppm2.editor.horn.separate_phong = 'Отделить настройки фонга рога от тела'
+gui.ppm2.editor.horn.use_new = 'Использовать новый тип рога'
+gui.ppm2.editor.horn.new_type = 'Тип нового рога'
 
 for i = 1, 3
 	gui.ppm2.editor.horn.detail['desc' .. i] = "URL деталь рога #{i}"

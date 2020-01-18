@@ -847,6 +847,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 		socksEnt\SetSubMaterial(1, @NewSocksColor1Name)
 		socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
+	UpdateNewHorn: (ent = @GetEntity(), hornEnt) =>
+		--return unless @compiled
+		return unless @isValid
+		hornEnt\SetSubMaterial(0, @HornMaterialName1)
+		hornEnt\SetSubMaterial(1, @HornMaterialName2)
+
 	@QUAD_SIZE_EYES = 512
 	@QUAD_SIZE_SOCKS = 512
 	@QUAD_SIZE_CMARK = 512
@@ -922,6 +928,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 	GetBodyPhongMaterials: (output = {}) =>
 		table.insert(output, {@BodyMaterial, false, false}) if @BodyMaterial
 		table.insert(output, {@HornMaterial, false, true}) if @HornMaterial and not @GrabData('SeparateHornPhong')
+		table.insert(output, {@HornMaterial1, false, true}) if @HornMaterial1 and not @GrabData('SeparateHornPhong')
+		table.insert(output, {@HornMaterial2, false, true}) if @HornMaterial2 and not @GrabData('SeparateHornPhong')
 		table.insert(output, {@WingsMaterial, false, false}) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
 		table.insert(output, {@Eyelashes, false, false}) if @Eyelashes and not @GrabData('SeparateEyelashesPhong')
 		if not @GrabData('SeparateManePhong')
@@ -937,8 +945,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		for _, mat in ipairs proceed
 			@ApplyPhongData(mat[1], 'Body', mat[2], mat[3], mat[4])
 
-		if @GrabData('SeparateHornPhong') and @HornMaterial
-			@ApplyPhongData(@HornMaterial, 'Horn', false, true)
+		if @GrabData('SeparateHornPhong')
+			@ApplyPhongData(@HornMaterial, 'Horn', false, true) if @HornMaterial
+			@ApplyPhongData(@HornMaterial1, 'Horn', false, true) if @HornMaterial1
+			@ApplyPhongData(@HornMaterial2, 'Horn', false, true) if @HornMaterial2
 
 		if @GrabData('SeparateEyelashesPhong') and @Eyelashes
 			@ApplyPhongData(@Eyelashes, 'Eyelashes', false, true)
@@ -1164,12 +1174,55 @@ class PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
+		textureData_New1 = {
+			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn1"
+			'shader': 'VertexLitGeneric'
+			'data': {
+				'$basetexture': 'models/debug/debugwhite'
+				'$selfillum': '0'
+
+				'$model': '1'
+				'$phong': '1'
+				'$phongexponent': '3'
+				'$phongboost': '0.05'
+				'$phongtint': '[1 .95 .95]'
+				'$phongfresnelranges': '[0.5 6 10]'
+				'$alpha': '1'
+				'$color': '[1 1 1]'
+				'$color2': '[1 1 1]'
+			}
+		}
+
+		textureData_New2 = {
+			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn2"
+			'shader': 'VertexLitGeneric'
+			'data': {
+				'$basetexture': 'models/debug/debugwhite'
+				'$selfillum': '1'
+				'$selfillummask': 'null'
+
+				'$model': '1'
+				'$phong': '1'
+				'$phongexponent': '3'
+				'$phongboost': '0.05'
+				'$phongtint': '[1 .95 .95]'
+				'$phongfresnelranges': '[0.5 6 10]'
+				'$alpha': '1'
+				'$color': '[1 1 1]'
+				'$color2': '[1 1 1]'
+			}
+		}
+
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HORN)
 		urlTextures = {}
 		left = 0
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
+		@HornMaterialName1 = "!#{textureData_New1.name\lower()}"
+		@HornMaterialName2 = "!#{textureData_New2.name\lower()}"
 		@HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
+		@HornMaterial1 = CreateMaterial(textureData_New1.name, textureData_New1.shader, textureData_New1.data)
+		@HornMaterial2 = CreateMaterial(textureData_New2.name, textureData_New2.shader, textureData_New2.data)
 		@UpdatePhongData()
 
 		@url_processes += 1
@@ -1181,7 +1234,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
 			@StartRTOpaque('Horn', texSize, r, g, b)
 
-			surface.SetDrawColor(@GrabData('HornDetailColor'))
+			@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+			{:r, :g, :b} = @GrabData('HornDetailColor')
+			@HornMaterial2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+			surface.SetDrawColor(r, g, b)
 			surface.SetMaterial(@@HORN_DETAIL_COLOR)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -1196,9 +1253,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@StartRTOpaque('Horn_illum', texSize)
 
 			if @GrabData('HornGlow')
+				@HornMaterial2\SetTexture('$selfillummask', 'models/debug/debugwhite')
 				surface.SetDrawColor(255, 255, 255, @GrabData('HornGlowSrength') * 255)
 				surface.SetMaterial(@@HORN_DETAIL_COLOR)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+			else
+				@HornMaterial2\SetTexture('$selfillummask', 'null')
 
 			@HornMaterial\SetTexture('$selfillummask', @EndRT())
 

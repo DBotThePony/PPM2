@@ -329,6 +329,18 @@ PPM2.PonyDataRegistry = {
 		type: 'BOOLEAN'
 	}
 
+	'new_horn': {
+		default: -> false
+		getFunc: 'UseNewHorn'
+		type: 'BOOLEAN'
+	}
+
+	'new_horn_type': {
+		default: -> 2
+		getFunc: 'NewHornType'
+		enum: [type for type in *PPM2.AvailableHorns]
+	}
+
 	'horn_color': {
 		default: -> Color(255, 255, 255)
 		getFunc: 'HornColor'

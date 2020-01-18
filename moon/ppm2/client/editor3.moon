@@ -1087,6 +1087,10 @@ EDIT_TREE = {
 									@ColorBox('gui.ppm2.editor.horn.color', 'HornColor')
 									@CheckBox('gui.ppm2.editor.horn.separate_magic_color', 'SeparateMagicColor')
 									@ColorBox('gui.ppm2.editor.horn.magic', 'HornMagicColor')
+									if ADVANCED_MODE\GetBool()
+										@Hr()
+										@CheckBox('gui.ppm2.editor.horn.use_new', 'UseNewHorn')
+										@ComboBox('gui.ppm2.editor.horn.new_type', 'NewHornType')
 									@CheckBox('gui.ppm2.editor.horn.separate_phong', 'SeparateHornPhong') if ADVANCED_MODE\GetBool()
 									PPM2.EditorPhongPanels(@, 'Horn', 'gui.ppm2.editor.horn.horn_phong') if ADVANCED_MODE\GetBool()
 								'gui.ppm2.editor.tabs.details': =>

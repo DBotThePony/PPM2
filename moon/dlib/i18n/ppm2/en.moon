@@ -242,6 +242,8 @@ gui.ppm2.editor.horn.magic = 'Horn magic color'
 gui.ppm2.editor.horn.separate_magic_color = 'Separate magic color from eye color'
 gui.ppm2.editor.horn.separate = 'Separate horn color from body'
 gui.ppm2.editor.horn.separate_phong = 'Separate horn phong settings from body'
+gui.ppm2.editor.horn.use_new = 'Use new horn'
+gui.ppm2.editor.horn.new_type = 'New horn type'
 
 for i = 1, 3
 	gui.ppm2.editor.horn.detail['desc' .. i] = "Horn URL detail #{i}"
