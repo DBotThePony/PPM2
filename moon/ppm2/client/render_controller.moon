@@ -49,6 +49,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@hornModel\SetNoDraw(false) if IsValid(@hornModel)
 		@newSocksModel = controller\GetNewSocksModel()
 		@newSocksModel\SetNoDraw(false) if IsValid(@newSocksModel)
+		@clothesModel = controller\GetClothesModel()
+		@clothesModel\SetNoDraw(false) if IsValid(@clothesModel)
 		@lastStareUpdate = 0
 		@staringAt = NULL
 		@staringAtDirectly = NULL
@@ -335,6 +337,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@socksModel\DrawModel() if IsValid(@socksModel)
 		@newSocksModel\DrawModel() if IsValid(@newSocksModel)
 		@hornModel\DrawModel() if IsValid(@hornModel)
+		@clothesModel\DrawModel() if IsValid(@clothesModel)
 
 	ShouldHideModels: => @hideModels or @GetEntity()\GetNoDraw()
 
@@ -342,6 +345,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@socksModel\SetNoDraw(status) if IsValid(@socksModel)
 		@newSocksModel\SetNoDraw(status) if IsValid(@newSocksModel)
 		@hornModel\SetNoDraw(status) if IsValid(@hornModel)
+		@clothesModel\SetNoDraw(status) if IsValid(@clothesModel)
 
 	HideModels: (status = true) =>
 		return if @hideModels == status
@@ -475,10 +479,12 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@socksModel\SetNoDraw(true) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(true) if IsValid(@newSocksModel)
 			@hornModel\SetNoDraw(true) if IsValid(@hornModel)
+			@clothesModel\SetNoDraw(true) if IsValid(@clothesModel)
 		else
 			@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 			@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 			@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
+			@clothesModel\SetNoDraw(@ShouldHideModels()) if IsValid(@clothesModel)
 
 	PostDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return if not @isValid
@@ -518,17 +524,21 @@ class PonyRenderController extends PPM2.ControllerChildren
 				@armsWeightSetup = false
 				@GrabData('WeightController')\UpdateWeight(@legsModel) if IsValid(@legsModel)
 			when 'SocksModel'
-				@socksModel = @GrabData('SocksModel')
+				@socksModel = state\GetValue()
 				@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 				@GetTextureController()\UpdateSocks(@GetEntity(), @socksModel) if @GetTextureController() and IsValid(@socksModel)
 			when 'NewSocksModel'
-				@newSocksModel = @GrabData('NewSocksModel')
+				@newSocksModel = state\GetValue()
 				@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 				@GetTextureController()\UpdateNewSocks(@GetEntity(), @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
 			when 'HornModel'
-				@hornModel = @GrabData('HornModel')
+				@hornModel = state\GetValue()
 				@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
 				@GetTextureController()\UpdateNewHorn(@GetEntity(), @hornModel) if @GetTextureController() and IsValid(@hornModel)
+			when 'ClothesModel'
+				@clothesModel = state\GetValue()
+				@clothesModel\SetNoDraw(@ShouldHideModels()) if IsValid(@clothesModel)
+				@GetTextureController()\UpdateNewHorn(@GetEntity(), @clothesModel) if @GetTextureController() and IsValid(@hornModel)
 			when 'NoFlex'
 				if state\GetValue()
 					@flexes\ResetSequences() if @flexes

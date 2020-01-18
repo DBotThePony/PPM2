@@ -232,6 +232,11 @@ for i = 1, 6
 gui.ppm2.editor.ears.bat = 'Bat pony ears'
 gui.ppm2.editor.ears.size = 'Ears size'
 
+gui.ppm2.editor.clothes.head = 'Head clothes'
+gui.ppm2.editor.clothes.eye = 'Eye(s) clothes'
+gui.ppm2.editor.clothes.neck = 'Neck clothes'
+gui.ppm2.editor.clothes.body = 'Body clothes'
+
 gui.ppm2.editor.horn.detail_color = 'Horn detail color'
 gui.ppm2.editor.horn.glowing_detail = 'Glowing Horn Detail'
 gui.ppm2.editor.horn.glow_strength = 'Horn Glow Strength'

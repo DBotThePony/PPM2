@@ -147,6 +147,30 @@ PPM2.PonyDataRegistry = {
 		type: 'FLOAT'
 	}
 
+	'clothes_head': {
+		default: -> 0
+		getFunc: 'HeadClothes'
+		enum: [piece for piece in *PPM2.AvailableClothesHead]
+	}
+
+	'clothes_neck': {
+		default: -> 0
+		getFunc: 'NeckClothes'
+		enum: [piece for piece in *PPM2.AvailableClothesNeck]
+	}
+
+	'clothes_body': {
+		default: -> 0
+		getFunc: 'BodyClothes'
+		enum: [piece for piece in *PPM2.AvailableClothesBody]
+	}
+
+	'clothes_eye': {
+		default: -> 0
+		getFunc: 'EyeClothes'
+		enum: [piece for piece in *PPM2.AvailableClothesEye]
+	}
+
 	'eyelash': {
 		default: -> 0
 		getFunc: 'EyelashType'

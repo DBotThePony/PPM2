@@ -922,6 +922,9 @@ EDIT_TREE = {
 							@ComboBox('gui.ppm2.editor.face.eyelashes', 'EyelashType')
 							@ColorBox('gui.ppm2.editor.face.eyelashes_color', 'EyelashesColor')
 							@ColorBox('gui.ppm2.editor.face.eyebrows_color', 'EyebrowsColor')
+							@ComboBox('gui.ppm2.editor.clothes.eye', 'EyeClothes')
+							@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
+							@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
 							@CheckBox('gui.ppm2.editor.face.new_muzzle', 'NewMuzzle')
 
@@ -1017,6 +1020,8 @@ EDIT_TREE = {
 									@ComboBox('gui.ppm2.editor.mane.type', 'ManeTypeNew')
 									@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
 									@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
+
+									@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
 									@Hr()
 									@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
@@ -1236,6 +1241,8 @@ EDIT_TREE = {
 						'gui.ppm2.editor.tabs.main': =>
 							@ComboBox('gui.ppm2.editor.body.suit', 'Bodysuit')
 							@ColorBox('gui.ppm2.editor.body.color', 'BodyColor')
+							@ComboBox('gui.ppm2.editor.clothes.body', 'BodyClothes')
+							@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
 
 						'gui.ppm2.editor.tabs.back': =>
 							@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)

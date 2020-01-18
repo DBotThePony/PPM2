@@ -215,10 +215,16 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	_SocksModelName: => 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
 	_NewSocksModelName: => 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
+	_ClothesModelname: => 'models/ppm/player_default_clothes1.mdl'
 
 	CreateSocksModel: (force = false) => @CreateGenericModel(force, 'isSocks', 'socksModel', 'SocksModel', @_SocksModelName)
 	CreateNewSocksModel: (force = false) => @CreateGenericModel(force, 'isNewSocks', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
 	CreateHornModel: (force = false) => @CreateGenericModel(force, 'isHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
+	CreateClothesModel: (force = false) => @CreateGenericModel(force, 'isClothesModel', 'clothesModel', 'ClothesModel', @_ClothesModelname)
+
+	CreateClothesModelIfNotExist: (force = false) =>
+		return @clothesModel if IsValid(@clothesModel)
+		return @CreateClothesModel(force)
 
 	CreateNewSocksModelIfNotExists: (force = false) =>
 		return @newSocksModel if IsValid(@newSocksModel)
@@ -232,12 +238,26 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return @hornModel if IsValid(@hornModel)
 		return @CreateHornModel(force)
 
+	UpdateClothesModel: (force = false) =>
+		@CreateClothesModelIfNotExist(force)
+		return NULL if not IsValid(@clothesModel)
+
+		with @clothesModel
+			\SetBodygroup(1, @GrabData('HeadClothes'))
+			\SetBodygroup(2, @GrabData('NeckClothes'))
+			\SetBodygroup(3, @GrabData('BodyClothes'))
+			\SetBodygroup(8, @GrabData('EyeClothes'))
+
 	MergeModels: (targetEnt = NULL) =>
 		return if SERVER or not @isValid or not IsValid(targetEnt)
 
 		socks = @CreateSocksModelIfNotExists(true) if @GrabData('SocksAsModel')
 		socks2 = @CreateNewSocksModelIfNotExists(true) if @GrabData('SocksAsNewModel')
 		horn = @CreateHornModelIfNotExists(true) if @GrabData('UseNewHorn')
+		clothesModel = @CreateClothesModelIfNotExist(true)
+
+		if IsValid(clothesModel)
+			clothesModel\SetParent(targetEnt)
 
 		if IsValid(horn)
 			horn\SetParent(targetEnt)
@@ -404,6 +424,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 		@ApplyRace()
 		if createModels
+			@UpdateClothesModel()
 			@UpdateHornModel(force) if @GrabData('UseNewHorn')
 			@UpdateSocksModel(force) if @GrabData('SocksAsModel')
 			@UpdateNewSocksModel(force) if @GrabData('SocksAsNewModel')
@@ -426,6 +447,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@Remap()
 
 		switch state\GetKey()
+			when 'HeadClothes', 'NeckClothes', 'BodyClothes', 'EyeClothes'
+				@UpdateClothesModel()
 			when 'ManeType'
 				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_UPPER, state\GetValue())
 			when 'ManeTypeLower'
@@ -733,6 +756,7 @@ class NewBodygroupController extends DefaultBodygroupController
 		@ApplyRace()
 
 		if createModels
+			@UpdateClothesModel()
 			@UpdateUpperMane(force)
 			@UpdateLowerMane(force)
 			@UpdateTailModel(force)
@@ -783,6 +807,8 @@ class NewBodygroupController extends DefaultBodygroupController
 		return if not IsValid(@GetEntity())
 		@Remap()
 		switch state\GetKey()
+			when 'HeadClothes', 'NeckClothes', 'BodyClothes', 'EyeClothes'
+				@UpdateClothesModel()
 			when 'EyelashType'
 				@GetEntity()\SetFlexWeight(@@FLEX_ID_EYELASHES, state\GetValue() == PPM2.EYELASHES_NONE and 1 or 0)
 			when 'Gender', 'NewMuzzle'

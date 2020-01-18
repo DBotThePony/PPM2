@@ -229,6 +229,11 @@ for i = 1, 6
 gui.ppm2.editor.ears.bat = 'Уши бэт-пони'
 gui.ppm2.editor.ears.size = 'Размер ушей'
 
+gui.ppm2.editor.clothes.head = 'Головной убор'
+gui.ppm2.editor.clothes.eye = 'Очки'
+gui.ppm2.editor.clothes.neck = 'Одежда на шею'
+gui.ppm2.editor.clothes.body = 'Одежда на тело'
+
 gui.ppm2.editor.horn.detail_color = 'Цвет детали рога'
 gui.ppm2.editor.horn.glowing_detail = 'Светящаяся деталь рога'
 gui.ppm2.editor.horn.glow_strength = 'Сила свечения'

@@ -348,6 +348,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('TailModel', 'm_tailModel')
 	@GetSet('SocksModel', 'm_socksModel')
 	@GetSet('HornModel', 'm_hornmodel')
+	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
 
 	@NetworkVar('Fly',                  rBool,   wBool,                 false)

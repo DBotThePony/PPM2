@@ -1177,14 +1177,18 @@ EditorPages = {
 			@ScrollPanel()
 			@ComboBox('gui.ppm2.editor.body.suit', 'Bodysuit')
 			@ColorBox('gui.ppm2.editor.body.color', 'BodyColor')
+			@ComboBox('gui.ppm2.editor.clothes.body', 'BodyClothes')
+			@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
 
 			if ADVANCED_MODE\GetBool()
+				@Hr()
 				@CheckBox('gui.ppm2.editor.face.inherit.lips', 'LipsColorInherit')
 				@CheckBox('gui.ppm2.editor.face.inherit.nose', 'NoseColorInherit')
 				@ColorBox('gui.ppm2.editor.face.lips', 'LipsColor')
 				@ColorBox('gui.ppm2.editor.face.nose', 'NoseColor')
 				PPM2.EditorPhongPanels(@, 'Body', 'gui.ppm2.editor.body.body_phong')
 
+			@Hr()
 			@NumSlider('gui.ppm2.editor.neck.height', 'NeckSize', 2)
 			@NumSlider('gui.ppm2.editor.legs.height', 'LegsSize', 2)
 			@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)
@@ -1306,22 +1310,23 @@ EditorPages = {
 		'display': (editorMode = false) -> not IS_USING_NEW(editorMode)
 		'func': (sheet) =>
 			@ScrollPanel()
-			@ComboBox('Mane type', 'ManeType')
-			@ComboBox('Lower Mane type', 'ManeTypeLower')
-			@ComboBox('Tail type', 'TailType')
+			@ComboBox('gui.ppm2.editor.mane.type', 'ManeType')
+			@ComboBox('gui.ppm2.editor.mane.down.type', 'ManeTypeLower')
+			@ComboBox('gui.ppm2.editor.tail.type', 'TailType')
+			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
-			@CheckBox('Hide entitites when using PAC3 entity', 'HideManes')
-			@CheckBox('Hide socks when using PAC3 entity', 'HideManesSocks')
+			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
+			@CheckBox('gui.ppm2.editor.misc.hide_socks', 'HideManesSocks')
 
-			@NumSlider('Tail size', 'TailSize', 2)
-
-			@Hr()
-			@ColorBox("Mane color #{i}", "ManeColor#{i}") for i = 1, 2
-			@ColorBox("Tail color #{i}", "TailColor#{i}") for i = 1, 2
+			@NumSlider('gui.ppm2.editor.tail.size', 'TailSize', 2)
 
 			@Hr()
-			@ColorBox("Mane detail color #{i}", "ManeDetailColor#{i}") for i = 1, 4
-			@ColorBox("Tail detail color #{i}", "TailDetailColor#{i}") for i = 1, 4
+			@ColorBox("gui.ppm2.editor.mane.color#{i}", "ManeColor#{i}") for i = 1, 2
+			@ColorBox("gui.ppm2.editor.tail.color#{i}", "TailColor#{i}") for i = 1, 2
+
+			@Hr()
+			@ColorBox("gui.ppm2.editor.mane.detail_color#{i}", "ManeDetailColor#{i}") for i = 1, 4
+			@ColorBox("gui.ppm2.editor.tail.detail_color#{i}", "TailDetailColor#{i}") for i = 1, 4
 	}
 
 	{
@@ -1333,6 +1338,7 @@ EditorPages = {
 			@ComboBox('gui.ppm2.editor.mane.type', 'ManeTypeNew')
 			@ComboBox('gui.ppm2.editor.mane.down.type', 'ManeTypeLowerNew')
 			@ComboBox('gui.ppm2.editor.tail.type', 'TailTypeNew')
+			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
 			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
 			@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
@@ -1374,6 +1380,11 @@ EditorPages = {
 		'internal': 'face'
 		'func': (sheet) =>
 			@ScrollPanel()
+
+			@ComboBox('gui.ppm2.editor.clothes.eye', 'EyeClothes')
+			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
+			@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
+
 			@ComboBox('gui.ppm2.editor.face.eyelashes', 'EyelashType')
 			@ColorBox('gui.ppm2.editor.face.eyelashes_color', 'EyelashesColor')
 			@ColorBox('gui.ppm2.editor.face.eyebrows_color', 'EyebrowsColor')
