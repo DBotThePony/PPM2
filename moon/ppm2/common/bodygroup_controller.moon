@@ -163,13 +163,6 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	@ATTACHMENT_EYES = 4
 	@ATTACHMENT_EYES_NAME = 'eyes'
 
-	_SocksModelName: => 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
-	_NewSocksModelName: => 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
-
-	CreateSocksModel: (force = false) => @CreateGenericModel(force, 'isSocks', 'socksModel', 'SocksModel', @_SocksModelName)
-	CreateNewSocksModel: (force = false) => @CreateGenericModel(force, 'isNewSocks', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
-	CreateHornModel: (force = false) => @CreateGenericModel(force, 'isHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
-
 	CreateGenericModel: (force, fModelIndex, mIndex, mName, mTranslateModelName, mCallType) =>
 		return @[mIndex] or NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
 		return @[mIndex] if IsValid(@[mIndex])
@@ -219,6 +212,13 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	UpdateHornModel: (force = false) => @UpdateGenericModel(force, 'CreateHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
 	UpdateSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateSocksModel', 'socksModel', 'SocksModel', @_SocksModelName)
 	UpdateNewSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateNewSocksModel', 'newSocksModel', 'NewSocksModel', @_SocksModelName)
+
+	_SocksModelName: => 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
+	_NewSocksModelName: => 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
+
+	CreateSocksModel: (force = false) => @CreateGenericModel(force, 'isSocks', 'socksModel', 'SocksModel', @_SocksModelName)
+	CreateNewSocksModel: (force = false) => @CreateGenericModel(force, 'isNewSocks', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
+	CreateHornModel: (force = false) => @CreateGenericModel(force, 'isHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
 
 	CreateNewSocksModelIfNotExists: (force = false) =>
 		return @newSocksModel if IsValid(@newSocksModel)
