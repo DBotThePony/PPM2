@@ -54,6 +54,9 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	GrabData: (str, ...) =>
 		error('Get' .. str .. ' - no such a function') if not @nwController['Get' .. str]
 		@nwController['Get' .. str](@nwController, ...)
+	SetData: (str, ...) =>
+		error('Set' .. str .. ' - no such a function') if not @nwController['Set' .. str]
+		@nwController['Set' .. str](@nwController, ...)
 	GetEntity: => @controller\GetEntity()
 	GetEntityID: => @entID
 	GetDataID: => @entID

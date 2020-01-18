@@ -268,12 +268,12 @@ class PonySizeController extends PPM2.ControllerChildren
 		@ResetLegs()
 		@ModifyScale()
 
-	GetLegsSize: => @GetData()\GetLegsSize()
-	GetLegsScale: => @GetData()\GetLegsSize()
-	GetNeckSize: => @GetData()\GetNeckSize()
-	GetNeckScale: => @GetData()\GetNeckSize()
-	GetPonySize: => @GetData()\GetPonySize()
-	GetPonyScale: => @GetData()\GetPonySize()
+	GetLegsSize: => @GrabData('LegsSize')
+	GetLegsScale: => @GrabData('LegsSize')
+	GetNeckSize: => @GrabData('NeckSize')
+	GetNeckScale: => @GrabData('NeckSize')
+	GetPonySize: => @GrabData('PonySize')
+	GetPonyScale: => @GrabData('PonySize')
 
 	PlayerDeath: =>
 		@ResetScale()

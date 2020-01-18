@@ -114,9 +114,9 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
 				@DelayCompile('CompileBatWingsSkin')
 
-	GetManeType: => @GetData()\GetManeTypeNew()
-	GetManeTypeLower: => @GetData()\GetManeTypeLowerNew()
-	GetTailType: => @GetData()\GetTailTypeNew()
+	GetManeType: => @GrabData('ManeTypeNew')
+	GetManeTypeLower: => @GrabData('ManeTypeLowerNew')
+	GetTailType: => @GrabData('TailTypeNew')
 
 	CompileHairInternal: (prefix = 'Upper') =>
 		return unless @isValid
@@ -380,7 +380,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 	CompileHair: =>
 		return unless @isValid
-		return super() if not @GetData()\GetSeparateMane()
+		return super() if not @GrabData('SeparateMane')
 		mat1, mat2, name1, name2 = @CompileHairInternal('Upper')
 		mat3, mat4, name3, name4 = @CompileHairInternal('Lower')
 		@UpperManeColor1, @UpperManeColor2 = mat1, mat2
@@ -485,7 +485,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 		--return unless @compiled
 
-		if not @GetData()\GetSeparateMane()
+		if not @GrabData('SeparateMane')
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
 		else
@@ -496,7 +496,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		--return unless @compiled
 		return unless @isValid
 
-		if not @GetData()\GetSeparateMane()
+		if not @GrabData('SeparateMane')
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
 			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
 		else

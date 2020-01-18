@@ -85,7 +85,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			.__PPM2_PonyData = @GetData()
 			--\PPMBonesModifier()
 
-		@GetData()\GetWeightController()\UpdateWeight(@legsModel)
+		@GrabData('WeightController')\UpdateWeight(@legsModel)
 
 		@lastLegUpdate = CurTimeL()
 		@legClipPlanePos = Vector(0, 0, 0)
@@ -242,7 +242,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if LEGS_RENDER_TYPE\GetBool() and ENABLE_FLASHLIGHT_PASS\GetBool()
 			render.PushFlashlightMode(true)
 			@GetTextureController()\PreDrawLegs(@legsModel)
-			if sizes = @GetData()\GetSizeController()
+			if sizes = @GrabData('SizeController')
 				sizes\ModifyNeck(@legsModel)
 				sizes\ModifyLegs(@legsModel)
 				sizes\ModifyScale(@legsModel)
@@ -291,7 +291,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		cam.Start3D() if start3D
 
 		@GetTextureController()\PreDrawLegs(@legsModel)
-		if sizes = @GetData()\GetSizeController()
+		if sizes = @GrabData('SizeController')
 			sizes\ModifyNeck(@legsModel)
 			sizes\ModifyLegs(@legsModel)
 			sizes\ModifyScale(@legsModel)
@@ -492,7 +492,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		hooves = @GrabData('PonyRaceFlags')\band(PPM2.RACE_HAS_HORN) == 0 or not PPM2.VM_MAGIC_HANDS\GetBool()
 
 		if ent and hooves
-			weight = 1 + (@GetData()\GetWeight() - 1)
+			weight = 1 + (@GrabData('Weight') - 1)
 			vec = Vector(weight, weight, weight)
 			ent\ManipulateBoneScale(i, vec) for i = 1, 43
 		elseif ent
@@ -516,17 +516,17 @@ class PonyRenderController extends PPM2.ControllerChildren
 		switch state\GetKey()
 			when 'Weight'
 				@armsWeightSetup = false
-				@GetData()\GetWeightController()\UpdateWeight(@legsModel) if IsValid(@legsModel)
+				@GrabData('WeightController')\UpdateWeight(@legsModel) if IsValid(@legsModel)
 			when 'SocksModel'
-				@socksModel = @GetData()\GetSocksModel()
+				@socksModel = @GrabData('SocksModel')
 				@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 				@GetTextureController()\UpdateSocks(@GetEntity(), @socksModel) if @GetTextureController() and IsValid(@socksModel)
 			when 'NewSocksModel'
-				@newSocksModel = @GetData()\GetNewSocksModel()
+				@newSocksModel = @GrabData('NewSocksModel')
 				@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 				@GetTextureController()\UpdateNewSocks(@GetEntity(), @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
 			when 'HornModel'
-				@hornModel = @GetData()\GetHornModel()
+				@hornModel = @GrabData('HornModel')
 				@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
 				@GetTextureController()\UpdateNewHorn(@GetEntity(), @hornModel) if @GetTextureController() and IsValid(@hornModel)
 			when 'NoFlex'
@@ -548,7 +548,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	CreateFlexController: =>
 		return @flexes if not @isValid
-		return if @GetData()\GetNoFlex()
+		return if @GrabData('NoFlex')
 		if not @flexes
 			cls = PPM2.GetFlexController(@modelCached)
 			return if not cls
@@ -586,15 +586,15 @@ class NewPonyRenderController extends PonyRenderController
 		return if not @isValid
 		switch state\GetKey()
 			when 'UpperManeModel'
-				@upperManeModel = @GetData()\GetUpperManeModel()
+				@upperManeModel = @GrabData('UpperManeModel')
 				@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
 				@GetTextureController()\UpdateUpperMane(@GetEntity(), @upperManeModel) if @GetTextureController() and IsValid(@upperManeModel)
 			when 'LowerManeModel'
-				@lowerManeModel = @GetData()\GetLowerManeModel()
+				@lowerManeModel = @GrabData('LowerManeModel')
 				@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
 				@GetTextureController()\UpdateLowerMane(@GetEntity(), @lowerManeModel) if @GetTextureController() and IsValid(@lowerManeModel)
 			when 'TailModel'
-				@tailModel = @GetData()\GetTailModel()
+				@tailModel = @GrabData('TailModel')
 				@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
 				@GetTextureController()\UpdateTail(@GetEntity(), @tailModel) if @GetTextureController() and IsValid(@tailModel)
 		super(state)
