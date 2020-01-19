@@ -1345,22 +1345,18 @@ class PonyTextureController extends PPM2.ControllerChildren
 		url = @GrabData('NewSocksTextureURL')
 		if url == '' or not url\find('^https?://')
 			{:r, :g, :b} = @GrabData('NewSocksColor1')
-			@NewSocksColor1\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 			@NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 			{:r, :g, :b} = @GrabData('NewSocksColor2')
-			@NewSocksColor2\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 			@NewSocksColor2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 			{:r, :g, :b} = @GrabData('NewSocksColor3')
-			@NewSocksBase\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 			@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 			PPM2.DebugPrint('Compiled new socks texture for ', @GetEntity(), ' as part of ', @)
 		else
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
 				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
-					tex\SetVector('$color', Vector(1, 1, 1))
 					tex\SetVector('$color2', Vector(1, 1, 1))
 					tex\SetTexture('$basetexture', texture)
 

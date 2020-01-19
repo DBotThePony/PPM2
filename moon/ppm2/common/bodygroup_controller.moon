@@ -211,7 +211,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	UpdateHornModel: (force = false) => @UpdateGenericModel(force, 'CreateHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
 	UpdateSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateSocksModel', 'socksModel', 'SocksModel', @_SocksModelName)
-	UpdateNewSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateNewSocksModel', 'newSocksModel', 'NewSocksModel', @_SocksModelName)
+	UpdateNewSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateNewSocksModel', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
 
 	_SocksModelName: => 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
 	_NewSocksModelName: => 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
