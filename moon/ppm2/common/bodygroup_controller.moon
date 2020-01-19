@@ -241,6 +241,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	UpdateClothesModel: (force = false) =>
 		@CreateClothesModelIfNotExist(force)
 		return NULL if not IsValid(@clothesModel)
+		@clothesModel\SetParent(@GetEntity()) if IsValid(@GetEntity())
 
 		with @clothesModel
 			\SetBodygroup(1, @GrabData('HeadClothes'))
