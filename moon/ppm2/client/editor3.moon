@@ -544,6 +544,8 @@ MODEL_BOX_PANEL = {
 				radius = ScreenScale(10)
 				drawCrosshair(x, y, radius, @crosshairCircleSelected, @crosshairBoxSelected)
 
+		DLib.blur.RefreshNow(true)
+
 	OnRemove: =>
 		@model\Remove() if IsValid(@model)
 		@buildingModel\Remove() if IsValid(@buildingModel)
