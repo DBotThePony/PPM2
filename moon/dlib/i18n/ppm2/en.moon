@@ -238,10 +238,10 @@ gui.ppm2.editor.clothes.eye = 'Eye(s) clothes'
 gui.ppm2.editor.clothes.neck = 'Neck clothes'
 gui.ppm2.editor.clothes.body = 'Body clothes'
 gui.ppm2.editor.clothes_col.help = 'Some of color pickers may not for some clothes'
-gui.ppm2.editor.clothes_col.head_use = 'Make head clothes be colorable'
-gui.ppm2.editor.clothes_col.eye_use = 'Make eye(s) clothes be colorable'
-gui.ppm2.editor.clothes_col.neck_use = 'Make neck clothes be colorable'
-gui.ppm2.editor.clothes_col.body_use = 'Make body clothes be colorable'
+gui.ppm2.editor.clothes_col.head_use = 'Custom head clothes color'
+gui.ppm2.editor.clothes_col.eye_use = 'Custom eye(s) clothes color'
+gui.ppm2.editor.clothes_col.neck_use = 'Custom neck clothes color'
+gui.ppm2.editor.clothes_col.body_use = 'Custom body clothes color'
 
 for i = 1, PPM2.MAX_CLOTHES_COLORS
 	gui.ppm2.editor.clothes_col["head_#{i}"] = 'Head clothes color №' .. i
