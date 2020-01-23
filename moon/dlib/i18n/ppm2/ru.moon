@@ -160,6 +160,7 @@ gui.ppm2.editor.tabs.legs = 'Ноги'
 gui.ppm2.editor.tabs.socks = 'Носки'
 gui.ppm2.editor.tabs.newsocks = 'Новые носки'
 gui.ppm2.editor.tabs.about = 'О PPM/2'
+gui.ppm2.editor.tabs.clothes = 'Одежда'
 
 gui.ppm2.editor.old_tabs.mane_tail = 'Грива и хвост'
 gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Детали крыльев и рога'
@@ -233,6 +234,17 @@ gui.ppm2.editor.clothes.head = 'Головной убор'
 gui.ppm2.editor.clothes.eye = 'Очки'
 gui.ppm2.editor.clothes.neck = 'Одежда на шею'
 gui.ppm2.editor.clothes.body = 'Одежда на тело'
+gui.ppm2.editor.clothes_col.help = 'Некоторые цвета могут не иметь визуального эффекта'
+gui.ppm2.editor.clothes_col.head_use = 'Своя раскарска головного убора'
+gui.ppm2.editor.clothes_col.eye_use = 'Своя раскраска на очки'
+gui.ppm2.editor.clothes_col.neck_use = 'Своя раскраска одежды на шею'
+gui.ppm2.editor.clothes_col.body_use = 'Своя раскраска одежды на тело'
+
+for i = 1, PPM2.MAX_CLOTHES_COLORS
+	gui.ppm2.editor.clothes_col["head_#{i}"] = 'Цвет головного убора №' .. i
+	gui.ppm2.editor.clothes_col["eye_#{i}"] = 'Цвет очков №' .. i
+	gui.ppm2.editor.clothes_col["neck_#{i}"] = 'Цвет одежды на шею №' .. i
+	gui.ppm2.editor.clothes_col["body_#{i}"] = 'Цвет одежды на тело №' .. i
 
 gui.ppm2.editor.horn.detail_color = 'Цвет детали рога'
 gui.ppm2.editor.horn.glowing_detail = 'Светящаяся деталь рога'

@@ -160,6 +160,7 @@ gui.ppm2.editor.tabs.legs = 'Legs'
 gui.ppm2.editor.tabs.socks = 'Socks'
 gui.ppm2.editor.tabs.newsocks = 'New Socks'
 gui.ppm2.editor.tabs.about = 'About'
+gui.ppm2.editor.tabs.clothes = 'Clothes'
 
 gui.ppm2.editor.old_tabs.mane_tail = 'Mane and tail'
 gui.ppm2.editor.old_tabs.wings_and_horn_details = 'Wings and horn details'
@@ -236,6 +237,17 @@ gui.ppm2.editor.clothes.head = 'Head clothes'
 gui.ppm2.editor.clothes.eye = 'Eye(s) clothes'
 gui.ppm2.editor.clothes.neck = 'Neck clothes'
 gui.ppm2.editor.clothes.body = 'Body clothes'
+gui.ppm2.editor.clothes_col.help = 'Some of color pickers may not for some clothes'
+gui.ppm2.editor.clothes_col.head_use = 'Make head clothes be colorable'
+gui.ppm2.editor.clothes_col.eye_use = 'Make eye(s) clothes be colorable'
+gui.ppm2.editor.clothes_col.neck_use = 'Make neck clothes be colorable'
+gui.ppm2.editor.clothes_col.body_use = 'Make body clothes be colorable'
+
+for i = 1, PPM2.MAX_CLOTHES_COLORS
+	gui.ppm2.editor.clothes_col["head_#{i}"] = 'Head clothes color №' .. i
+	gui.ppm2.editor.clothes_col["eye_#{i}"] = 'Eye(s) clothes color №' .. i
+	gui.ppm2.editor.clothes_col["neck_#{i}"] = 'Neck clothes color №' .. i
+	gui.ppm2.editor.clothes_col["body_#{i}"] = 'Body clothes color №' .. i
 
 gui.ppm2.editor.horn.detail_color = 'Horn detail color'
 gui.ppm2.editor.horn.glowing_detail = 'Glowing Horn Detail'

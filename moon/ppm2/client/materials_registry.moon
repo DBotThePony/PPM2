@@ -248,6 +248,153 @@ module.EYE_REFLECTIONS = {
 	Material('models/ppm2/partrender/eye_reflection_male.png')
 }
 
+module.HEAD_CLOTHES = {
+	[2]: {
+		Material('models/ppm2/clothesrender/hat_aj.png')
+	}
+
+	[3]: {
+		Material('models/ppm2/clothesrender/hat_braeburn_2.png')
+	}
+
+	[4]: {
+		Material('models/ppm2/clothesrender/tr_hat_stars_1.png')
+		Material('models/ppm2/clothesrender/tr_hat_stars_2.png')
+	}
+
+	[5]: {
+		Material('models/ppm2/clothesrender/headphones_1.png')
+		Material('models/ppm2/clothesrender/headphones_2.png')
+		Material('models/ppm2/clothesrender/headphones_note.png')
+	}
+}
+
+module.HEAD_CLOTHES_INDEX = {
+	[2]: 0
+	[3]: 1
+	[4]: 2
+	[5]: 3
+}
+
+module.NECK_CLOTHES = {
+	[2]: {
+		Material('models/ppm2/clothesrender/winter_scarf_1.png')
+		Material('models/ppm2/clothesrender/winter_scarf_2.png')
+	}
+
+	[3]: {
+		{
+			Material('models/ppm2/clothesrender/cape_stars_1.png')
+			Material('models/ppm2/clothesrender/cape_stars_2.png')
+			nil
+		}
+		{
+			Material('models/ppm2/clothesrender/gem.png')
+			nil
+		}
+	}
+
+	[4]: {
+		Material('models/ppm2/clothesrender/tie_1.png')
+		Material('models/ppm2/clothesrender/tie_2.png')
+	}
+
+	[5]: {
+		Material('models/ppm2/clothesrender/bowtie_1.png')
+		Material('models/ppm2/clothesrender/bowtie_2.png')
+	}
+}
+
+module.NECK_CLOTHES_INDEX = {
+	[2]: 4
+	[3]: {5, 6}
+	[4]: 7
+	[5]: 8
+}
+
+module.BODY_CLOTHES = {
+	[2]: {
+		Material('models/ppm2/clothesrender/vest_pouches.png')
+		Material('models/ppm2/clothesrender/vest_string.png')
+	}
+
+	[3]: {
+		Material('models/ppm2/clothesrender/shirt.png')
+	}
+
+	[4]: {
+		Material('models/ppm2/clothesrender/hoodie.png')
+	}
+
+	[5]: {
+		Material('models/ppm2/clothesrender/badge.png')
+	}
+}
+
+module.BODY_CLOTHES_INDEX = {
+	[2]: 9
+	[3]: 10
+	[4]: 11
+	[5]: 12
+}
+
+module.EYE_CLOTHES = {
+	[2]: {
+		{}
+		{Material('models/ppm2/clothesrender/lense.png')}
+	}
+	[4]: {
+		{}
+		{Material('models/ppm2/clothesrender/shades_lense.png')}
+	}
+	[6]: {
+		{}
+		{}
+	}
+	[8]: {
+		{}
+		{}
+	}
+}
+
+module.EYE_CLOTHES[3] = module.EYE_CLOTHES[2]
+module.EYE_CLOTHES[5] = module.EYE_CLOTHES[4]
+module.EYE_CLOTHES[7] = module.EYE_CLOTHES[6]
+module.EYE_CLOTHES[9] = module.EYE_CLOTHES[8]
+
+module.EYE_CLOTHES_INDEX = {
+	[2]: {13, 14}
+	[4]: {15, 16}
+	[6]: {17, 18}
+	[8]: {20, 21}
+}
+
+module.EYE_CLOTHES_INDEX[3] = module.EYE_CLOTHES_INDEX[2]
+module.EYE_CLOTHES_INDEX[5] = module.EYE_CLOTHES_INDEX[4]
+module.EYE_CLOTHES_INDEX[7] = module.EYE_CLOTHES_INDEX[6]
+module.EYE_CLOTHES_INDEX[9] = module.EYE_CLOTHES_INDEX[8]
+
+do
+	_prMaterial = (tab) ->
+		for i, sub in pairs(tab)
+			if not istable(sub[1])
+				tab[i] = {}
+				tab[i][1] = [mat for mat in *sub when not isnumber(mat)]
+
+	_prIndex = (tab) ->
+		for i, sub in pairs(tab)
+			if not istable(sub)
+				tab[i] = {sub}
+
+	_prMaterial(module.HEAD_CLOTHES)
+	_prIndex(module.HEAD_CLOTHES_INDEX)
+	_prMaterial(module.NECK_CLOTHES)
+	_prIndex(module.NECK_CLOTHES_INDEX)
+	_prMaterial(module.BODY_CLOTHES)
+	_prIndex(module.BODY_CLOTHES_INDEX)
+	_prMaterial(module.EYE_CLOTHES)
+	_prIndex(module.EYE_CLOTHES_INDEX)
+
 module.DEBUGWHITE = CreateMaterial('PPM2.Debugwhite', 'UnlitGeneric', debugwhite)
 module.HAIR_MATERIAL_COLOR = CreateMaterial('PPM2.ManeTextureBase', 'UnlitGeneric', debugwhite)
 module.TAIL_MATERIAL_COLOR = CreateMaterial('PPM2.TailTextureBase', 'UnlitGeneric', debugwhite)

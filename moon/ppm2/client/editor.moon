@@ -1177,8 +1177,6 @@ EditorPages = {
 			@ScrollPanel()
 			@ComboBox('gui.ppm2.editor.body.suit', 'Bodysuit')
 			@ColorBox('gui.ppm2.editor.body.color', 'BodyColor')
-			@ComboBox('gui.ppm2.editor.clothes.body', 'BodyClothes')
-			@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
 
 			if ADVANCED_MODE\GetBool()
 				@Hr()
@@ -1313,7 +1311,6 @@ EditorPages = {
 			@ComboBox('gui.ppm2.editor.mane.type', 'ManeType')
 			@ComboBox('gui.ppm2.editor.mane.down.type', 'ManeTypeLower')
 			@ComboBox('gui.ppm2.editor.tail.type', 'TailType')
-			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
 			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
 			@CheckBox('gui.ppm2.editor.misc.hide_socks', 'HideManesSocks')
@@ -1338,7 +1335,6 @@ EditorPages = {
 			@ComboBox('gui.ppm2.editor.mane.type', 'ManeTypeNew')
 			@ComboBox('gui.ppm2.editor.mane.down.type', 'ManeTypeLowerNew')
 			@ComboBox('gui.ppm2.editor.tail.type', 'TailTypeNew')
-			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
 			@CheckBox('gui.ppm2.editor.misc.hide_pac3', 'HideManes')
 			@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
@@ -1380,10 +1376,6 @@ EditorPages = {
 		'internal': 'face'
 		'func': (sheet) =>
 			@ScrollPanel()
-
-			@ComboBox('gui.ppm2.editor.clothes.eye', 'EyeClothes')
-			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
-			@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
 
 			@ComboBox('gui.ppm2.editor.face.eyelashes', 'EyelashType')
 			@ColorBox('gui.ppm2.editor.face.eyelashes_color', 'EyelashesColor')
@@ -1524,6 +1516,26 @@ EditorPages = {
 				@URLInput("BatWingSkinURL#{i}")
 				@ColorBox('gui.ppm2.editor.wings.details.batskin.color' .. i, "BatWingSkinURLColor#{i}")
 				@Hr()
+	}
+
+	{
+		'name': 'gui.ppm2.editor.tabs.clothes'
+		'internal': 'clothes'
+		'func': (sheet) =>
+			@ScrollPanel()
+			@ComboBox('gui.ppm2.editor.clothes.body', 'BodyClothes')
+			@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
+			@ComboBox('gui.ppm2.editor.clothes.eye', 'EyeClothes')
+			@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
+			return if not ADVANCED_MODE\GetBool()
+
+			@Hr()
+			@Label('gui.ppm2.editor.clothes_col.help')
+
+			for {internal, publicName} in *{{'head', 'Head'}, {'neck', 'Neck'}, {'body', 'Body'}, {'eye', 'Eye'}}
+				@Hr()
+				@CheckBox("gui.ppm2.editor.clothes_col.#{internal}_use", "#{publicName}ClothesUseColor")
+				@ColorBox("gui.ppm2.editor.clothes_col.#{internal}_#{i}", "#{publicName}ClothesColor#{i}") for i = 1, PPM2.MAX_CLOTHES_COLORS
 	}
 
 	{

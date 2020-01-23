@@ -538,7 +538,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			when 'ClothesModel'
 				@clothesModel = state\GetValue()
 				@clothesModel\SetNoDraw(@ShouldHideModels()) if IsValid(@clothesModel)
-				@GetTextureController()\UpdateNewHorn(@GetEntity(), @clothesModel) if @GetTextureController() and IsValid(@hornModel)
+				@GetTextureController()\UpdateClothes(@GetEntity(), @clothesModel) if @GetTextureController() and IsValid(@clothesModel)
 			when 'NoFlex'
 				if state\GetValue()
 					@flexes\ResetSequences() if @flexes

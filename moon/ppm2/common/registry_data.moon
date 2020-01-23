@@ -736,6 +736,20 @@ PPM2.PonyDataRegistry = {
 	}
 }
 
+for {internal, publicName} in *{{'_head', 'Head'}, {'_neck', 'Neck'}, {'_body', 'Body'}, {'_eye', 'Eye'}}
+	PPM2.PonyDataRegistry["clothes#{internal}_color_#{num}"] = {
+		default: -> false
+		getFunc: "#{publicName}ClothesUseColor"
+		type: 'BOOLEAN'
+	}
+
+	for num = 1, PPM2.MAX_CLOTHES_COLORS
+		PPM2.PonyDataRegistry["clothes#{internal}_color_#{num}"] = {
+			default: -> Color(255, 255, 255)
+			getFunc: "#{publicName}ClothesColor#{num}"
+			type: 'COLOR'
+		}
+
 for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
 	PPM2.PonyDataRegistry["eye_url#{internal}"] = {
 		default: -> ''

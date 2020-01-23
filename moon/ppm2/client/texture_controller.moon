@@ -138,7 +138,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@PONY_SOCKS = _M.PONY_SOCKS
 
 	--@SessionID = math.random(1, 1000)
-	@SessionID = 6
+	@SessionID = 2
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
@@ -163,6 +163,32 @@ class PonyTextureController extends PPM2.ControllerChildren
 		'SeparateManePhong': true
 		'SeparateTailPhong': true
 	}
+
+	@CLOTHES_UPDATE_HEAD = {
+		'HeadClothes': true
+		'HeadClothesUseColor': true
+	}
+
+	@CLOTHES_UPDATE_NECK = {
+		'NeckClothes': true
+		'NeckClothesUseColor': true
+	}
+
+	@CLOTHES_UPDATE_BODY = {
+		'BodyClothes': true
+		'BodyClothesUseColor': true
+	}
+
+	@CLOTHES_UPDATE_EYES = {
+		'EyeClothes': true
+		'EyeClothesUseColor': true
+	}
+
+	for i = 1, PPM2.MAX_CLOTHES_COLORS
+		@CLOTHES_UPDATE_HEAD["HeadClothesColor#{i}"] = true
+		@CLOTHES_UPDATE_NECK["NeckClothesColor#{i}"] = true
+		@CLOTHES_UPDATE_BODY["BodyClothesColor#{i}"] = true
+		@CLOTHES_UPDATE_EYES["EyeClothesColor#{i}"] = true
 
 	for _, ttype in ipairs {'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
@@ -358,6 +384,14 @@ class PonyTextureController extends PPM2.ControllerChildren
 					@DelayCompile('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
 					@UpdatePhongData()
+				elseif @@CLOTHES_UPDATE_HEAD[key]
+					@DelayCompile('CompileHeadClothes')
+				elseif @@CLOTHES_UPDATE_EYES[key]
+					@DelayCompile('CompileEyeClothes')
+				elseif @@CLOTHES_UPDATE_NECK[key]
+					@DelayCompile('CompileNeckClothes')
+				elseif @@CLOTHES_UPDATE_BODY[key]
+					@DelayCompile('CompileBodyClothes')
 
 	@HTML_MATERIAL_QUEUE = {}
 	@URL_MATERIAL_CACHE = {}
@@ -662,6 +696,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@CompileEyelashes()
 			@CompileLeftEye()
 			@CompileRightEye()
+			@CompileBodyClothes()
+			@CompileNeckClothes()
+			@CompileHeadClothes()
+			@CompileEyeClothes()
 		else
 			@DelayCompile('CompileBody')
 			@DelayCompile('CompileHair')
@@ -674,6 +712,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@DelayCompile('CompileEyelashes')
 			@DelayCompile('CompileLeftEye')
 			@DelayCompile('CompileRightEye')
+			@DelayCompile('CompileBodyClothes')
+			@DelayCompile('CompileNeckClothes')
+			@DelayCompile('CompileHeadClothes')
+			@DelayCompile('CompileEyeClothes')
 		@compiled = true
 
 	--@RT_SIZES = [math.pow(2, i) for i = 1, 24]
@@ -836,25 +878,55 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@MAT_INDEX_SOCKS = 0
 
 	UpdateSocks: (ent = @GetEntity(), socksEnt) =>
-		--return unless @compiled
 		return unless @isValid
 		socksEnt\SetSubMaterial(@@MAT_INDEX_SOCKS, @GetSocksName())
 
 	UpdateNewSocks: (ent = @GetEntity(), socksEnt) =>
-		--return unless @compiled
 		return unless @isValid
 		socksEnt\SetSubMaterial(0, @NewSocksColor2Name)
 		socksEnt\SetSubMaterial(1, @NewSocksColor1Name)
 		socksEnt\SetSubMaterial(2, @NewSocksBaseName)
 
 	UpdateNewHorn: (ent = @GetEntity(), hornEnt) =>
-		--return unless @compiled
 		return unless @isValid
 		hornEnt\SetSubMaterial(0, @HornMaterialName1)
 		hornEnt\SetSubMaterial(1, @HornMaterialName2)
 
+	UpdateClothes: (ent = @GetEntity(), clothesEnt) =>
+		return unless @isValid
+
+		if @NeckClothes_Index
+			if @NeckClothes_MatName
+				clothesEnt\SetSubMaterial(@NeckClothes_Index[index], @NeckClothes_MatName[index]) for index = 1, #@NeckClothes_Index
+			else
+				clothesEnt\SetSubMaterial(index, '') for index in *@NeckClothes_Index
+
+		if @EyeClothes_Index
+			if @EyeClothes_MatName
+				clothesEnt\SetSubMaterial(@EyeClothes_Index[index], @EyeClothes_MatName[index]) for index = 1, #@EyeClothes_Index
+			else
+				clothesEnt\SetSubMaterial(index, '') for index in *@EyeClothes_Index
+
+		if @HeadClothes_Index
+			if @HeadClothes_MatName
+				clothesEnt\SetSubMaterial(@HeadClothes_Index[index], @HeadClothes_MatName[index]) for index = 1, #@HeadClothes_Index
+			else
+				clothesEnt\SetSubMaterial(index, '') for index in *@HeadClothes_Index
+
+		if @BodyClothes_Index
+			if @BodyClothes_MatName
+				clothesEnt\SetSubMaterial(@BodyClothes_Index[index], @BodyClothes_MatName[index]) for index = 1, #@BodyClothes_Index
+			else
+				clothesEnt\SetSubMaterial(index, '') for index in *@BodyClothes_Index
+
+		@clothesModel = clothesEnt
+
 	@QUAD_SIZE_EYES = 512
 	@QUAD_SIZE_SOCKS = 512
+	@QUAD_SIZE_CLOTHES_BODY = 1024
+	@QUAD_SIZE_CLOTHES_HEAD = 512
+	@QUAD_SIZE_CLOTHES_NECK = 512
+	@QUAD_SIZE_CLOTHES_EYES = 256
 	@QUAD_SIZE_CMARK = 512
 	@QUAD_SIZE_CONST = 512
 	@QUAD_SIZE_WING = 64
@@ -1290,6 +1362,115 @@ class PonyTextureController extends PPM2.ControllerChildren
 			continueCompilation()
 		return @HornMaterial
 
+	CompileClothPart: (iName, matregistry, indexregistry, rtsize, opaque = true) =>
+		return unless @isValid
+
+		data = {
+			'$basetexture': 'models/debug/debugwhite'
+
+			'$phong': '1'
+			'$phongexponent': '20'
+			'$phongboost': '.1'
+			'$phongfresnelranges':	'[.3 1 8]'
+			'$halflambert': '1'
+			'$lightwarptexture': 'models/ppm/clothes/lightwarp'
+
+			'$rimlight': '1'
+			'$rimlightexponent': '4'
+			'$rimlightboost': '2'
+			'$color': '[1 1 1]'
+			'$color2': '[1 1 1]'
+		}
+
+		if not opaque
+			data['$alpha'] = '1'
+			data['$translucent'] = '1'
+
+		clothes = @GrabData(iName .. 'Clothes')
+		return if not matregistry[clothes + 1] or not indexregistry[clothes + 1]
+
+		@[iName .. 'Clothes_Index'] = indexregistry[clothes + 1]
+
+		if not @GrabData(iName .. 'ClothesUseColor')
+			@[iName .. 'Clothes_Mat'] = nil
+			@[iName .. 'Clothes_MatName'] = nil
+			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+			return
+
+		name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_1"
+		mat = CreateMaterial(name, 'VertexLitGeneric', data)
+		@[iName .. 'Clothes_Mat'] = {mat}
+		@[iName .. 'Clothes_MatName'] = {"!#{name}"}
+
+		if #matregistry[clothes + 1] == 0
+			mat\SetTexture('$basetexture', 'models/debug/debugwhite')
+			col = @GrabData("#{iName}ClothesColor1")
+			mat\SetVector('$color2', col\ToVector())
+
+			if opaque
+				mat\SetFloat('$alpha', 1)
+				mat\SetInt('$translucent', 0)
+			else
+				mat\SetFloat('$alpha', col.a / 255)
+				mat\SetInt('$translucent', 1)
+
+			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+			return
+
+		@[iName .. 'Clothes_Mat'] = {}
+		@[iName .. 'Clothes_MatName'] = {}
+		nextindex = 1
+
+		for matIndex = 1, #matregistry[clothes + 1]
+			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
+			mat = CreateMaterial(name, 'VertexLitGeneric', data)
+
+			table.insert(@[iName .. 'Clothes_Mat'], mat)
+			table.insert(@[iName .. 'Clothes_MatName'], "!#{name}")
+
+			if #matregistry[clothes + 1][matIndex] == 0
+				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
+				col = @GrabData("#{iName}ClothesColor#{nextindex}")
+				nextindex += 1
+				mat\SetVector('$color2', col\ToVector())
+
+				if opaque
+					mat\SetFloat('$alpha', 1)
+					mat\SetInt('$translucent', 0)
+				else
+					mat\SetFloat('$alpha', col.a / 255)
+					mat\SetInt('$translucent', 1)
+			else
+				rtsize = PPM2.GetTextureSize(rtsize)
+				mat\SetVector('$color2', Vector(1, 1, 1))
+				{:r, :g, :b, :a} = @GrabData("#{iName}ClothesColor#{nextindex}")
+
+				if opaque
+					mat\SetFloat('$alpha', 1)
+					mat\SetInt('$translucent', 0)
+				else
+					mat\SetFloat('$alpha', a / 255)
+					mat\SetInt('$translucent', 1)
+
+				nextindex += 1
+				@StartRTOpaque("Clothes_#{iName}_#{matIndex}", rtsize, r, g, b)
+
+				for i, texture in ipairs(matregistry[clothes + 1][matIndex])
+					if not isnumber(texture)
+						surface.SetMaterial(texture)
+						surface.SetDrawColor(@GrabData("#{iName}ClothesColor#{nextindex}"))
+						nextindex += 1
+						surface.DrawTexturedRect(0, 0, rtsize, rtsize)
+
+				mat\SetTexture('$basetexture', @EndRT())
+
+		@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+
+	CompileHeadClothes: => @CompileClothPart('Head', _M.HEAD_CLOTHES, _M.HEAD_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_HEAD)
+	CompileBodyClothes: => @CompileClothPart('Body', _M.BODY_CLOTHES, _M.BODY_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_BODY)
+	CompileNeckClothes: => @CompileClothPart('Neck', _M.NECK_CLOTHES, _M.NECK_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_NECK)
+	CompileEyeClothes: => @CompileClothPart('Eye', _M.EYE_CLOTHES, _M.EYE_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_EYES, false)
+
 	CompileNewSocks: =>
 		return unless @isValid
 
@@ -1355,7 +1536,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 			PPM2.DebugPrint('Compiled new socks texture for ', @GetEntity(), ' as part of ', @)
 		else
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
+				@url_processes -= 1
+
 				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
 					tex\SetVector('$color2', Vector(1, 1, 1))
 					tex\SetTexture('$basetexture', texture)
