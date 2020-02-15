@@ -104,7 +104,7 @@ class PonyDataInstance
 			newVal = fix(val)
 			oldVal = @dataTable[key]
 			@dataTable[key] = newVal
-			@ValueChanges(key, oldVal, newVal, ...)
+			@ValueChanges(key, oldVal, newVal, ...) if oldVal ~= newVal
 
 	WriteNetworkData: =>
 		for _, {:strName, :writeFunc, :getName, :defValue} in ipairs PPM2.NetworkedPonyData.NW_Vars
@@ -188,11 +188,14 @@ class PonyDataInstance
 	SetupData: (data = @NBTTagCompound, force = false, doBackup = false) =>
 		if luatype(data) == 'NBTCompound'
 			data = data\GetValue()
+
 		if doBackup or not force
 			makeBackup = false
+
 			for key, value2 in pairs(data)
 				key = key\lower()
 				map = @@PONY_DATA_MAPPING[key]
+
 				if map
 					mapData = @@PONY_DATA[map]
 					value = @GetValueFromNBT(mapData, value2)
@@ -201,9 +204,12 @@ class PonyDataInstance
 							return @@ERR_MISSING_CONTENT if not force
 							makeBackup = true
 							break
+
 			if doBackup and makeBackup and @exists
 				fRead = file.Read(@fpath, 'DATA')
 				file.Write(@GetExtraBackupPath(), fRead)
+
+		dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
 
 		for key, value2 in pairs(data)
 			key = key\lower()
@@ -211,11 +217,16 @@ class PonyDataInstance
 			continue unless map
 			mapData = @@PONY_DATA[map]
 			@dataTable[key] = @GetValueFromNBT(mapData, value2)
+			dataTable[key] = nil
+
+		@dataTable[k] = v for k, v in pairs(dataTable)
+
 	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
 		if @nwObj and @updateNWObject
 			{:getFunc} = @@PONY_DATA[key]
 			@nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
 		@Save() if saveNow
+
 	SetFilename: (filename) =>
 		@filename = filename
 		@filenameFull = "#{filename}.dat"
@@ -225,6 +236,7 @@ class PonyDataInstance
 		@isOpen = @filename ~= nil
 		@exists = file.Exists(@fpath, 'DATA')
 		return @exists
+
 	SetNetworkData: (nwObj) => @nwObj = nwObj
 	SetPonyData: (nwObj) => @nwObj = nwObj
 	SetPonyDataController: (nwObj) => @nwObj = nwObj
