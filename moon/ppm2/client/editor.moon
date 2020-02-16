@@ -1109,6 +1109,8 @@ EditorPages = {
 		'name': 'gui.ppm2.editor.tabs.main'
 		'internal': 'main'
 		'func': (sheet) =>
+			@ScrollPanel()
+
 			@Button 'gui.ppm2.editor.io.newfile.title', ->
 				data = @GetTargetData()
 				return if not data
