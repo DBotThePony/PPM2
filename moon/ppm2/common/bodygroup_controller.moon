@@ -344,6 +344,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	RemoveModels: =>
 		@socksModel\Remove() if IsValid(@socksModel)
 		@newSocksModel\Remove() if IsValid(@newSocksModel)
+		@hornModel\Remove() if IsValid(@hornModel)
+		@clothesModel\Remove() if IsValid(@clothesModel)
 
 	UpdateTailSize: (ent = @GetEntity()) =>
 		return if not CLIENT
