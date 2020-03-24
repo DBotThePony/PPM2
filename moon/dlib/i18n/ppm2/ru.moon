@@ -240,6 +240,10 @@ gui.ppm2.editor.clothes_col.eye_use = 'Своя раскраска на очки
 gui.ppm2.editor.clothes_col.neck_use = 'Своя раскраска одежды на шею'
 gui.ppm2.editor.clothes_col.body_use = 'Своя раскраска одежды на тело'
 
+for {internal, publicName} in *{{'head', 'Головной убор'}, {'neck', 'Шея'}, {'body', 'Тело'}, {'eye', 'Очки'}}
+	for i = 1, PPM2.MAX_CLOTHES_COLORS
+		gui.ppm2.editor.clothes[internal .. '_url' .. i] = string.format('%s URL материал №%d', publicName, i)
+
 for i = 1, PPM2.MAX_CLOTHES_COLORS
 	gui.ppm2.editor.clothes_col["head_#{i}"] = 'Цвет головного убора №' .. i
 	gui.ppm2.editor.clothes_col["eye_#{i}"] = 'Цвет очков №' .. i
