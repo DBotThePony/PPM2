@@ -243,6 +243,10 @@ gui.ppm2.editor.clothes_col.eye_use = 'Custom eye(s) clothes color'
 gui.ppm2.editor.clothes_col.neck_use = 'Custom neck clothes color'
 gui.ppm2.editor.clothes_col.body_use = 'Custom body clothes color'
 
+for {internal, publicName} in *{{'head', 'Head'}, {'neck', 'Neck'}, {'body', 'Body'}, {'eye', 'Eye'}}
+	for i = 1, PPM2.MAX_CLOTHES_COLORS
+		gui.ppm2.editor.clothes[internal .. '_url' .. i] = string.format('%s clothes URL material %d', publicName, i)
+
 for i = 1, PPM2.MAX_CLOTHES_COLORS
 	gui.ppm2.editor.clothes_col["head_#{i}"] = 'Head clothes color №' .. i
 	gui.ppm2.editor.clothes_col["eye_#{i}"] = 'Eye(s) clothes color №' .. i

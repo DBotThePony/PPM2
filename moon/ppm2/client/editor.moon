@@ -1538,8 +1538,9 @@ EditorPages = {
 				@Hr()
 				@CheckBox("gui.ppm2.editor.clothes_col.#{internal}_use", "#{publicName}ClothesUseColor")
 
-				if ADVANCED_MODE\GetBool()
-					@URLInput("#{publicName}ClothesURL#{i}") for i = 1, PPM2.MAX_CLOTHES_URLS
+				for i = 1, PPM2.MAX_CLOTHES_URLS
+					@Label('gui.ppm2.editor.clothes.' .. internal .. '_url' .. i)
+					@URLInput("#{publicName}ClothesURL#{i}")
 
 				@ColorBox("gui.ppm2.editor.clothes_col.#{internal}_#{i}", "#{publicName}ClothesColor#{i}") for i = 1, PPM2.MAX_CLOTHES_COLORS
 	}

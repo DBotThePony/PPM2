@@ -928,6 +928,17 @@ EDIT_TREE = {
 							@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
 							@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
 
+							if ADVANCED_MODE\GetBool()
+								for {internal, publicName} in *{{'head', 'Head'}, {'neck', 'Neck'}, {'eye', 'Eye'}}
+									@Hr()
+									@CheckBox("gui.ppm2.editor.clothes_col.#{internal}_use", "#{publicName}ClothesUseColor")
+
+									for i = 1, PPM2.MAX_CLOTHES_URLS
+										@Label('gui.ppm2.editor.clothes.' .. internal .. '_url' .. i)
+										@URLInput("#{publicName}ClothesURL#{i}")
+
+									@ColorBox("gui.ppm2.editor.clothes_col.#{internal}_#{i}", "#{publicName}ClothesColor#{i}") for i = 1, PPM2.MAX_CLOTHES_COLORS
+
 							@CheckBox('gui.ppm2.editor.face.new_muzzle', 'NewMuzzle')
 
 							if ADVANCED_MODE\GetBool()
@@ -1024,6 +1035,17 @@ EDIT_TREE = {
 									@CheckBox('gui.ppm2.editor.misc.hide_mane', 'HideManesMane')
 
 									@ComboBox('gui.ppm2.editor.clothes.head', 'HeadClothes')
+
+									if ADVANCED_MODE\GetBool()
+										for {internal, publicName} in *{{'head', 'Head'}}
+											@Hr()
+											@CheckBox("gui.ppm2.editor.clothes_col.#{internal}_use", "#{publicName}ClothesUseColor")
+
+											for i = 1, PPM2.MAX_CLOTHES_URLS
+												@Label('gui.ppm2.editor.clothes.' .. internal .. '_url' .. i)
+												@URLInput("#{publicName}ClothesURL#{i}")
+
+											@ColorBox("gui.ppm2.editor.clothes_col.#{internal}_#{i}", "#{publicName}ClothesColor#{i}") for i = 1, PPM2.MAX_CLOTHES_COLORS
 
 									@Hr()
 									@CheckBox('gui.ppm2.editor.mane.phong', 'SeparateManePhong') if ADVANCED_MODE\GetBool()
@@ -1245,6 +1267,18 @@ EDIT_TREE = {
 							@ColorBox('gui.ppm2.editor.body.color', 'BodyColor')
 							@ComboBox('gui.ppm2.editor.clothes.body', 'BodyClothes')
 							@ComboBox('gui.ppm2.editor.clothes.neck', 'NeckClothes')
+
+							if ADVANCED_MODE\GetBool()
+								for {internal, publicName} in *{{'neck', 'Neck'}, {'body', 'Body'}}
+									@Hr()
+									@CheckBox("gui.ppm2.editor.clothes_col.#{internal}_use", "#{publicName}ClothesUseColor")
+
+									for i = 1, PPM2.MAX_CLOTHES_URLS
+										@Label('gui.ppm2.editor.clothes.' .. internal .. '_url' .. i)
+										@URLInput("#{publicName}ClothesURL#{i}")
+
+									@ColorBox("gui.ppm2.editor.clothes_col.#{internal}_#{i}", "#{publicName}ClothesColor#{i}") for i = 1, PPM2.MAX_CLOTHES_COLORS
+
 
 						'gui.ppm2.editor.tabs.back': =>
 							@NumSlider('gui.ppm2.editor.body.spine_length', 'BackSize', 2)
