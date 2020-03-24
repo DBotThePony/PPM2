@@ -130,6 +130,7 @@ PPM2.AvailableClothesEye = {
 }
 
 PPM2.MAX_CLOTHES_COLORS = 6
+PPM2.MAX_CLOTHES_URLS = 4
 
 PPM2.AvailableHorns = {
 	'EMPTY', 'CUSTOM', 'CLASSIC_SHARP', 'CLASSIC', 'BROKEN', 'LONG'

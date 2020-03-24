@@ -190,6 +190,12 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@CLOTHES_UPDATE_BODY["BodyClothesColor#{i}"] = true
 		@CLOTHES_UPDATE_EYES["EyeClothesColor#{i}"] = true
 
+	for i = 1, PPM2.MAX_CLOTHES_URLS
+		@CLOTHES_UPDATE_HEAD["HeadClothesURL#{i}"] = true
+		@CLOTHES_UPDATE_NECK["NeckClothesURL#{i}"] = true
+		@CLOTHES_UPDATE_BODY["BodyClothesURL#{i}"] = true
+		@CLOTHES_UPDATE_EYES["EyeClothesURL#{i}"] = true
+
 	for _, ttype in ipairs {'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes'}
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongExponent'] = true
 		@PHONG_UPDATE_TRIGGER[ttype .. 'PhongBoost'] = true
@@ -1391,44 +1397,77 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		@[iName .. 'Clothes_Index'] = indexregistry[clothes + 1]
 
-		if not @GrabData(iName .. 'ClothesUseColor')
+		urls = {}
+
+		for i = 1, PPM2.MAX_CLOTHES_URLS
+			url = @GrabData(iName .. 'ClothesURL' .. i)\trim()
+			url = '' if not url\find('^https?://')
+			urls[i] = url if url ~= ''
+
+		colored = @GrabData(iName .. 'ClothesUseColor')
+
+		if not colored and table.Count(urls) == 0
 			@[iName .. 'Clothes_Mat'] = nil
 			@[iName .. 'Clothes_MatName'] = nil
 			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 			return
 
-		name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_1"
-		mat = CreateMaterial(name, 'VertexLitGeneric', data)
-		@[iName .. 'Clothes_Mat'] = {mat}
-		@[iName .. 'Clothes_MatName'] = {"!#{name}"}
-
 		if #matregistry[clothes + 1] == 0
-			mat\SetTexture('$basetexture', 'models/debug/debugwhite')
-			col = @GrabData("#{iName}ClothesColor1")
-			mat\SetVector('$color2', col\ToVector())
+			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_1"
+			mat = CreateMaterial(name, 'VertexLitGeneric', data)
+			@[iName .. 'Clothes_Mat'] = {mat}
+			@[iName .. 'Clothes_MatName'] = {"!#{name}"}
 
-			if opaque
-				mat\SetFloat('$alpha', 1)
-				mat\SetInt('$translucent', 0)
-			else
-				mat\SetFloat('$alpha', col.a / 255)
-				mat\SetInt('$translucent', 1)
+			if urls[1]
+				@url_processes += 1
 
-			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+				@@LoadURL urls[1], texSize, texSize, (texture, panel, material) ->
+					@url_processes -= 1
+
+					mat\SetVector('$color2', Vector(1, 1, 1))
+					mat\SetTexture('$basetexture', texture)
+
+					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+			elseif colored
+				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
+				col = @GrabData("#{iName}ClothesColor1")
+				mat\SetVector('$color2', col\ToVector())
+
+				if opaque
+					mat\SetFloat('$alpha', 1)
+					mat\SetInt('$translucent', 0)
+				else
+					mat\SetFloat('$alpha', col.a / 255)
+					mat\SetInt('$translucent', 1)
+
+				@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+
 			return
 
 		@[iName .. 'Clothes_Mat'] = {}
+		tab1 = @[iName .. 'Clothes_Mat']
 		@[iName .. 'Clothes_MatName'] = {}
+		tab2 = @[iName .. 'Clothes_MatName']
 		nextindex = 1
 
 		for matIndex = 1, #matregistry[clothes + 1]
 			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 
-			table.insert(@[iName .. 'Clothes_Mat'], mat)
-			table.insert(@[iName .. 'Clothes_MatName'], "!#{name}")
+			tab1[matIndex] = mat
+			tab2[matIndex] = "!#{name}"
 
-			if #matregistry[clothes + 1][matIndex] == 0
+			if urls[matIndex]
+				@url_processes += 1
+
+				@@LoadURL urls[1], texSize, texSize, (texture, panel, material) ->
+					@url_processes -= 1
+
+					mat\SetVector('$color2', Vector(1, 1, 1))
+					mat\SetTexture('$basetexture', texture)
+
+					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+			elseif colored and #matregistry[clothes + 1][matIndex] == 0
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
 				col = @GrabData("#{iName}ClothesColor#{nextindex}")
 				nextindex += 1
@@ -1440,7 +1479,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				else
 					mat\SetFloat('$alpha', col.a / 255)
 					mat\SetInt('$translucent', 1)
-			else
+			elseif colored
 				rtsize = PPM2.GetTextureSize(rtsize)
 				mat\SetVector('$color2', Vector(1, 1, 1))
 				{:r, :g, :b, :a} = @GrabData("#{iName}ClothesColor#{nextindex}")
@@ -1463,6 +1502,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 						surface.DrawTexturedRect(0, 0, rtsize, rtsize)
 
 				mat\SetTexture('$basetexture', @EndRT())
+			else
+				tab1[matIndex] = nil
+				tab2[matIndex] = nil
 
 		@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 
