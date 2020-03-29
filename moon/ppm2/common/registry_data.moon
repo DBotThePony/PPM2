@@ -46,13 +46,13 @@ wString = net.WriteString
 COLOR_FIXER = (r = 255, g = 255, b = 255, a = 255) ->
 	func = (arg = Color(r, g, b, a)) ->
 		if not IsColor(arg)
-			return Color(255, 255, 255)
+			return Color()
 		else
 			{:r, :g, :b, :a} = arg
 			if r and g and b and a
 				return Color(r, g, b, a)
 			else
-				return Color(255, 255, 255)
+				return Color()
 	return func
 
 URL_FIXER = (arg = '') ->
@@ -178,37 +178,37 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'tail': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'TailType'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableTails]
 	}
 
 	'tail_new': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'TailTypeNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableTailsNew]
 	}
 
 	'mane': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'ManeType'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManes]
 	}
 
 	'mane_new': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'ManeTypeNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManesNew]
 	}
 
 	'manelower': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'ManeTypeLower'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManes]
 	}
 
 	'manelower_new': {
-		default: -> 0
+		default: -> 2
 		getFunc: 'ManeTypeLowerNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManesNew]
 	}
@@ -248,7 +248,7 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'cmark_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'CMarkColor'
 		type: 'COLOR'
 	}
@@ -296,7 +296,7 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'body': {
-		default: -> Color(255, 255, 255)
+		default: -> Color(0xEE321F)
 		getFunc: 'BodyColor'
 		type: 'COLOR'
 	}
@@ -366,13 +366,13 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'horn_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'HornColor'
 		type: 'COLOR'
 	}
 
 	'wings_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'WingsColor'
 		type: 'COLOR'
 	}
@@ -396,7 +396,7 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'horn_magic_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'HornMagicColor'
 		type: 'COLOR'
 	}
@@ -500,13 +500,13 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'socks_model_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'SocksColor'
 		type: 'COLOR'
 	}
 
 	'socks_new_model_color1': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'NewSocksColor1'
 		type: 'COLOR'
 	}
@@ -600,7 +600,7 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'teeth_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'TeethColor'
 		type: 'COLOR'
 	}
@@ -618,13 +618,13 @@ PPM2.PonyDataRegistry = {
 	}
 
 	'bat_wing_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'BatWingColor'
 		type: 'COLOR'
 	}
 
 	'bat_wing_skin_color': {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: 'BatWingSkinColor'
 		type: 'COLOR'
 	}
@@ -752,7 +752,7 @@ for {internal, publicName} in *{{'_head', 'Head'}, {'_neck', 'Neck'}, {'_body', 
 
 	for num = 1, PPM2.MAX_CLOTHES_COLORS
 		PPM2.PonyDataRegistry["clothes#{internal}_color_#{num}"] = {
-			default: -> Color(255, 255, 255)
+			default: -> Color()
 			getFunc: "#{publicName}ClothesColor#{num}"
 			type: 'COLOR'
 		}
@@ -765,7 +765,7 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["eye_bg#{internal}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "EyeBackground#{publicName}"
 		type: 'COLOR'
 	}
@@ -777,19 +777,19 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["eye_iris1#{internal}"] = {
-		default: -> Color(200, 200, 200)
+		default: -> Color(0xEE9620)
 		getFunc: "EyeIrisTop#{publicName}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["eye_iris2#{internal}"] = {
-		default: -> Color(200, 200, 200)
+		default: -> Color(0xEE9620)
 		getFunc: "EyeIrisBottom#{publicName}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["eye_irisline1#{internal}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "EyeIrisLine1#{publicName}"
 		type: 'COLOR'
 	}
@@ -801,7 +801,7 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["eye_irisline2#{internal}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "EyeIrisLine2#{publicName}"
 		type: 'COLOR'
 	}
@@ -813,7 +813,7 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["eye_effect#{internal}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "EyeEffect#{publicName}"
 		type: 'COLOR'
 	}
@@ -977,50 +977,50 @@ for i = 1, 3
 	}
 
 	PPM2.PonyDataRegistry["horn_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "HornURLColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["bat_wing_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "BatWingURLColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["bat_wing_skin_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "BatWingSkinURLColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["wings_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "WingsURLColor#{i}"
 		type: 'COLOR'
 	}
 
 for i = 1, 6
 	PPM2.PonyDataRegistry["socks_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "SocksDetailColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["mane_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "ManeColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["mane_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "ManeDetailColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["mane_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "ManeURLColor#{i}"
 		type: 'COLOR'
 	}
@@ -1032,13 +1032,13 @@ for i = 1, 6
 	}
 
 	PPM2.PonyDataRegistry["tail_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "TailDetailColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["tail_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "TailURLColor#{i}"
 		type: 'COLOR'
 	}
@@ -1050,19 +1050,19 @@ for i = 1, 6
 	}
 
 	PPM2.PonyDataRegistry["tail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "TailColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["lower_mane_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "LowerManeColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["lower_mane_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "LowerManeURLColor#{i}"
 		type: 'COLOR'
 	}
@@ -1074,13 +1074,13 @@ for i = 1, 6
 	}
 
 	PPM2.PonyDataRegistry["upper_mane_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
 		getFunc: "UpperManeColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["upper_mane_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "UpperManeURLColor#{i}"
 		type: 'COLOR'
 	}
@@ -1092,20 +1092,20 @@ for i = 1, 6
 	}
 
 	PPM2.PonyDataRegistry["lower_mane_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "LowerManeDetailColor#{i}"
 		type: 'COLOR'
 	}
 
 	PPM2.PonyDataRegistry["upper_mane_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "UpperManeDetailColor#{i}"
 		type: 'COLOR'
 	}
 
 for i = 1, PPM2.MAX_BODY_DETAILS
 	PPM2.PonyDataRegistry["body_detail_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "BodyDetailColor#{i}"
 		type: 'COLOR'
 	}
@@ -1135,7 +1135,7 @@ for i = 1, PPM2.MAX_BODY_DETAILS
 	}
 
 	PPM2.PonyDataRegistry["body_detail_url_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "BodyDetailURLColor#{i}"
 		type: 'COLOR'
 	}
@@ -1223,7 +1223,7 @@ for i = 1, PPM2.MAX_TATTOOS
 	}
 
 	PPM2.PonyDataRegistry["tattoo_color_#{i}"] = {
-		default: -> Color(255, 255, 255)
+		default: -> Color()
 		getFunc: "TattooColor#{i}"
 		type: 'COLOR'
 	}
