@@ -84,7 +84,7 @@ doPatch = =>
 
 		copy = PPM2.GetMainData()\Copy()
 		controller = copy\CreateCustomController(targetModel.Entity)
-		copy\SetController(controller)
+		copy\SetNetworkData(controller)
 		controller\SetDisableTask(true)
 		targetModel.ponyController = controller
 

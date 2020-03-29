@@ -87,7 +87,7 @@ concommand.Add 'ppm2_reload', ->
 	instance = PPM2.GetMainData()
 	newData = instance\CreateNetworkObject()
 	newData\Create()
-	instance\SetNetworkData(newData)
+	instance\SetNetworkObject(newData)
 	PPM2.Message 'Sending pony data to server...'
 
 if not IsValid(LocalPlayer())

@@ -843,7 +843,7 @@ EDIT_TREE = {
 					.Paint = (pnl, w = 0, h = 0) ->
 						data = @GetTargetData()
 						return if not data
-						controller = data\GetController()
+						controller = data\GetNetworkObject()
 						return if not controller
 						rcontroller = controller\GetRenderController()
 						return if not rcontroller
@@ -1573,7 +1573,7 @@ ppm2_editor3 = ->
 
 	controller = copy\CreateCustomController(ent)
 	controller\SetFlexLerpMultiplier(1.3)
-	copy\SetController(controller)
+	copy\SetNetworkData(controller)
 
 	@controller = controller
 

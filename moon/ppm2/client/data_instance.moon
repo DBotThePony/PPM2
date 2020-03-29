@@ -29,29 +29,20 @@ for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 	-- maybe joined server with old ppm2 and new clear _current was generated
 	if not file.Exists('ppm2/' .. fTarget .. '.dat', 'DATA')
 		fRead = file.Read('ppm2/' .. ffind, 'DATA')
-		json = util.JSONToTable(fRead)
-		if json
-			TagCompound = DLib.NBT.TagCompound()
+		if json = util.JSONToTable(fRead)
+			tab = {}
+
 			for key, value in pairs json
-				switch luatype(value)
-					when 'string'
-						TagCompound\AddString(key, value)
-					when 'number'
-						TagCompound\AddFloat(key, value)
-					when 'boolean'
-						TagCompound\AddByte(key, value and 1 or 0)
-					when 'table'
-						-- assume color
-						TagCompound\AddByteArray(key, {value.r - 128, value.g - 128, value.b - 128, value.a - 128}) if value.r and value.g and value.b and value.a
-					else
-						error(luatype(value))
-			buf = DLib.BytesBuffer()
-			TagCompound\WriteFile(buf)
+				if luatype(value) == 'table'
+					tab[key] = Color(value.r, value.g, value.b, value.a)
+				else
+					tab[key] = value
+
+			buf = DLib.GON.Serialize(tab)
 			stream = file.Open('ppm2/' .. fTarget .. '.dat', 'wb', 'DATA')
 			buf\ToFileStream(stream)
 			stream\Flush()
 			stream\Close()
-	file.Delete('ppm2/' .. ffind)
 
 class PonyDataInstance
 	@DATA_DIR = "ppm2/"
@@ -106,6 +97,20 @@ class PonyDataInstance
 			@dataTable[key] = newVal
 			@ValueChanges(key, oldVal, newVal, ...) if oldVal ~= newVal
 
+	new: (filename, data, readIfExists = true) =>
+		@SetFilename(filename)
+
+		@updateNWObject = true
+		@networkNWObject = true
+		@rawData = data
+		@dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
+		@saveOnChange = false
+
+		if data
+			@Deserialize(data)
+		elseif @exists and readIfExists
+			@ReadFromDisk()
+
 	WriteNetworkData: =>
 		for _, {:strName, :writeFunc, :getName, :defValue} in ipairs PPM2.NetworkedPonyData.NW_Vars
 			if @["Get#{getName}"]
@@ -121,43 +126,31 @@ class PonyDataInstance
 				when 'number', 'string', 'boolean'
 					copyOfData[key] = val
 				when 'table', 'Color'
-					if IsColor(val)
-						copyOfData[key] = Color(val)
-					else
-						copyOfData[key] = Color(255, 255, 255)
+					copyOfData[key] = IsColor(val) and Color(val) or Color()
+
 		newData = @@(fileName, copyOfData, false)
 		return newData
+
 	CreateCustomNetworkObject: (goingToNetwork = false, ply = LocalPlayer(), ...) =>
 		newData = PPM2.NetworkedPonyData(nil, ply)
 		newData\SetIsGoingToNetwork(goingToNetwork)
 		@ApplyDataToObject(newData, ...)
 		return newData
+
 	CreateNetworkObject: (goingToNetwork = true, ...) =>
 		newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
 		newData\SetIsGoingToNetwork(goingToNetwork)
 		@ApplyDataToObject(newData, ...)
 		return newData
+
 	ApplyDataToObject: (target, ...) =>
 		for key, value in pairs @GetAsNetworked()
 			error("Attempt to apply data to object #{target} at unknown index #{key}!") if not target["Set#{key}"]
 			target["Set#{key}"](target, value, ...)
+
 	UpdateController: (...) => @ApplyDataToObject(@nwObj, ...)
 	CreateController: (...) => @CreateNetworkObject(false, ...)
 	CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
-
-	new: (filename, data, readIfExists = true, force = false, doBackup = true) =>
-		@SetFilename(filename)
-		@NBTTagCompound = DLib.NBT.TagCompound()
-		@updateNWObject = true
-		@networkNWObject = true
-		@valid = @isOpen
-		@rawData = data
-		@dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
-		@saveOnChange = true
-		if data
-			@SetupData(data, true)
-		elseif @exists and readIfExists
-			@ReadFromDisk(force, doBackup)
 
 	Reset: => @['Reset' .. getFunc](@) for k, {:getFunc} in pairs @@PONY_DATA
 
@@ -166,8 +159,72 @@ class PonyDataInstance
 
 	GetSaveOnChange: => @saveOnChange
 	SaveOnChange: => @saveOnChange
-	SetSaveOnChange: (val = true) => @saveOnChange = val
-	GetValueFromNBT: (mapData, value) =>
+	SetSaveOnChange: (val = false) => @saveOnChange = val
+
+	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
+		if @nwObj and @updateNWObject
+			{:getFunc} = @@PONY_DATA[key]
+			@nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
+
+		@Save() if saveNow
+
+	SetFilename: (filename) =>
+		@filename = filename
+		@fullPath = "#{@@DATA_DIR}#{filename}.dat"
+		@thumbnailPath = "#{@@DATA_DIR}thumbnails/#{filename}.png"
+		@absolutePath = "data/#{@@DATA_DIR}#{filename}.dat"
+		@exists = file.Exists(@fullPath, 'DATA')
+		return @exists
+
+	SetNetworkObject: (nwObj) => @nwObj = nwObj
+	SetNetworkOnChange: (newVal = true) => @networkNWObject = newVal
+	SetUpdateOnChange: (newVal = true) => @updateNWObject = newVal
+	GetNetworkOnChange: => @networkNWObject
+	GetUpdateOnChange: => @updateNWObject
+	GetNetworkObject: => @nwObj
+
+	Exists: => @exists
+	FileExists: => @exists
+	IsExists: => @exists
+	GetFilename: => @filename
+	GetFilenameFull: => @filename .. '.dat'
+	GetFullPath: => @fullPath
+	GetAbsolutePath: => @absolutePath
+	GetBackupPath: => "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
+
+	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
+
+	Serealize: =>
+		tab = {}
+
+		for key, value in pairs(@dataTable)
+			if map = @@PONY_DATA[key]
+				if map.enum
+					tab[key] = map.enumMapping[value] or map.enumMapping[map.default()]
+				elseif map.serealize
+					tab[key] = map.serealize(value)
+				else
+					tab[key] = value
+
+		return DLib.GON.Serialize(tab)
+
+	ReadFromDisk: =>
+		return false if not @exists
+		fRead = file.Read(@fullPath, 'DATA')
+		return false if not fRead or fRead == ''
+
+		buf = DLib.BytesBuffer(fRead)
+
+		if buf\ReadUByte() == 10
+			buf\Seek(0)
+			tag = DLib.NBT.TagCompound()
+			return false if not tag\ReadFile(buf)
+			return @Deserialize(tag)
+		else
+			buf\Seek(0)
+			return @Deserialize(DLib.GON.Deserialize(buf))
+
+	FixNBTValue: (mapData, value) =>
 		if mapData.enum and type(value) == 'string'
 			mapData.fix(mapData.enumMappingBackward[value\upper()])
 		elseif mapData.type == 'COLOR'
@@ -183,134 +240,41 @@ class PonyDataInstance
 		else
 			mapData.fix(value)
 
-	GetExtraBackupPath: => "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
+	DeserializeValue: (mapData, value) =>
+		if mapData.enum and type(value) == 'string'
+			return mapData.fix(mapData.enumMappingBackward[value\upper()])
 
-	SetupData: (data = @NBTTagCompound, force = false, doBackup = false) =>
+		return mapData.fix(value)
+
+	Deserialize: (data) =>
+		fixNBT = false
+
 		if luatype(data) == 'NBTCompound'
 			data = data\GetValue()
-
-		if doBackup or not force
-			makeBackup = false
-
-			for key, value2 in pairs(data)
-				key = key\lower()
-				map = @@PONY_DATA_MAPPING[key]
-
-				if map
-					mapData = @@PONY_DATA[map]
-					value = @GetValueFromNBT(mapData, value2)
-					if mapData.enum
-						if luatype(value) == 'string' and not mapData.enumMappingBackward[value\upper()] or luatype(value) == 'number' and not mapData.enumMapping[value]
-							return @@ERR_MISSING_CONTENT if not force
-							makeBackup = true
-							break
-
-			if doBackup and makeBackup and @exists
-				fRead = file.Read(@fpath, 'DATA')
-				file.Write(@GetExtraBackupPath(), fRead)
+			fixNBT = true
 
 		dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
 
 		for key, value2 in pairs(data)
 			key = key\lower()
-			map = @@PONY_DATA_MAPPING[key]
-			continue unless map
-			mapData = @@PONY_DATA[map]
-			@dataTable[key] = @GetValueFromNBT(mapData, value2)
-			dataTable[key] = nil
+			if map = @@PONY_DATA_MAPPING[key]
+				if mapData = @@PONY_DATA[map]
+					@dataTable[key] = @DeserializeValue(mapData, value2) if not fixNBT
+					@dataTable[key] = @FixNBTValue(mapData, value2) if fixNBT
+					dataTable[key] = nil
 
 		@dataTable[k] = v for k, v in pairs(dataTable)
 
-	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
-		if @nwObj and @updateNWObject
-			{:getFunc} = @@PONY_DATA[key]
-			@nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
-		@Save() if saveNow
-
-	SetFilename: (filename) =>
-		@filename = filename
-		@filenameFull = "#{filename}.dat"
-		@fpath = "#{@@DATA_DIR}#{filename}.dat"
-		@preview = "#{@@DATA_DIR}thumbnails/#{filename}.png"
-		@fpathFull = "data/#{@@DATA_DIR}#{filename}.dat"
-		@isOpen = @filename ~= nil
-		@exists = file.Exists(@fpath, 'DATA')
-		return @exists
-
-	SetNetworkData: (nwObj) => @nwObj = nwObj
-	SetPonyData: (nwObj) => @nwObj = nwObj
-	SetPonyDataController: (nwObj) => @nwObj = nwObj
-	SetPonyController: (nwObj) => @nwObj = nwObj
-	SetController: (nwObj) => @nwObj = nwObj
-	SetDataController: (nwObj) => @nwObj = nwObj
-
-	SetNetworkOnChange: (newVal = true) => @networkNWObject = newVal
-	SetUpdateOnChange: (newVal = true) => @updateNWObject = newVal
-
-	GetNetworkOnChange: => @networkNWObject
-	GetUpdateOnChange: => @updateNWObject
-
-	GetNetworkData: => @nwObj
-	GetPonyData: => @nwObj
-	GetPonyDataController: => @nwObj
-	GetPonyController: => @nwObj
-	GetController: => @nwObj
-	GetDataController: => @nwObj
-
-	IsValid: => @valid
-	Exists: => @exists
-	FileExists: => @exists
-	IsExists: => @exists
-	GetFileName: => @filename
-	GetFilename: => @filename
-	GetFileNameFull: => @filenameFull
-	GetFilenameFull: => @filenameFull
-	GetFilePath: => @fpath
-	GetFullFilePath: => @fpathFull
-	SerealizeValue: (valID = '') =>
-		map = @@PONY_DATA[valID]
-		return unless map
-		val = @dataTable[valID]
-		if map.enum
-			return DLib.NBT.TagString(map.enumMapping[val] or map.enumMapping[map.default()])
-		elseif map.serealize
-			return map.serealize(val)
-		else
-			switch map.type
-				when 'INT'
-					return DLib.NBT.TagInt(val)
-				when 'FLOAT'
-					return DLib.NBT.TagFloat(val)
-				when 'URL'
-					return DLib.NBT.TagString(val)
-				when 'BOOLEAN'
-					return DLib.NBT.TagByte(val and 1 or 0)
-				when 'COLOR'
-					return DLib.NBT.TagByteArray({val.r - 128, val.g - 128, val.b - 128, val.a - 128})
-	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
-
-	@READ_SUCCESS = 0
-	@ERR_FILE_NOT_EXISTS = 1
-	@ERR_FILE_EMPTY = 2
-	@ERR_FILE_CORRUPT = 3
-	ReadFromDisk: (force = false, doBackup = true) =>
-		return @@ERR_FILE_NOT_EXISTS unless @exists
-		fRead = file.Read(@fpath, 'DATA')
-		return @@ERR_FILE_EMPTY if not fRead or fRead == ''
-		@NBTTagCompound\ReadFile(DLib.BytesBuffer(fRead))
-		return @SetupData(@NBTTagCompound, force, doBackup) or @@READ_SUCCESS
-
-	SaveAs: (path = @fpath) =>
-		@NBTTagCompound\AddTag(key, @SerealizeValue(key)) for key, val in pairs @dataTable
-		buf = DLib.BytesBuffer()
-		@NBTTagCompound\WriteFile(buf)
+	SaveAs: (path = @fullPath) =>
+		buf = @Serealize()
 		stream = file.Open(path, 'wb', 'DATA')
+		error('Unable to open ' .. path .. '!') if not stream
 		buf\ToFileStream(stream)
 		stream\Flush()
 		stream\Close()
 		return buf
 
-	SavePreview: (path = @preview) =>
+	WriteThumbnail: (path = @thumbnailPath) =>
 		buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
 		buildingModel\SetNoDraw(true)
 		buildingModel\SetModelScale(0.9)
@@ -334,7 +298,7 @@ class PonyDataInstance
 			\FrameAdvance(0)
 
 		timer.Simple 0.5, ->
-			renderTarget = GetRenderTarget('ppm2_save_preview_generate2', 1024, 1024, false)
+			renderTarget = GetRenderTarget('ppm2_save_thumbnailPath_generate2', 1024, 1024, false)
 			renderTarget\Download()
 			render.PushRenderTarget(renderTarget)
 			--render.SuppressEngineLighting(true)
@@ -385,10 +349,10 @@ class PonyDataInstance
 			--render.SuppressEngineLighting(false)
 			render.PopRenderTarget()
 
-	Save: (doBackup = true, preview = true) =>
-		file.Write(@GetExtraBackupPath(), file.Read(@fpath, 'DATA')) if doBackup and @exists
-		buf = @SaveAs(@fpath)
-		@SavePreview(@preview) if preview
+	Save: (doBackup = true, saveThumbnail = true) =>
+		file.Write(@GetBackupPath(), file.Read(@fullPath, 'DATA')) if doBackup and @exists
+		buf = @SaveAs(@fullPath)
+		@WriteThumbnail(@thumbnailPath) if saveThumbnail
 		@exists = true
 		return buf
 

@@ -53,7 +53,7 @@ applyPonyData = {
 					net.Start('PPM2.RagdollEdit')
 					net.WriteEntity(ent)
 					net.WriteBool(false)
-					data = PPM2.PonyDataInstance(fil, nil, true, true, false)
+					data = PPM2.PonyDataInstance(fil, nil, true, true)
 					data\WriteNetworkData()
 					net.SendToServer()
 	Filter: genericEditFilter

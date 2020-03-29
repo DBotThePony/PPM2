@@ -650,7 +650,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 						surface.DrawTexturedRect(x, y, 512, 512)
 					else
 						if not @genPreview
-							PPM2.PonyDataInstance(fil2)\SavePreview()
+							PPM2.PonyDataInstance(fil2)\WriteThumbnail()
 							@genPreview = true
 							timer.Simple 1, ->
 								@png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
@@ -723,7 +723,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 					surface.DrawTexturedRect(x, y, 512, 512)
 				else
 					if not @genPreview
-						PPM2.ReadFromOldData(fil2)\SavePreview()
+						PPM2.ReadFromOldData(fil2)\WriteThumbnail()
 						@genPreview = true
 						timer.Simple 1, ->
 							@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
@@ -1649,7 +1649,7 @@ EditorPages = {
 				.Paint = (pnl, w = 0, h = 0) ->
 					data = @GetTargetData()
 					return if not data
-					controller = data\GetController()
+					controller = data\GetNetworkObject()
 					return if not controller
 					rcontroller = controller\GetRenderController()
 					return if not rcontroller
@@ -1793,7 +1793,7 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 			mainData = PPM2.GetMainData()
 			nwdata = LocalPlayer()\GetPonyData()
 			if nwdata
-				mainData\SetNetworkData(nwdata)
+				mainData\SetNetworkObject(nwdata)
 				if nwdata.netID == -1
 					nwdata.NETWORKED = false
 					nwdata\Create()
@@ -1865,7 +1865,7 @@ PPM2.OpenNewEditor = ->
 			\SetVisible(true)
 			.controller = LocalPlayer()\GetPonyData() or .controller
 			.data\ApplyDataToObject(.controller, false)
-			.data\SetNetworkData(.controller)
+			.data\SetNetworkObject(.controller)
 			.leftPanel\SetVisible(true)
 			.calcPanel\SetVisible(true)
 			net.Start('PPM2.EditorStatus')
@@ -1953,7 +1953,7 @@ PPM2.OpenNewEditor = ->
 
 	copy = PPM2.GetMainData()\Copy()
 	@controller = controller
-	copy\SetNetworkData(@controller)
+	copy\SetNetworkObject(@controller)
 	copy\SetNetworkOnChange(false)
 	@data = copy
 	@DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
@@ -2038,7 +2038,7 @@ PPM2.OpenOldEditor = ->
 	ent = @model\ResetModel(nil, EditorModels[editorModelSelect])
 	controller = copy\CreateCustomController(ent)
 	controller\SetFlexLerpMultiplier(1.3)
-	copy\SetController(controller)
+	copy\SetNetworkObject(controller)
 	@controller = controller
 	@data = copy
 	@DoUpdate = -> pnl\DoUpdate() for i, pnl in pairs @panels
