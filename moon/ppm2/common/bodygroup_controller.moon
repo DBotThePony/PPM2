@@ -191,7 +191,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@[mIndex][fModelIndex] = true
 
 		PPM2.DebugPrint('Creating new ', mName, ' for ', @GetEntity(), ' as ', @[mIndex])
-		@SetData(mName, @[mIndex]) if @G
+		@SetData(mName, @[mIndex]) if @GrabData(mName) ~= @[mIndex]
 		return @[mIndex]
 
 	UpdateGenericModel: (force, fcallNone, mIndex, mName, mTranslateModelName, mCallType) =>
