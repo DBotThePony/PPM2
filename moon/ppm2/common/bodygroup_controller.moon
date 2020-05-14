@@ -191,7 +191,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@[mIndex][fModelIndex] = true
 
 		PPM2.DebugPrint('Creating new ', mName, ' for ', @GetEntity(), ' as ', @[mIndex])
-		@SetData(mName, @[mIndex])
+		@SetData(mName, @[mIndex]) if @G
 		return @[mIndex]
 
 	UpdateGenericModel: (force, fcallNone, mIndex, mName, mTranslateModelName, mCallType) =>
@@ -206,7 +206,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			\SetBodygroup(1, bodygroupID) if bodygroupID and \GetBodygroup(1) ~= bodygroupID
 			\SetParent(@GetEntity()) if \GetParent() ~= @GetEntity() and IsValid(@GetEntity())
 
-		@SetData(mName, @[mIndex])
+		@SetData(mName, @[mIndex]) if @GrabData(mName) ~= @[mIndex]
 		return @[mIndex]
 
 	UpdateHornModel: (force = false) => @UpdateGenericModel(force, 'CreateHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
