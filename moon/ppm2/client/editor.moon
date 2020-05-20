@@ -957,8 +957,10 @@ PANEL_SETTINGS_BASE = {
 	ColorBox: (name = 'Colorful Box', option = '', parent = @scroll or @) =>
 		@createdPanels += 7
 		collapse = vgui.Create('DCollapsibleCategory', parent)
-		box = vgui.Create('DColorMixer', collapse)
+		box = vgui.Create('DLibColorMixer', collapse)
+		box\SetTallLayout(true)
 		collapse.box = box
+
 		with box
 			\SetSize(250, 270)
 			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
@@ -973,15 +975,17 @@ PANEL_SETTINGS_BASE = {
 					@ValueChanges(option, newVal, pnl)
 			table.insert @updateFuncs, ->
 				\SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+
 		with collapse
 			\SetContents(box)
 			\Dock(TOP)
 			\DockMargin(2, 2, 2, 2)
-			\SetSize(250, 270)
+			\SetSize(250, 340)
 			\SetLabel(name)
 			\SetExpanded(false)
 			@scroll\AddItem(collapse) if IsValid(@scroll) and parent == @scroll
 			@CreateResetButton(name, option, collapse)
+
 		return box, collapse
 	Spoiler: (name = 'gui.ppm2.editor.generic.spoiler', parent = @scroll or @) =>
 		@createdPanels += 2
