@@ -135,9 +135,9 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
-				'$rimlight': 1
-				'$rimlightexponent': 2
-				'$rimlightboost': 1
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
 			}
@@ -258,6 +258,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
 
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
+
 				'$model': '1'
 				'$phong': '1'
 				'$phongexponent': '0.1'
@@ -322,6 +326,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				'$basetexture': 'models/debug/debugwhite'
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 				'$halflambert': '1'
+
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 
 				'$model': '1'
 				'$phong': '1'
@@ -402,8 +410,8 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			'$basemapalphaphongmask': '1'
 
 			'$rimlight': '1'
-			'$rimlightexponent': '4'
-			'$rimlightboost': '2'
+			'$rimlightexponent': '2'
+			'$rimlightboost': '1'
 			'$color': '[1 1 1]'
 			'$color2': '[1 1 1]'
 

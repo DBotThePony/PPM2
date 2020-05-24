@@ -138,7 +138,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 	@PONY_SOCKS = _M.PONY_SOCKS
 
 	--@SessionID = math.random(1, 1000)
-	@SessionID = 2
+	@SessionID = 0
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
@@ -1240,6 +1240,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$selfillum': '1'
 				'$selfillummask': 'null'
 
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
+
 				'$model': '1'
 				'$phong': '1'
 				'$phongexponent': '3'
@@ -1258,6 +1262,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
 				'$selfillum': '0'
+
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 
 				'$model': '1'
 				'$phong': '1'
@@ -1278,6 +1286,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$basetexture': 'models/debug/debugwhite'
 				'$selfillum': '1'
 				'$selfillummask': 'null'
+
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 
 				'$model': '1'
 				'$phong': '1'
@@ -1382,8 +1394,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'$lightwarptexture': 'models/ppm/clothes/lightwarp'
 
 			'$rimlight': '1'
-			'$rimlightexponent': '4'
-			'$rimlightboost': '2'
+			'$rimlightexponent': '2'
+			'$rimlightboost': '1'
 			'$color': '[1 1 1]'
 			'$color2': '[1 1 1]'
 		}
@@ -1528,8 +1540,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'$phongtint': '[1 .95 .95]'
 			'$phongfresnelranges': '[1 5 10]'
 			'$rimlight': '1'
-			'$rimlightexponent': '4.0'
-			'$rimlightboost': '2'
+			'$rimlightexponent': '2'
+			'$rimlightboost': '1'
 			'$color': '[1 1 1]'
 			'$color2': '[1 1 1]'
 			'$cloakPassEnabled': '1'
@@ -1607,8 +1619,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[1 5 10]'
 				'$rimlight': '1'
-				'$rimlightexponent': '4.0'
-				'$rimlightboost': '2'
+				'$rimlightexponent': '1'
+				'$rimlightboost': '0.5'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
 				'$cloakPassEnabled': '1'
@@ -1645,8 +1657,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[1 5 10]'
 				'$rimlight': '1'
-				'$rimlightexponent': '4.0'
-				'$rimlightboost': '2'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
 				'$cloakPassEnabled': '1'
@@ -1705,6 +1717,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$alpha': '1'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
+
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 			}
 		}
 
@@ -1776,9 +1792,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
-				'$rimlight': 1
-				'$rimlightexponent': 2
-				'$rimlightboost': 1
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
 			}
@@ -1882,9 +1898,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 				'$phongtint': '[1 .95 .95]'
 				'$phongfresnelranges': '[0.5 6 10]'
 
-				'$rimlight': 1
-				'$rimlightexponent': 2
-				'$rimlightboost': 1
+				'$rimlight': '1'
+				'$rimlightexponent': '2'
+				'$rimlightboost': '1'
 				'$color': '[1 1 1]'
 				'$color2': '[1 1 1]'
 			}
