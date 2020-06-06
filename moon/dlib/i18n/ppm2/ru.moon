@@ -33,21 +33,21 @@ gui.ppm2.editor.eyes.lightwarp = "Lightwarp"
 gui.ppm2.editor.eyes.desc1 = "Lightwarp URL текстура\nОБЯЗАНА БЫТЬ 256x16!"
 gui.ppm2.editor.eyes.desc2 = "Сила 'Зеркалья' у глаз\nЭтот параметр влияет на отражения в режиме Отражений в реальном времени\nЗа это отвечает переменная клиента ppm2_cl_reflections\nОстальные игроки увидят отражения только с ppm2_cl_reflections 1\n0 - матовая поверхность; 1 - зеркальная"
 
-for _, {tprefix, prefix} in ipairs {{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
+for _, {tprefix, prefix, suffix} in ipairs {{'def', '', ''}, {'left', 'Левый: ', 'а'}, {'right', 'Правый: ', 'а'}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.shader = "#{prefix}Использовать шейдер EyeRefract"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Использовать Cornera диффуз текстуру"
-	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Стеклянность (?)"
+	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Зеркальность"
 
-	gui.ppm2.editor.eyes[tprefix].type = "#{prefix}Тип глаза"
-	gui.ppm2.editor.eyes[tprefix].reflection_type = "#{prefix}Тип отражений глаза"
+	gui.ppm2.editor.eyes[tprefix].type = "#{prefix}Тип глаз#{suffix}"
+	gui.ppm2.editor.eyes[tprefix].reflection_type = "#{prefix}Тип отражения глаз#{suffix}"
 	gui.ppm2.editor.eyes[tprefix].lines = "#{prefix}Линии радужной оболочки"
-	gui.ppm2.editor.eyes[tprefix].derp = "#{prefix}Derp глаз"
-	gui.ppm2.editor.eyes[tprefix].derp_strength = "#{prefix}Сила Derp глаза"
-	gui.ppm2.editor.eyes[tprefix].iris_size = "#{prefix}Размер глаза"
+	gui.ppm2.editor.eyes[tprefix].derp = "#{prefix}Расхождение глаз#{suffix}"
+	gui.ppm2.editor.eyes[tprefix].derp_strength = "#{prefix}Сила расхождения глаз#{suffix}"
+	gui.ppm2.editor.eyes[tprefix].iris_size = "#{prefix}Размер глаз#{suffix}"
 
 	gui.ppm2.editor.eyes[tprefix].points_inside = "#{prefix}Линии радужной оболочки смотрят внутрь"
-	gui.ppm2.editor.eyes[tprefix].width = "#{prefix}Ширина глаза"
-	gui.ppm2.editor.eyes[tprefix].height = "#{prefix}Высота глаза"
+	gui.ppm2.editor.eyes[tprefix].width = "#{prefix}Ширина глаз#{suffix}"
+	gui.ppm2.editor.eyes[tprefix].height = "#{prefix}Высота глаз#{suffix}"
 
 	gui.ppm2.editor.eyes[tprefix].pupil.width = "#{prefix}Ширина зрачка"
 	gui.ppm2.editor.eyes[tprefix].pupil.height = "#{prefix}Высота зрачка"
@@ -55,16 +55,16 @@ for _, {tprefix, prefix} in ipairs {{'def', ''}, {'left', 'Left '}, {'right', 'R
 
 	gui.ppm2.editor.eyes[tprefix].pupil.shift_x = "#{prefix}Сдвиг зрачка по X"
 	gui.ppm2.editor.eyes[tprefix].pupil.shift_y = "#{prefix}Сдвиг зрачка по Y"
-	gui.ppm2.editor.eyes[tprefix].pupil.rotation = "#{prefix}Поворот глаза"
+	gui.ppm2.editor.eyes[tprefix].pupil.rotation = "#{prefix}Поворот глаз#{suffix}"
 
-	gui.ppm2.editor.eyes[tprefix].background = "#{prefix}Фон глаза"
+	gui.ppm2.editor.eyes[tprefix].background = "#{prefix}Фон глаз#{suffix}"
 	gui.ppm2.editor.eyes[tprefix].pupil_size = "#{prefix}Зрачок"
 	gui.ppm2.editor.eyes[tprefix].top_iris = "#{prefix}Верхняя радужная оболочка"
 	gui.ppm2.editor.eyes[tprefix].bottom_iris = "#{prefix}Нижняя радужная оболочка"
-	gui.ppm2.editor.eyes[tprefix].line1 = "#{prefix}Радужная линия 1"
-	gui.ppm2.editor.eyes[tprefix].line2 = "#{prefix}Радужная линия 2"
+	gui.ppm2.editor.eyes[tprefix].line1 = "#{prefix}Линия радужной оболочки 1"
+	gui.ppm2.editor.eyes[tprefix].line2 = "#{prefix}Линия радужной оболочки 2"
 	gui.ppm2.editor.eyes[tprefix].reflection = "#{prefix}Эффект отражения"
-	gui.ppm2.editor.eyes[tprefix].effect = "#{prefix}Эффект мультяшного глаза"
+	gui.ppm2.editor.eyes[tprefix].effect = "#{prefix}Эффект мультяшного глаз#{suffix}"
 
 gui.ppm2.editor.generic.title = 'PPM/2 Пони редактор'
 gui.ppm2.editor.generic.title_file = '%q - PPM/2 Пони редактор'
