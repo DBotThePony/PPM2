@@ -35,7 +35,7 @@ gui.ppm2.editor.eyes.desc2 = "Сила 'Зеркалья' у глаз\nЭтот 
 
 for _, {tprefix, prefix} in ipairs {{'def', ''}, {'left', 'Left '}, {'right', 'Right '}}
 	gui.ppm2.editor.eyes[tprefix].lightwarp.shader = "#{prefix}Использовать шейдер EyeRefract"
-	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Испольщовать Cornera диффуз текстуру"
+	gui.ppm2.editor.eyes[tprefix].lightwarp.cornera = "#{prefix}Использовать Cornera диффуз текстуру"
 	gui.ppm2.editor.eyes[tprefix].lightwarp.glossiness = "#{prefix}Стеклянность (?)"
 
 	gui.ppm2.editor.eyes[tprefix].type = "#{prefix}Тип глаза"
