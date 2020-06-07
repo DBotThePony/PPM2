@@ -237,6 +237,8 @@ class PonyRenderController extends PPM2.ControllerChildren
 			@legsModel\SetNoDraw(true)
 			@legsModel.RenderOverride = nil
 
+		return if hook.Run('PPM2_ShouldDrawLegs', @GetEntity(), @legsModel) == false
+
 		@UpdateLegs()
 
 		oldClip = render.EnableClipping(true)
@@ -270,6 +272,9 @@ class PonyRenderController extends PPM2.ControllerChildren
 		return if not @GetEntity()\InVehicle() and EyeAngles().p < 60
 		return if @GetEntity()\ShouldDrawLocalPlayer()
 		return if (@GetEntity()\GetPos() + @GetEntity()\GetViewOffset())\DistToSqr(EyePos()) > @@LEGS_MAX_DISTANCE
+
+		return if hook.Run('PPM2_ShouldDrawLegs', @GetEntity(), @legsModel) == false
+
 		@UpdateLegs()
 
 		oldClip = render.EnableClipping(true)
