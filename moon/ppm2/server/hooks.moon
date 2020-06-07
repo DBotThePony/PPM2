@@ -66,7 +66,7 @@ do
 				if data
 					table.insert(target, ent)
 
-PPM2.ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_new_ragdolls', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable new ragdolls')
+PPM2.ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_phys_ragdolls', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable physics ragdolls (Pre March 2020 gmod update workaround)')
 ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS
 RAGDOLL_COLLISIONS = CreateConVar('ppm2_sv_ragdolls_collisions', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable ragdolls collisions')
 

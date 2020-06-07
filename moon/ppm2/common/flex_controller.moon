@@ -267,7 +267,6 @@ class PonyFlexController extends PPM2.ControllerChildren
 		{flex: 'Lowerlid_Raise',    scale: 1, speed: 1, active: false}
 		{flex: 'Happy_Eyes',        scale: 1, speed: 1, active: true}
 		{flex: 'Duck',              scale: 1, speed: 1, active: true}
-
 	}
 
 	@SEQUENCES = {
@@ -423,7 +422,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Left_Blink', 'Right_Blink'}
 			'func': (delta, timeOfAnim) =>
-				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll') or (@GetEntity()\IsPlayer() and not @GetEntity()\Alive())
 				value = math.abs(math.sin(CurTimeL() * .5) * .15)
 				@SetModifierWeight(1, value)
 				@SetModifierWeight(2, value)
@@ -436,7 +435,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
 			'func': (delta, timeOfAnim) =>
-				return if not @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
+				return if not @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll') and not (not @GetEntity()\IsPlayer() or not @GetEntity()\Alive())
 				@SetModifierWeight(1, 1)
 				@SetModifierWeight(2, 1)
 				@SetModifierWeight(3, 0.5)
@@ -449,7 +448,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 2
 			'ids': {'Stomach_Out'}
 			'func': (delta, timeOfAnim) =>
-				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll') or (@GetEntity()\IsPlayer() and not @GetEntity()\Alive())
 				return if timeOfAnim < 0 or timeOfAnim > 1
 				@SetModifierWeight(1, math.tbezier(timeOfAnim, BREATH_CURVE) * 0.35)
 		}
@@ -461,7 +460,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Frown', 'Left_Blink', 'Right_Blink', 'Scrunch', 'Mouth_O', 'JawOpen', 'Grin'}
 			'func': (delta, timeOfAnim) =>
-				return false if not @GetEntity()\IsPlayer() and not @GetEntity()\IsNPC() and @GetEntity().Type ~= 'nextbot'
+				return false if (not @GetEntity()\IsPlayer() or not @GetEntity()\Alive()) and not @GetEntity()\IsNPC() and @GetEntity().Type ~= 'nextbot'
 				frown = @GetModifierID(1)
 				frownState = @GetFlexState(1)
 				left, right = @GetModifierID(2), @GetModifierID(3)
@@ -748,7 +747,7 @@ class PonyFlexController extends PPM2.ControllerChildren
 				@min, @max = @nextBlink, @nextBlink + @nextBlinkLength
 
 			'func': (delta, timeOfAnim) =>
-				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
+				return false if @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll') or (@GetEntity()\IsPlayer() and not @GetEntity()\Alive())
 				if @min > timeOfAnim or @max < timeOfAnim
 					if @blinkHit
 						@blinkHit = false
