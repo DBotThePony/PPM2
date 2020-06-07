@@ -342,13 +342,24 @@ class PonyTextureController extends PPM2.ControllerChildren
 		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: true, :args, run: @[func]})
 
 	IsBeingProcessed: =>
-		return false if #@@COMPILE_QUEUE == 0
+		return true if @url_processes > 0
+		if #@@COMPILE_QUEUE == 0
+			@processing_first = false
+			return false
+
+		num = 0
 
 		for data in *@@COMPILE_QUEUE
 			if data.self == @
-				return true
+				num += 1
 
-		return @url_processes > 0
+		if not @processing_first and num > 10
+			@processing_first = true
+		elseif @processing_first and num == 0
+			@processing_first = false
+
+		return num > 0 if @processing_first
+		return num > 3
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -583,15 +594,18 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@isValid = true
 		@cachedENT = @GetEntity()
 		@id = @GetEntity()\EntIndex()
+
 		if @id == -1
 			@clientsideID = true
 			@id = @@NEXT_GENERATED_ID
 			@@NEXT_GENERATED_ID += 1
+
 		@compiled = false
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
 		@delayCompilation = {}
 		@url_processes = 0
+		@processing_first = true
 		@CheckReflectionsClosure = -> @CheckReflections()
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
