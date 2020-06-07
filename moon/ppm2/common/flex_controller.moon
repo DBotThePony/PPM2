@@ -96,6 +96,8 @@ class FlexState extends PPM2.ModifierBase
 		@useLerp = true
 		@lerpMultiplier = 1
 		@activeID = "DisableFlex#{@flexName}"
+		controller = @controller\GetController()\GetData()
+		@SetIsActive(not controller['Get' .. @activeID](controller)) if controller['Get' .. @activeID]
 
 	__tostring: => "[#{@@__name}:#{@flexName}[#{@flexID}]|#{@GetData()}]"
 
