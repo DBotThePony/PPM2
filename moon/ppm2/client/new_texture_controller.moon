@@ -216,8 +216,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
+		tickets = {i, @PutTicket(prefix .. 'mane' .. i) for i = 1, 6}
+
 		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				return if not @CheckTicket(prefix .. 'mane' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
 				if left == 0
@@ -306,8 +309,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
+		tickets = {i, @PutTicket('batwing' .. i) for i = 1, 3}
+
 		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				return if not @CheckTicket('batwing' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
 				if left == 0
@@ -375,8 +381,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			left += 1
 			{detailURL, i}
 
+		tickets = {i, @PutTicket('batwingskin' .. i) for i = 1, 3}
+
 		for _, {url, i} in ipairs validURLS
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				return if not @CheckTicket('batwingskin' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
 				if left == 0
