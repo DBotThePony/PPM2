@@ -221,15 +221,21 @@ class PonyRenderController extends PPM2.ControllerChildren
 		if USE_RENDER_OVERRIDE\GetBool()
 			@legsModel\SetNoDraw(false)
 			rTime = RealTimeL()
+
 			if @legsModel.lastRedrawFix < rTime
+				@UpdateLegs()
 				@legsModel\DrawModel()
-				@legsModel.lastRedrawFix = rTime + 5
+				@legsModel.lastRedrawFix = rTime + 2
+
 			if not @legsModel.RenderOverride
 				@legsModel.RenderOverride = -> @DrawLegsOverride()
+				@UpdateLegs()
 				@legsModel\DrawModel()
+
 			return
 		else
 			@legsModel\SetNoDraw(true)
+			@legsModel.RenderOverride = nil
 
 		@UpdateLegs()
 
