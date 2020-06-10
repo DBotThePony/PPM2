@@ -1573,7 +1573,7 @@ ppm2_editor3 = ->
 
 	controller = copy\CreateCustomController(ent)
 	controller\SetFlexLerpMultiplier(1.3)
-	copy\SetNetworkData(controller)
+	copy\SetNetworkObject(controller)
 
 	@controller = controller
 
