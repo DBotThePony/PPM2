@@ -435,7 +435,21 @@ class PonyFlexController extends PPM2.ControllerChildren
 			'time': 5
 			'ids': {'Left_Blink', 'Right_Blink', 'Frown'}
 			'func': (delta, timeOfAnim) =>
-				return if not @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll') and not (not @GetEntity()\IsPlayer() or not @GetEntity()\Alive())
+				allow = true
+
+				if @GetEntity()\IsPlayer()
+					if @GetEntity()\Alive()
+						allow = false
+				else
+					if not @GetEntity()\GetNWBool('PPM2.IsDeathRagdoll')
+						allow = false
+
+				if not allow
+					@SetModifierWeight(1, 0)
+					@SetModifierWeight(2, 0)
+					@SetModifierWeight(3, 0)
+					return
+
 				@SetModifierWeight(1, 1)
 				@SetModifierWeight(2, 1)
 				@SetModifierWeight(3, 0.5)
