@@ -1631,10 +1631,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			PPM2.DebugPrint('Compiled new socks texture for ', @GetEntity(), ' as part of ', @)
 		else
 			@url_processes += 1
-			ticket = @PutTicket(prefix .. '_newsocks')
+			ticket = @PutTicket('newsocks')
 
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
-				return if not @CheckTicket(prefix .. '_newsocks', ticket)
+				return if not @CheckTicket('newsocks', ticket)
 				@url_processes -= 1
 
 				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
