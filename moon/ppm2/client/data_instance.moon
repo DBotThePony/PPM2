@@ -24,6 +24,11 @@ file.CreateDir('ppm2')
 file.CreateDir('ppm2/backups')
 file.CreateDir('ppm2/thumbnails')
 
+if canon_presets = include('ppm2/client/canon_presets.lua')
+	for presetname, payload in pairs(canon_presets)
+		if not file.Exists('ppm2/' .. presetname .. '.dat', 'DATA')
+			file.Write('ppm2/' .. presetname .. '.dat', payload)
+
 for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 	fTarget = ffind\sub(1, -5)
 	-- maybe joined server with old ppm2 and new clear _current was generated

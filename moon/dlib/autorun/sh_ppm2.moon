@@ -65,6 +65,8 @@ client('client/editor3.lua')
 client('client/rag_edit.lua')
 client('client/render.lua')
 
+AddCSLuaFile('ppm2/client/canon_presets.lua') if SERVER
+
 server('server/misc.lua')
 server('server/hooks.lua')
 server('server/emotes.lua')
