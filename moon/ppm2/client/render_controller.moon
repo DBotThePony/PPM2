@@ -386,6 +386,19 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@lastStareUpdate = ctime + 0.2
 		lpos = @GetEntity()\EyePos()
 		lang = @GetEntity()\EyeAnglesFixed()
+		lply = LocalPlayer()
+
+		if @GetEntity() == lply and PPM2.EditorTopFrame\IsVisible()
+			if PPM2.EditorTopFrame.calcPanel and PPM2.EditorTopFrame.calcPanel.drawPos and PPM2.EditorTopFrame.calcPanel.drawAngle
+				origin, angles = LocalToWorld(PPM2.EditorTopFrame.calcPanel.drawPos, PPM2.EditorTopFrame.calcPanel.drawAngle, lply\GetPos(), Angle(0, lply\EyeAnglesFixed().y, 0))
+				origin, angles = WorldToLocal(origin, angles, lpos, lang)
+				@staringAt = NULL
+				@staringAtDirectly = NULL
+				@idleEyes = true
+				@eyeRollTargetPos = origin
+				@prevRollTargetPos = origin
+
+			return
 
 		@staringAt = NULL if IsValid(@staringAt) and @staringAt\IsPlayer() and not @staringAt\Alive()
 
