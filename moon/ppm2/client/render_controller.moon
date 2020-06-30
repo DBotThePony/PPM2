@@ -388,7 +388,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		lang = @GetEntity()\EyeAnglesFixed()
 		lply = LocalPlayer()
 
-		if @GetEntity() == lply and PPM2.EditorTopFrame\IsVisible()
+		if @GetEntity() == lply and IsValid(PPM2.EditorTopFrame) and PPM2.EditorTopFrame\IsVisible()
 			if PPM2.EditorTopFrame.calcPanel and PPM2.EditorTopFrame.calcPanel.drawPos and PPM2.EditorTopFrame.calcPanel.drawAngle
 				origin, angles = LocalToWorld(PPM2.EditorTopFrame.calcPanel.drawPos, PPM2.EditorTopFrame.calcPanel.drawAngle, lply\GetPos(), Angle(0, lply\EyeAnglesFixed().y, 0))
 				origin, angles = WorldToLocal(origin, angles, lpos, lang)
