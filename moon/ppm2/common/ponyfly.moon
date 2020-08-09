@@ -75,11 +75,11 @@ class PonyflyController
 		pos     = movedata\GetOrigin()
 		ang     = movedata\GetAngles()
 		fwd     = ang\Forward()
-		bcwd    = -ang\Forward()
+		bcwd    = -fwd
 		right   = ang\Right()
-		left    = -ang\Right()
+		left    = -right
 		up      = ang\Up()
-		down    = -ang\Up()
+		down    = -up
 		W       = movedata\KeyDown(IN_FORWARD)
 		S       = movedata\KeyDown(IN_BACK)
 		D       = movedata\KeyDown(IN_MOVERIGHT)
