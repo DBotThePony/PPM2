@@ -71,6 +71,7 @@ class PonyflyController
 			@roll = 0
 			@pitch = 0
 			@yaw = 0
+
 	Think: (movedata) =>
 		pos     = movedata\GetOrigin()
 		ang     = movedata\GetAngles()
@@ -133,7 +134,7 @@ class PonyflyController
 			hitLift = true
 
 		if CLIENT
-			lerpMult = FrameTime() * @angleLerp
+			lerpMult = game.GetTimeScale() * engine.TickInterval() * @angleLerp
 			{:p, :y, :r} = ang
 			p -= @pitch
 			y -= @yaw
@@ -142,7 +143,7 @@ class PonyflyController
 			@roll = Lerp(lerpMult, @roll, roll)
 			p += @pitch
 			y += @yaw
-			r = @roll + math.sin(RealTimeL()) * 2
+			r = @roll + math.sin(CurTime()) * 2
 			newAng = Angle(p, y, r)
 			@GetEntity()\SetEyeAngles(newAng)
 
@@ -152,13 +153,12 @@ class PonyflyController
 
 		if not hitLift
 			velocity.z *= dragCalc
-			velocity.z += math.sin(RealTimeL() * 2) * .01
+			velocity.z += math.sin(CurTime() * 2) * .01
 
 		pos += velocity
 
 		movedata\SetVelocity(velocity)
 		movedata\SetOrigin(pos)
-		return true
 
 	SetupMove: (movedata, cmd) =>
 		@isLiftingUp = movedata\KeyDown(IN_JUMP)
@@ -229,7 +229,8 @@ class PonyflyController
 					nativeEntity\EmitSound("physics/flesh/flesh_impact_bullet#{math.random(1, 5)}.wav", 75)
 				dmgInfo\SetDamage(calcDamage)
 				nativeEntity\TakeDamageInfo(dmgInfo)
-		@lastVelocity = newVelocity
+
+		@lastVelocity = newVelocity if IsFirstTimePredicted()
 
 PPM2.PonyflyController = PonyflyController
 
