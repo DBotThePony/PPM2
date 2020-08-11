@@ -1016,8 +1016,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			matTarget\SetTexture('$lightwarptexture', myTex)
 		else
 			ticket = @PutTicket(prefix .. '_phong')
+			@url_processes += 1
 
 			@@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket(prefix .. '_phong', ticket)
 				matTarget\SetTexture('$lightwarptexture', tex)
 
@@ -1026,8 +1028,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 				matTarget\SetUndefined('$bumpmap')
 			else
 				ticket = @PutTicket(prefix .. '_bump')
+				@url_processes += 1
 
 				@@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
+					@url_processes -= 1
 					return if not @CheckTicket(prefix .. '_bump', ticket)
 					matTarget\SetTexture('$bumpmap', tex)
 
@@ -1118,11 +1122,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('BodyColor')
 			@StartRTOpaque("Body_rt", bodysize, r, g, b)
@@ -1249,7 +1249,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tickets = {i, @PutTicket('body_detail' .. i) for i = 1, PPM2.MAX_BODY_DETAILS}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, bodysize, bodysize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('body_detail' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -1346,11 +1349,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@HornMaterial2 = CreateMaterial(textureData_New2.name, textureData_New2.shader, textureData_New2.data)
 		@UpdatePhongData()
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
 			@StartRTOpaque('Horn', texSize, r, g, b)
@@ -1404,7 +1403,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tickets = {i, @PutTicket('horn' .. i) for i = 1, 3}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('horn' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -1472,8 +1474,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@url_processes += 1
 
 				@@LoadURL urls[1], texSize, texSize, (texture, panel, material) ->
-					return if not @CheckTicket('clothes1', tickets[1])
 					@url_processes -= 1
+					return if not @CheckTicket('clothes1', tickets[1])
 
 					mat\SetVector('$color2', Vector(1, 1, 1))
 					mat\SetTexture('$basetexture', texture)
@@ -1512,8 +1514,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 				@url_processes += 1
 
 				@@LoadURL urls[matIndex], texSize, texSize, (texture, panel, material) ->
-					return if not @CheckTicket('clothes' .. matIndex, tickets[matIndex])
 					@url_processes -= 1
+					return if not @CheckTicket('clothes' .. matIndex, tickets[matIndex])
 
 					mat\SetVector('$color2', Vector(1, 1, 1))
 					mat\SetTexture('$basetexture', texture)
@@ -1634,8 +1636,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 			ticket = @PutTicket('newsocks')
 
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
-				return if not @CheckTicket('newsocks', ticket)
 				@url_processes -= 1
+				return if not @CheckTicket('newsocks', ticket)
 
 				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
 					tex\SetVector('$color2', Vector(1, 1, 1))
@@ -1736,8 +1738,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			PPM2.DebugPrint('Compiled socks texture for ', @GetEntity(), ' as part of ', @)
 		else
 			ticket = @PutTicket('socks')
+			@url_processes += 1
 
 			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
+				@url_processes -= 1
 				return if not @CheckTicket('socks', ticket)
 				@SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 				@SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -1777,11 +1781,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
 			rt = @StartRTOpaque('Wings_rt', texSize, r, g, b)
@@ -1809,12 +1809,16 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tickets = {i, @PutTicket('wing' .. i) for i = 1, 3}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('wing' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
 				if left == 0
 					continueCompilation()
+
 		if left == 0
 			continueCompilation()
 
@@ -1864,11 +1868,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		urlTextures = {}
 		left = 0
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('ManeColor1')
 			@StartRTOpaque('Mane_1', texSize, r, g, b)
@@ -1923,7 +1923,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tickets = {i, @PutTicket('mane' .. i) for i = 1, 6}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('mane' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -1973,11 +1976,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		urlTextures = {}
 		left = 0
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			return unless @isValid
 			{:r, :g, :b} = @GrabData('TailColor1')
 
@@ -2032,7 +2031,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tickets = {i, @PutTicket('tail' .. i) for i = 1, 6}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('tail' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -2332,8 +2334,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 			ticket = @PutTicket(prefixData .. '_eye')
 
 			@@LoadURL EyeURL, texSize, texSize, (texture, panel, material) ->
-				return if not @CheckTicket(prefixData .. '_eye', ticket)
 				@url_processes -= 1
+				return if not @CheckTicket(prefixData .. '_eye', ticket)
 				@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
 
 		return @["EyeMaterial#{prefixUpper}"]
@@ -2397,8 +2399,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 			ticket = @PutTicket('cmark')
 
 			@@LoadURL URL, texSize, texSize, (texture, panel, material) ->
-				return if not @CheckTicket('cmark', ticket)
 				@url_processes -= 1
+				return if not @CheckTicket('cmark', ticket)
 
 				rt = @StartRT('CMark', texSize, 0, 0, 0, 0)
 
