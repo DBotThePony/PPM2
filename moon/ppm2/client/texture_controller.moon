@@ -2331,11 +2331,11 @@ class PonyTextureController extends PPM2.ControllerChildren
 			PPM2.DebugPrint('Compiled eyes texture for ', @GetEntity(), ' as part of ', @)
 		else
 			@url_processes += 1
-			ticket = @PutTicket(prefixData .. '_eye')
+			ticket = @PutTicket(prefixUpper .. '_eye')
 
 			@@LoadURL EyeURL, texSize, texSize, (texture, panel, material) ->
 				@url_processes -= 1
-				return if not @CheckTicket(prefixData .. '_eye', ticket)
+				return if not @CheckTicket(prefixUpper .. '_eye', ticket)
 				@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
 
 		return @["EyeMaterial#{prefixUpper}"]
