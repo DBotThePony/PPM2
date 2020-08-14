@@ -199,15 +199,15 @@ class PonyDataInstance
 
 	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
 
-	Serealize: =>
+	Serialize: =>
 		tab = {}
 
 		for key, value in pairs(@dataTable)
 			if map = @@PONY_DATA[key]
 				if map.enum
 					tab[key] = map.enumMapping[value] or map.enumMapping[map.default()]
-				elseif map.serealize
-					tab[key] = map.serealize(value)
+				elseif map.serialize
+					tab[key] = map.serialize(value)
 				else
 					tab[key] = value
 
@@ -271,7 +271,7 @@ class PonyDataInstance
 		@dataTable[k] = v for k, v in pairs(dataTable)
 
 	SaveAs: (path = @fullPath) =>
-		buf = @Serealize()
+		buf = @Serialize()
 		stream = file.Open(path, 'wb', 'DATA')
 		error('Unable to open ' .. path .. '!') if not stream
 		buf\ToFileStream(stream)
