@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 ALLOW_ONLY_RAGDOLLS = CreateConVar('ppm2_sv_edit_ragdolls_only', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Allow to edit only ragdolls')
 DISALLOW_PLAYERS = CreateConVar('ppm2_sv_edit_no_players', '1', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'When unrestricted edit allowed, do not allow to edit players.')
@@ -33,6 +34,7 @@ genericUsageCheck = (ply, ent) ->
 	return false if not hook.Run('CanProperty', ply, 'ponydata', ent)
 	return true
 
+net.ReceiveAntispam('PPM2.RagdollEdit')
 net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
 	ent = net.ReadEntity()
 	useLocal = net.ReadBool()
@@ -59,6 +61,7 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
 
 	duplicator.StoreEntityModifier(ent, 'ppm2_ragdolledit', ent\GetPonyData()\NetworkedIterable(false))
 
+net.ReceiveAntispam('PPM2.RagdollEditFlex')
 net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
 	ent = net.ReadEntity()
 	status = net.ReadBool()
@@ -71,6 +74,7 @@ net.Receive 'PPM2.RagdollEditFlex', (len = 0, ply = NULL) ->
 	data\SetNoFlex(status)
 	data\Create() if not data\IsNetworked()
 
+net.ReceiveAntispam('PPM2.RagdollEditEmote')
 net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
 	ent = net.ReadEntity()
 	return if not genericUsageCheck(ply, ent)

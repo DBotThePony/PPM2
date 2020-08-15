@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 net.pool('PPM2.RequestPonyData')
 net.pool('PPM2.PlayerRespawn')
@@ -38,6 +39,7 @@ CreateConVar('ppm2_sv_editor_dist', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_
 
 resource.AddWorkshop('933203381')
 
+net.ReceiveAntispam('PPM2.EditorCamPos')
 net.receive 'PPM2.EditorCamPos', (len = 0, ply = NULL) ->
 	return if not ply\IsValid()
 	return if ply.__ppm2_lcpt and ply.__ppm2_lcpt > RealTime()
@@ -56,6 +58,7 @@ net.receive 'PPM2.EditorCamPos', (len = 0, ply = NULL) ->
 	net.WriteAngle(camAng)
 	net.Send(filter)
 
+net.ReceiveAntispam('PPM2.EditorStatus')
 net.Receive 'PPM2.EditorStatus', (len = 0, ply = NULL) ->
 	return if not IsValid(ply)
 	ply\SetNWBool('PPM2.InEditor', net.ReadBool())

@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)

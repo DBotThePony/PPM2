@@ -19,11 +19,12 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
-util.AddNetworkString('PPM2.DamageAnimation')
-util.AddNetworkString('PPM2.KillAnimation')
-util.AddNetworkString('PPM2.AngerAnimation')
-util.AddNetworkString('PPM2.PlayEmote')
+net.pool('PPM2.DamageAnimation')
+net.pool('PPM2.KillAnimation')
+net.pool('PPM2.AngerAnimation')
+net.pool('PPM2.PlayEmote')
 
 hook.Add 'EntityTakeDamage', 'PPM2.Emotes', (ent, dmg) ->
 	do
@@ -58,6 +59,7 @@ killGrin = =>
 hook.Add 'OnNPCKilled', 'PPM2.Emotes', (npc = NULL, attacker = NULL, weapon = NULL) => killGrin(attacker)
 hook.Add 'DoPlayerDeath', 'PPM2.Emotes', (ply = NULL, attacker = NULL) => killGrin(attacker)
 
+net.ReceiveAntispam('PPM2.PlayEmote', 0.5)
 net.Receive 'PPM2.PlayEmote', (len = 0, ply = NULL) ->
 	return if not IsValid(ply)
 	self = ply
