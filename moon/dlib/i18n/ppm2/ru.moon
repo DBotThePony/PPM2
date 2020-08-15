@@ -96,7 +96,7 @@ gui.ppm2.editor.io.hint = 'Можно открыть двойным нажати
 gui.ppm2.editor.io.reload = 'Перезагрузить список файлов'
 gui.ppm2.editor.io.failed = 'Ошибка импорта.'
 
-gui.ppm2.editor.io.warn.oldfile = '!!! Это может или сработать или нет. Вы будете аннигилированы.'
+gui.ppm2.editor.io.warn.oldfile = '[!] Это может или сработать или нет. Есть шанс аннигиляции.'
 gui.ppm2.editor.io.warn.text = "В данный момент вы не сохранили свои изменения.\nВы действительно хотите открыть другой файл?"
 gui.ppm2.editor.io.warn.header = 'Несохраненные изменения!'
 gui.ppm2.editor.io.save.button = 'Сохранить'
@@ -494,3 +494,5 @@ gui.ppm2.editor.size.pony2 = 'Визуальная высота пони: ~%s'
 gui.ppm2.editor.size.pony_width = 'Ширина коллизий пони: %s'
 gui.ppm2.editor.size.back = 'Длинна спины: ~%s'
 gui.ppm2.editor.size.neck = 'Длинна шеи: ~%s'
+
+gui.ppm2.editor.generic.quicksearch = 'Быстрый поиск'
