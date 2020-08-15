@@ -2156,6 +2156,7 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
 	@CheckBox 'gui.ppm2.spawnmenu.advancedmode', 'ppm2_editor_advanced'
 	@CheckBox 'gui.ppm2.spawnmenu.reflections', 'ppm2_cl_reflections'
 	@CheckBox 'gui.ppm2.spawnmenu.vm_magic', 'ppm2_cl_vm_magic'
+	@CheckBox 'gui.ppm2.spawnmenu.vm_magic_hands', 'ppm2_cl_vm_magic_hands'
 	@NumSlider 'gui.ppm2.spawnmenu.reflections_drawdist', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
 	@NumSlider 'gui.ppm2.spawnmenu.reflections_renderdist', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
 	@CheckBox 'gui.ppm2.spawnmenu.doublejump', 'ppm2_flight_djump'

@@ -480,6 +480,7 @@ gui.ppm2.spawnmenu.reflections_drawdist = 'Дистанция для отрис�
 gui.ppm2.spawnmenu.reflections_renderdist = 'Точность отражений'
 gui.ppm2.spawnmenu.doublejump = 'Двойной прыжок включает режим полета'
 gui.ppm2.spawnmenu.vm_magic = 'Изменения ViewModel для единорогов'
+gui.ppm2.spawnmenu.vm_magic_hands = 'Магические руки для единорогов'
 
 tip.ppm2.in_editor = 'В редакторе PPM/2'
 tip.ppm2.camera = "PPM/2 камера игрока %s"
