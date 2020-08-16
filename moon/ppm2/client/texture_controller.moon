@@ -428,21 +428,27 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@ALREADY_DOWNLOADING[width][height] = @ALREADY_DOWNLOADING[width][height] or {}
 		@FAILED_TO_DOWNLOAD[width] = @FAILED_TO_DOWNLOAD[width] or {}
 		@FAILED_TO_DOWNLOAD[width][height] = @FAILED_TO_DOWNLOAD[width][height] or {}
-		if @FAILED_TO_DOWNLOAD[width][height][url]
+
+		if @FAILED_TO_DOWNLOAD[width] and @FAILED_TO_DOWNLOAD[width][height] and @FAILED_TO_DOWNLOAD[width][height][url]
 			callback(@FAILED_TO_DOWNLOAD[width][height][url].texture, nil, @FAILED_TO_DOWNLOAD[width][height][url].material)
 			return
-		if @ALREADY_DOWNLOADING[width][height][url]
+
+		if @ALREADY_DOWNLOADING[width] and @ALREADY_DOWNLOADING[width][height] and @ALREADY_DOWNLOADING[width][height][url]
 			for _, data in ipairs @HTML_MATERIAL_QUEUE
 				if data.url == url
 					table.insert(data.callbacks, callback)
 					break
 			return
-		if @URL_MATERIAL_CACHE[width][height][url]
+
+		if @URL_MATERIAL_CACHE[width] and @URL_MATERIAL_CACHE[width][height] and @URL_MATERIAL_CACHE[width][height][url]
 			callback(@URL_MATERIAL_CACHE[width][height][url].texture, nil, @URL_MATERIAL_CACHE[width][height][url].material)
 			return
+
+		return if not @ALREADY_DOWNLOADING[width] or not @ALREADY_DOWNLOADING[width][height]
 		@ALREADY_DOWNLOADING[width][height][url] = true
 		table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}, timeouts: 0})
 		--PPM2.Message 'Queuing to download ', url
+
 	@BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST)) =>
 		url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
 		return "<html>
