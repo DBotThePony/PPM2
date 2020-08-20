@@ -1321,7 +1321,7 @@ for key, value in pairs PPM2.PonyDataRegistry
 				value.read = rUInt(selectBits, value.min, value.max)
 				value.write = wUInt(value.default(), selectBits)
 			else
-				selectBits = net.ChooseOptimalBits(math.max(math.abs(value.max), math.abs(value.min)))
+				selectBits = net.ChooseOptimalBits(math.abs(value.max - value.min))
 				testMinimalBits += selectBits
 				value.read = rInt(selectBits, value.min, value.max)
 				value.write = wInt(value.default(), selectBits)
