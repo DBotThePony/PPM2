@@ -1883,7 +1883,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				i = 1
 
 				-- using moonscripts iterator will call index metamethods while iterating
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -1906,7 +1906,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
 				i = 1
 
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					surface.SetDrawColor(@GrabData("ManeDetailColor#{i}"))
 					surface.SetMaterial(mat)
@@ -1995,7 +1995,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
 				i = 1
 
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -2016,7 +2016,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
 				i = 1
 
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GrabData("TailDetailColor#{i}"))

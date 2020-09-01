@@ -164,7 +164,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[maneTypeUpper]
 				i = 1
 
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -187,7 +187,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
 				i = 1
 
-				for i2 = 2, registry[1]
+				for i2 = 2, registry[1] + 1
 					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
