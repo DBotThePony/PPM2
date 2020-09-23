@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ doPatch = =>
 
 		copy = PPM2.GetMainData()\Copy()
 		controller = copy\CreateCustomController(targetModel.Entity)
-		copy\SetNetworkData(controller)
+		copy\SetNetworkObject(controller)
 		controller\SetDisableTask(true)
 		targetModel.ponyController = controller
 

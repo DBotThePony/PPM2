@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,12 +19,15 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-
 PPM2.USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ARCHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
 PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ARCHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
+PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of loading them when needed')
+
+_Material = Material
 
 RELOADABLE_MATERIALS = {}
 PPM2.RELOADABLE_MATERIALS = RELOADABLE_MATERIALS
+
 concommand.Add 'ppm2_reload_materials', ->
 	cTime = SysTime()
 	for _, mat in ipairs RELOADABLE_MATERIALS
@@ -39,12 +42,13 @@ concommand.Add 'ppm2_reload_materials', ->
 	RunConsoleCommand('ppm2_reload')
 	RunConsoleCommand('ppm2_require')
 
-_Material = Material
 _CreateMaterial = CreateMaterial
+
 Material = (path) ->
-	matNew, time = _Material(path)
+	return path if not PPM2.FORCE_PRECACHE\GetBool()
+	matNew = _Material(path)
 	table.insert(RELOADABLE_MATERIALS, matNew)
-	return matNew, time
+	return matNew
 
 CreateMaterial = (name, shader, data) ->
 	matNew, time = _CreateMaterial(name, shader, data)
@@ -88,35 +92,35 @@ module = {
 	}
 
 	UPPER_MANE_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/upmane_5_mask0.png')}
-		[5]: {Material('models/ppm2/partrender/upmane_6_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
-		[8]: {Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
-		[9]: {Material('models/ppm2/partrender/upmane_10_mask0.png')}
-		[10]: {Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
-		[11]: {Material('models/ppm2/partrender/upmane_12_mask0.png')}
-		[12]: {Material('models/ppm2/partrender/upmane_13_mask0.png')}
-		[13]: {Material('models/ppm2/partrender/upmane_14_mask0.png')}
-		[14]: {Material('models/ppm2/partrender/upmane_15_mask0.png')}
+		[4]: {1, Material('models/ppm2/partrender/upmane_5_mask0.png')}
+		[5]: {1, Material('models/ppm2/partrender/upmane_6_mask0.png')}
+		[7]: {2, Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
+		[8]: {3, Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
+		[9]: {1, Material('models/ppm2/partrender/upmane_10_mask0.png')}
+		[10]: {3, Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
+		[11]: {1, Material('models/ppm2/partrender/upmane_12_mask0.png')}
+		[12]: {1, Material('models/ppm2/partrender/upmane_13_mask0.png')}
+		[13]: {1, Material('models/ppm2/partrender/upmane_14_mask0.png')}
+		[14]: {1, Material('models/ppm2/partrender/upmane_15_mask0.png')}
 	}
 
 	LOWER_MANE_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/dnmane_5_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
-		[8]: {Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
-		[9]: {Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
-		[10]: {Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
-		[11]: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
+		[4]: {1, Material('models/ppm2/partrender/dnmane_5_mask0.png')}
+		[7]: {2, Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
+		[8]: {2, Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
+		[9]: {3, Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
+		[10]: {2, Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
+		[11]: {1, Material('models/ppm2/partrender/dnmane_12_mask0.png')}
 	}
 
 	TAIL_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/tail_5_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
-		[9]: {Material('models/ppm2/partrender/tail_10_mask0.png')}
-		[10]: {Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
-		[11]: {Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
-		[12]: {Material('models/ppm2/partrender/tail_13_mask0.png')}
-		[13]: {Material('models/ppm2/partrender/tail_14_mask0.png')}
+		[4]: {1, Material('models/ppm2/partrender/tail_5_mask0.png')}
+		[7]: {4, Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
+		[9]: {1, Material('models/ppm2/partrender/tail_10_mask0.png')}
+		[10]: {3, Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
+		[11]: {2, Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
+		[12]: {1, Material('models/ppm2/partrender/tail_13_mask0.png')}
+		[13]: {1, Material('models/ppm2/partrender/tail_14_mask0.png')}
 	}
 
 	SOCKS_PATCHS: {
@@ -426,5 +430,28 @@ module.EYE_REFLECTION2 = Material('models/ppm2/eyes/eye_reflection')
 
 module.MAGIC_HANDS_MATERIAL = Material('models/ppm2/base/magic_arms')
 
-PPM2.MaterialsRegistry = module
+__index = (key) =>
+	value = rawget(getmetatable(@).original, key)
+	return value if not isstring(value)
+	mat = _Material(value, 'smooth')
+	table.insert(RELOADABLE_MATERIALS, mat)
+	rawset(@, key, mat)
+	return mat
+
+patch = (input) ->
+	patch(value) for key, value in pairs(input) when istable(value)
+
+	meta = {
+		__index: __index
+		original: table.Copy(input)
+	}
+
+	for k in *table.GetKeys(input)
+		if not istable(input[k])
+			input[k] = nil
+
+	return setmetatable(input, meta)
+
+PPM2.MaterialsRegistry = patch(module)
+
 return module

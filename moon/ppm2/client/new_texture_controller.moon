@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,6 @@ USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
 class NewPonyTextureController extends PPM2.PonyTextureController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
-
-	@UPPER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @UPPER_MANE_MATERIALS}
-	@LOWER_MANE_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @LOWER_MANE_MATERIALS}
-	@TAIL_DETAIL_MATERIALS = {i, [val1 for _, val1 in ipairs val] for i, val in pairs @TAIL_DETAIL_MATERIALS}
 
 	@PHONG_UPDATE_TRIGGER = {k, v for k, v in pairs PPM2.PonyTextureController.PHONG_UPDATE_TRIGGER}
 
@@ -159,20 +155,17 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		urlTextures = {}
 		left = 0
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			return unless @isValid
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
 			@StartRTOpaque("Mane_rt_1_#{prefix}", texSize, r, g, b)
 
 			maneTypeUpper = @GetManeType()
-			if @@UPPER_MANE_MATERIALS[maneTypeUpper]
+			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[maneTypeUpper]
 				i = 1
-				for _, mat in ipairs @@UPPER_MANE_MATERIALS[maneTypeUpper]
-					continue if type(mat) == 'number'
+
+				for i2 = 2, registry[1] + 1
+					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
@@ -191,10 +184,11 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			@StartRTOpaque("Mane_rt_2_#{prefix}", texSize, r, g, b)
 
 			maneTypeLower = @GetManeTypeLower()
-			if @@LOWER_MANE_MATERIALS[maneTypeLower]
+			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
 				i = 1
-				for _, mat in ipairs @@LOWER_MANE_MATERIALS[maneTypeLower]
-					continue if type(mat) == 'number'
+
+				for i2 = 2, registry[1] + 1
+					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
@@ -219,7 +213,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		tickets = {i, @PutTicket(prefix .. 'mane' .. i) for i = 1, 6}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket(prefix .. 'mane' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -284,11 +281,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
 			@StartRTOpaque('BatWings_rt', texSize, r, g, b)
@@ -312,7 +305,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		tickets = {i, @PutTicket('batwing' .. i) for i = 1, 3}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('batwing' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat
@@ -356,11 +352,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
-		@url_processes += 1
-
 		continueCompilation = ->
-			@url_processes -= 1
-
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
 			@StartRTOpaque('BatWingsSkin_rt', texSize, r, g, b)
@@ -384,7 +376,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		tickets = {i, @PutTicket('batwingskin' .. i) for i = 1, 3}
 
 		for _, {url, i} in ipairs validURLS
+			@url_processes += 1
+
 			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
+				@url_processes -= 1
 				return if not @CheckTicket('batwingskin' .. i, tickets[i])
 				left -= 1
 				urlTextures[i] = mat

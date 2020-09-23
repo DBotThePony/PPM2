@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,11 @@
 file.CreateDir('ppm2')
 file.CreateDir('ppm2/backups')
 file.CreateDir('ppm2/thumbnails')
+
+if canon_presets = include('ppm2/client/canon_presets.lua')
+	for presetname, payload in pairs(canon_presets)
+		if not file.Exists('ppm2/' .. presetname .. '.dat', 'DATA')
+			file.Write('ppm2/' .. presetname .. '.dat', payload)
 
 for _, ffind in ipairs file.Find('ppm2/*.txt', 'DATA')
 	fTarget = ffind\sub(1, -5)
@@ -194,15 +199,15 @@ class PonyDataInstance
 
 	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
 
-	Serealize: =>
+	Serialize: =>
 		tab = {}
 
 		for key, value in pairs(@dataTable)
 			if map = @@PONY_DATA[key]
 				if map.enum
 					tab[key] = map.enumMapping[value] or map.enumMapping[map.default()]
-				elseif map.serealize
-					tab[key] = map.serealize(value)
+				elseif map.serialize
+					tab[key] = map.serialize(value)
 				else
 					tab[key] = value
 
@@ -266,7 +271,7 @@ class PonyDataInstance
 		@dataTable[k] = v for k, v in pairs(dataTable)
 
 	SaveAs: (path = @fullPath) =>
-		buf = @Serealize()
+		buf = @Serialize()
 		stream = file.Open(path, 'wb', 'DATA')
 		error('Unable to open ' .. path .. '!') if not stream
 		buf\ToFileStream(stream)

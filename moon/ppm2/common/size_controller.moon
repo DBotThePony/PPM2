@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -416,6 +416,12 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition(@NECK_BONE_3, vec + (boneAnimTable[@NECK_BONE_3] or emptyVector))
 			\ManipulateBonePosition(@NECK_BONE_4, vec + (boneAnimTable[@NECK_BONE_4] or emptyVector))
 
+	@LEGS_PONY_HEIGHT_MODIF = 3.8
+	@LEGS_BACK_MODIF = 2.5
+	@LEGS_BACK_MODIF2 = 0.5
+	@LEGS_BACK_MODIF_ = 1
+	@LEGS_BACK_MODIF_2 = 0.7
+
 	ModifyLegs: (ent = @GetEntity()) =>
 		return if not IsValid(ent)
 		return if not @AllowResize()
@@ -428,7 +434,7 @@ class PonySizeController extends PPM2.ControllerChildren
 		emptyVector = Vector(0, 0, 0)
 
 		with ent
-			\ManipulateBonePosition(@LEGS_BONE_ROOT, Vector(0, 0, size * 5) + \GetManipulateBonePosition(@LEGS_BONE_ROOT))
+			\ManipulateBonePosition(@LEGS_BONE_ROOT, Vector(0, 0, size * @@LEGS_PONY_HEIGHT_MODIF) + \GetManipulateBonePosition(@LEGS_BONE_ROOT))
 
 			\ManipulateBonePosition(@LEGS_FRONT_1, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_1] or emptyVector))
 			\ManipulateBonePosition(@LEGS_FRONT_2, Vector(size * 1.5, 0, 0) + (boneAnimTable[@LEGS_FRONT_2] or emptyVector))
@@ -439,14 +445,14 @@ class PonySizeController extends PPM2.ControllerChildren
 			\ManipulateBonePosition(@LEGS_FRONT_5, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_5] or emptyVector))
 			\ManipulateBonePosition(@LEGS_FRONT_6, Vector(size, size, 0) + (boneAnimTable[@LEGS_FRONT_6] or emptyVector))
 
-			\ManipulateBonePosition(@LEGS_BEHIND_1_1, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_1] or emptyVector))
-			\ManipulateBonePosition(@LEGS_BEHIND_1_2, Vector(size, -size * 0.5, 0) + (boneAnimTable[@LEGS_BEHIND_1_2] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_1_1, Vector(size * @@LEGS_BACK_MODIF_, -size * @@LEGS_BACK_MODIF_2, 0) + (boneAnimTable[@LEGS_BEHIND_1_1] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_1_2, Vector(size * @@LEGS_BACK_MODIF_, -size * @@LEGS_BACK_MODIF_2, 0) + (boneAnimTable[@LEGS_BEHIND_1_2] or emptyVector))
 
-			\ManipulateBonePosition(@LEGS_BEHIND_2_1, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_1] or emptyVector))
-			\ManipulateBonePosition(@LEGS_BEHIND_2_2, Vector(size, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_2] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_2_1, Vector(size * @@LEGS_BACK_MODIF, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_1] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_2_2, Vector(size * @@LEGS_BACK_MODIF, 0, 0) + (boneAnimTable[@LEGS_BEHIND_2_2] or emptyVector))
 
-			\ManipulateBonePosition(@LEGS_BEHIND_3_1, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_1] or emptyVector))
-			\ManipulateBonePosition(@LEGS_BEHIND_3_2, Vector(size * 2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_2] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_3_1, Vector(size * @@LEGS_BACK_MODIF2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_1] or emptyVector))
+			\ManipulateBonePosition(@LEGS_BEHIND_3_2, Vector(size * @@LEGS_BACK_MODIF2, 0, 0) + (boneAnimTable[@LEGS_BEHIND_3_2] or emptyVector))
 
 -- 0    LrigPelvis
 -- 1    Lrig_LEG_BL_Femur

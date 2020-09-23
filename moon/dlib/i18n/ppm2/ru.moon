@@ -1,5 +1,5 @@
 
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ gui.ppm2.editor.io.hint = 'Можно открыть двойным нажати
 gui.ppm2.editor.io.reload = 'Перезагрузить список файлов'
 gui.ppm2.editor.io.failed = 'Ошибка импорта.'
 
-gui.ppm2.editor.io.warn.oldfile = '!!! Это может или сработать или нет. Вы будете аннигилированы.'
+gui.ppm2.editor.io.warn.oldfile = '[!] Это может или сработать или нет. Есть шанс аннигиляции.'
 gui.ppm2.editor.io.warn.text = "В данный момент вы не сохранили свои изменения.\nВы действительно хотите открыть другой файл?"
 gui.ppm2.editor.io.warn.header = 'Несохраненные изменения!'
 gui.ppm2.editor.io.save.button = 'Сохранить'
@@ -480,6 +480,7 @@ gui.ppm2.spawnmenu.reflections_drawdist = 'Дистанция для отрис�
 gui.ppm2.spawnmenu.reflections_renderdist = 'Точность отражений'
 gui.ppm2.spawnmenu.doublejump = 'Двойной прыжок включает режим полета'
 gui.ppm2.spawnmenu.vm_magic = 'Изменения ViewModel для единорогов'
+gui.ppm2.spawnmenu.vm_magic_hands = 'Магические руки для единорогов'
 
 tip.ppm2.in_editor = 'В редакторе PPM/2'
 tip.ppm2.camera = "PPM/2 камера игрока %s"
@@ -494,3 +495,5 @@ gui.ppm2.editor.size.pony2 = 'Визуальная высота пони: ~%s'
 gui.ppm2.editor.size.pony_width = 'Ширина коллизий пони: %s'
 gui.ppm2.editor.size.back = 'Длинна спины: ~%s'
 gui.ppm2.editor.size.neck = 'Длинна шеи: ~%s'
+
+gui.ppm2.editor.generic.quicksearch = 'Быстрый поиск'

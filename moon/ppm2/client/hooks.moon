@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 DLib.RegisterAddonName('PPM/2')
 
@@ -90,23 +91,9 @@ concommand.Add 'ppm2_reload', ->
 	instance\SetNetworkObject(newData)
 	PPM2.Message 'Sending pony data to server...'
 
-if not IsValid(LocalPlayer())
-	times = 0
-	hook.Add 'Think', 'PPM2.RequireData', ->
-		ply = LocalPlayer()
-		return if not IsValid(ply)
-		times += 1 if ply\GetVelocity()\Length() > 5
-
-		return if times < 200
-		hook.Remove 'Think', 'PPM2.RequireData'
-		hook.Add 'KeyPress', 'PPM2.RequireData', ->
-			hook.Remove 'KeyPress', 'PPM2.RequireData'
-			RunConsoleCommand('ppm2_reload')
-			timer.Simple 3, -> RunConsoleCommand('ppm2_require')
-else
-	timer.Simple 0, ->
-		RunConsoleCommand('ppm2_reload')
-		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+timer.Simple 0, ->
+	RunConsoleCommand('ppm2_reload')
+	timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 
 PPM_HINT_COLOR_FIRST = Color(255, 255, 255)
 PPM_HINT_COLOR_SECOND = Color(0, 0, 0)

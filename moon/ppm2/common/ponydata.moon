@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,8 @@
 -- FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
+
+net = DLib.net
 
 class PPM2.NetworkChangeState
 	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
@@ -312,6 +314,10 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	net.Receive @NW_Create, (len = 0, ply = NULL, obj) -> @OnNetworkedCreated(ply, len, obj)
 	net.Receive @NW_Modify, (len = 0, ply = NULL, obj) -> @OnNetworkedModify(ply, len, obj)
 	net.Receive @NW_Remove, (len = 0, ply = NULL, obj) -> @OnNetworkedDelete(ply, len, obj)
+
+	if SERVER
+		net.ReceiveAntispam(@NW_Create)
+		net.ReceiveAntispam(@NW_Remove)
 
 	net.Receive @NW_ReceiveID, (len = 0, ply = NULL) ->
 		return if SERVER

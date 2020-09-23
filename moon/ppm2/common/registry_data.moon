@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)
@@ -1320,7 +1321,7 @@ for key, value in pairs PPM2.PonyDataRegistry
 				value.read = rUInt(selectBits, value.min, value.max)
 				value.write = wUInt(value.default(), selectBits)
 			else
-				selectBits = net.ChooseOptimalBits(math.max(math.abs(value.max), math.abs(value.min)))
+				selectBits = net.ChooseOptimalBits(math.abs(value.max - value.min))
 				testMinimalBits += selectBits
 				value.read = rInt(selectBits, value.min, value.max)
 				value.write = wInt(value.default(), selectBits)

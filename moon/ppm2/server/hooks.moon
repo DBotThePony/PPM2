@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
 	if IsValid(@__ppm2_ragdoll)
@@ -33,38 +34,13 @@ hook.Add 'PlayerSpawn', 'PPM2.Hooks', =>
 			net.Broadcast()
 
 do
-	REQUIRE_CLIENTS = {}
-
-	safeSendFunction = ->
-		for ply, data in pairs REQUIRE_CLIENTS
-			if not IsValid(ply)
-				REQUIRE_CLIENTS[ply] = nil
-				continue
-
-			ent = table.remove(data, 1)
-			if not ent
-				REQUIRE_CLIENTS[ply] = nil
-				continue
-
-			data = ent\GetPonyData()
-			continue if not data
-			data\NetworkTo(ply)
-
-	errorTrack = (err) ->
-		PPM2.Message 'Networking Error: ', err
-		PPM2.Message debug.traceback()
-
-	timer.Create 'PPM2.Require', 0.25, 0, -> xpcall(safeSendFunction, errorTrack)
+	net.ReceiveAntispam('PPM2.Require', 4)
 	net.Receive 'PPM2.Require', (len = 0, ply = NULL) ->
 		return if not IsValid(ply)
-		REQUIRE_CLIENTS[ply] = {}
-		target = REQUIRE_CLIENTS[ply]
 
 		for _, ent in ipairs ents.GetAll()
-			if ent ~= ply
-				data = ent\GetPonyData()
-				if data
-					table.insert(target, ent)
+			data = ent\GetPonyData()
+			data\NetworkTo(ply) if data and ent ~= ply
 
 PPM2.ENABLE_NEW_RAGDOLLS = CreateConVar('ppm2_sv_phys_ragdolls', '0', {FCVAR_NOTIFY, FCVAR_REPLICATED}, 'Enable physics ragdolls (Pre March 2020 gmod update workaround)')
 ENABLE_NEW_RAGDOLLS = PPM2.ENABLE_NEW_RAGDOLLS

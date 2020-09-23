@@ -1,5 +1,5 @@
 
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ gui.ppm2.editor.io.hint = 'Open file by double click'
 gui.ppm2.editor.io.reload = 'Reload file list'
 gui.ppm2.editor.io.failed = 'Failed to import.'
 
-gui.ppm2.editor.io.warn.oldfile = '!!! It may or may not work. You will be squished.'
+gui.ppm2.editor.io.warn.oldfile = '[!] It may or may not work. You might get annihilated.'
 gui.ppm2.editor.io.warn.text = "Currently, you did not stated your changes.\nDo you really want to open another file?"
 gui.ppm2.editor.io.warn.header = 'Unsaved changes!'
 gui.ppm2.editor.io.save.button = 'Save'
@@ -483,6 +483,7 @@ gui.ppm2.spawnmenu.reflections_drawdist = 'Reflections draw distance'
 gui.ppm2.spawnmenu.reflections_renderdist = 'Reflections render distance'
 gui.ppm2.spawnmenu.doublejump = 'Double jump activate flight'
 gui.ppm2.spawnmenu.vm_magic = 'ViewModel unicorn alignment'
+gui.ppm2.spawnmenu.vm_magic_hands = 'Magic hands for unicors'
 
 tip.ppm2.in_editor = 'In PPM/2 Editor'
 tip.ppm2.camera = "%s's PPM/2 Camera"
@@ -497,3 +498,5 @@ gui.ppm2.editor.size.pony2 = 'Visual height of pony: ~%s'
 gui.ppm2.editor.size.pony_width = 'Collision width of pony: %s'
 gui.ppm2.editor.size.back = 'Length of spine: ~%s'
 gui.ppm2.editor.size.neck = 'Length of neck: ~%s'
+
+gui.ppm2.editor.generic.quicksearch = 'Quicksearch'

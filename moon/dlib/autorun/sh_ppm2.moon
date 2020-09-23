@@ -1,6 +1,6 @@
 
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -64,6 +64,8 @@ client('client/editor.lua')
 client('client/editor3.lua')
 client('client/rag_edit.lua')
 client('client/render.lua')
+
+AddCSLuaFile('ppm2/client/canon_presets.lua') if SERVER
 
 server('server/misc.lua')
 server('server/hooks.lua')

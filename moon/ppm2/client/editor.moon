@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2017-2019 DBot
+-- Copyright (C) 2017-2020 DBotThePony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+net = DLib.net
 
 ADVANCED_MODE = CreateConVar('ppm2_editor_advanced', '0', {FCVAR_ARCHIVE}, 'Show all options. Keep in mind Editor3 acts different with this option.')
 ENABLE_FULLBRIGHT = CreateConVar('ppm2_editor_fullbright', '1', {FCVAR_ARCHIVE}, 'Disable lighting in editor')
@@ -594,9 +595,17 @@ vgui.Register('PPM2TattooEditor', TATTOO_INPUT_GRABBER, 'EditablePanel')
 PPM2.EditorBuildNewFilesPanel = =>
 	@Label('gui.ppm2.editor.io.hint')
 	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
+
+	quicksearch = vgui.Create('DTextEntry', @)
+	quicksearch\Dock(TOP)
+	quicksearch.OnValueChange = -> @rebuildFileList()
+	quicksearch\SetUpdateOnType(true)
+	quicksearch\SetPlaceholderText(DLib.i18n.localize('gui.ppm2.editor.generic.quicksearch'))
+
 	list = vgui.Create('DListView', @)
 	list\Dock(FILL)
 	list\SetMultiSelect(false)
+
 	openFile = (fil) ->
 		confirm = ->
 			@frame.data\SetFilename(fil)
@@ -606,6 +615,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 			@unsavedChanges = false
 			@frame.unsavedChanges = false
 			@frame\SetTitle('gui.ppm2.editor.generic.title_file', fil)
+
 		if @unsavedChanges
 			Derma_Query(
 				'gui.ppm2.editor.io.warn.text',
@@ -619,12 +629,15 @@ PPM2.EditorBuildNewFilesPanel = =>
 
 	PPM2.EditorFileManipFuncs(list, 'ppm2', openFile)
 	list\AddColumn('gui.ppm2.editor.io.filename')
+
 	@rebuildFileList = ->
 		list\Clear()
 		files, dirs = file.Find('ppm2/*.dat', 'DATA')
 		matchBak = '.bak.dat'
+		text = string.lower(quicksearch\GetValue() or '')
+
 		for _, fil in ipairs files
-			if fil\sub(-#matchBak) ~= matchBak
+			if not fil\endsWith(matchBak) and (text == '' or fil\lower()\find(text, 1, false))
 				fil2 = fil\sub(1, #fil - 4)
 				line = list\AddLine(fil2)
 				line.file = fil
@@ -666,9 +679,17 @@ PPM2.EditorBuildNewFilesPanel = =>
 PPM2.EditorBuildOldFilesPanel = =>
 	@Label('gui.ppm2.editor.io.warn.oldfile')
 	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
+
+	quicksearch = vgui.Create('DTextEntry', @)
+	quicksearch\Dock(TOP)
+	quicksearch.OnValueChange = -> @rebuildFileList()
+	quicksearch\SetUpdateOnType(true)
+	quicksearch\SetPlaceholderText(DLib.i18n.localize('gui.ppm2.editor.generic.quicksearch'))
+
 	list = vgui.Create('DListView', @)
 	list\Dock(FILL)
 	list\SetMultiSelect(false)
+
 	openFile = (fil) ->
 		confirm = ->
 			newData = PPM2.ReadFromOldData(fil)
@@ -692,47 +713,53 @@ PPM2.EditorBuildOldFilesPanel = =>
 			)
 		else
 			confirm()
+
 	list\AddColumn('gui.ppm2.editor.io.filename')
 	PPM2.EditorFileManipFuncs(list, 'ppm', openFile)
+
 	@rebuildFileList = ->
 		list\Clear()
 		files, dirs = file.Find('ppm/*', 'DATA')
+		text = string.lower(quicksearch\GetValue() or '')
+
 		for _, fil in ipairs files
-			fil2 = fil\sub(1, #fil - 4)
-			line = list\AddLine(fil2)
-			line.file = fil
+			if text == '' or fil\lower()\find(text, 1, false)
+				fil2 = fil\sub(1, #fil - 4)
+				line = list\AddLine(fil2)
+				line.file = fil
 
-			recomputed = false
+				recomputed = false
 
-			hook.Add 'PostRenderVGUI', line, =>
-				return if not @IsVisible() or not @IsHovered()
+				hook.Add 'PostRenderVGUI', line, =>
+					return if not @IsVisible() or not @IsHovered()
 
-				if not recomputed
-					recomputed = true
-					if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
-						line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
-						line.png\Recompute()
-						line.png\GetTexture('$basetexture')\Download()
+					if not recomputed
+						recomputed = true
+						if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
+							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
+							line.png\Recompute()
+							line.png\GetTexture('$basetexture')\Download()
 
-				parent = @GetParent()\GetParent()
-				x, y = parent\LocalToScreen(parent\GetWide(), 0)
+					parent = @GetParent()\GetParent()
+					x, y = parent\LocalToScreen(parent\GetWide(), 0)
 
-				if @png
-					surface.SetMaterial(@png)
-					surface.SetDrawColor(255, 255, 255)
-					surface.DrawTexturedRect(x, y, 512, 512)
-				else
-					if not @genPreview
-						PPM2.ReadFromOldData(fil2)\WriteThumbnail()
-						@genPreview = true
-						timer.Simple 1, ->
-							@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
-							@png\Recompute()
-							@png\GetTexture('$basetexture')\Download()
+					if @png
+						surface.SetMaterial(@png)
+						surface.SetDrawColor(255, 255, 255)
+						surface.DrawTexturedRect(x, y, 512, 512)
+					else
+						if not @genPreview
+							PPM2.ReadFromOldData(fil2)\WriteThumbnail()
+							@genPreview = true
+							timer.Simple 1, ->
+								@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
+								@png\Recompute()
+								@png\GetTexture('$basetexture')\Download()
 
-					surface.SetDrawColor(0, 0, 0)
-					surface.DrawRect(x, y, 512, 512)
-					DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
+						surface.SetDrawColor(0, 0, 0)
+						surface.DrawRect(x, y, 512, 512)
+						DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
+
 	@rebuildFileList()
 	list.rebuildFileList = @rebuildFileList
 
@@ -2129,6 +2156,7 @@ hook.Add 'PopulateToolMenu', 'PPM2.PonyPosing', -> spawnmenu.AddToolMenuOption '
 	@CheckBox 'gui.ppm2.spawnmenu.advancedmode', 'ppm2_editor_advanced'
 	@CheckBox 'gui.ppm2.spawnmenu.reflections', 'ppm2_cl_reflections'
 	@CheckBox 'gui.ppm2.spawnmenu.vm_magic', 'ppm2_cl_vm_magic'
+	@CheckBox 'gui.ppm2.spawnmenu.vm_magic_hands', 'ppm2_cl_vm_magic_hands'
 	@NumSlider 'gui.ppm2.spawnmenu.reflections_drawdist', 'ppm2_cl_reflections_drawdist', 0, 1024, 0
 	@NumSlider 'gui.ppm2.spawnmenu.reflections_renderdist', 'ppm2_cl_reflections_renderdist', 32, 4096, 0
 	@CheckBox 'gui.ppm2.spawnmenu.doublejump', 'ppm2_flight_djump'
