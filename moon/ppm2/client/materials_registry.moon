@@ -92,35 +92,35 @@ module = {
 	}
 
 	UPPER_MANE_DETAILS: {
-		[4]: {1, Material('models/ppm2/partrender/upmane_5_mask0.png')}
-		[5]: {1, Material('models/ppm2/partrender/upmane_6_mask0.png')}
-		[7]: {2, Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
-		[8]: {3, Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
-		[9]: {1, Material('models/ppm2/partrender/upmane_10_mask0.png')}
-		[10]: {3, Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
-		[11]: {1, Material('models/ppm2/partrender/upmane_12_mask0.png')}
-		[12]: {1, Material('models/ppm2/partrender/upmane_13_mask0.png')}
-		[13]: {1, Material('models/ppm2/partrender/upmane_14_mask0.png')}
-		[14]: {1, Material('models/ppm2/partrender/upmane_15_mask0.png')}
+		[4]: {Material('models/ppm2/partrender/upmane_5_mask0.png')}
+		[5]: {Material('models/ppm2/partrender/upmane_6_mask0.png')}
+		[7]: {Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
+		[8]: {Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
+		[9]: {Material('models/ppm2/partrender/upmane_10_mask0.png')}
+		[10]: {Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
+		[11]: {Material('models/ppm2/partrender/upmane_12_mask0.png')}
+		[12]: {Material('models/ppm2/partrender/upmane_13_mask0.png')}
+		[13]: {Material('models/ppm2/partrender/upmane_14_mask0.png')}
+		[14]: {Material('models/ppm2/partrender/upmane_15_mask0.png')}
 	}
 
 	LOWER_MANE_DETAILS: {
-		[4]: {1, Material('models/ppm2/partrender/dnmane_5_mask0.png')}
-		[7]: {2, Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
-		[8]: {2, Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
-		[9]: {3, Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
-		[10]: {2, Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
-		[11]: {1, Material('models/ppm2/partrender/dnmane_12_mask0.png')}
+		[4]: {Material('models/ppm2/partrender/dnmane_5_mask0.png')}
+		[7]: {Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
+		[8]: {Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
+		[9]: {Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
+		[10]: {Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
+		[11]: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
 	}
 
 	TAIL_DETAILS: {
-		[4]: {1, Material('models/ppm2/partrender/tail_5_mask0.png')}
-		[7]: {5, Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
-		[9]: {1, Material('models/ppm2/partrender/tail_10_mask0.png')}
-		[10]: {3, Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
-		[11]: {2, Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
-		[12]: {1, Material('models/ppm2/partrender/tail_13_mask0.png')}
-		[13]: {1, Material('models/ppm2/partrender/tail_14_mask0.png')}
+		[4]: {Material('models/ppm2/partrender/tail_5_mask0.png')}
+		[7]: {Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
+		[9]: {Material('models/ppm2/partrender/tail_10_mask0.png')}
+		[10]: {Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
+		[11]: {Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
+		[12]: {Material('models/ppm2/partrender/tail_13_mask0.png')}
+		[13]: {Material('models/ppm2/partrender/tail_14_mask0.png')}
 	}
 
 	SOCKS_PATCHS: {
@@ -245,11 +245,11 @@ module.EYE_OVALS = {
 }
 
 module.EYE_REFLECTIONS = {
-	Material('models/ppm2/partrender/eye_reflection.png')
-	Material('models/ppm2/partrender/eye_reflection_crystal_foal.png')
-	Material('models/ppm2/partrender/eye_reflection_crystal_unisex.png')
-	Material('models/ppm2/partrender/eye_reflection_foal.png')
-	Material('models/ppm2/partrender/eye_reflection_male.png')
+	_Material('models/ppm2/partrender/eye_reflection.png')
+	_Material('models/ppm2/partrender/eye_reflection_crystal_foal.png')
+	_Material('models/ppm2/partrender/eye_reflection_crystal_unisex.png')
+	_Material('models/ppm2/partrender/eye_reflection_foal.png')
+	_Material('models/ppm2/partrender/eye_reflection_male.png')
 }
 
 module.HEAD_CLOTHES = {
@@ -290,11 +290,9 @@ module.NECK_CLOTHES = {
 		{
 			Material('models/ppm2/clothesrender/cape_stars_1.png')
 			Material('models/ppm2/clothesrender/cape_stars_2.png')
-			nil
 		}
 		{
 			Material('models/ppm2/clothesrender/gem.png')
-			nil
 		}
 	}
 
@@ -431,6 +429,12 @@ module.EYE_REFLECTION2 = Material('models/ppm2/eyes/eye_reflection')
 module.MAGIC_HANDS_MATERIAL = Material('models/ppm2/base/magic_arms')
 
 __index = (key) =>
+	if value2 = meta[key]
+		return value2
+
+	if key == 'size'
+		return #getmetatable(@).original
+
 	value = rawget(getmetatable(@).original, key)
 	return value if not isstring(value)
 	mat = _Material(value, 'smooth')

@@ -48,9 +48,10 @@ REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
 PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
 REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
 
-lastReflectionFrame = 0
+PPM2.INSANT_TEXTURE_COMPILE = CreateConVar('ppm2_cl_instant_compile', '0', {FCVAR_ACRHIVE}, 'Instantly compile pony textures')
+INSANT_TEXTURE_COMPILE = PPM2.INSANT_TEXTURE_COMPILE
 
-hook.Remove 'DrawOverlay', 'PPM2.ReflectionsUpdate'
+lastReflectionFrame = 0
 
 hook.Add 'PreRender', 'PPM2.ReflectionsUpdate', (a, b) ->
 	return if PPM2.__RENDERING_REFLECTIONS
@@ -302,7 +303,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				if data and data.self\IsValid()
 					xpcall(data.run, handleError, data.self, unpack(data.args))
 					data.self.lastMaterialUpdate = 0
-					coroutine.yield()
+					coroutine.yield() if not INSANT_TEXTURE_COMPILE\GetBool()
 
 	@COMPILE_TEXTURES = ->
 		return if #@COMPILE_QUEUE == 0
@@ -930,25 +931,25 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		if @NeckClothes_Index
 			if @NeckClothes_MatName
-				clothesEnt\SetSubMaterial(@NeckClothes_Index[index], @NeckClothes_MatName[index]) for index = 1, #@NeckClothes_Index
+				clothesEnt\SetSubMaterial(@NeckClothes_Index[index], @NeckClothes_MatName[index]) for index = 1, @NeckClothes_Index.size
 			else
 				clothesEnt\SetSubMaterial(index, '') for index in *@NeckClothes_Index
 
 		if @EyeClothes_Index
 			if @EyeClothes_MatName
-				clothesEnt\SetSubMaterial(@EyeClothes_Index[index], @EyeClothes_MatName[index]) for index = 1, #@EyeClothes_Index
+				clothesEnt\SetSubMaterial(@EyeClothes_Index[index], @EyeClothes_MatName[index]) for index = 1, @EyeClothes_Index.size
 			else
 				clothesEnt\SetSubMaterial(index, '') for index in *@EyeClothes_Index
 
 		if @HeadClothes_Index
 			if @HeadClothes_MatName
-				clothesEnt\SetSubMaterial(@HeadClothes_Index[index], @HeadClothes_MatName[index]) for index = 1, #@HeadClothes_Index
+				clothesEnt\SetSubMaterial(@HeadClothes_Index[index], @HeadClothes_MatName[index]) for index = 1, @HeadClothes_Index.size
 			else
 				clothesEnt\SetSubMaterial(index, '') for index in *@HeadClothes_Index
 
 		if @BodyClothes_Index
 			if @BodyClothes_MatName
-				clothesEnt\SetSubMaterial(@BodyClothes_Index[index], @BodyClothes_MatName[index]) for index = 1, #@BodyClothes_Index
+				clothesEnt\SetSubMaterial(@BodyClothes_Index[index], @BodyClothes_MatName[index]) for index = 1, @BodyClothes_Index.size
 			else
 				clothesEnt\SetSubMaterial(index, '') for index in *@BodyClothes_Index
 
@@ -1469,7 +1470,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 			return
 
-		if #matregistry[clothes + 1] == 0
+		if matregistry[clothes + 1].size == 0
 			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_1"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 			@[iName .. 'Clothes_Mat'] = {mat}
@@ -1486,6 +1487,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 					mat\SetTexture('$basetexture', texture)
 
 					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+
 			elseif colored
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
 				col = @GrabData("#{iName}ClothesColor1")
@@ -1508,7 +1510,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 		tab2 = @[iName .. 'Clothes_MatName']
 		nextindex = 1
 
-		for matIndex = 1, #matregistry[clothes + 1]
+		for matIndex = 1, matregistry[clothes + 1].size
 			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 
@@ -1526,7 +1528,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 					mat\SetTexture('$basetexture', texture)
 
 					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
-			elseif colored and #matregistry[clothes + 1][matIndex] == 0
+			elseif colored and matregistry[clothes + 1][matIndex].size == 0
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
 				col = @GrabData("#{iName}ClothesColor#{nextindex}")
 				nextindex += 1
@@ -1553,7 +1555,9 @@ class PonyTextureController extends PPM2.ControllerChildren
 				nextindex += 1
 				@StartRTOpaque("Clothes_#{iName}_#{matIndex}", rtsize, r, g, b)
 
-				for i, texture in ipairs(matregistry[clothes + 1][matIndex])
+				for i2 = 1, matregistry[clothes + 1][matIndex].size
+					texture = matregistry[clothes + 1][matIndex][i2]
+
 					if not isnumber(texture)
 						surface.SetMaterial(texture)
 						surface.SetDrawColor(@GrabData("#{iName}ClothesColor#{nextindex}"))
@@ -1733,10 +1737,10 @@ class PonyTextureController extends PPM2.ControllerChildren
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if details = PPM2.MaterialsRegistry.SOCKS_DETAILS[socksType]
-				for i, id in pairs details
+				for i = 1, details.size
 					{:r, :g, :b} = @GetData()['GetSocksDetailColor' .. i](@GetData())
 					surface.SetDrawColor(r, g, b)
-					surface.SetMaterial(id)
+					surface.SetMaterial(details[i])
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@SocksMaterial\SetTexture('$basetexture', @EndRT())
@@ -1883,7 +1887,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 				i = 1
 
 				-- using moonscripts iterator will call index metamethods while iterating
-				for i2 = 2, registry[1] + 1
+				for i2 = 1, registry.size
 					mat = registry[i2]
 					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
 					surface.SetDrawColor(r, g, b, a)
@@ -1906,7 +1910,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
 				i = 1
 
-				for i2 = 2, registry[1] + 1
+				for i2 = 1, registry.size
 					mat = registry[i2]
 					surface.SetDrawColor(@GrabData("ManeDetailColor#{i}"))
 					surface.SetMaterial(mat)
@@ -1995,7 +1999,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
 				i = 1
 
-				for i2 = 2, registry[1] + 1
+				for i2 = 1, registry.size
 					mat = registry[i2]
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
@@ -2016,7 +2020,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
 				i = 1
 
-				for i2 = 2, registry[1] + 1
+				for i2 = 1, registry.size
 					mat = registry[i2]
 					surface.SetMaterial(mat)
 					surface.SetDrawColor(@GrabData("TailDetailColor#{i}"))
