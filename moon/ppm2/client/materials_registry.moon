@@ -429,9 +429,6 @@ module.EYE_REFLECTION2 = Material('models/ppm2/eyes/eye_reflection')
 module.MAGIC_HANDS_MATERIAL = Material('models/ppm2/base/magic_arms')
 
 __index = (key) =>
-	if value2 = meta[key]
-		return value2
-
 	if key == 'size'
 		return #getmetatable(@).original
 
