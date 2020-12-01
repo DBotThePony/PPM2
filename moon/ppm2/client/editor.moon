@@ -408,7 +408,7 @@ CALC_VIEW_PANEL = {
 		if @drawPos ~= @prevPos and @lastPosSend < RealTimeL()
 			@lastPosSend = RealTimeL() + 0.1
 			@prevPos = Vector(@drawPos)
-			net.Start('PPM2.EditorCamPos')
+			net.Start('PPM2.EditorCamPos', true)
 			net.WriteVector(@drawPos)
 			net.WriteAngle(@drawAngle)
 			net.SendToServer()

@@ -151,7 +151,7 @@ LEmitSound = (ply, name, level = 75, volume = 1, levelIfOnServer = level) ->
 
 	return if filter\GetCount() == 0
 
-	net.Start('ppm2_workaround_emitsound')
+	net.Start('ppm2_workaround_emitsound', true)
 	net.WritePlayer(ply)
 	net.WriteUInt8(SOUND_STRINGS_POOL[name])
 	net.WriteUInt8(levelIfOnServer)

@@ -52,7 +52,7 @@ net.receive 'PPM2.EditorCamPos', (len = 0, ply = NULL) ->
 
 	return if filter\GetCount() == 0
 
-	net.Start('PPM2.EditorCamPos')
+	net.Start('PPM2.EditorCamPos', true)
 	net.WritePlayer(ply)
 	net.WriteVector(camPos)
 	net.WriteAngle(camAng)
