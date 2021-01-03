@@ -802,14 +802,14 @@ class NewBodygroupController extends DefaultBodygroupController
 			when PPM2.RACE_PEGASUS
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				-- strictly prop_ragdoll and not death body
-				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if not ent\GetClass() == 'prop_ragdoll' and not ent\GetNWBool('PPM2.IsDeathRagdoll')
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or not ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_UNICORN
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
 			when PPM2.RACE_ALICORN
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				-- strictly prop_ragdoll and not death body
-				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if not ent\GetClass() == 'prop_ragdoll' and not ent\GetNWBool('PPM2.IsDeathRagdoll')
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or not ent\GetNWBool('PPM2.IsDeathRagdoll')
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -857,9 +857,7 @@ class NewBodygroupController extends DefaultBodygroupController
 					@hornModel\Remove() if IsValid(@hornModel)
 
 				@ApplyRace()
-			when 'Race'
-				@ApplyRace()
-			when 'WingsType'
+			when 'Race', 'WingsType'
 				@ApplyRace()
 			when 'LWingSize', 'RWingSize', 'LWingX', 'RWingX', 'LWingY', 'RWingY', 'LWingZ', 'RWingZ'
 				@UpdateWings()
