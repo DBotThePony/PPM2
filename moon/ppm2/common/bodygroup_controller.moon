@@ -792,20 +792,24 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	ApplyRace: =>
 		return unless @isValid
-		return if not IsValid(@GetEntity())
+		ent = @GetEntity()
+		return if not IsValid(ent)
+
 		switch @GrabData('Race')
 			when PPM2.RACE_EARTH
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
+				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
 			when PPM2.RACE_PEGASUS
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
+				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+				-- strictly prop_ragdoll and not death body
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if not ent\GetClass() == 'prop_ragdoll' and not ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_UNICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
+				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
 			when PPM2.RACE_ALICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType())
+				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
+				-- strictly prop_ragdoll and not death body
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if not ent\GetClass() == 'prop_ragdoll' and not ent\GetNWBool('PPM2.IsDeathRagdoll')
 
 	DataChanges: (state) =>
 		return unless @isValid
