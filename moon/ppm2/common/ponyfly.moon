@@ -59,11 +59,11 @@ class PonyflyController
 			@roll = 0
 			@pitch = 0
 			@yaw = 0
-			@GetEntity()\SetVelocity(@lastVelocity * 50)
+			--@GetEntity()\SetVelocity(@lastVelocity * 50)
 			@lastVelocity = Vector(0, 0, 0)
 		else
 			@lastVelocity = Vector(0, 0, 0)
-			@GetEntity()\SetVelocity(-@GetEntity()\GetVelocity() * .97)
+			--@GetEntity()\SetVelocity(-@GetEntity()\GetVelocity() * .97)
 			@GetEntity()\SetMoveType(MOVETYPE_CUSTOM)
 			@obbCenter = @GetEntity()\OBBCenter()
 			@obbMins = @GetEntity()\OBBMins()
