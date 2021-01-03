@@ -784,8 +784,10 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	SelectWingsType: =>
 		wtype = @GrabData('WingsType')
-		if (@GrabData('Fly') or @GetEntity().GetMoveType and @GetEntity()\GetMoveType() == MOVETYPE_NOCLIP) and (not @GetEntity().InVehicle or not @GetEntity()\InVehicle())
+
+		if (@GetEntity()\GetNW2Bool('ppm2_fly') or @GetEntity().GetMoveType and @GetEntity()\GetMoveType() == MOVETYPE_NOCLIP) and (not @GetEntity().InVehicle or not @GetEntity()\InVehicle())
 			wtype += PPM2.MAX_WINGS + 1
+
 		return wtype
 
 	ApplyRace: =>
@@ -816,8 +818,6 @@ class NewBodygroupController extends DefaultBodygroupController
 				@GetEntity()\SetFlexWeight(@@FLEX_ID_EYELASHES, state\GetValue() == PPM2.EYELASHES_NONE and 1 or 0)
 			when 'Gender', 'NewMuzzle'
 				@_UpdateMaleBuff()
-			when 'Fly'
-				@ApplyRace()
 			when 'BatPonyEars', 'BatPonyEarsStrength'
 				@GetEntity()\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
 			when 'Fangs', 'AlternativeFangs', 'FangsStrength'

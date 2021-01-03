@@ -19,6 +19,8 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+PPM2.FLIGHT_IMPULSE = 188
+vector_origin = Vector()
 
 ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight', '1', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow flight for pegasus and alicorns. It obeys PlayerNoClip hook.')
 FORCE_ALLOW_FLIGHT = CreateConVar('ppm2_sv_flight_force', '0', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Ignore PlayerNoClip hook')
@@ -40,40 +42,39 @@ class PonyflyController
 		@yaw = 0
 		@roll = 0
 		@angleLerp = 1
-		@lastVelocity = Vector(0, 0, 0)
-		@lastState = false
 
 	GetEntity: => @controller\GetEntity()
 	GetData: => @controller
 	GetController: => @controller
 
-	Switch: (status = false) =>
-		return if not IsValid(@GetEntity()) or not @GetEntity()\IsPlayer()
-		return if @lastState == status
-		@lastState = status
+	Switch: (status = false, movedata) =>
+		ply = @GetEntity()
+		return if not IsValid(ply) or not ply\IsPlayer()
+
 		if not status
-			{:p, :y, :r} = @GetEntity()\EyeAngles()
+			{:p, :y, :r} = ply\EyeAngles()
 			newAng = Angle(p, y, 0)
-			@GetEntity()\SetEyeAngles(newAng)
-			@GetEntity()\SetMoveType(MOVETYPE_WALK)
-			@roll = 0
-			@pitch = 0
-			@yaw = 0
-			--@GetEntity()\SetVelocity(@lastVelocity * 50)
-			@lastVelocity = Vector(0, 0, 0)
-		else
-			@lastVelocity = Vector(0, 0, 0)
-			--@GetEntity()\SetVelocity(-@GetEntity()\GetVelocity() * .97)
-			@GetEntity()\SetMoveType(MOVETYPE_CUSTOM)
-			@obbCenter = @GetEntity()\OBBCenter()
-			@obbMins = @GetEntity()\OBBMins()
-			@obbMaxs = @GetEntity()\OBBMaxs()
+			ply\SetEyeAngles(newAng)
+			ply\SetMoveType(MOVETYPE_WALK)
 			@roll = 0
 			@pitch = 0
 			@yaw = 0
 
-	Think: (movedata) =>
-		pos     = movedata\GetOrigin()
+			movedata\SetVelocity(ply\GetNW2Vector('ppm2_fly_last_vel') * 50) if movedata
+			ply\SetNW2Vector('ppm2_fly_last_vel', vector_origin)
+		else
+			ply\SetNW2Vector('ppm2_fly_last_vel', vector_origin)
+			ply\SetNW2Vector('ppm2_fly_init_vel', ply\GetVelocity() * 0.01)
+			ply\SetNW2Bool('ppm2_fly_init', true)
+			ply\SetMoveType(MOVETYPE_CUSTOM)
+			@obbCenter = ply\OBBCenter()
+			@obbMins = ply\OBBMins()
+			@obbMaxs = ply\OBBMaxs()
+			@roll = 0
+			@pitch = 0
+			@yaw = 0
+
+	Think: (movedata, ply) =>
 		ang     = movedata\GetAngles()
 		fwd     = ang\Forward()
 		bcwd    = -fwd
@@ -89,6 +90,11 @@ class PonyflyController
 		MULT    = FrameTime() * 66
 
 		velocity = movedata\GetVelocity()
+
+		if ply\GetNW2Bool('ppm2_fly_init')
+			ply\SetNW2Bool('ppm2_fly_init', false)
+			velocity = ply\GetNW2Vector('ppm2_fly_init_vel')
+
 		cSpeed = velocity\Length()
 		cSpeed = 1 if cSpeed < 1
 		dragSqrt = math.min(math.sqrt(cSpeed) / cSpeed * 2, 0.99)
@@ -97,7 +103,7 @@ class PonyflyController
 		cSpeedLiftMult = @speedMultLift / cSpeed
 		cSpeedLiftMult = @speedMultLift if cSpeedLiftMult ~= cSpeedLiftMult
 
-		dragCalc = math.Clamp(@dragMult / dragSqrt, 0, 0.99)
+		dragCalc = math.clamp(@dragMult / dragSqrt, 0, 0.99)
 		pitch = 0
 		yaw = 0
 		roll = 0
@@ -145,7 +151,7 @@ class PonyflyController
 			y += @yaw
 			r = @roll + math.sin(CurTime()) * 2
 			newAng = Angle(p, y, r)
-			@GetEntity()\SetEyeAngles(newAng)
+			ply\SetEyeAngles(newAng)
 
 		if not hit
 			velocity.x *= dragCalc
@@ -155,10 +161,7 @@ class PonyflyController
 			velocity.z *= dragCalc
 			velocity.z += math.sin(CurTime() * 2) * .01
 
-		pos += velocity
-
 		movedata\SetVelocity(velocity)
-		movedata\SetOrigin(pos)
 
 	SetupMove: (movedata, cmd) =>
 		@isLiftingUp = movedata\KeyDown(IN_JUMP)
@@ -166,9 +169,9 @@ class PonyflyController
 			movedata\SetButtons(movedata\GetButtons() - IN_JUMP)
 		cmd\SetButtons(cmd\GetButtons() - IN_JUMP) if cmd\KeyDown(IN_JUMP)
 
-	FinishMove: (movedata) =>
-		nativeEntity = @GetEntity()
-		mvPos = movedata\GetOrigin()
+	FinishMove: (movedata, nativeEntity) =>
+		velocity = movedata\GetVelocity()
+		mvPos = movedata\GetOrigin() + velocity
 		pos = nativeEntity\GetPos()
 		rpos = pos
 		tryMove = util.TraceHull({
@@ -190,12 +193,12 @@ class PonyflyController
 			endpos: mvPos
 		})
 
-		velocity = movedata\GetVelocity()
 		newVelocity = velocity
 		length = velocity\Length()
 
 		if not tryMove.Hit
 			nativeEntity\SetPos(mvPos)
+			movedata\SetOrigin(mvPos)
 		else
 			if IsValid(tryMove.Entity)
 				newVelocity = Vector(0, 0, 0)
@@ -230,69 +233,80 @@ class PonyflyController
 				dmgInfo\SetDamage(calcDamage)
 				nativeEntity\TakeDamageInfo(dmgInfo)
 
-		@lastVelocity = newVelocity if IsFirstTimePredicted()
+		nativeEntity\SetNW2Vector('ppm2_fly_last_vel', velocity)
 
 PPM2.PonyflyController = PonyflyController
 
 import IsPonyCached, GetPonyData, GetTable, SetIK, IsNewPonyCached from FindMetaTable('Entity')
 import AnimRestartGesture, AnimResetGestureSlot from FindMetaTable('Player')
 
+SwitchFlight = (data, flyController, movedata) =>
+	if @GetNW2Bool('ppm2_fly')
+		if FORCE_ALLOW_FLIGHT\GetBool() or hook.Run('PlayerNoClip', @, false) or hook.Run('PPM2Fly', @, false)
+			@SetNW2Bool('ppm2_fly', false)
+			flyController\Switch(false, movedata)
+
+		return
+
+	return if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
+
+	if FORCE_ALLOW_FLIGHT\GetBool() or hook.Run('PlayerNoClip', @, true) or hook.Run('PPM2Fly', @, true)
+		@SetNW2Bool('ppm2_fly', true)
+		flyController\Switch(true)
+
 hook.Add 'SetupMove', 'PPM2.Ponyfly', (movedata, cmd) =>
+	return if not ALLOW_FLIGHT\GetBool()
 	return if not IsPonyCached(@)
-	data = GetPonyData(@)
-	return if not data or not data\GetFly()
+	return if not @IsPonyCached()
+	data = @GetPonyData()
+	return if not data
 	flight = data\GetFlightController()
 	return if not flight
-	return flight\SetupMove(movedata, cmd)
+
+	if @GetMoveType() ~= MOVETYPE_CUSTOM and @GetNW2Bool('ppm2_fly')
+		@SetNW2Bool('ppm2_fly', false)
+		flight\Switch(false)
+
+	SwitchFlight(@, data, flight, movedata) if cmd\GetImpulse() == PPM2.FLIGHT_IMPULSE
+	return flight\SetupMove(movedata, cmd) if @GetNW2Bool('ppm2_fly')
 
 hook.Add 'Move', 'PPM2.Ponyfly', (movedata) =>
+	return if not @GetNW2Bool('ppm2_fly')
 	return if not IsPonyCached(@)
 	data = GetPonyData(@)
-	return if not data or not data\GetFly()
+	return if not data
 	flight = data\GetFlightController()
 	return if not flight
-	return flight\Think(movedata)
+	return flight\Think(movedata, @)
 
 hook.Add 'FinishMove', 'PPM2.Ponyfly', (movedata) =>
+	return if not @GetNW2Bool('ppm2_fly')
 	return if not IsPonyCached(@)
 	data = GetPonyData(@)
-	return if not data or not data\GetFly()
+	return if not data
 	flight = data\GetFlightController()
 	return if not flight
-	return flight\FinishMove(movedata)
+	return flight\FinishMove(movedata, @)
 
 hook.Add 'CalcMainActivity', 'PPM2.Ponyfly', (movedata) =>
 	return if not IsNewPonyCached(@)
-	if data = GetPonyData(@)
-		if data\GetFly()
-			if not @isPlayingPPM2Anim
-				@isPlayingPPM2Anim = true
-				AnimRestartGesture(@, GESTURE_SLOT_CUSTOM, ACT_GMOD_NOCLIP_LAYER, false)
-				SetIK(@, false) if CLIENT
-			return ACT_GMOD_NOCLIP_LAYER, 370
-		else
-			if @isPlayingPPM2Anim
-				@isPlayingPPM2Anim = false
-				AnimResetGestureSlot(@, GESTURE_SLOT_CUSTOM)
-				SetIK(@, true) if CLIENT
 
-if SERVER
-	concommand.Add 'ppm2_fly', =>
-		return if not ALLOW_FLIGHT\GetBool()
-		return if not IsValid(@)
-		return if not @IsPonyCached()
-		data = @GetPonyData()
-		return if not data
-		if data\GetFly()
-			return data\SetFly(false) if FORCE_ALLOW_FLIGHT\GetBool()
-			can = hook.Run('PlayerNoClip', @, false) or hook.Run('PPM2Fly', @, false)
-			data\SetFly(false) if can
-		else
-			return if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
-			return data\SetFly(true) if FORCE_ALLOW_FLIGHT\GetBool()
-			can = hook.Run('PlayerNoClip', @, true) or hook.Run('PPM2Fly', @, true)
-			data\SetFly(true) if can
-else
+	if @GetNW2Bool('ppm2_fly')
+		if not @isPlayingPPM2Anim
+			@isPlayingPPM2Anim = true
+			AnimRestartGesture(@, GESTURE_SLOT_CUSTOM, ACT_GMOD_NOCLIP_LAYER, false)
+			SetIK(@, false) if CLIENT
+
+		return ACT_GMOD_NOCLIP_LAYER, 370
+	else
+		if @isPlayingPPM2Anim
+			@isPlayingPPM2Anim = false
+			AnimResetGestureSlot(@, GESTURE_SLOT_CUSTOM)
+			SetIK(@, true) if CLIENT
+
+if CLIENT
+	concommand.Add 'ppm2_fly', -> RunConsoleCommand('impulse', tostring(PPM2.FLIGHT_IMPULSE))
+
 	lastDouble = 0
 	lastMessage = 0
 	lastMessage2 = 0
@@ -303,26 +317,32 @@ else
 		return if not FLIGHT_BIND\GetBool()
 		return if not pressed
 		return if bind ~= '+jump' and bind ~= 'jump'
-		if lastDouble > RealTimeL()
-			return if not @IsPonyCached()
-			data = @GetPonyData()
-			return if not data
 
-			if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
-				if lastMessage < RealTimeL()
-					lastMessage = RealTimeL() + 1
-					PPM2.LChatPrint('info.ppm2.fly.pegasus')
+		_lastDouble = lastDouble
+		lastDouble = RealTimeL() + 0.2
+
+		return if _lastDouble <= RealTimeL()
+		return if not @IsPonyCached()
+		data = @GetPonyData()
+		return if not data
+
+		if @GetPonyRaceFlags()\band(PPM2.RACE_HAS_WINGS) == 0
+			if lastMessage < RealTimeL()
+				lastMessage = RealTimeL() + 1
+				PPM2.LChatPrint('info.ppm2.fly.pegasus')
+
+			return
+
+		if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
+			can = hook.Run('PlayerNoClip', @, not @GetNW2Bool('ppm2_fly')) or hook.Run('PPM2Fly', @, not @GetNW2Bool('ppm2_fly'))
+
+			if not can
+				if lastMessage2 < RealTimeL()
+					lastMessage2 = RealTimeL() + 1
+					PPM2.LChatPrint('info.ppm2.fly.cannot', @GetNW2Bool('ppm2_fly') and 'land' or 'fly')
+
 				return
 
-			if not FORCE_ALLOW_FLIGHT\GetBool() and not SUPPRESS_CLIENTSIDE_CHECK\GetBool()
-				can = hook.Run('PlayerNoClip', @, not data\GetFly()) or hook.Run('PPM2Fly', @, not data\GetFly())
-				if not can
-					if lastMessage2 < RealTimeL()
-						lastMessage2 = RealTimeL() + 1
-						PPM2.LChatPrint('info.ppm2.fly.cannot', data\GetFly() and 'land' or 'fly')
-					return
+		RunConsoleCommand('impulse', tostring(PPM2.FLIGHT_IMPULSE))
+		lastDouble = 0
 
-			RunConsoleCommand('ppm2_fly')
-			lastDouble = 0
-			return
-		lastDouble = RealTimeL() + 0.2

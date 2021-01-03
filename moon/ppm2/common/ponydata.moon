@@ -357,7 +357,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
 
-	@NetworkVar('Fly',                  rBool,   wBool,                 false)
+	-- @NetworkVar('Fly',                  rBool,   wBool,                 false)
 	@NetworkVar('DisableTask',          rBool,   wBool,                 false)
 	@NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
 	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
@@ -467,16 +467,15 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	ModelChanges: (old = @ent\GetModel(), new = old) =>
 		@modelCached = new
-		@SetFly(false) if SERVER
+
+		@ent\SetNW2Bool('ppm2_fly', false)
+
 		timer.Simple 0.5, ->
 			return unless IsValid(@ent)
 			@Reset()
 
 	GenericDataChange: (state) =>
 		hook.Run 'PPM2_PonyDataChanges', @ent, @, state
-
-		if state\GetKey() == 'Fly' and @flightController
-			@flightController\Switch(state\GetValue())
 
 		if state\GetKey() == 'DisableTask'
 			@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
@@ -524,7 +523,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			@alreadyCalledRespawn = false
 			@alreadyCalledDeath = false
 		@ApplyBodygroups(CLIENT, true)
-		@SetFly(false) if SERVER
+
+		@ent\SetNW2Bool('ppm2_fly', false)
 
 		@ent\PPMBonesModifier()
 
@@ -553,7 +553,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		else
 			@alreadyCalledDeath = false
 
-		@SetFly(false) if SERVER
+		@ent\SetNW2Bool('ppm2_fly', false)
 
 		if scale = @GetSizeController()
 			scale\PlayerDeath()
@@ -692,8 +692,10 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			if IsValid(@ent) and @ent.__ppm2_task_hit
 				@entTable.__ppm2_task_hit = false
 				@ent\SetNoDraw(false)
+
 		@GetBodygroupController()\Remove() if @GetBodygroupController()
 		@GetSizeController()\Remove() if @GetSizeController()
+
 		@flightController\Switch(false) if @flightController
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
 		@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
