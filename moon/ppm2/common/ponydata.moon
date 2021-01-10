@@ -74,16 +74,15 @@ class PPM2.NetworkChangeState
 
 do
 	nullify = ->
-		ProtectedCall ->
-			for _, ent in ipairs ents.GetAll()
-				ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData
+		for _, ent in ipairs ents.GetAll()
+			if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
+				ProtectedCall -> ent.__PPM2_PonyData\Remove()
 
 		for _, ent in ipairs ents.GetAll()
 			ent.__PPM2_PonyData = nil
 
 	nullify()
-	timer.Simple 0, -> timer.Simple 0, -> timer.Simple 0, nullify
-	hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', nullify
+	hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', -> ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)

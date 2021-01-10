@@ -91,9 +91,13 @@ concommand.Add 'ppm2_reload', ->
 	instance\SetNetworkObject(newData)
 	PPM2.Message 'Sending pony data to server...'
 
-timer.Simple 0, ->
+if IsValid(LocalPlayer())
 	RunConsoleCommand('ppm2_reload')
 	timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+else
+	hook.Add 'InitPostEntity', 'PPM2.LocalPonydataInit', ->
+		RunConsoleCommand('ppm2_reload')
+		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
 
 PPM_HINT_COLOR_FIRST = Color(255, 255, 255)
 PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
