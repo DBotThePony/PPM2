@@ -87,6 +87,8 @@ net.Receive 'PPM2.RagdollEditEmote', (len = 0, ply = NULL) ->
 	net.Start('PPM2.PlayEmote')
 	net.WriteUInt(emoteID, 8)
 	net.WriteEntity(ent)
+	net.WriteBool(false)
+	net.WriteBool(false)
 	net.SendOmit(ply)
 
 duplicator.RegisterEntityModifier 'ppm2_ragdolledit', (ply = NULL, ent = NULL, storeddata = {}) ->
