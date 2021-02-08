@@ -355,7 +355,7 @@ class PonyDataInstance
 			render.PopRenderTarget()
 
 	Save: (doBackup = true, saveThumbnail = true) =>
-		file.Write(@GetBackupPath(), file.Read(@fullPath, 'DATA')) if doBackup and @exists
+		file.Rename(@fullPath, @GetBackupPath()) if doBackup and @exists
 		buf = @SaveAs(@fullPath)
 		@WriteThumbnail(@thumbnailPath) if saveThumbnail
 		@exists = true
