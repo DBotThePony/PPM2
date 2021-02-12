@@ -181,12 +181,14 @@ timer.Create 'PPM2.CheckDXLevel', 180, 0, ->
 IN_DRAW = false
 MARKED_FOR_DRAW = {}
 
+player_GetAll = player.GetAll
+
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
 
 	MARKED_FOR_DRAW = {}
 
-	for _, ply in ipairs player.GetAll()
+	for ply in *player_GetAll()
 		if not IsDormant(ply)
 			p = IsPony(ply)
 			ply.__cachedIsPony = p

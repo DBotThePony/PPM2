@@ -497,9 +497,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		return if not @isValid
-
-		with @GetTextureController()
-			\PreDraw(ent, drawingNewTask)
+		@GetTextureController()\PreDraw(ent, drawingNewTask)
 
 		if drawingNewTask
 			with bones = ent\PPMBonesModifier()
@@ -510,6 +508,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 
 		@flexes\Think(ent) if @flexes
 		@emotes\Think(ent) if @emotes
+
 		if ent\IsPlayer()
 			@UpdateStare()
 			@UpdateEyeRoll()
