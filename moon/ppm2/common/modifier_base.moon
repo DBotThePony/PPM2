@@ -234,18 +234,23 @@ class PPM2.ModifierBase
 
 	TriggerLerpAll: (lerpBy = 0.5) =>
 		outputTriggered = {}
-		for _, modif in ipairs @CUSTOM_MODIFIERS
+
+		for modif in *@CUSTOM_MODIFIERS
 			if modif.iNameLerp
 				for id = 1, #@[modif.iNameLerp]
 					if @[modif.iNameLerp][id] ~= @[modif.iName][id]
 						@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+						@[modif.iNameLerp][id] = @[modif.iName][id] if isnumber(@[modif.iNameLerp][id]) and @[modif.iNameLerp][id] ~= @[modif.iNameLerp][id]
 						table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
-		for _, modif in ipairs @@MODIFIERS
+
+		for modif in *@@MODIFIERS
 			if modif.iNameLerp
 				for id = 1, #@[modif.iNameLerp]
 					if @[modif.iNameLerp][id] ~= @[modif.iName][id]
 						@[modif.iNameLerp][id] = modif.lerpFunc(lerpBy, @[modif.iNameLerp][id], @[modif.iName][id])
+						@[modif.iNameLerp][id] = @[modif.iName][id] if isnumber(@[modif.iNameLerp][id]) and @[modif.iNameLerp][id] ~= @[modif.iNameLerp][id]
 						table.insert(outputTriggered, {modif.name, @[modif.iNameLerp][id]})
+
 		return outputTriggered
 
 	@ClearModifiers: =>
