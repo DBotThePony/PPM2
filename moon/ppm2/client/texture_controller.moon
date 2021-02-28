@@ -80,6 +80,221 @@ hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return 
 mat_picmip = GetConVar('mat_picmip')
 RT_SIZES = [math.pow(2, i) for i = 1, 24]
 
+file.mkdir('ppm2_cache')
+
+PPM2.IsValidURL = (url) -> url ~= '' and url\find('^https?://') and url or false
+
+PPM2.BuildURLHTML = (url, width, height) ->
+	url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
+
+	return "<html>
+				<head>
+					<style>
+						html, body {
+							background: transparent;
+							margin: 0;
+							padding: 0;
+							overflow: hidden;
+						}
+
+						#mainimage {
+							max-width: #{width};
+							height: auto;
+							width: 100%;
+							margin: 0;
+							padding: 0;
+							max-height: #{height};
+						}
+
+						#imgdiv {
+							width: #{width};
+							height: #{height};
+							overflow: hidden;
+							margin: 0;
+							padding: 0;
+							text-align: center;
+						}
+					</style>
+					<script>
+						window.onload = function() {
+							var img = document.getElementById('mainimage');
+							if (img.naturalWidth < img.naturalHeight) {
+								img.style.setProperty('height', '100%');
+								img.style.setProperty('width', 'auto');
+							}
+
+							img.style.setProperty('margin-top', (#{height} - img.height) / 2);
+
+							setInterval(function() {
+								console.log('FRAME');
+							}, 50);
+						};
+					</script>
+				</head>
+				<body>
+					<div id='imgdiv'>
+						<img src='#{url}' id='mainimage' />
+					</div>
+				</body>
+			</html>"
+
+PPM2.HTML_MATERIAL_QUEUE =  PPM2.HTML_MATERIAL_QUEUE or {}
+PPM2.URL_MATERIAL_CACHE =   PPM2.URL_MATERIAL_CACHE  or {}
+PPM2.ALREADY_DOWNLOADING =  PPM2.ALREADY_DOWNLOADING or {}
+PPM2.FAILED_TO_DOWNLOAD =   PPM2.FAILED_TO_DOWNLOAD  or {}
+
+PPM2.TEXTURE_TASKS = PPM2.TEXTURE_TASKS or {}
+
+coroutine_yield = coroutine.yield
+coroutine_resume = coroutine.resume
+
+texture_compile_worker = ->
+	while true
+		name, task = next(PPM2.TEXTURE_TASKS)
+
+		if not name
+			coroutine_yield()
+		else
+			PPM2.TEXTURE_TASKS[name] = nil
+			task[1](task[2])
+			coroutine.syswait(1)
+
+texture_compile_thread = coroutine.create(texture_compile_worker)
+
+url_thread = coroutine.create ->
+	while true
+		if not PPM2.HTML_MATERIAL_QUEUE[1]
+			coroutine_yield()
+		else
+			data = table.remove(PPM2.HTML_MATERIAL_QUEUE, 1)
+
+			panel = vgui.Create('DHTML')
+			panel\SetVisible(false)
+			panel\SetSize(data.width, data.height)
+			panel\SetHTML(PPM2.BuildURLHTML(data.url, data.width, data.height))
+			panel\Refresh()
+
+			frame = 0
+
+			panel.ConsoleMessage = (pnl, msg) ->
+				if msg == 'FRAME'
+					data.frame += 1
+
+			systime = SysTime() + 8
+
+			timeout = false
+
+			while panel\IsLoading() or frame < 20
+				if systime <= SysTime()
+					timeout = true
+					panel\Remove() if IsValid(panel)
+
+					newMat = CreateMaterial("PPM2_URLMaterial_Failed_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': 'null'
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+						'$translucent': 1
+					})
+
+					PPM2.FAILED_TO_DOWNLOAD[data.index] = {
+						texture: newMat\GetTexture('$basetexture')
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(newMat\GetTexture('$basetexture'), nil, newMat)
+
+					break
+
+				coroutine_yield()
+
+			if not timeout
+				panel\UpdateHTMLTexture()
+				htmlmat = panel\GetHTMLMaterial()
+
+				if htmlmat
+					texture = htmlmat\GetTexture('$basetexture')
+					texture\Download()
+
+					newMat = CreateMaterial("PPM2_URLMaterial_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': 'models/debug/debugwhite'
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+					})
+
+					newMat\SetTexture('$basetexture', texture)
+
+					PPM2.URL_MATERIAL_CACHE[data.index] = {
+						texture: texture
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(texture, panel, newMat)
+
+				coroutine_yield()
+				panel\Remove() if IsValid(panel)
+
+PPM2.GetURLMaterial = (url, width, height) ->
+	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
+
+	index = url .. '_' .. width .. '_height'
+
+	if data = PPM2.FAILED_TO_DOWNLOAD[index]
+		return DLib.Promise (resolve) -> resolve(data)
+
+	if data = PPM2.URL_MATERIAL_CACHE[index]
+		return DLib.Promise (resolve) -> resolve(data)
+
+	if data = PPM2.ALREADY_DOWNLOADING[index]
+		return DLib.Promise (resolve) -> table.insert(data.resolve, resolve)
+
+	return DLib.Promise (resolve) ->
+		data = {
+			:url
+			:width
+			:height
+			:index
+			hash: DLib.Util.QuickSHA1(index)
+			resolve: {resolve}
+		}
+
+hook.Add 'Think', 'PPM2 Material Tasks', ->
+	status, err = coroutine_resume(url_thread)
+	error(err) if not status
+
+	status, err = coroutine_resume(texture_compile_thread)
+
+	if not status
+		texture_compile_thread = coroutine.create(texture_compile_worker)
+		error(err)
+
+hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
+	PPM2.HTML_MATERIAL_QUEUE = {}
+	PPM2.URL_MATERIAL_CACHE = {}
+	PPM2.ALREADY_DOWNLOADING = {}
+	PPM2.FAILED_TO_DOWNLOAD = {}
+
+hook.Remove 'PreRender', 'PPM2.CompileTextures'
+hook.Remove 'Think', 'PPM2.WebMaterialThink'
+
+PPM2.TextureTableHash = (input) ->
+	hash = DLib.Util.SHA1()
+	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
+	return hash\Digest()
+
 PPM2.GetTextureQuality = ->
 	mult = 1
 
@@ -117,7 +332,9 @@ GetMat = (matIn) ->
 	return matIn if not isstring(matIn)
 	return Material(matIn, 'smooth'), nil
 
-class PonyTextureController extends PPM2.ControllerChildren
+LOCKED_RENDERTARGETS = PPM2.PonyTextureController and PPM2.PonyTextureController.LOCKED_RENDERTARGETS
+
+class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
@@ -154,6 +371,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 	@NEXT_GENERATED_ID = 100000
 
+	@BODY_UPDATE_TRIGGER = {}
 	@MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
 	@TAIL_UPDATE_TRIGGER = {'TailType': true}
 	@EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
@@ -251,7 +469,6 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@TAIL_UPDATE_TRIGGER["TailColor#{i}"] = true
 		@TAIL_UPDATE_TRIGGER["TailDetailColor#{i}"] = true
 
-	@BODY_UPDATE_TRIGGER = {}
 	for i = 1, PPM2.MAX_BODY_DETAILS
 		@BODY_UPDATE_TRIGGER["BodyDetail#{i}"] = true
 		@BODY_UPDATE_TRIGGER["BodyDetailColor#{i}"] = true
@@ -274,74 +491,95 @@ class PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
-	@COMPILE_QUEUE = {IN_PLACE: false}
-	@COMPILE_WAIT_UNTIL = 0
+	@GetCache = (index) =>
+		hash = DLib.Util.QuickSHA1(index)
+		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
+		return if not file.Exists(path, 'DATA')
+		return '../data/' .. path
 
-	@COMPILE_THREAD = coroutine.create () ->
-		handleError = (err) ->
-			PPM2.MessageError('There was a problem in compiling texture')
-			PPM2.MessageError(debug.traceback(err))
+	@SetCache = (index, value) =>
+		hash = DLib.Util.QuickSHA1(index)
+		file.mkdir('ppm2_cache/' .. hash\sub(1, 2))
+		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
+		file.Write(path, value)
+		return '../data/' .. path
 
-		while true
-			if #@COMPILE_QUEUE == 0
-				coroutine.yield()
-			else
-				if #@COMPILE_QUEUE > 40 and #@COMPILE_QUEUE % 20 == 0
-					PPM2.LMessage('message.ppm2.queue_notify', #@COMPILE_QUEUE)
+	@GetCacheH = (hash) =>
+		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
+		return if not file.Exists(path, 'DATA')
+		return '../data/' .. path
 
-				if @COMPILE_QUEUE.IN_PLACE
-					for _, data in ipairs(@COMPILE_QUEUE)
-						if data.self\IsValid() and data.now
-							xpcall(data.run, handleError, data.self, unpack(data.args))
-							data.self.lastMaterialUpdate = 0
+	@SetCacheH = (hash, value) =>
+		file.mkdir('ppm2_cache/' .. hash\sub(1, 2))
+		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
+		file.Write(path, value)
+		return '../data/' .. path
 
-					@COMPILE_QUEUE = [data for _, data in ipairs(@COMPILE_QUEUE) when data.self\IsValid() and not data.now]
-					@COMPILE_QUEUE.IN_PLACE = false
+	@LOCKED_RENDERTARGETS = LOCKED_RENDERTARGETS or {}
 
-				data = table.remove(@COMPILE_QUEUE)
+	@LockRenderTarget = (width, height, r = 255, g = 255, b = 255, a = 255) =>
+		index = string.format('PPM2_buffer_%d_%d', width, height)
 
-				if data and data.self\IsValid()
-					xpcall(data.run, handleError, data.self, unpack(data.args))
-					data.self.lastMaterialUpdate = 0
-					coroutine.yield() if not INSANT_TEXTURE_COMPILE\GetBool()
+		while @LOCKED_RENDERTARGETS[index]
+			coroutine_yield()
 
-	@COMPILE_TEXTURES = ->
-		return if #@COMPILE_QUEUE == 0
+		@LOCKED_RENDERTARGETS[index] = true
 
-		if @COMPILE_WAIT_UNTIL < RealTimeL() or @COMPILE_QUEUE.IN_PLACE
-			@COMPILE_WAIT_UNTIL = RealTimeL() + 0.2
-			coroutine.resume(@COMPILE_THREAD)
+		rt = GetRenderTarget(index, width, height)
 
-		return
+		render.PushRenderTarget(rt)
+		render.Clear(r, g, b, a, true, true)
 
-	hook.Add 'PreRender', 'PPM2.CompileTextures', @COMPILE_TEXTURES, -1
+		--render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+		--render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+		cam.Start2D()
 
-	DelayCompile: (func = '', ...) =>
-		return if not @[func]
-		args = {...}
+		return rt
 
-		for i, val in ipairs(@@COMPILE_QUEUE)
-			if val.func == func and val.self == @
-				val.args = args
-				val.now = false
-				return
+	@ReleaseRenderTarget = (width, height) =>
+		index = string.format('PPM2_buffer_%d_%d', width, height)
+		@LOCKED_RENDERTARGETS[index] = false
 
-		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: false, :args, run: @[func]})
+		--render.PopFilterMin()
+		--render.PopFilterMag()
 
-	DelayCompileNow: (func = '', ...) =>
-		return if not @[func]
-		args = {...}
-		@@COMPILE_QUEUE.IN_PLACE = true
+		cam.End2D()
+		render.PopRenderTarget()
 
-		for i, val in ipairs(@@COMPILE_QUEUE)
-			if val.func == func and val.self == @
-				val.args = args
-				val.now = true
-				return
+	new: (controller, compile = true) =>
+		super(controller\GetData())
 
-		table.insert(@@COMPILE_QUEUE, {self: @, :func, now: true, :args, run: @[func]})
+		@isValid = true
+		@cachedENT = @GetEntity()
+		@id = @GetEntity()\EntIndex()
+		@load_tickets = {}
+
+		if @id == -1
+			@clientsideID = true
+			@id = @@NEXT_GENERATED_ID
+			@@NEXT_GENERATED_ID += 1
+
+		@compiled = false
+		@lastMaterialUpdate = 0
+		@lastMaterialUpdateEnt = NULL
+		@delayCompilation = {}
+		@url_processes = 0
+		@processing_first = true
+		@CheckReflectionsClosure = -> @CheckReflections()
+		@CompileTextures() if compile
+		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
+		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
+
+	CreateRenderTask: (func = '', ...) =>
+		return if func ~= 'CompileBody'
+		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
+
+	CreateInstantRenderTask: (func = '', ...) =>
+		return if func ~= 'CompileBody'
+		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
 
 	IsBeingProcessed: =>
+		return false if true
 		return true if @url_processes > 0
 		if #@@COMPILE_QUEUE == 0
 			@processing_first = false
@@ -372,251 +610,43 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		switch key
 			when 'BodyColor'
-				@DelayCompile('CompileBody')
-				@DelayCompile('CompileWings')
-				@DelayCompile('CompileHorn')
+				@CreateRenderTask('CompileBody')
+				@CreateRenderTask('CompileWings')
+				@CreateRenderTask('CompileHorn')
 			when 'EyelashesColor'
-				@DelayCompile('CompileEyelashes')
+				@CreateRenderTask('CompileEyelashes')
 			when 'BodyBumpStrength', 'Socks', 'Bodysuit', 'LipsColor', 'NoseColor', 'LipsColorInherit', 'NoseColorInherit', 'EyebrowsColor', 'GlowingEyebrows', 'EyebrowsGlowStrength'
-				@DelayCompile('CompileBody')
+				@CreateRenderTask('CompileBody')
 			when 'CMark', 'CMarkType', 'CMarkURL', 'CMarkColor', 'CMarkSize'
-				@DelayCompile('CompileCMark')
+				@CreateRenderTask('CompileCMark')
 			when 'SocksColor', 'SocksTextureURL', 'SocksTexture', 'SocksDetailColor1', 'SocksDetailColor2', 'SocksDetailColor3', 'SocksDetailColor4', 'SocksDetailColor5', 'SocksDetailColor6'
-				@DelayCompile('CompileSocks')
+				@CreateRenderTask('CompileSocks')
 			when 'NewSocksColor1', 'NewSocksColor2', 'NewSocksColor3', 'NewSocksTextureURL'
-				@DelayCompile('CompileNewSocks')
+				@CreateRenderTask('CompileNewSocks')
 			when 'HornURL1', 'SeparateHorn', 'HornColor', 'HornURL2', 'HornURL3', 'HornURLColor1', 'HornURLColor2', 'HornURLColor3', 'UseHornDetail', 'HornGlow', 'HornGlowSrength', 'HornDetailColor'
-				@DelayCompile('CompileHorn')
+				@CreateRenderTask('CompileHorn')
 			when 'WingsURL1', 'WingsURL2', 'WingsURL3', 'WingsURLColor1', 'WingsURLColor2', 'WingsURLColor3', 'SeparateWings', 'WingsColor'
-				@DelayCompile('CompileWings')
+				@CreateRenderTask('CompileWings')
 			else
 				if @@MANE_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileHair')
+					@CreateRenderTask('CompileHair')
 				elseif @@TAIL_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileTail')
+					@CreateRenderTask('CompileTail')
 				elseif @@EYE_UPDATE_TRIGGER[key]
-					@DelayCompileNow('CompileLeftEye')
-					@DelayCompileNow('CompileRightEye')
+					@CreateInstantRenderTask('CompileLeftEye')
+					@CreateInstantRenderTask('CompileRightEye')
 				elseif @@BODY_UPDATE_TRIGGER[key]
-					@DelayCompile('CompileBody')
+					@CreateRenderTask('CompileBody')
 				elseif @@PHONG_UPDATE_TRIGGER[key]
 					@UpdatePhongData()
 				elseif @@CLOTHES_UPDATE_HEAD[key]
-					@DelayCompile('CompileHeadClothes')
+					@CreateRenderTask('CompileHeadClothes')
 				elseif @@CLOTHES_UPDATE_EYES[key]
-					@DelayCompile('CompileEyeClothes')
+					@CreateRenderTask('CompileEyeClothes')
 				elseif @@CLOTHES_UPDATE_NECK[key]
-					@DelayCompile('CompileNeckClothes')
+					@CreateRenderTask('CompileNeckClothes')
 				elseif @@CLOTHES_UPDATE_BODY[key]
-					@DelayCompile('CompileBodyClothes')
-
-	@HTML_MATERIAL_QUEUE = {}
-	@URL_MATERIAL_CACHE = {}
-	@ALREADY_DOWNLOADING = {}
-	@FAILED_TO_DOWNLOAD = {}
-
-	hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
-		@HTML_MATERIAL_QUEUE = {}
-		@URL_MATERIAL_CACHE = {}
-		@ALREADY_DOWNLOADING = {}
-		@FAILED_TO_DOWNLOAD = {}
-
-	@LoadURL: (url, width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST), callback = (->)) =>
-		error('Must specify URL') if not url or url == ''
-		@URL_MATERIAL_CACHE[width] = @URL_MATERIAL_CACHE[width] or {}
-		@URL_MATERIAL_CACHE[width][height] = @URL_MATERIAL_CACHE[width][height] or {}
-		@ALREADY_DOWNLOADING[width] = @ALREADY_DOWNLOADING[width] or {}
-		@ALREADY_DOWNLOADING[width][height] = @ALREADY_DOWNLOADING[width][height] or {}
-		@FAILED_TO_DOWNLOAD[width] = @FAILED_TO_DOWNLOAD[width] or {}
-		@FAILED_TO_DOWNLOAD[width][height] = @FAILED_TO_DOWNLOAD[width][height] or {}
-
-		if @FAILED_TO_DOWNLOAD[width] and @FAILED_TO_DOWNLOAD[width][height] and @FAILED_TO_DOWNLOAD[width][height][url]
-			callback(@FAILED_TO_DOWNLOAD[width][height][url].texture, nil, @FAILED_TO_DOWNLOAD[width][height][url].material)
-			return
-
-		if @ALREADY_DOWNLOADING[width] and @ALREADY_DOWNLOADING[width][height] and @ALREADY_DOWNLOADING[width][height][url]
-			for _, data in ipairs @HTML_MATERIAL_QUEUE
-				if data.url == url
-					table.insert(data.callbacks, callback)
-					break
-			return
-
-		if @URL_MATERIAL_CACHE[width] and @URL_MATERIAL_CACHE[width][height] and @URL_MATERIAL_CACHE[width][height][url]
-			callback(@URL_MATERIAL_CACHE[width][height][url].texture, nil, @URL_MATERIAL_CACHE[width][height][url].material)
-			return
-
-		return if not @ALREADY_DOWNLOADING[width] or not @ALREADY_DOWNLOADING[width][height]
-		@ALREADY_DOWNLOADING[width][height][url] = true
-		table.insert(@HTML_MATERIAL_QUEUE, {:url, :width, :height, callbacks: {callback}, timeouts: 0})
-		--PPM2.Message 'Queuing to download ', url
-
-	@BuildURLHTML = (url = 'https://dbot.serealia.ca/illuminati.jpg', width = PPM2.GetTextureSize(@QUAD_SIZE_CONST), height = PPM2.GetTextureSize(@QUAD_SIZE_CONST)) =>
-		url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
-		return "<html>
-					<head>
-						<style>
-							html, body {
-								background: transparent;
-								margin: 0;
-								padding: 0;
-								overflow: hidden;
-							}
-
-							#mainimage {
-								max-width: #{width};
-								height: auto;
-								width: 100%;
-								margin: 0;
-								padding: 0;
-								max-height: #{height};
-							}
-
-							#imgdiv {
-								width: #{width};
-								height: #{height};
-								overflow: hidden;
-								margin: 0;
-								padding: 0;
-								text-align: center;
-							}
-						</style>
-						<script>
-							window.onload = function() {
-								var img = document.getElementById('mainimage');
-								if (img.naturalWidth < img.naturalHeight) {
-									img.style.setProperty('height', '100%');
-									img.style.setProperty('width', 'auto');
-								}
-
-								img.style.setProperty('margin-top', (#{height} - img.height) / 2);
-
-								setInterval(function() {
-									console.log('FRAME');
-								}, 50);
-							};
-						</script>
-					</head>
-					<body>
-						<div id='imgdiv'>
-							<img src='#{url}' id='mainimage' />
-						</div>
-					</body>
-				</html>"
-
-	@SHOULD_WAIT_WEB = false
-	hook.Add 'Think', 'PPM2.WebMaterialThink', ->
-		return if @SHOULD_WAIT_WEB
-		data = @HTML_MATERIAL_QUEUE[1]
-		return if not data
-
-		if IsValid(data.panel)
-			panel = data.panel
-			return if panel\IsLoading()
-
-			if data.timerid
-				timer.Remove(data.timerid)
-				data.timerid = nil
-
-			return if data.frame < 20
-
-			@SHOULD_WAIT_WEB = true
-
-			timer.Simple 1, ->
-				@SHOULD_WAIT_WEB = false
-				table.remove(@HTML_MATERIAL_QUEUE, 1)
-				return unless IsValid(panel)
-
-				panel\UpdateHTMLTexture()
-				htmlmat = panel\GetHTMLMaterial()
-				return if not htmlmat
-
-				texture = htmlmat\GetTexture('$basetexture')
-				texture\Download()
-				newMat = CreateMaterial("PPM2.URLMaterial.#{texture\GetName()}_#{math.random(1, 100000)}", 'UnlitGeneric', {
-					'$basetexture': 'models/debug/debugwhite'
-					'$ignorez': 1
-					'$vertexcolor': 1
-					'$vertexalpha': 1
-					'$nolod': 1
-				})
-
-				newMat\SetTexture('$basetexture', texture)
-
-				@URL_MATERIAL_CACHE[data.width][data.height][data.url] = {
-					texture: texture
-					material: newMat
-				}
-
-				@ALREADY_DOWNLOADING[data.width][data.height][data.url] = false
-
-				for _, callback in ipairs data.callbacks
-					callback(texture, panel, newMat)
-				timer.Simple 0, -> panel\Remove() if IsValid(panel)
-			return
-
-		data.frame = 0
-		panel = vgui.Create('DHTML')
-		panel\SetVisible(false)
-		panel\SetSize(data.width, data.height)
-		panel\SetHTML(@BuildURLHTML(data.url, data.width, data.height))
-		panel\Refresh()
-
-		panel.ConsoleMessage = (pnl, msg) ->
-			if msg == 'FRAME'
-				data.frame += 1
-
-		data.panel = panel
-		data.timerid = "PPM2.TextureMaterialTimeout.#{math.random(1, 100000)}"
-
-		timer.Create data.timerid, 8, 1, ->
-			return unless IsValid(panel)
-			panel\Remove()
-			if data.timeouts >= 4
-				newMat = CreateMaterial("PPM2.URLMaterial_Failed_#{math.random(1, 100000)}", 'UnlitGeneric', {
-					'$basetexture': 'null'
-					'$ignorez': 1
-					'$vertexcolor': 1
-					'$vertexalpha': 1
-					'$nolod': 1
-					'$translucent': 1
-				})
-
-				@FAILED_TO_DOWNLOAD[data.width][data.height][data.url] = {
-					texture: newMat\GetTexture('$basetexture')
-					material: newMat
-				}
-
-				for _, callback in ipairs data.callbacks
-					callback(newMat\GetTexture('$basetexture'), nil, newMat)
-
-				table.remove(@HTML_MATERIAL_QUEUE, 1)
-			else
-				data.timeouts += 1
-				table.remove(@HTML_MATERIAL_QUEUE, 1)
-				table.insert(@HTML_MATERIAL_QUEUE, data)
-
-	new: (controller, compile = true) =>
-		super(controller\GetData())
-		@isValid = true
-		@cachedENT = @GetEntity()
-		@id = @GetEntity()\EntIndex()
-		@load_tickets = {}
-
-		if @id == -1
-			@clientsideID = true
-			@id = @@NEXT_GENERATED_ID
-			@@NEXT_GENERATED_ID += 1
-
-		@compiled = false
-		@lastMaterialUpdate = 0
-		@lastMaterialUpdateEnt = NULL
-		@delayCompilation = {}
-		@url_processes = 0
-		@processing_first = true
-		@CheckReflectionsClosure = -> @CheckReflections()
-		@CompileTextures() if compile
-		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
-		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
+					@CreateRenderTask('CompileBodyClothes')
 
 	PutTicket: (name) =>
 		@load_tickets[name] = (@load_tickets[name] or 0) + 1
@@ -715,44 +745,42 @@ class PonyTextureController extends PPM2.ControllerChildren
 	GetWingsName: => @WingsMaterialName
 
 	CompileTextures: (now = false) =>
-		--return if @compiled
 		return if not @GetData()\IsValid()
 
 		if now
-			@CompileBody()
-			@CompileHair()
-			@CompileTail()
-			@CompileHorn()
-			@CompileWings()
-			@CompileCMark()
-			@CompileSocks()
-			@CompileNewSocks()
-			@CompileEyelashes()
-			@CompileLeftEye()
-			@CompileRightEye()
-			@CompileBodyClothes()
-			@CompileNeckClothes()
-			@CompileHeadClothes()
-			@CompileEyeClothes()
+			@CreateInstantRenderTask('CompileBody')
+			@CreateInstantRenderTask('CompileHair')
+			@CreateInstantRenderTask('CompileTail')
+			@CreateInstantRenderTask('CompileHorn')
+			@CreateInstantRenderTask('CompileWings')
+			@CreateInstantRenderTask('CompileCMark')
+			@CreateInstantRenderTask('CompileSocks')
+			@CreateInstantRenderTask('CompileNewSocks')
+			@CreateInstantRenderTask('CompileEyelashes')
+			@CreateInstantRenderTask('CompileLeftEye')
+			@CreateInstantRenderTask('CompileRightEye')
+			@CreateInstantRenderTask('CompileBodyClothes')
+			@CreateInstantRenderTask('CompileNeckClothes')
+			@CreateInstantRenderTask('CompileHeadClothes')
+			@CreateInstantRenderTask('CompileEyeClothes')
 		else
-			@DelayCompile('CompileBody')
-			@DelayCompile('CompileHair')
-			@DelayCompile('CompileTail')
-			@DelayCompile('CompileHorn')
-			@DelayCompile('CompileWings')
-			@DelayCompile('CompileCMark')
-			@DelayCompile('CompileSocks')
-			@DelayCompile('CompileNewSocks')
-			@DelayCompile('CompileEyelashes')
-			@DelayCompile('CompileLeftEye')
-			@DelayCompile('CompileRightEye')
-			@DelayCompile('CompileBodyClothes')
-			@DelayCompile('CompileNeckClothes')
-			@DelayCompile('CompileHeadClothes')
-			@DelayCompile('CompileEyeClothes')
-		@compiled = true
+			@CreateRenderTask('CompileBody')
+			@CreateRenderTask('CompileHair')
+			@CreateRenderTask('CompileTail')
+			@CreateRenderTask('CompileHorn')
+			@CreateRenderTask('CompileWings')
+			@CreateRenderTask('CompileCMark')
+			@CreateRenderTask('CompileSocks')
+			@CreateRenderTask('CompileNewSocks')
+			@CreateRenderTask('CompileEyelashes')
+			@CreateRenderTask('CompileLeftEye')
+			@CreateRenderTask('CompileRightEye')
+			@CreateRenderTask('CompileBodyClothes')
+			@CreateRenderTask('CompileNeckClothes')
+			@CreateRenderTask('CompileHeadClothes')
+			@CreateRenderTask('CompileEyeClothes')
 
-	--@RT_SIZES = [math.pow(2, i) for i = 1, 24]
+		@compiled = true
 
 	StartRT: (name, texSize, r = 0, g = 0, b = 0, a = 255) =>
 		error('Attempt to start new render target without finishing the old one!\nUPCOMING =======' .. debug.traceback() .. '\nCURRENT =======' .. @currentRTTrace) if @currentRT
@@ -1092,9 +1120,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 			@ApplyPhongData(@EyeMaterialL, 'BEyes', true)
 			@ApplyPhongData(@EyeMaterialR, 'BEyes', true)
 
+	MakeHashTable: (fnlist) => [@GrabData(fn) for fn in *fnlist]
+
 	CompileBody: =>
 		return unless @isValid
+
 		urlTextures = {}
+		data = @GetData()
 		left = 0
 		bodysize = @@GetBodySize()
 
@@ -1124,16 +1156,52 @@ class PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
+		hashtable = {
+			'BodyColor'
+			'LipsColorInherit'
+			'LipsColor'
+			'NoseColorInherit'
+			'NoseColor'
+			'Socks'
+			'Bodysuit'
+			'EyebrowsColor'
+		}
+
+		for i = 1, PPM2.MAX_BODY_DETAILS
+			table.insert(hashtable, "BodyDetailURL#{i}")
+			table.insert(hashtable, "BodyDetailFirst#{i}")
+			table.insert(hashtable, "BodyDetail#{i}")
+			table.insert(hashtable, "BodyDetailColor#{i}")
+
+		for i = 1, PPM2.MAX_TATTOOS
+			table.insert(hashtable, "TattooType#{i}")
+			table.insert(hashtable, "TattooOverDetail#{i}")
+			table.insert(hashtable, "TattooPosX#{i}")
+			table.insert(hashtable, "TattooRotate#{i}")
+			table.insert(hashtable, "TattooScaleX#{i}")
+			table.insert(hashtable, "TattooScaleY#{i}")
+			table.insert(hashtable, "TattooColor#{i}")
+			--table.insert(hashtable, "TattooGlowStrength#{i}")
+			--table.insert(hashtable, "TattooGlow#{i}")
+
+		hash = PPM2.TextureTableHash(@MakeHashTable(hashtable))
+
 		@BodyMaterialName = "!#{textureData.name\lower()}"
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
-		@UpdatePhongData()
 
-		continueCompilation = ->
-			return unless @isValid
+		if getcache = @@GetCacheH(hash)
+			@BodyMaterial\SetTexture('$basetexture', getcache)
+			@BodyMaterial\GetTexture('$basetexture')\Download()
+		else
+			for i = 1, PPM2.MAX_BODY_DETAILS
+				if geturl = PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}"))
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, bodysize, bodysize)\Await())
+
+			@UpdatePhongData()
+
 			{:r, :g, :b} = @GrabData('BodyColor')
-			@StartRTOpaque("Body_rt", bodysize, r, g, b)
 
-			surface.DrawRect(0, 0, bodysize, bodysize)
+			rendertarget = @@LockRenderTarget(bodysize, bodysize, r, g, b)
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if @GrabData('BodyDetailFirst' .. i)
@@ -1203,17 +1271,66 @@ class PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(@@PONY_SOCKS)
 				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
-			@BodyMaterial\SetTexture('$basetexture', @EndRT())
+			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(bodysize, bodysize)
 
-			@StartRTOpaque("Body_rtBump", bodysize, 127, 127, 255)
+			@BodyMaterial\SetTexture('$basetexture', path)
+			@BodyMaterial\GetTexture('$basetexture')\Download()
+
+		bodysize = bodysize / 2
+
+		hash_bump = PPM2.TextureTableHash({
+			math.floor(@GrabData('BodyBumpStrength') * 255)
+		})
+
+		if getcache = @@GetCacheH(hash_bump)
+			@BodyMaterial\SetTexture('$bumpmap', getcache)
+			@BodyMaterial\GetTexture('$bumpmap')\Download()
+		else
+			rendertarget = @@LockRenderTarget(bodysize, bodysize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
 			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
 
-			@BodyMaterial\SetTexture('$bumpmap', @EndRT())
+			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash_bump, vtf\ToString())
+			@@ReleaseRenderTarget(bodysize, bodysize)
 
-			@StartRTOpaque("Body_rtIllum", bodysize)
+			@BodyMaterial\SetTexture('$bumpmap', path)
+			@BodyMaterial\GetTexture('$bumpmap')\Download()
+
+		hash_glow = {
+			@GrabData('GlowingEyebrows')
+			math.floor(@GrabData('EyebrowsGlowStrength') * 255)
+		}
+
+		for i = 1, PPM2.MAX_BODY_DETAILS
+			table.insert(hash_glow, @GrabData("BodyDetail#{i}"))
+			table.insert(hash_glow, math.floor(@GrabData("BodyDetailGlowStrength#{i}") * 255))
+			table.insert(hash_glow, @GrabData("BodyDetailGlow#{i}"))
+
+		for i = 1, PPM2.MAX_TATTOOS
+			table.insert(hash_glow, math.floor(@GrabData("TattooGlowStrength#{i}") * 255))
+			table.insert(hash_glow, @GrabData("TattooGlow#{i}"))
+			table.insert(hash_glow, @GrabData("TattooType#{i}"))
+			table.insert(hash_glow, @GrabData("TattooOverDetail#{i}"))
+			table.insert(hash_glow, @GrabData("TattooPosX#{i}"))
+			table.insert(hash_glow, @GrabData("TattooRotate#{i}"))
+			table.insert(hash_glow, @GrabData("TattooScaleX#{i}"))
+			table.insert(hash_glow, @GrabData("TattooScaleY#{i}"))
+
+		hash_glow = PPM2.TextureTableHash(hash_glow)
+
+		if getcache = @@GetCacheH(hash_glow)
+			@BodyMaterial\SetTexture('$selfillummask', getcache)
+			@BodyMaterial\GetTexture('$selfillummask')\Download()
+		else
+			rendertarget = @@LockRenderTarget(bodysize, bodysize, 0, 0, 0)
+
 			surface.SetDrawColor(255, 255, 255)
 
 			if @GrabData('GlowingEyebrows')
@@ -1226,8 +1343,8 @@ class PonyTextureController extends PPM2.ControllerChildren
 					@DrawTattoo(i, true)
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
-				if mat = PPM2.MaterialsRegistry.BODY_DETAILS[@GetData()["GetBodyDetail#{i}"](@GetData())]
-					alpha = @GetData()["GetBodyDetailGlowStrength#{i}"](@GetData())
+				if mat = PPM2.MaterialsRegistry.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
+					alpha = @GrabData("BodyDetailGlowStrength#{i}")
 
 					if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
 						surface.SetDrawColor(255, 255, 255, alpha * 255)
@@ -1242,31 +1359,13 @@ class PonyTextureController extends PPM2.ControllerChildren
 				if @GrabData("TattooOverDetail#{i}")
 					@DrawTattoo(i, true)
 
-			@BodyMaterial\SetTexture('$selfillummask', @EndRT())
-			PPM2.DebugPrint('Compiled body texture for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash_glow, vtf\ToString())
+			@@ReleaseRenderTarget(bodysize, bodysize)
 
-		data = @GetData()
-		validURLS = for i = 1, PPM2.MAX_BODY_DETAILS
-			detailURL = data["GetBodyDetailURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('body_detail' .. i) for i = 1, PPM2.MAX_BODY_DETAILS}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, bodysize, bodysize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('body_detail' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-
-		continueCompilation() if left == 0
-		return @BodyMaterial
+			@BodyMaterial\SetTexture('$selfillummask', path)
+			@BodyMaterial\GetTexture('$selfillummask')\Download()
 
 	@BUMP_COLOR = Color(127, 127, 255)
 	CompileHorn: =>
@@ -1433,7 +1532,7 @@ class PonyTextureController extends PPM2.ControllerChildren
 			'$phong': '1'
 			'$phongexponent': '20'
 			'$phongboost': '.1'
-			'$phongfresnelranges':	'[.3 1 8]'
+			'$phongfresnelranges':  '[.3 1 8]'
 			'$halflambert': '1'
 			'$lightwarptexture': 'models/ppm/clothes/lightwarp'
 
@@ -2429,5 +2528,5 @@ class PonyTextureController extends PPM2.ControllerChildren
 
 		return @CMarkTexture, @CMarkTextureGUI
 
-PPM2.PonyTextureController = PonyTextureController
-PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PonyTextureController
+
+PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController

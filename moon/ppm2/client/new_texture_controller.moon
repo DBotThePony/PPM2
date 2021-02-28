@@ -95,20 +95,20 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		super(state)
 		switch state\GetKey()
 			when 'ManeTypeNew', 'ManeTypeLowerNew', 'TailTypeNew'
-				@DelayCompile('CompileHair')
+				@CreateRenderTask('CompileHair')
 
 			when 'TeethColor', 'MouthColor', 'TongueColor'
-				@DelayCompile('CompileMouth')
+				@CreateRenderTask('CompileMouth')
 
 			when 'SeparateWings'
-				@DelayCompile('CompileBatWings')
-				@DelayCompile('CompileBatWingsSkin')
+				@CreateRenderTask('CompileBatWings')
+				@CreateRenderTask('CompileBatWingsSkin')
 
 			when 'BatWingColor', 'BatWingURL1', 'BatWingURL2', 'BatWingURL3', 'BatWingURLColor1', 'BatWingURLColor2', 'BatWingURLColor3'
-				@DelayCompile('CompileBatWings')
+				@CreateRenderTask('CompileBatWings')
 
 			when 'BatWingSkinColor', 'BatWingSkinURL1', 'BatWingSkinURL2', 'BatWingSkinURL3', 'BatWingSkinURLColor1', 'BatWingSkinURLColor2', 'BatWingSkinURLColor3'
-				@DelayCompile('CompileBatWingsSkin')
+				@CreateRenderTask('CompileBatWingsSkin')
 
 	GetManeType: => @GrabData('ManeTypeNew')
 	GetManeTypeLower: => @GrabData('ManeTypeLowerNew')
@@ -451,13 +451,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		super(now)
 
 		if now
-			@CompileMouth()
-			@CompileBatWingsSkin()
-			@CompileBatWings()
+			@CreateInstantRenderTask('CompileMouth')
+			@CreateInstantRenderTask('CompileBatWingsSkin')
+			@CreateInstantRenderTask('CompileBatWings')
 		else
-			@DelayCompile('CompileMouth')
-			@DelayCompile('CompileBatWingsSkin')
-			@DelayCompile('CompileBatWings')
+			@CreateRenderTask('CompileMouth')
+			@CreateRenderTask('CompileBatWingsSkin')
+			@CreateRenderTask('CompileBatWings')
 
 	GetTeeth: => @TeethMaterial
 	GetMouth: => @MouthMaterial
