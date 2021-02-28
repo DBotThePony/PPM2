@@ -116,6 +116,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 	CompileHairInternal: (prefix = 'Upper') =>
 		return unless @isValid
+
 		textureFirst = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
 			'shader': 'VertexLitGeneric'
@@ -147,93 +148,123 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 		HairColor1MaterialName = "!#{textureFirst.name\lower()}"
 		HairColor2MaterialName = "!#{textureSecond.name\lower()}"
+
 		HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
 
-		urlTextures = {}
-		left = 0
+		hash = {
+			'mane ' .. prefix .. ' 1',
+			@GrabData("#{prefix}ManeColor1")
+		}
 
-		continueCompilation = ->
-			return unless @isValid
+		for i = 1, 6
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeDetailColor#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURLColor#{i}")))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			HairColor1Material\SetTexture('$basetexture', getcache)
+			HairColor1Material\GetTexture('$basetexture')\Download()
+		else
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
-			@StartRTOpaque("Mane_rt_1_#{prefix}", texSize, r, g, b)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			maneTypeUpper = @GetManeType()
-			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[maneTypeUpper]
+			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
 
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+					{:r, :g, :b, :a} = @GrabData("#{prefix}ManeDetailColor#{i}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
+				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			HairColor1Material\SetTexture('$basetexture', @EndRT())
 
-			-- Second mane pass
-			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
-			@StartRTOpaque("Mane_rt_2_#{prefix}", texSize, r, g, b)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			maneTypeLower = @GetManeTypeLower()
-			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
+		hash = {
+			'mane ' .. prefix .. ' 2',
+			@GrabData("#{prefix}ManeColor2")
+		}
+
+		for i = 1, 6
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeDetailColor#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURLColor#{i}")))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			HairColor2Material\SetTexture('$basetexture', getcache)
+			HairColor2Material\GetTexture('$basetexture')\Download()
+		else
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
+			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
+			@@LockRenderTarget(texSize, texSize, r, g, b)
+
+			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
 
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GetData()["Get#{prefix}ManeDetailColor#{i}"](@GetData())
+					{:r, :g, :b, :a} = @GrabData("#{prefix}ManeDetailColor#{i}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["Get#{prefix}ManeURLColor#{i}"](@GetData()))
+				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			HairColor2Material\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled mane textures for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 6
-			detailURL = data["Get#{prefix}ManeURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
+			HairColor2Material\SetTexture('$basetexture', path)
+			HairColor2Material\GetTexture('$basetexture')\Download()
 
-		tickets = {i, @PutTicket(prefix .. 'mane' .. i) for i = 1, 6}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket(prefix .. 'mane' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-		if left == 0
-			continueCompilation()
 		return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
 
 	GetBodyPhongMaterials: (output = {}) =>
 		super(output)
+
 		if not @GrabData('SeparateWingsPhong')
 			table.insert(output, @BatWingsMaterial) if @BatWingsMaterial
 			table.insert(output, @BatWingsSkinMaterial) if @BatWingsSkinMaterial
 
 	UpdatePhongData: =>
 		super()
+
 		if @GrabData('SeparateWingsPhong')
 			@ApplyPhongData(@BatWingsMaterial, 'Wings')
 			@ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
@@ -250,6 +281,7 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 	CompileBatWings: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWings"
 			'shader': 'VertexLitGeneric'
@@ -274,53 +306,55 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			}
 		}
 
-		urlTextures = {}
-		left = 0
 		@BatWingsMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
-		continueCompilation = ->
-			{:r, :g, :b} = @GrabData('BodyColor')
-			{:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
-			@StartRTOpaque('BatWings_rt', texSize, r, g, b)
+		urlTextures = {}
+
+		{:r, :g, :b} = @GrabData('BodyColor')
+		{:r, :g, :b} = @GrabData('BatWingColor') if @GrabData('SeparateWings')
+
+		hash = {
+			'bat wings',
+			r, g, b
+		}
+
+		for i = 1, 3
+			if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
+				table.insert(hash, url)
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@BatWingsMaterial\SetTexture('$basetexture', getcache)
+			@BatWingsMaterial\GetTexture('$basetexture')\Download()
+		else
+			for i = 1, 3
+				if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
-				{:r, :g, :b, :a} = @GetData()["GetBatWingURLColor#{i}"](@GetData())
+				{:r, :g, :b, :a} = @GrabData("BatWingURLColor#{i}")
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@BatWingsMaterial\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled Bat Wings texture for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 3
-			detailURL = data["GetBatWingURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('batwing' .. i) for i = 1, 3}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('batwing' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-		if left == 0
-			continueCompilation()
-
-		return @BatWingsMaterial
+			@BatWingsMaterial\SetTexture('$basetexture', path)
+			@BatWingsMaterial\GetTexture('$basetexture')\Download()
 
 	CompileBatWingsSkin: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWingsSkin"
 			'shader': 'VertexLitGeneric'
@@ -345,17 +379,37 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 			}
 		}
 
-		urlTextures = {}
-		left = 0
 		@BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
 
-		continueCompilation = ->
-			{:r, :g, :b} = @GrabData('BodyColor')
-			{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
-			@StartRTOpaque('BatWingsSkin_rt', texSize, r, g, b)
+		{:r, :g, :b} = @GrabData('BodyColor')
+		{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
+
+		hash = {
+			'bat wings skin',
+			r, g, b
+		}
+
+		for i = 1, 3
+			if url = PPM2.IsValidURL(@GrabData("BatWingSkinURL#{i}"))
+				table.insert(hash, url)
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@BatWingsSkinMaterial\SetTexture('$basetexture', getcache)
+			@BatWingsSkinMaterial\GetTexture('$basetexture')\Download()
+		else
+			urlTextures = {}
+
+			for i = 1, 3
+				if url = PPM2.IsValidURL(@GrabData("BatWingSkinURL#{i}"))
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
@@ -363,43 +417,26 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@BatWingsSkinMaterial\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled Bat Wings skin texture for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 3
-			detailURL = data["GetBatWingSkinURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('batwingskin' .. i) for i = 1, 3}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('batwingskin' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-		if left == 0
-			continueCompilation()
-
-		return @BatWingsSkinMaterial
+			@BatWingsSkinMaterial\SetTexture('$basetexture', path)
+			@BatWingsSkinMaterial\GetTexture('$basetexture')\Download()
 
 	CompileHair: =>
 		return unless @isValid
 		return super() if not @GrabData('SeparateMane')
+
 		mat1, mat2, name1, name2 = @CompileHairInternal('Upper')
 		mat3, mat4, name3, name4 = @CompileHairInternal('Lower')
+
 		@UpperManeColor1, @UpperManeColor2 = mat1, mat2
 		@LowerManeColor1, @LowerManeColor2 = mat3, mat4
+
 		@UpperManeColor1Name, @UpperManeColor2Name = name1, name2
 		@LowerManeColor1Name, @LowerManeColor2Name = name3, name4
-		return mat1, mat2, mat3, mat4
 
 	CompileMouth: =>
 		textureData = {
@@ -441,13 +478,10 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		@TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		@UpdatePhongData()
-		PPM2.DebugPrint('Compiled mouth textures for ', @GetEntity(), ' as part of ', @)
-
-		return @TeethMaterial, @MouthMaterial, @TongueMaterial
 
 	CompileTextures: (now = false) =>
-		--return if @compiled
 		return if not @GetData()\IsValid()
+
 		super(now)
 
 		if now

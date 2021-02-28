@@ -156,8 +156,9 @@ texture_compile_worker = ->
 			coroutine_yield()
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
+			PPM2.TEXTURE_TASK_CURRENT = name
 			task[1](task[2])
-			coroutine.syswait(1)
+			PPM2.TEXTURE_TASK_CURRENT = nil
 
 texture_compile_thread = coroutine.create(texture_compile_worker)
 
@@ -178,7 +179,7 @@ url_thread = coroutine.create ->
 
 			panel.ConsoleMessage = (pnl, msg) ->
 				if msg == 'FRAME'
-					data.frame += 1
+					frame += 1
 
 			systime = SysTime() + 8
 
@@ -247,16 +248,16 @@ url_thread = coroutine.create ->
 				coroutine_yield()
 				panel\Remove() if IsValid(panel)
 
-PPM2.GetURLMaterial = (url, width, height) ->
+PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
-	index = url .. '_' .. width .. '_height'
+	index = url .. '_' .. width .. '_' .. height
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
-		return DLib.Promise (resolve) -> resolve(data)
+		return DLib.Promise (resolve) -> resolve(data.texture, nil, data.material)
 
 	if data = PPM2.URL_MATERIAL_CACHE[index]
-		return DLib.Promise (resolve) -> resolve(data)
+		return DLib.Promise (resolve) -> resolve(data.texture, nil, data.material)
 
 	if data = PPM2.ALREADY_DOWNLOADING[index]
 		return DLib.Promise (resolve) -> table.insert(data.resolve, resolve)
@@ -270,6 +271,9 @@ PPM2.GetURLMaterial = (url, width, height) ->
 			hash: DLib.Util.QuickSHA1(index)
 			resolve: {resolve}
 		}
+
+		PPM2.ALREADY_DOWNLOADING[index] = data
+		table.insert(PPM2.HTML_MATERIAL_QUEUE, data)
 
 hook.Add 'Think', 'PPM2 Material Tasks', ->
 	status, err = coroutine_resume(url_thread)
@@ -517,7 +521,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 	@LOCKED_RENDERTARGETS = LOCKED_RENDERTARGETS or {}
 
-	@LockRenderTarget = (width, height, r = 255, g = 255, b = 255, a = 255) =>
+	@LockRenderTarget = (width, height, r = 0, g = 0, b = 0, a = 255) =>
 		index = string.format('PPM2_buffer_%d_%d', width, height)
 
 		while @LOCKED_RENDERTARGETS[index]
@@ -571,11 +575,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
 
 	CreateRenderTask: (func = '', ...) =>
-		return if func ~= 'CompileBody'
 		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
 
 	CreateInstantRenderTask: (func = '', ...) =>
-		return if func ~= 'CompileBody'
 		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
 
 	IsBeingProcessed: =>
@@ -1120,7 +1122,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@ApplyPhongData(@EyeMaterialL, 'BEyes', true)
 			@ApplyPhongData(@EyeMaterialR, 'BEyes', true)
 
-	MakeHashTable: (fnlist) => [@GrabData(fn) for fn in *fnlist]
+	MakeHashTable: (fnlist, additional) =>
+		tab = [@GrabData(fn) for fn in *fnlist]
+		tab[#fnlist + 1] = additional if additional
+		return tab
 
 	CompileBody: =>
 		return unless @isValid
@@ -1181,10 +1186,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hashtable, "TattooScaleX#{i}")
 			table.insert(hashtable, "TattooScaleY#{i}")
 			table.insert(hashtable, "TattooColor#{i}")
-			--table.insert(hashtable, "TattooGlowStrength#{i}")
-			--table.insert(hashtable, "TattooGlow#{i}")
 
-		hash = PPM2.TextureTableHash(@MakeHashTable(hashtable))
+		hash = PPM2.TextureTableHash(@MakeHashTable(hashtable, 'body'))
 
 		@BodyMaterialName = "!#{textureData.name\lower()}"
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1196,12 +1199,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if geturl = PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}"))
 					urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, bodysize, bodysize)\Await())
+					return unless @isValid
 
 			@UpdatePhongData()
 
 			{:r, :g, :b} = @GrabData('BodyColor')
 
-			rendertarget = @@LockRenderTarget(bodysize, bodysize, r, g, b)
+			@@LockRenderTarget(bodysize, bodysize, r, g, b)
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if @GrabData('BodyDetailFirst' .. i)
@@ -1282,6 +1286,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		bodysize = bodysize / 2
 
 		hash_bump = PPM2.TextureTableHash({
+			'body bump'
 			math.floor(@GrabData('BodyBumpStrength') * 255)
 		})
 
@@ -1289,7 +1294,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$bumpmap', getcache)
 			@BodyMaterial\GetTexture('$bumpmap')\Download()
 		else
-			rendertarget = @@LockRenderTarget(bodysize, bodysize, 127, 127, 255)
+			@@LockRenderTarget(bodysize, bodysize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
@@ -1304,6 +1309,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\GetTexture('$bumpmap')\Download()
 
 		hash_glow = {
+			'body illum'
 			@GrabData('GlowingEyebrows')
 			math.floor(@GrabData('EyebrowsGlowStrength') * 255)
 		}
@@ -1329,7 +1335,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$selfillummask', getcache)
 			@BodyMaterial\GetTexture('$selfillummask')\Download()
 		else
-			rendertarget = @@LockRenderTarget(bodysize, bodysize, 0, 0, 0)
+			@@LockRenderTarget(bodysize, bodysize)
 
 			surface.SetDrawColor(255, 255, 255)
 
@@ -1368,8 +1374,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\GetTexture('$selfillummask')\Download()
 
 	@BUMP_COLOR = Color(127, 127, 255)
+
 	CompileHorn: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn"
 			'shader': 'VertexLitGeneric'
@@ -1444,7 +1452,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HORN)
 		urlTextures = {}
-		left = 0
+
+		for i = 1, 3
+			if geturl = PPM2.IsValidURL(@GrabData("HornURL#{i}"))
+				urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
+				return unless @isValid
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
 		@HornMaterialName1 = "!#{textureData_New1.name\lower()}"
@@ -1452,12 +1464,29 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@HornMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@HornMaterial1 = CreateMaterial(textureData_New1.name, textureData_New1.shader, textureData_New1.data)
 		@HornMaterial2 = CreateMaterial(textureData_New2.name, textureData_New2.shader, textureData_New2.data)
+
 		@UpdatePhongData()
 
-		continueCompilation = ->
+		hash = PPM2.TextureTableHash(@MakeHashTable({
+			'BodyColor'
+			'HornColor'
+			'SeparateHorn'
+			'HornDetailColor'
+			'HornURLColor1'
+			'HornURLColor2'
+			'HornURLColor3'
+			'HornURL1'
+			'HornURL2'
+			'HornURL3'
+		}))
+
+		if getcache = @@GetCacheH(hash)
+			@HornMaterial\SetTexture('$basetexture', getcache)
+			@HornMaterial\GetTexture('$basetexture')\Download()
+		else
 			{:r, :g, :b} = @GrabData('BodyColor')
 			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
-			@StartRTOpaque('Horn', texSize, r, g, b)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 			{:r, :g, :b} = @GrabData('HornDetailColor')
@@ -1473,55 +1502,65 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@HornMaterial\SetTexture('$basetexture', @EndRT())
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			@StartRTOpaque('Horn_illum', texSize)
+			@HornMaterial\SetTexture('$basetexture', path)
+			@HornMaterial\GetTexture('$basetexture')\Download()
+
+		hash = PPM2.TextureTableHash({
+			'horn illum'
+			@GrabData('HornGlow')
+			math.floor(@GrabData('HornGlowSrength') * 255)
+		})
+
+		if getcache = @@GetCacheH(hash)
+			@HornMaterial\SetTexture('$selfillummask', getcache)
+			@HornMaterial\GetTexture('$selfillummask')\Download()
+		else
+			@@LockRenderTarget(texSize, texSize)
 
 			if @GrabData('HornGlow')
 				@HornMaterial2\SetTexture('$selfillummask', 'models/debug/debugwhite')
+
 				surface.SetDrawColor(255, 255, 255, @GrabData('HornGlowSrength') * 255)
 				surface.SetMaterial(@@HORN_DETAIL_COLOR)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 			else
 				@HornMaterial2\SetTexture('$selfillummask', 'null')
 
-			@HornMaterial\SetTexture('$selfillummask', @EndRT())
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			{:r, :g, :b} = @@BUMP_COLOR
-			@StartRTOpaque('Horn_bump', texSize, r, g, b)
-			alpha = 255
-			alpha = @GrabData('HornDetailColor').a
-			surface.SetDrawColor(255, 255, 255, alpha)
+			@HornMaterial\SetTexture('$selfillummask', path)
+			@HornMaterial\GetTexture('$selfillummask')\Download()
+
+		hash = PPM2.TextureTableHash({
+			'horn bump'
+			@GrabData('HornDetailColor').a
+		})
+
+		if getcache = @@GetCacheH(hash)
+			@HornMaterial\SetTexture('$bumpmap', getcache)
+			@HornMaterial\GetTexture('$bumpmap')\Download()
+		else
+			@@LockRenderTarget(texSize, texSize, 127, 127, 255)
+
+			surface.SetDrawColor(255, 255, 255, @GrabData('HornDetailColor').a)
 			surface.SetMaterial(PPM2.MaterialsRegistry.HORN_DETAIL_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
-			@HornMaterial\SetTexture('$bumpmap', @EndRT())
 
-			PPM2.DebugPrint('Compiled Horn texture for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 3
-			detailURL = data["GetHornURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('horn' .. i) for i = 1, 3}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('horn' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-
-		if left == 0
-			continueCompilation()
-
-		return @HornMaterial
+			@HornMaterial\SetTexture('$bumpmap', path)
+			@HornMaterial\GetTexture('$bumpmap')\Download()
 
 	CompileClothPart: (iName, matregistry, indexregistry, rtsize, opaque = true) =>
 		return unless @isValid
@@ -1555,11 +1594,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		urls = {}
 
 		for i = 1, PPM2.MAX_CLOTHES_URLS
-			url = @GrabData(iName .. 'ClothesURL' .. i)\trim()
-			url = '' if not url\find('^https?://')
-			urls[i] = url if url ~= ''
-
-		tickets = {i, @PutTicket('clothes' .. i) for i = 1, PPM2.MAX_CLOTHES_URLS}
+			if url = PPM2.IsValidURL(@GrabData(iName .. 'ClothesURL' .. i))
+				urls[i] = select(1, PPM2.GetURLMaterial(geturl)\Await())
+				return unless @isValid
 
 		colored = @GrabData(iName .. 'ClothesUseColor')
 
@@ -1576,16 +1613,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@[iName .. 'Clothes_MatName'] = {"!#{name}"}
 
 			if urls[1]
-				@url_processes += 1
-
-				@@LoadURL urls[1], texSize, texSize, (texture, panel, material) ->
-					@url_processes -= 1
-					return if not @CheckTicket('clothes1', tickets[1])
-
-					mat\SetVector('$color2', Vector(1, 1, 1))
-					mat\SetTexture('$basetexture', texture)
-
-					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
+				mat\SetVector('$color2', Vector(1, 1, 1))
+				mat\SetTexture('$basetexture', urls[1])
+				@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 
 			elseif colored
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
@@ -1617,16 +1647,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			tab2[matIndex] = "!#{name}"
 
 			if urls[matIndex]
-				@url_processes += 1
+				mat\SetVector('$color2', Vector(1, 1, 1))
+				mat\SetTexture('$basetexture', urls[matIndex])
+				@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 
-				@@LoadURL urls[matIndex], texSize, texSize, (texture, panel, material) ->
-					@url_processes -= 1
-					return if not @CheckTicket('clothes' .. matIndex, tickets[matIndex])
-
-					mat\SetVector('$color2', Vector(1, 1, 1))
-					mat\SetTexture('$basetexture', texture)
-
-					@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 			elseif colored and matregistry[clothes + 1][matIndex].size == 0
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
 				col = @GrabData("#{iName}ClothesColor#{nextindex}")
@@ -1639,6 +1663,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				else
 					mat\SetFloat('$alpha', col.a / 255)
 					mat\SetInt('$translucent', 1)
+
 			elseif colored
 				rtsize = PPM2.GetTextureSize(rtsize)
 				mat\SetVector('$color2', Vector(1, 1, 1))
@@ -1652,18 +1677,42 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					mat\SetInt('$translucent', 1)
 
 				nextindex += 1
-				@StartRTOpaque("Clothes_#{iName}_#{matIndex}", rtsize, r, g, b)
 
-				for i2 = 1, matregistry[clothes + 1][matIndex].size
-					texture = matregistry[clothes + 1][matIndex][i2]
+				hash = {
+					'cloth part'
+					opaque
+					iName
+					@GrabData(iName .. 'Clothes')
+				}
 
-					if not isnumber(texture)
-						surface.SetMaterial(texture)
-						surface.SetDrawColor(@GrabData("#{iName}ClothesColor#{nextindex}"))
-						nextindex += 1
-						surface.DrawTexturedRect(0, 0, rtsize, rtsize)
+				for num = 1, PPM2.MAX_CLOTHES_COLORS
+					table.insert(hash, @GrabData(iName .. 'ClothesColor' .. i))
 
-				mat\SetTexture('$basetexture', @EndRT())
+				hash = PPM2.TextureTableHash(hash)
+
+				if getcache = @@GetCacheH(hash)
+					mat\SetTexture('$bumpmap', getcache)
+					mat\GetTexture('$bumpmap')\Download()
+				else
+					@@LockRenderTarget(rtsize, rtsize, r, g, b)
+
+					for i2 = 1, matregistry[clothes + 1][matIndex].size
+						texture = matregistry[clothes + 1][matIndex][i2]
+
+						if not isnumber(texture)
+							surface.SetMaterial(texture)
+							surface.SetDrawColor(@GrabData("#{iName}ClothesColor#{nextindex}"))
+							nextindex += 1
+							surface.DrawTexturedRect(0, 0, rtsize, rtsize)
+
+					vtf = DLib.VTF.Create(2, rtsize, rtsize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+					vtf\CaptureRenderTargetCoroutine()
+					path = @@SetCacheH(hash, vtf\ToString())
+					@@ReleaseRenderTarget(rtsize, rtsize)
+
+					mat\SetTexture('$basetexture', path)
+					mat\GetTexture('$basetexture')\Download()
+
 			else
 				tab1[matIndex] = nil
 				tab2[matIndex] = nil
@@ -1727,8 +1776,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		@UpdatePhongData()
 
-		url = @GrabData('NewSocksTextureURL')
-		if url == '' or not url\find('^https?://')
+		if url = PPM2.IsValidURL(@GrabData('NewSocksTextureURL'))
+			texture = DLib.GetURLMaterial(url, texSize, texSize)\Await()
+			return unless @isValid
+
+			for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
+				tex\SetVector('$color2', Vector(1, 1, 1))
+				tex\SetTexture('$basetexture', texture)
+		else
 			{:r, :g, :b} = @GrabData('NewSocksColor1')
 			@NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
@@ -1737,21 +1792,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			{:r, :g, :b} = @GrabData('NewSocksColor3')
 			@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-
-			PPM2.DebugPrint('Compiled new socks texture for ', @GetEntity(), ' as part of ', @)
-		else
-			@url_processes += 1
-			ticket = @PutTicket('newsocks')
-
-			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
-				@url_processes -= 1
-				return if not @CheckTicket('newsocks', ticket)
-
-				for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
-					tex\SetVector('$color2', Vector(1, 1, 1))
-					tex\SetTexture('$basetexture', texture)
-
-		return @NewSocksColor1, @NewSocksColor2, @NewSocksBase
 
 	CompileEyelashes: =>
 		return unless @isValid
@@ -1788,12 +1828,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@Eyelashes\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@Eyelashes\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
-		PPM2.DebugPrint('Compiled new eyelashes texture for ', @GetEntity(), ' as part of ', @)
-
-		return @Eyelashes
-
 	CompileSocks: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Socks"
 			'shader': 'VertexLitGeneric'
@@ -1825,40 +1862,58 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
 
-		url = @GrabData('SocksTextureURL')
-		if url == '' or not url\find('^https?://')
+		if url = PPM2.IsValidURL(@GrabData('SocksTextureURL'))
+			texture = DLib.GetURLMaterial(url, texSize, texSize)\Await()
+			return unless @isValid
+
+			@SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
+			@SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+			@SocksMaterial\SetTexture('$basetexture', texture)
+		else
 			@SocksMaterial\SetVector('$color', Vector(1, 1, 1))
 			@SocksMaterial\SetVector('$color2', Vector(1, 1, 1))
-			@StartRTOpaque('Socks', texSize, r, g, b)
 
-			socksType = @GrabData('SocksTexture') + 1
-			surface.SetMaterial(PPM2.MaterialsRegistry.SOCKS_MATERIALS[socksType] or PPM2.MaterialsRegistry.SOCKS_MATERIALS[1])
-			surface.DrawTexturedRect(0, 0, texSize, texSize)
+			hash = {
+				'socks'
+				@GrabData('SocksTexture')
+				@GrabData('SocksDetailColor1')
+				@GrabData('SocksDetailColor2')
+				@GrabData('SocksDetailColor3')
+				@GrabData('SocksDetailColor4')
+				@GrabData('SocksDetailColor5')
+				@GrabData('SocksDetailColor6')
+			}
 
-			if details = PPM2.MaterialsRegistry.SOCKS_DETAILS[socksType]
-				for i = 1, details.size
-					{:r, :g, :b} = @GetData()['GetSocksDetailColor' .. i](@GetData())
-					surface.SetDrawColor(r, g, b)
-					surface.SetMaterial(details[i])
-					surface.DrawTexturedRect(0, 0, texSize, texSize)
+			hash = PPM2.TextureTableHash(hash)
 
-			@SocksMaterial\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled socks texture for ', @GetEntity(), ' as part of ', @)
-		else
-			ticket = @PutTicket('socks')
-			@url_processes += 1
+			if getcache = @@GetCacheH(hash)
+				@SocksMaterial\SetTexture('$bumpmap', getcache)
+				@SocksMaterial\GetTexture('$bumpmap')\Download()
+			else
+				@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			@@LoadURL url, texSize, texSize, (texture, panel, material) ->
-				@url_processes -= 1
-				return if not @CheckTicket('socks', ticket)
-				@SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
-				@SocksMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
-				@SocksMaterial\SetTexture('$basetexture', texture)
+				socksType = @GrabData('SocksTexture') + 1
+				surface.SetMaterial(PPM2.MaterialsRegistry.SOCKS_MATERIALS[socksType] or PPM2.MaterialsRegistry.SOCKS_MATERIALS[1])
+				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-		return @SocksMaterial
+				if details = PPM2.MaterialsRegistry.SOCKS_DETAILS[socksType]
+					for i = 1, details.size
+						{:r, :g, :b} = @GrabData('SocksDetailColor' .. i)
+						surface.SetDrawColor(r, g, b)
+						surface.SetMaterial(details[i])
+						surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+				vtf\CaptureRenderTargetCoroutine()
+				path = @@SetCacheH(hash, vtf\ToString())
+				@@ReleaseRenderTarget(texSize, texSize)
+
+				@SocksMaterial\SetTexture('$basetexture', path)
+				@SocksMaterial\GetTexture('$basetexture')\Download()
 
 	CompileWings: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Wings"
 			'shader': 'VertexLitGeneric'
@@ -1881,56 +1936,55 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
+		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
+
 		urlTextures = {}
-		left = 0
+
+		for i = 1, 3
+			if url = PPM2.IsValidURL(@GrabData("WingsURL#{i}"))
+				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				return unless @isValid
+
 		@WingsMaterialName = "!#{textureData.name\lower()}"
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
+		{:r, :g, :b} = @GrabData('BodyColor')
+		{:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
 
-		continueCompilation = ->
-			{:r, :g, :b} = @GrabData('BodyColor')
-			{:r, :g, :b} = @GrabData('WingsColor') if @GrabData('SeparateWings')
-			rt = @StartRTOpaque('Wings_rt', texSize, r, g, b)
+		hash = {
+			'wings',
+			r, g, b
+		}
+
+		for i = 1, 3
+			table.insert(hash, @GrabData("WingsURL#{i}"))
+			table.insert(hash, @GrabData("WingsURLColor#{i}"))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@WingsMaterial\SetTexture('$basetexture', getcache)
+			@WingsMaterial\GetTexture('$basetexture')\Download()
+		else
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			for i, mat in pairs urlTextures
-				{:r, :g, :b, :a} = @GetData()["GetWingsURLColor#{i}"](@GetData())
+				{:r, :g, :b, :a} = @GrabData("WingsURLColor#{i}")
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@WingsMaterial\SetTexture('$basetexture', rt)
-			@EndRT()
-			PPM2.DebugPrint('Compiled wings texture for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 3
-			detailURL = data["GetWingsURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('wing' .. i) for i = 1, 3}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('wing' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-
-		if left == 0
-			continueCompilation()
-
-		return @WingsMaterial
+			@WingsMaterial\SetTexture('$basetexture', path)
+			@WingsMaterial\GetTexture('$basetexture')\Download()
 
 	GetManeType: => @GrabData('ManeType')
 	GetManeTypeLower: => @GrabData('ManeTypeLower')
@@ -1938,6 +1992,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 	CompileHair: =>
 		return unless @isValid
+
 		textureFirst = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1"
 			'shader': 'VertexLitGeneric'
@@ -1974,39 +2029,76 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
 
 		urlTextures = {}
-		left = 0
 
-		continueCompilation = ->
-			return unless @isValid
+		for i = 1, 6
+			if url = PPM2.IsValidURL(@GrabData("ManeURL#{i}"))
+				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				return unless @isValid
+
+		hash = {
+			'mane 1',
+			@GrabData('ManeColor1')
+		}
+
+		for i = 1, 6
+			table.insert(hash, @GrabData("ManeURL#{i}"))
+			table.insert(hash, @GrabData("ManeURLColor#{i}"))
+			table.insert(hash, @GrabData("ManeDetailColor#{i}"))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@HairColor1Material\SetTexture('$basetexture', getcache)
+			@HairColor1Material\GetTexture('$basetexture')\Download()
+		else
 			{:r, :g, :b} = @GrabData('ManeColor1')
-			@StartRTOpaque('Mane_1', texSize, r, g, b)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			maneTypeUpper = @GetManeType()
-			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[maneTypeUpper]
+			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
 
 				-- using moonscripts iterator will call index metamethods while iterating
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GetData()["GetManeDetailColor#{i}"](@GetData())
+					{:r, :g, :b, :a} = @GrabData("ManeDetailColor#{i}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["GetManeURLColor#{i}"](@GetData()))
+				surface.SetDrawColor(@GrabData("ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@HairColor1Material\SetTexture('$basetexture', @EndRT())
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			-- Second mane pass
+			@HairColor1Material\SetTexture('$basetexture', path)
+			@HairColor1Material\GetTexture('$basetexture')\Download()
+
+		hash = {
+			'mane 2',
+			@GrabData('ManeColor2')
+		}
+
+		for i = 1, 6
+			table.insert(hash, @GrabData("ManeURL#{i}"))
+			table.insert(hash, @GrabData("ManeURLColor#{i}"))
+			table.insert(hash, @GrabData("ManeDetailColor#{i}"))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@HairColor1Material\SetTexture('$basetexture', getcache)
+			@HairColor1Material\GetTexture('$basetexture')\Download()
+		else
 			{:r, :g, :b} = @GrabData('ManeColor2')
-			@StartRTOpaque('Mane_2', texSize, r, g, b)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			maneTypeLower = @GetManeTypeLower()
-			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[maneTypeLower]
+			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
 
 				for i2 = 1, registry.size
@@ -2021,31 +2113,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@HairColor2Material\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled mane textures for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 6
-			detailURL = data["GetManeURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
-
-		tickets = {i, @PutTicket('mane' .. i) for i = 1, 6}
-
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
-
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('mane' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-		if left == 0
-			continueCompilation()
-		return @HairColor1Material, @HairColor2Material
+			@HairColor2Material\SetTexture('$basetexture', path)
+			@HairColor2Material\GetTexture('$basetexture')\Download()
 
 	CompileTail: =>
 		return unless @isValid
@@ -2085,38 +2159,32 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_TAIL)
 
 		urlTextures = {}
-		left = 0
 
-		continueCompilation = ->
-			return unless @isValid
+		for i = 1, 6
+			if url = PPM2.IsValidURL(@GrabData("TailURL#{i}"))
+				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				return unless @isValid
+
+		hash = {
+			'tail 1',
+			@GrabData('TailColor1')
+		}
+
+		for i = 1, 6
+			table.insert(hash, @GrabData("TailURL#{i}"))
+			table.insert(hash, @GrabData("TailDetailColor#{i}"))
+			table.insert(hash, @GrabData("TailURLColor#{i}"))
+
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@TailColor1Material\SetTexture('$basetexture', getcache)
+			@TailColor1Material\GetTexture('$basetexture')\Download()
+		else
 			{:r, :g, :b} = @GrabData('TailColor1')
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			-- First tail pass
-			@StartRTOpaque('Tail_1', texSize, r, g, b)
-
-			tailType = @GetTailType()
-			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
-				i = 1
-
-				for i2 = 1, registry.size
-					mat = registry[i2]
-					surface.SetMaterial(mat)
-					surface.SetDrawColor(@GetData()["GetTailDetailColor#{i}"](@GetData()))
-					surface.DrawTexturedRect(0, 0, texSize, texSize)
-					i += 1
-
-			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GetData()["GetTailURLColor#{i}"](@GetData()))
-				surface.SetMaterial(mat)
-				surface.DrawTexturedRect(0, 0, texSize, texSize)
-
-			@TailColor1Material\SetTexture('$basetexture', @EndRT())
-
-			-- Second tail pass
-			{:r, :g, :b} = @GrabData('TailColor2')
-			@StartRTOpaque('Tail_2', texSize, r, g, b)
-
-			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[tailType]
+			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
 				i = 1
 
 				for i2 = 1, registry.size
@@ -2131,31 +2199,56 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			@TailColor2Material\SetTexture('$basetexture', @EndRT())
-			PPM2.DebugPrint('Compiled tail textures for ', @GetEntity(), ' as part of ', @)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-		data = @GetData()
-		validURLS = for i = 1, 6
-			detailURL = data["GetTailURL#{i}"](data)
-			continue if detailURL == '' or not detailURL\find('^https?://')
-			left += 1
-			{detailURL, i}
+			@TailColor1Material\SetTexture('$basetexture', path)
+			@TailColor1Material\GetTexture('$basetexture')\Download()
 
-		tickets = {i, @PutTicket('tail' .. i) for i = 1, 6}
+		hash = {
+			'tail 2',
+			@GrabData('TailColor2')
+		}
 
-		for _, {url, i} in ipairs validURLS
-			@url_processes += 1
+		for i = 1, 6
+			table.insert(hash, @GrabData("TailURL#{i}"))
+			table.insert(hash, @GrabData("TailDetailColor#{i}"))
+			table.insert(hash, @GrabData("TailURLColor#{i}"))
 
-			@@LoadURL url, texSize, texSize, (texture, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket('tail' .. i, tickets[i])
-				left -= 1
-				urlTextures[i] = mat
-				if left == 0
-					continueCompilation()
-		if left == 0
-			continueCompilation()
-		return @TailColor1Material, @TailColor2Material
+		hash = PPM2.TextureTableHash(hash)
+
+		if getcache = @@GetCacheH(hash)
+			@TailColor2Material\SetTexture('$basetexture', getcache)
+			@TailColor2Material\GetTexture('$basetexture')\Download()
+		else
+			-- Second tail pass
+			{:r, :g, :b} = @GrabData('TailColor2')
+			@@LockRenderTarget(texSize, texSize, r, g, b)
+
+			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
+				i = 1
+
+				for i2 = 1, registry.size
+					mat = registry[i2]
+					surface.SetMaterial(mat)
+					surface.SetDrawColor(@GrabData("TailDetailColor#{i}"))
+					surface.DrawTexturedRect(0, 0, texSize, texSize)
+					i += 1
+
+			for i, mat in pairs urlTextures
+				surface.SetDrawColor(@GrabData("TailURLColor#{i}"))
+				surface.SetMaterial(mat)
+				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
+
+			@TailColor2Material\SetTexture('$basetexture', path)
+			@TailColor2Material\GetTexture('$basetexture')\Download()
 
 	@REFLECT_RENDER_SIZE = 64
 	@GetReflectionsScale: =>
@@ -2164,135 +2257,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return val
 
 	ResetEyeReflections: =>
-		@EyeMaterialL\SetTexture('$iris', @EyeTextureL) if @EyeTextureL
-		@EyeMaterialR\SetTexture('$iris', @EyeTextureR) if @EyeTextureR
-
 	UpdateEyeReflections: (ent = @GetEntity()) =>
-		return if not @EyeMaterialDrawL or not @EyeMaterialDrawR
-		return if not ent\IsValid()
-		@AttachID = @AttachID or @GetEntity()\LookupAttachment('eyes')
-		local Pos
-		local Ang
-		{:Pos, :Ang} = @GetEntity()\GetAttachment(@AttachID) if ent == @GetEntity()
-		{:Pos, :Ang} = ent\GetAttachment(ent\LookupAttachment('eyes')) if ent ~= @GetEntity()
-
-		return @ResetEyeReflections() if Pos\Distance(EyePos()) > REAL_TIME_EYE_REFLECTIONS_DIST\GetInt()
-
-		scale = @@GetReflectionsScale()
-		@lastScale = @lastScale or scale
-		if @lastScale ~= scale
-			@lastScale = scale
-			@reflectRT = nil
-			@reflectRTMat = nil
-
-		texName = "PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_EyesReflect_#{scale}"
-		--reflectrt = @reflectRT or GetRenderTargetEx(
-		--  texName,
-		--  scale,
-		--  scale,
-		--  RT_SIZE_DEFAULT,
-		--  MATERIAL_RT_DEPTH_NONE,
-		--  1 + 32768 + 2048 + 8388608 + 512 + 256,
-		--  CREATERENDERTARGETFLAGS_UNFILTERABLE_OK,
-		--  IMAGE_FORMAT_RGB888
-		--)
-
-		reflectrt = @@reflectRT or GetRenderTarget(
-			texName,
-			scale,
-			scale,
-			false
-		)
-
-		reflectrt\Download()
-		@@reflectRT = reflectrt
-		@reflectRTMat = @reflectRTMat or CreateMaterial(texName .. '_Mat', 'UnlitGeneric', {
-			'$basetexture': 'models/debug/debugwhite'
-			'$ignorez': 1
-			'$vertexcolor': 1
-			'$translucent': 1
-			'$alpha': 1
-			'$vertexalpha': 1
-			'$nolod': 1
-		})
-
-		@reflectRTMat\SetTexture('$basetexture', reflectrt)
-
-		render.PushRenderTarget(reflectrt)
-		render.Clear(0, 0, 0, 255, true, true)
-
-		viewData = {}
-		viewData.drawhud = false
-		viewData.drawmonitors = false
-		viewData.drawviewmodel = false
-		viewData.origin = Pos
-		viewData.angles = Ang
-		viewData.x = 0
-		viewData.y = 0
-		viewData.fov = 150
-		viewData.w = scale
-		viewData.h = scale
-		viewData.aspectratio = 1
-		viewData.znear = 1
-		viewData.zfar = REAL_TIME_EYE_REFLECTIONS_RDIST\GetInt()
-
-		render.RenderView(viewData)
-		render.PopRenderTarget()
-
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
-
-		surface.DisableClipping(true)
-		rtleft = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_LeftReflect_#{scale}", texSize, texSize, false)
-		rtleft\Download()
-		rtright = GetRenderTarget("PPM2_#{@@SessionID}_#{@GetID()}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_RightReflect_#{scale}", texSize, texSize, false)
-		rtright\Download()
-
-		W, H = 1, 1
-
-		separated = @GrabData('SeparateEyes')
-		prefixData = ''
-		prefixData = 'Left' if separated
-
-		render.PushRenderTarget(rtleft)
-		render.Clear(0, 0, 0, 255, true, true)
-		cam.Start2D()
-
-		surface.SetDrawColor(255, 255, 255, 255)
-		surface.SetMaterial(@EyeMaterialDrawL)
-		surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
-
-		surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
-		surface.SetMaterial(@reflectRTMat)
-		surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
-
-		cam.End2D()
-		render.PopRenderTarget()
-		@EyeMaterialL\SetTexture('$iris', rtleft)
-
-		prefixData = 'Right' if separated
-
-		render.PushRenderTarget(rtright)
-		render.Clear(0, 0, 0, 255, true, true)
-		cam.Start2D()
-
-		surface.SetDrawColor(255, 255, 255, 255)
-		surface.SetMaterial(@EyeMaterialDrawR)
-		surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
-
-		surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyeGlossyStrength' .. prefixData))
-		surface.SetMaterial(@reflectRTMat)
-		surface.DrawTexturedRect(0, 0, texSize * W, texSize * H)
-
-		cam.End2D()
-		render.PopRenderTarget()
-		surface.DisableClipping(false)
-
-		@EyeMaterialR\SetTexture('$iris', rtright)
 
 	CompileLeftEye: => @CompileEye(true)
 	CompileRightEye: => @CompileEye(false)
+
 	CompileEye: (left = false) =>
 		return unless @isValid
+
 		prefix = left and 'l' or 'r'
 		prefixUpper = left and 'L' or 'R'
 		prefixUpperR = left and 'R' or 'L'
@@ -2328,7 +2300,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		EyeRotation =       @GrabData("EyeRotation#{prefixData}")
 		EyeLineDirection =  @GrabData("EyeLineDirection#{prefixData}")
 		PonySize =          @GrabData('PonySize')
-		PonySize = 1 if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
+		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
 		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
 
@@ -2383,30 +2355,75 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
 
 		if EyeRefract
-			@StartRT("EyeCornea_#{prefix}", texSize)
-
 			if EyeCornerA
-				surface.SetMaterial(PPM2.MaterialsRegistry.EYE_CORNERA_OVAL)
-				surface.SetDrawColor(255, 255, 255)
-				DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
+				hash = PPM2.TextureTableHash({
+					'eye cornera',
+					IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation
+				})
 
-			createdMaterial\SetTexture('$corneatexture', @EndRT())
+				if getcache = @@GetCacheH(hash)
+					createdMaterial\SetTexture('$corneatexture', getcache)
+					createdMaterial\GetTexture('$corneatexture')\Download()
+				else
+					@@LockRenderTarget(texSize, texSize)
 
-		if EyeURL == '' or not EyeURL\find('^https?://')
+					surface.SetMaterial(PPM2.MaterialsRegistry.EYE_CORNERA_OVAL)
+					surface.SetDrawColor(255, 255, 255)
+					DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
+
+					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+					vtf\CaptureRenderTargetCoroutine()
+					path = @@SetCacheH(hash, vtf\ToString())
+					@@ReleaseRenderTarget(texSize, texSize)
+
+					createdMaterial\SetTexture('$corneatexture', path)
+					createdMaterial\SetTexture('$corneatexture')\Download()
+			else
+				createdMaterial\SetTexture('$corneatexture', 'null')
+
+		if url = PPM2.IsValidURL(EyeURL)
+			texture = PPM2.GetURLMaterial(url, texSize, texSize)\Await()
+			return unless @isValid
+			createdMaterial\SetTexture('$iris', texture)
+			return
+
+		hash = PPM2.TextureTableHash({
+			'eye',
+			prefixData
+			EyeType
+			EyeBackground
+			EyeHole
+			HoleWidth
+			IrisSize
+			EyeIris1
+			EyeIris2
+			EyeIrisLine1
+			EyeIrisLine2
+			EyeLines
+			HoleSize
+			EyeReflection
+			EyeReflectionType
+			EyeEffect
+			DerpEyes
+			DerpEyesStrength
+			EyeURL
+			IrisWidth
+			IrisHeight
+			HoleHeight
+			HoleShiftX
+			HoleShiftY
+			EyeRotation
+			EyeLineDirection
+			PonySize
+			PonySize
+		})
+
+		if getcache = @@GetCacheH(hash)
+			createdMaterial\SetTexture('$basetexture', getcache)
+			createdMaterial\GetTexture('$basetexture')\Download()
+		else
 			{:r, :g, :b, :a} = EyeBackground
-			rt = @StartRTOpaque("#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}", texSize, r, g, b)
-			@["EyeTexture#{prefixUpper}"] = rt
-
-			drawMat = CreateMaterial("PPM2_#{@@SessionID}_#{USE_HIGHRES_TEXTURES\GetBool() and 'HD' or 'NORMAL'}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_RenderMat_#{prefix}", 'UnlitGeneric', {
-				'$basetexture': 'models/debug/debugwhite'
-				'$ignorez': 1
-				'$vertexcolor': 1
-				'$vertexalpha': 1
-				'$nolod': 1
-			})
-
-			@["EyeMaterialDraw#{prefixUpper}"] = drawMat
-			drawMat\SetTexture('$basetexture', rt)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			surface.SetDrawColor(EyeIris1)
 			surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
@@ -2439,22 +2456,17 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType + 1])
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-			@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', @EndRT())
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			PPM2.DebugPrint('Compiled eyes texture for ', @GetEntity(), ' as part of ', @)
-		else
-			@url_processes += 1
-			ticket = @PutTicket(prefixUpper .. '_eye')
-
-			@@LoadURL EyeURL, texSize, texSize, (texture, panel, material) ->
-				@url_processes -= 1
-				return if not @CheckTicket(prefixUpper .. '_eye', ticket)
-				@["EyeMaterial#{prefixUpper}"]\SetTexture('$iris', texture)
-
-		return @["EyeMaterial#{prefixUpper}"]
+			createdMaterial\SetTexture('$iris', path)
+			createdMaterial\GetTexture('$iris')\Download()
 
 	CompileCMark: =>
 		return unless @isValid
+
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
 			'shader': 'VertexLitGeneric'
@@ -2485,7 +2497,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		unless @GrabData('CMark')
 			@CMarkTexture\SetTexture('$basetexture', 'null')
 			@CMarkTextureGUI\SetTexture('$basetexture', 'null')
-			return @CMarkTexture, @CMarkTextureGUI
+			return
 
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
@@ -2494,39 +2506,69 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
-		if URL == '' or not URL\find('^https?://')
-			rt = @StartRT('CMark', texSize, 0, 0, 0, 0)
+		if url = PPM2.IsValidURL(URL)
+			hash = PPM2.TextureTableHash({
+				'cutie mark url'
+				url
+				@GrabData('CMarkColor')
+				shift, shift, sizeQuad, sizeQuad
+			})
+
+			if getcache = @@GetCacheH(hash)
+				@CMarkTexture\SetTexture('$basetexture', getcache)
+				@CMarkTextureGUI\SetTexture('$basetexture', getcache)
+				@CMarkTexture\GetTexture('$basetexture')\Download()
+				@CMarkTextureGUI\GetTexture('$basetexture')\Download()
+			else
+				material = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				return unless @isValid
+
+				@@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
+
+				surface.SetDrawColor(@GrabData('CMarkColor'))
+				surface.SetMaterial(material)
+				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
+
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+				vtf\CaptureRenderTargetCoroutine()
+				path = @@SetCacheH(hash, vtf\ToString())
+				@@ReleaseRenderTarget(texSize, texSize)
+
+				@CMarkTexture\SetTexture('$basetexture', path)
+				@CMarkTexture\GetTexture('$basetexture')\Download()
+				@CMarkTextureGUI\SetTexture('$basetexture', path)
+				@CMarkTextureGUI\GetTexture('$basetexture')\Download()
+
+			return
+
+		hash = PPM2.TextureTableHash({
+			'cutie mark'
+			@GrabData('CMarkType')
+			@GrabData('CMarkColor')
+			shift, shift, sizeQuad, sizeQuad
+		})
+
+		if getcache = @@GetCacheH(hash)
+			@CMarkTexture\SetTexture('$basetexture', getcache)
+			@CMarkTextureGUI\SetTexture('$basetexture', getcache)
+			@CMarkTexture\GetTexture('$basetexture')\Download()
+			@CMarkTextureGUI\GetTexture('$basetexture')\Download()
+		else
+			@@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
 
 			if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(mark)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-			@EndRT()
-			@CMarkTexture\SetTexture('$basetexture', rt)
-			@CMarkTextureGUI\SetTexture('$basetexture', rt)
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf\CaptureRenderTargetCoroutine()
+			path = @@SetCacheH(hash, vtf\ToString())
+			@@ReleaseRenderTarget(texSize, texSize)
 
-			PPM2.DebugPrint('Compiled cutiemark texture for ', @GetEntity(), ' as part of ', @)
-		else
-			@url_processes += 1
-			ticket = @PutTicket('cmark')
-
-			@@LoadURL URL, texSize, texSize, (texture, panel, material) ->
-				@url_processes -= 1
-				return if not @CheckTicket('cmark', ticket)
-
-				rt = @StartRT('CMark', texSize, 0, 0, 0, 0)
-
-				surface.SetDrawColor(@GrabData('CMarkColor'))
-				surface.SetMaterial(material)
-				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
-
-				@EndRT()
-				@CMarkTexture\SetTexture('$basetexture', rt)
-				@CMarkTextureGUI\SetTexture('$basetexture', rt)
-				PPM2.DebugPrint('Compiled cutiemark texture for ', @GetEntity(), ' as part of ', @)
-
-		return @CMarkTexture, @CMarkTextureGUI
-
+			@CMarkTexture\SetTexture('$basetexture', path)
+			@CMarkTexture\GetTexture('$basetexture')\Download()
+			@CMarkTextureGUI\SetTexture('$basetexture', path)
+			@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController
