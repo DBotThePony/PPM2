@@ -36,53 +36,24 @@
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
-PPM2.REAL_TIME_EYE_REFLECTIONS = CreateConVar('ppm2_cl_reflections', '0', {FCVAR_ACRHIVE}, 'Calculate eye reflections in real time. Needs beefy computer.')
-REAL_TIME_EYE_REFLECTIONS = PPM2.REAL_TIME_EYE_REFLECTIONS
-
-PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE = CreateConVar('ppm2_cl_reflections_size', '512', {FCVAR_ACRHIVE}, 'Reflections size. Must be multiple to 2! (16, 32, 64, 128, 256)')
-REAL_TIME_EYE_REFLECTIONS_SIZE = PPM2.REAL_TIME_EYE_REFLECTIONS_SIZE
-
-PPM2.REAL_TIME_EYE_REFLECTIONS_DIST = CreateConVar('ppm2_cl_reflections_drawdist', '192', {FCVAR_ACRHIVE}, 'Reflections maximal draw distance')
-REAL_TIME_EYE_REFLECTIONS_DIST = PPM2.REAL_TIME_EYE_REFLECTIONS_DIST
-
-PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST = CreateConVar('ppm2_cl_reflections_renderdist', '1000', {FCVAR_ACRHIVE}, 'Reflection scene draw distance (ZFar)')
-REAL_TIME_EYE_REFLECTIONS_RDIST = PPM2.REAL_TIME_EYE_REFLECTIONS_RDIST
-
-PPM2.INSANT_TEXTURE_COMPILE = CreateConVar('ppm2_cl_instant_compile', '0', {FCVAR_ACRHIVE}, 'Instantly compile pony textures')
-INSANT_TEXTURE_COMPILE = PPM2.INSANT_TEXTURE_COMPILE
-
-lastReflectionFrame = 0
-
-hook.Add 'PreRender', 'PPM2.ReflectionsUpdate', (a, b) ->
-	return if PPM2.__RENDERING_REFLECTIONS
-	return if lastReflectionFrame == FrameNumberL()
-	lastReflectionFrame = FrameNumberL()
-
-	PPM2.__RENDERING_REFLECTIONS = true
-
-	for i, task in ipairs PPM2.NetworkedPonyData.CheckTasks
-		if task.GetRenderController
-			if render = task\GetRenderController()
-				if textures = render\GetTextureController()
-					ProtectedCall(textures.CheckReflectionsClosure)
-
-	PPM2.__RENDERING_REFLECTIONS = false
-
-hook.Add 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PreDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PostDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Add 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PreRender', 'PPM2.ReflectionsUpdate'
+hook.Remove 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PreDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PostDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
+hook.Remove 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
 
 mat_picmip = GetConVar('mat_picmip')
 RT_SIZES = [math.pow(2, i) for i = 1, 24]
 
 file.mkdir('ppm2_cache')
 
-PPM2.IsValidURL = (url) -> url ~= '' and url\find('^https?://') and url or false
+PPM2.IsValidURL = (url) ->
+	print(debug.traceback()) if not isstring(url)
+	url ~= '' and url\find('^https?://') and url or false
 
 PPM2.BuildURLHTML = (url, width, height) ->
 	url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
@@ -157,7 +128,9 @@ texture_compile_worker = ->
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
-			task[1](task[2])
+			--print('Start task', name)
+			task[1](task[2]) if IsValid(task[2])
+			--print('Completed task', name)
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 texture_compile_thread = coroutine.create(texture_compile_worker)
@@ -284,6 +257,8 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 	if not status
 		texture_compile_thread = coroutine.create(texture_compile_worker)
 		error(err)
+
+	return
 
 hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.HTML_MATERIAL_QUEUE = {}
@@ -569,7 +544,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@delayCompilation = {}
 		@url_processes = 0
 		@processing_first = true
-		@CheckReflectionsClosure = -> @CheckReflections()
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
@@ -852,14 +826,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		return rt
 
-	CheckReflections: (ent = @GetEntity()) =>
-		if REAL_TIME_EYE_REFLECTIONS\GetBool()
-			@isInRealTimeLReflections = true
-			@UpdateEyeReflections()
-		elseif @isInRealTimeLReflections
-			@isInRealTimeLReflections = false
-			@ResetEyeReflections()
-
 	PreDraw: (ent = @GetEntity(), drawingNewTask = false) =>
 		--return unless @compiled
 		return unless @isValid
@@ -1000,15 +966,16 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_BODY = 2048
 	@TATTOO_DEF_SIZE = 128
 
-	@GetBodySize = => PPM2.GetTextureSize(@QUAD_SIZE_BODY * (USE_HIGHRES_BODY\GetInt() + 1))
-
-	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@GetBodySize()) =>
+	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@QUAD_SIZE_BODY) =>
 		mat = PPM2.MaterialsRegistry.TATTOOS[@GrabData("TattooType#{index}")]
 		return if not mat
+
 		X, Y = @GrabData("TattooPosX#{index}"), @GrabData("TattooPosY#{index}")
+
 		TattooRotate = @GrabData("TattooRotate#{index}")
 		TattooScaleX = @GrabData("TattooScaleX#{index}")
 		TattooScaleY = @GrabData("TattooScaleY#{index}")
+
 		if not drawingGlow
 			{:r, :g, :b} = @GrabData("TattooColor#{index}")
 			surface.SetDrawColor(r, g, b)
@@ -1017,8 +984,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(255, 255, 255, 255 * @GrabData("TattooGlowStrength#{index}"))
 			else
 				surface.SetDrawColor(0, 0, 0)
+
 		surface.SetMaterial(mat)
-		tSize = PPM2.GetTextureSize(@@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1))
+		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1)
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
@@ -1130,11 +1098,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	CompileBody: =>
 		return unless @isValid
 
-		urlTextures = {}
-		data = @GetData()
-		left = 0
-		bodysize = @@GetBodySize()
-
 		textureData = {
 			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body"
 			'shader': 'VertexLitGeneric'
@@ -1188,6 +1151,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hashtable, "TattooColor#{i}")
 
 		hash = PPM2.TextureTableHash(@MakeHashTable(hashtable, 'body'))
+		texSize = @@QUAD_SIZE_BODY
 
 		@BodyMaterialName = "!#{textureData.name\lower()}"
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1196,23 +1160,25 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$basetexture', getcache)
 			@BodyMaterial\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if geturl = PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, bodysize, bodysize)\Await())
+					urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
 					return unless @isValid
 
 			@UpdatePhongData()
 
 			{:r, :g, :b} = @GrabData('BodyColor')
 
-			@@LockRenderTarget(bodysize, bodysize, r, g, b)
+			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if @GrabData('BodyDetailFirst' .. i)
 					if mat = PPM2.MaterialsRegistry.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
 						surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
 						surface.SetMaterial(mat)
-						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+						surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			surface.SetDrawColor(255, 255, 255)
 
@@ -1220,11 +1186,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if @GrabData('BodyDetailURLFirst' .. i)
 					surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
 					surface.SetMaterial(mat)
-					surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+					surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			surface.SetDrawColor(@GrabData('EyebrowsColor'))
 			surface.SetMaterial(PPM2.MaterialsRegistry.EYEBROWS)
-			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if not @GrabData('LipsColorInherit')
 				surface.SetDrawColor(@GrabData('LipsColor'))
@@ -1234,7 +1200,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(r, g, b)
 
 			surface.SetMaterial(PPM2.MaterialsRegistry.LIPS)
-			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if not @GrabData('NoseColorInherit')
 				surface.SetDrawColor(@GrabData('NoseColor'))
@@ -1244,7 +1210,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(r, g, b)
 
 			surface.SetMaterial(PPM2.MaterialsRegistry.NOSE)
-			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 
@@ -1253,7 +1219,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if mat = PPM2.MaterialsRegistry.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
 						surface.SetDrawColor(@GrabData("BodyDetailColor#{i}"))
 						surface.SetMaterial(mat)
-						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+						surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			surface.SetDrawColor(255, 255, 255)
 
@@ -1261,29 +1227,29 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if not @GrabData('BodyDetailURLFirst' .. i)
 					surface.SetDrawColor(@GrabData("BodyDetailURLColor#{i}"))
 					surface.SetMaterial(mat)
-					surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+					surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			@DrawTattoo(i) for i = 1, PPM2.MAX_TATTOOS when @GrabData("TattooOverDetail#{i}")
 
 			if suit = PPM2.MaterialsRegistry.SUITS[@GrabData('Bodysuit')]
 				surface.SetDrawColor(255, 255, 255)
 				surface.SetMaterial(suit)
-				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if @GrabData('Socks')
 				surface.SetDrawColor(255, 255, 255)
 				surface.SetMaterial(@@PONY_SOCKS)
-				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
 			vtf\CaptureRenderTargetCoroutine()
 			path = @@SetCacheH(hash, vtf\ToString())
-			@@ReleaseRenderTarget(bodysize, bodysize)
+			@@ReleaseRenderTarget(texSize, texSize)
 
 			@BodyMaterial\SetTexture('$basetexture', path)
 			@BodyMaterial\GetTexture('$basetexture')\Download()
 
-		bodysize = bodysize / 2
+		texSize = texSize / 2
 
 		hash_bump = PPM2.TextureTableHash({
 			'body bump'
@@ -1294,16 +1260,16 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$bumpmap', getcache)
 			@BodyMaterial\GetTexture('$bumpmap')\Download()
 		else
-			@@LockRenderTarget(bodysize, bodysize, 127, 127, 255)
+			@@LockRenderTarget(texSize, texSize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
-			surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
 			vtf\CaptureRenderTargetCoroutine()
 			path = @@SetCacheH(hash_bump, vtf\ToString())
-			@@ReleaseRenderTarget(bodysize, bodysize)
+			@@ReleaseRenderTarget(texSize, texSize)
 
 			@BodyMaterial\SetTexture('$bumpmap', path)
 			@BodyMaterial\GetTexture('$bumpmap')\Download()
@@ -1335,14 +1301,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$selfillummask', getcache)
 			@BodyMaterial\GetTexture('$selfillummask')\Download()
 		else
-			@@LockRenderTarget(bodysize, bodysize)
+			@@LockRenderTarget(texSize, texSize)
 
 			surface.SetDrawColor(255, 255, 255)
 
 			if @GrabData('GlowingEyebrows')
 				surface.SetDrawColor(255, 255, 255, 255 * @GrabData('EyebrowsGlowStrength'))
 				surface.SetMaterial(PPM2.MaterialsRegistry.EYEBROWS)
-				surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			for i = 1, PPM2.MAX_TATTOOS
 				if not @GrabData("TattooOverDetail#{i}")
@@ -1355,20 +1321,20 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if @GetData()["GetBodyDetailGlow#{i}"](@GetData())
 						surface.SetDrawColor(255, 255, 255, alpha * 255)
 						surface.SetMaterial(mat)
-						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+						surface.DrawTexturedRect(0, 0, texSize, texSize)
 					else
 						surface.SetDrawColor(0, 0, 0, alpha * 255)
 						surface.SetMaterial(mat)
-						surface.DrawTexturedRect(0, 0, bodysize, bodysize)
+						surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			for i = 1, PPM2.MAX_TATTOOS
 				if @GrabData("TattooOverDetail#{i}")
 					@DrawTattoo(i, true)
 
-			vtf = DLib.VTF.Create(2, bodysize, bodysize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
 			vtf\CaptureRenderTargetCoroutine()
 			path = @@SetCacheH(hash_glow, vtf\ToString())
-			@@ReleaseRenderTarget(bodysize, bodysize)
+			@@ReleaseRenderTarget(texSize, texSize)
 
 			@BodyMaterial\SetTexture('$selfillummask', path)
 			@BodyMaterial\GetTexture('$selfillummask')\Download()
@@ -1450,7 +1416,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HORN)
+		texSize = @@QUAD_SIZE_HORN
 		urlTextures = {}
 
 		for i = 1, 3
@@ -1665,7 +1631,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					mat\SetInt('$translucent', 1)
 
 			elseif colored
-				rtsize = PPM2.GetTextureSize(rtsize)
+				rtsize = rtsize
 				mat\SetVector('$color2', Vector(1, 1, 1))
 				{:r, :g, :b, :a} = @GrabData("#{iName}ClothesColor#{nextindex}")
 
@@ -1685,7 +1651,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					@GrabData(iName .. 'Clothes')
 				}
 
-				for num = 1, PPM2.MAX_CLOTHES_COLORS
+				for i = 1, PPM2.MAX_CLOTHES_COLORS
 					table.insert(hash, @GrabData(iName .. 'ClothesColor' .. i))
 
 				hash = PPM2.TextureTableHash(hash)
@@ -1772,12 +1738,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@NewSocksColor2 = CreateMaterial(textureColor2.name, textureColor2.shader, textureColor2.data)
 		@NewSocksBase = CreateMaterial(textureBase.name, textureBase.shader, textureBase.data)
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_SOCKS)
+		texSize = @@QUAD_SIZE_SOCKS
 
 		@UpdatePhongData()
 
 		if url = PPM2.IsValidURL(@GrabData('NewSocksTextureURL'))
-			texture = DLib.GetURLMaterial(url, texSize, texSize)\Await()
+			texture = PPM2.GetURLMaterial(url, texSize, texSize)\Await()
 			return unless @isValid
 
 			for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
@@ -1857,13 +1823,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@SocksMaterialName = "!#{textureData.name\lower()}"
 		@SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_SOCKS)
+		texSize = @@QUAD_SIZE_SOCKS
 
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
 
 		if url = PPM2.IsValidURL(@GrabData('SocksTextureURL'))
-			texture = DLib.GetURLMaterial(url, texSize, texSize)\Await()
+			texture = PPM2.GetURLMaterial(url, texSize, texSize)\Await()
 			return unless @isValid
 
 			@SocksMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
@@ -1936,7 +1902,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_WING)
+		texSize = @@QUAD_SIZE_WING
 
 		urlTextures = {}
 
@@ -2026,7 +1992,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_HAIR)
+		texSize = @@QUAD_SIZE_HAIR
 
 		urlTextures = {}
 
@@ -2156,7 +2122,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_TAIL)
+		texSize = @@QUAD_SIZE_TAIL
 
 		urlTextures = {}
 
@@ -2302,7 +2268,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_EYES)
+		texSize = @@QUAD_SIZE_EYES
 
 		shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
 		shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
@@ -2502,7 +2468,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
 
-		texSize = PPM2.GetTextureSize(@@QUAD_SIZE_CMARK)
+		texSize = @@QUAD_SIZE_CMARK
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
@@ -2571,4 +2537,5 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@CMarkTextureGUI\SetTexture('$basetexture', path)
 			@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 
-PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') -> PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController
+PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') ->
+	PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController

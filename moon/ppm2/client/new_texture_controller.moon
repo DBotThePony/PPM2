@@ -38,7 +38,7 @@ USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 -- [13] = "models/ppm2/base/hair_color_1",
 -- [14] = "models/ppm2/base/tail_color_1"
 
-class NewPonyTextureController extends PPM2.PonyTextureController
+class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 	@MODELS = {'models/ppm/player_default_base_new.mdl', 'models/ppm/player_default_base_new_nj.mdl'}
 
 	@PHONG_UPDATE_TRIGGER = {k, v for k, v in pairs PPM2.PonyTextureController.PHONG_UPDATE_TRIGGER}
@@ -161,8 +161,8 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeDetailColor#{i}")))
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURLColor#{i}")))
+			table.insert(hash, @GrabData("#{prefix}ManeDetailColor#{i}"))
+			table.insert(hash, @GrabData("#{prefix}ManeURLColor#{i}"))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -196,12 +196,13 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			HairColor1Material\SetTexture('$basetexture', @EndRT())
-
 			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
 			vtf\CaptureRenderTargetCoroutine()
 			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			HairColor1Material\SetTexture('$basetexture', path)
+			HairColor1Material\GetTexture('$basetexture')\Download()
 
 		hash = {
 			'mane ' .. prefix .. ' 2',
@@ -210,8 +211,8 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeDetailColor#{i}")))
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURLColor#{i}")))
+			table.insert(hash, @GrabData("#{prefix}ManeDetailColor#{i}"))
+			table.insert(hash, @GrabData("#{prefix}ManeURLColor#{i}"))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -622,5 +623,3 @@ class NewPonyTextureController extends PPM2.PonyTextureController
 		ent\SetSubMaterial(@@MAT_INDEX_EYELASHES)
 		ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT)
 		ent\SetSubMaterial(@@MAT_INDEX_WINGS_BAT_SKIN)
-
-PPM2.NewPonyTextureController = NewPonyTextureController
