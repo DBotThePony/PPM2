@@ -1486,7 +1486,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		for i = 1, PPM2.MAX_CLOTHES_URLS
 			if url = PPM2.IsValidURL(@GrabData(iName .. 'ClothesURL' .. i))
-				urls[i] = select(1, PPM2.GetURLMaterial(geturl)\Await())
+				urls[i] = select(1, PPM2.GetURLMaterial(url)\Await())
 				return unless @isValid
 
 		colored = @GrabData(iName .. 'ClothesUseColor')
