@@ -128,7 +128,9 @@ texture_compile_worker = ->
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
-			task[1](task[2]) if IsValid(task[2])
+			if IsValid(task[2])
+				task[1](task[2])
+				task[2].unfinished_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 texture_compile_thread = coroutine.create(texture_compile_worker)
@@ -580,38 +582,21 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
 		@delayCompilation = {}
-		@url_processes = 0
+		@unfinished_tasks = 0
 		@processing_first = true
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
 
 	CreateRenderTask: (func = '', ...) =>
-		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
+		index = string.format('%p%s', @, func)
+		return if PPM2.TEXTURE_TASKS[index]
+		@unfinished_tasks += 1
+		PPM2.TEXTURE_TASKS[index] = {@[func], @}
 
-	CreateInstantRenderTask: (func = '', ...) =>
-		PPM2.TEXTURE_TASKS[string.format('%p%s', @, func)] = {@[func], @}
+	CreateInstantRenderTask: (...) => @CreateRenderTask(...) -- TODO?
 
-	IsBeingProcessed: =>
-		return false if true
-		return true if @url_processes > 0
-		if #@@COMPILE_QUEUE == 0
-			@processing_first = false
-			return false
-
-		num = 0
-
-		for data in *@@COMPILE_QUEUE
-			if data.self == @
-				num += 1
-
-		if not @processing_first and num > 10
-			@processing_first = true
-		elseif @processing_first and num == 0
-			@processing_first = false
-
-		return num > 0 if @processing_first
-		return num > 3
+	IsBeingProcessed: => @unfinished_tasks > 0
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -1159,14 +1144,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'body'
-			'BodyColor'
-			'LipsColorInherit'
-			'LipsColor'
-			'NoseColorInherit'
-			'NoseColor'
-			'Socks'
-			'Bodysuit'
-			'EyebrowsColor'
+			@GrabData('BodyColor')
+			@GrabData('LipsColorInherit')
+			@GrabData('LipsColor')
+			@GrabData('NoseColorInherit')
+			@GrabData('NoseColor')
+			@GrabData('Socks')
+			@GrabData('Bodysuit')
+			@GrabData('EyebrowsColor')
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
