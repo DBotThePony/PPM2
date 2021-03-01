@@ -1128,11 +1128,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@ApplyPhongData(@EyeMaterialL, 'BEyes', true)
 			@ApplyPhongData(@EyeMaterialR, 'BEyes', true)
 
-	MakeHashTable: (fnlist, additional) =>
-		tab = [@GrabData(fn) for fn in *fnlist]
-		tab[#fnlist + 1] = additional if additional
-		return tab
-
 	CompileBody: =>
 		return unless @isValid
 
@@ -1162,7 +1157,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		hashtable = {
+		hash = {
+			'body'
 			'BodyColor'
 			'LipsColorInherit'
 			'LipsColor'
@@ -1174,21 +1170,21 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
-			table.insert(hashtable, "BodyDetailURL#{i}")
-			table.insert(hashtable, "BodyDetailFirst#{i}")
-			table.insert(hashtable, "BodyDetail#{i}")
-			table.insert(hashtable, "BodyDetailColor#{i}")
+			table.insert(hash, PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}")))
+			table.insert(hash, @GrabData("BodyDetailFirst#{i}"))
+			table.insert(hash, @GrabData("BodyDetail#{i}"))
+			table.insert(hash, @GrabData("BodyDetailColor#{i}"))
 
 		for i = 1, PPM2.MAX_TATTOOS
-			table.insert(hashtable, "TattooType#{i}")
-			table.insert(hashtable, "TattooOverDetail#{i}")
-			table.insert(hashtable, "TattooPosX#{i}")
-			table.insert(hashtable, "TattooRotate#{i}")
-			table.insert(hashtable, "TattooScaleX#{i}")
-			table.insert(hashtable, "TattooScaleY#{i}")
-			table.insert(hashtable, "TattooColor#{i}")
+			table.insert(hash, @GrabData("TattooType#{i}"))
+			table.insert(hash, @GrabData("TattooOverDetail#{i}"))
+			table.insert(hash, @GrabData("TattooPosX#{i}"))
+			table.insert(hash, @GrabData("TattooRotate#{i}"))
+			table.insert(hash, @GrabData("TattooScaleX#{i}"))
+			table.insert(hash, @GrabData("TattooScaleY#{i}"))
+			table.insert(hash, @GrabData("TattooColor#{i}"))
 
-		hash = PPM2.TextureTableHash(@MakeHashTable(hashtable, 'body'))
+		hash = PPM2.TextureTableHash(hash)
 		texSize = @@QUAD_SIZE_BODY
 
 		@BodyMaterialName = "!#{textureData.name\lower()}"
@@ -1483,9 +1479,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@GrabData('HornURLColor1')
 			@GrabData('HornURLColor2')
 			@GrabData('HornURLColor3')
-			@GrabData('HornURL1')
-			@GrabData('HornURL2')
-			@GrabData('HornURL3')
+			PPM2.IsValidURL(@GrabData('HornURL1'))
+			PPM2.IsValidURL(@GrabData('HornURL2'))
+			PPM2.IsValidURL(@GrabData('HornURL3'))
 		})
 
 		@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -1809,15 +1805,17 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			for _, tex in ipairs {@NewSocksColor1, @NewSocksColor2, @NewSocksBase}
 				tex\SetVector('$color2', Vector(1, 1, 1))
 				tex\SetTexture('$basetexture', texture)
-		else
-			{:r, :g, :b} = @GrabData('NewSocksColor1')
-			@NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
-			{:r, :g, :b} = @GrabData('NewSocksColor2')
-			@NewSocksColor2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+			return
 
-			{:r, :g, :b} = @GrabData('NewSocksColor3')
-			@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+		{:r, :g, :b} = @GrabData('NewSocksColor1')
+		@NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+		{:r, :g, :b} = @GrabData('NewSocksColor2')
+		@NewSocksColor2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+		{:r, :g, :b} = @GrabData('NewSocksColor3')
+		@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 	CompileEyelashes: =>
 		return unless @isValid
@@ -1979,7 +1977,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		for i = 1, 3
-			table.insert(hash, @GrabData("WingsURL#{i}"))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("WingsURL#{i}")))
 			table.insert(hash, @GrabData("WingsURLColor#{i}"))
 
 		hash = PPM2.TextureTableHash(hash)
@@ -2064,7 +2062,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		for i = 1, 6
-			table.insert(hash, @GrabData("ManeURL#{i}"))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("ManeURL#{i}")))
 			table.insert(hash, @GrabData("ManeURLColor#{i}"))
 			table.insert(hash, @GrabData("ManeDetailColor#{i}"))
 
@@ -2205,7 +2203,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		for i = 1, 6
-			table.insert(hash, @GrabData("TailURL#{i}"))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("TailURL#{i}")))
 			table.insert(hash, @GrabData("TailDetailColor#{i}"))
 			table.insert(hash, @GrabData("TailURLColor#{i}"))
 
@@ -2256,7 +2254,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		for i = 1, 6
-			table.insert(hash, @GrabData("TailURL#{i}"))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("TailURL#{i}")))
 			table.insert(hash, @GrabData("TailDetailColor#{i}"))
 			table.insert(hash, @GrabData("TailURLColor#{i}"))
 
