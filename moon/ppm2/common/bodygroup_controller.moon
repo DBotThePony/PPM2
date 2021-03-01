@@ -278,16 +278,16 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			switch @GrabData('Race')
 				when PPM2.RACE_EARTH
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
-					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
+					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_PEGASUS
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
-					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
+					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_UNICORN
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
+					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_ALICORN
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
+					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
 
 	ResetTail: =>
 		return if not CLIENT
