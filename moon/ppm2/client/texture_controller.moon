@@ -494,6 +494,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return '../data/' .. path
 
 	@LOCKED_RENDERTARGETS = LOCKED_RENDERTARGETS or {}
+	@LOCKED_RENDERTARGETS_MASK = LOCKED_RENDERTARGETS_MASK or {}
 
 	@LockRenderTarget = (width, height, r = 0, g = 0, b = 0, a = 255) =>
 		index = string.format('PPM2_buffer_%d_%d', width, height)
@@ -514,17 +515,53 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		surface.SetDrawColor(r, g, b, a)
 
-		return rt
+		mat = CreateMaterial(index .. 'a', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		})
 
-	@ReleaseRenderTarget = (width, height) =>
+		mat\SetTexture('$basetexture', rt)
+
+		return rt, mat
+
+	@ReleaseRenderTarget = (width, height, no_pop = false) =>
 		index = string.format('PPM2_buffer_%d_%d', width, height)
 		@LOCKED_RENDERTARGETS[index] = false
 
 		--render.PopFilterMin()
 		--render.PopFilterMag()
 
-		cam.End2D()
-		render.PopRenderTarget()
+		if not no_pop
+			cam.End2D()
+			render.PopRenderTarget()
+
+	@LockRenderTargetMask = (width, height) =>
+		index = string.format('PPM2_mask_%d_%d', width, height)
+
+		while @LOCKED_RENDERTARGETS_MASK[index]
+			coroutine_yield()
+
+		@LOCKED_RENDERTARGETS_MASK[index] = true
+
+		index2 = string.format('PPM2_mask2_%d_%d', width, height)
+		rt1, rt2 = GetRenderTarget(index, width, height), GetRenderTarget(index2, width, height)
+
+		mat1, mat2 = CreateMaterial(index .. 'b', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		}), CreateMaterial(index2 .. 'b', 'UnlitGeneric', {
+			'$basetexture': '!' .. index2,
+			'$translucent': '1',
+		})
+
+		mat1\SetTexture('$basetexture', rt1)
+		mat2\SetTexture('$basetexture', rt2)
+
+		return rt1, rt2, mat1, mat2
+
+	@ReleaseRenderTargetMask = (width, height) =>
+		index = string.format('PPM2_mask_%d_%d', width, height)
+		@LOCKED_RENDERTARGETS_MASK[index] = false
 
 	new: (controller, compile = true) =>
 		super(controller\GetData())
@@ -2437,28 +2474,62 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			createdMaterial\SetTexture('$iris', path)
 			createdMaterial\GetTexture('$iris')\Download()
 
+	_CaptureAlphaClosure: (texSize, mat, vtf) =>
+		rt1, rt2, mat1, mat2 = @@LockRenderTargetMask(texSize, texSize)
+
+		-- capture alpha
+		render.PushRenderTarget(rt1)
+		render.Clear(255, 255, 255, 0, true, true)
+
+		cam.Start2D()
+		render.OverrideBlend(true, BLEND_DST_COLOR, BLEND_DST_COLOR, BLENDFUNC_ADD, BLEND_SRC_ALPHA, BLEND_DST_ALPHA, BLENDFUNC_ADD)
+		surface.SetMaterial(mat)
+		surface.DrawTexturedRectUV(0, 0, texSize - 1, texSize - 1, -0.016129032258065, -0.016129032258065, 1.0161290322581, 1.0161290322581)
+		render.OverrideBlend(false)
+		cam.End2D()
+
+		render.PopRenderTarget()
+
+		@@ReleaseRenderTarget(texSize, texSize, true)
+
+		-- compute alpha
+		render.PushRenderTarget(rt2)
+		render.Clear(0, 0, 0, 255, true, true)
+
+		cam.Start2D()
+		surface.SetMaterial(mat1)
+		surface.DrawTexturedRectUV(0, 0, texSize - 1, texSize - 1, -0.016129032258065, -0.016129032258065, 1.0161290322581, 1.0161290322581)
+		cam.End2D()
+
+		PPM2.LATEST_MASK_ = mat1
+		PPM2.LATEST_MASK = mat2
+
+		vtf\CaptureRenderTargetAsAlphaCoroutine()
+		render.PopRenderTarget()
+
+		@@ReleaseRenderTargetMask(texSize, texSize)
+
 	CompileCMark: =>
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark"
+			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark3"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'null'
 				'$translucent': '1'
+				'$vertexalpha': '1' -- this is required for DXT3/DXT5 textures
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
-				'$halflambert': '1'
 			}
 		}
 
 		textureDataGUI = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI"
+			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI3"
 			'shader': 'UnlitGeneric'
 			'data': {
 				'$basetexture': 'null'
-				'$translucent': '1'
+				'$vertexalpha': '1' -- this is required for DXT3/DXT5 textures
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
-				'$halflambert': '1'
 			}
 		}
 
@@ -2484,7 +2555,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				'cutie mark url'
 				url
 				@GrabData('CMarkColor')
-				shift, shift, sizeQuad, sizeQuad
+				shift\floor(), sizeQuad\floor()
 			})
 
 			if getcache = @@GetCacheH(hash)
@@ -2496,16 +2567,20 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				material = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
-				@@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
+				rt, mat = @@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
 
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(material)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b)})
 				vtf\CaptureRenderTargetCoroutine()
+				cam.End2D()
+				render.PopRenderTarget()
+
+				@_CaptureAlphaClosure(texSize, mat, vtf)
+
 				path = @@SetCacheH(hash, vtf\ToString())
-				@@ReleaseRenderTarget(texSize, texSize)
 
 				@CMarkTexture\SetTexture('$basetexture', path)
 				@CMarkTexture\GetTexture('$basetexture')\Download()
@@ -2518,7 +2593,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'cutie mark'
 			@GrabData('CMarkType')
 			@GrabData('CMarkColor')
-			shift, shift, sizeQuad, sizeQuad
+			shift\floor(), sizeQuad\floor()
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -2527,17 +2602,21 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@CMarkTexture\GetTexture('$basetexture')\Download()
 			@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 		else
-			@@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
+			rt, mat = @@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)
 
 			if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(mark)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b)})
 			vtf\CaptureRenderTargetCoroutine()
+			cam.End2D()
+			render.PopRenderTarget()
+
+			@_CaptureAlphaClosure(texSize, mat, vtf)
+
 			path = @@SetCacheH(hash, vtf\ToString())
-			@@ReleaseRenderTarget(texSize, texSize)
 
 			@CMarkTexture\SetTexture('$basetexture', path)
 			@CMarkTexture\GetTexture('$basetexture')\Download()
