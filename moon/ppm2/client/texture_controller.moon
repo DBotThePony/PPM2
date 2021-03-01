@@ -1264,7 +1264,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 
 			path = @@SetCacheH(hash, vtf\ToString())
 
@@ -1292,7 +1292,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash_bump, vtf\ToString())
 
 			@BodyMaterial\SetTexture('$bumpmap', path)
@@ -1359,7 +1359,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash_glow, vtf\ToString())
 
 			@BodyMaterial\SetTexture('$selfillummask', path)
@@ -1505,7 +1505,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$basetexture', path)
@@ -1536,7 +1536,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$selfillummask', path)
@@ -1561,7 +1561,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$bumpmap', path)
@@ -1714,7 +1714,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					vtf\CaptureRenderTargetCoroutine()
 					@@ReleaseRenderTarget(rtsize, rtsize)
 
-					vtf\AutoGenerateMips(true)
+					vtf\AutoGenerateMips(false)
 					path = @@SetCacheH(hash, vtf\ToString())
 
 					mat\SetTexture('$basetexture', path)
@@ -1916,7 +1916,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
-				vtf\AutoGenerateMips(true)
+				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@SocksMaterial\SetTexture('$basetexture', path)
@@ -1993,7 +1993,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@WingsMaterial\SetTexture('$basetexture', path)
@@ -2088,7 +2088,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HairColor1Material\SetTexture('$basetexture', path)
@@ -2139,7 +2139,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HairColor2Material\SetTexture('$basetexture', path)
@@ -2227,7 +2227,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@TailColor1Material\SetTexture('$basetexture', path)
@@ -2278,7 +2278,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@TailColor2Material\SetTexture('$basetexture', path)
@@ -2409,7 +2409,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					vtf\CaptureRenderTargetCoroutine()
 					@@ReleaseRenderTarget(texSize, texSize)
 
-					vtf\AutoGenerateMips(true)
+					vtf\AutoGenerateMips(false)
 					path = @@SetCacheH(hash, vtf\ToString())
 
 					createdMaterial\SetTexture('$corneatexture', path)
@@ -2496,7 +2496,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			createdMaterial\SetTexture('$iris', path)
@@ -2608,7 +2608,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 				@_CaptureAlphaClosure(texSize, mat, vtf)
 
-				vtf\AutoGenerateMips(true)
+				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@CMarkTexture\SetTexture('$basetexture', path)
@@ -2645,7 +2645,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			@_CaptureAlphaClosure(texSize, mat, vtf)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@CMarkTexture\SetTexture('$basetexture', path)

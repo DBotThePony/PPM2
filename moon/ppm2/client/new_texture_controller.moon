@@ -200,7 +200,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			HairColor1Material\SetTexture('$basetexture', path)
@@ -252,7 +252,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			HairColor2Material\SetTexture('$basetexture', path)
@@ -352,7 +352,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@BatWingsMaterial\SetTexture('$basetexture', path)
@@ -427,7 +427,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			vtf\CaptureRenderTargetCoroutine()
 			@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(true)
+			vtf\AutoGenerateMips(false)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@BatWingsSkinMaterial\SetTexture('$basetexture', path)
