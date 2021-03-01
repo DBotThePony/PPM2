@@ -243,7 +243,7 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 	status, err = coroutine_resume(PPM2.TextureCompileThread)
 
 	if not status
-		PPM2.PonyTextureController.LOCKED_RENDERTARGETS = {}
+		table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS)
 		PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
 		error(err)
 
