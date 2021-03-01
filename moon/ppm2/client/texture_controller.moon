@@ -120,9 +120,9 @@ texture_compile_worker = ->
 				task[2].unfinished_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
-texture_compile_thread = coroutine.create(texture_compile_worker)
+PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(texture_compile_worker)
 
-url_thread = coroutine.create ->
+PPM2.URLThread = PPM2.URLThread or coroutine.create ->
 	while true
 		if not PPM2.HTML_MATERIAL_QUEUE[1]
 			coroutine_yield()
@@ -236,14 +236,14 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 		table.insert(PPM2.HTML_MATERIAL_QUEUE, data)
 
 hook.Add 'Think', 'PPM2 Material Tasks', ->
-	status, err = coroutine_resume(url_thread)
+	status, err = coroutine_resume(PPM2.URLThread)
 	error(err) if not status
 
-	status, err = coroutine_resume(texture_compile_thread)
+	status, err = coroutine_resume(PPM2.TextureCompileThread)
 
 	if not status
 		PPM2.PonyTextureController.LOCKED_RENDERTARGETS = {}
-		texture_compile_thread = coroutine.create(texture_compile_worker)
+		PPM2.TextureCompileThread = coroutine.create(texture_compile_worker)
 		error(err)
 
 	return
