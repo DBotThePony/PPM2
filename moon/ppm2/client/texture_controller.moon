@@ -1462,12 +1462,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		texSize = @@QUAD_SIZE_HORN
-		urlTextures = {}
-
-		for i = 1, 3
-			if geturl = PPM2.IsValidURL(@GrabData("HornURL#{i}"))
-				urlTextures[i] = select(2, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
-				return unless @isValid
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
 		@HornMaterialName1 = "!#{textureData_New1.name\lower()}"
@@ -1505,6 +1499,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@HornMaterial\SetTexture('$basetexture', getcache)
 			@HornMaterial\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
+			for i = 1, 3
+				if geturl = PPM2.IsValidURL(@GrabData("HornURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
+					return unless @isValid
+
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			{:r, :g, :b} = @GrabData('HornDetailColor')
@@ -1965,13 +1966,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = @@QUAD_SIZE_WING
 
-		urlTextures = {}
-
-		for i = 1, 3
-			if url = PPM2.IsValidURL(@GrabData("WingsURL#{i}"))
-				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
-				return unless @isValid
-
 		@WingsMaterialName = "!#{textureData.name\lower()}"
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
@@ -1994,6 +1988,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@WingsMaterial\SetTexture('$basetexture', getcache)
 			@WingsMaterial\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
+			for i = 1, 3
+				if url = PPM2.IsValidURL(@GrabData("WingsURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
 			surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
@@ -2057,13 +2058,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = @@QUAD_SIZE_HAIR
 
-		urlTextures = {}
-
-		for i = 1, 6
-			if url = PPM2.IsValidURL(@GrabData("ManeURL#{i}"))
-				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
-				return unless @isValid
-
 		hash = {
 			'mane 1',
 			@GrabData('ManeColor1')
@@ -2080,6 +2074,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@HairColor1Material\SetTexture('$basetexture', getcache)
 			@HairColor1Material\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("ManeURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			{:r, :g, :b} = @GrabData('ManeColor1')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
@@ -2126,6 +2127,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@HairColor2Material\SetTexture('$basetexture', getcache)
 			@HairColor2Material\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("ManeURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			{:r, :g, :b} = @GrabData('ManeColor2')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
@@ -2191,13 +2199,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		texSize = @@QUAD_SIZE_TAIL
 
-		urlTextures = {}
-
-		for i = 1, 6
-			if url = PPM2.IsValidURL(@GrabData("TailURL#{i}"))
-				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
-				return unless @isValid
-
 		hash = {
 			'tail 1',
 			@GrabData('TailColor1')
@@ -2214,6 +2215,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@TailColor1Material\SetTexture('$basetexture', getcache)
 			@TailColor1Material\GetTexture('$basetexture')\Download()
 		else
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("TailURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			{:r, :g, :b} = @GrabData('TailColor1')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
@@ -2258,7 +2266,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@TailColor2Material\SetTexture('$basetexture', getcache)
 			@TailColor2Material\GetTexture('$basetexture')\Download()
 		else
-			-- Second tail pass
+			urlTextures = {}
+
+			for i = 1, 6
+				if url = PPM2.IsValidURL(@GrabData("TailURL#{i}"))
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					return unless @isValid
+
 			{:r, :g, :b} = @GrabData('TailColor2')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
