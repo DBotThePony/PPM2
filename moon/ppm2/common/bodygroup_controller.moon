@@ -278,16 +278,16 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			switch @GrabData('Race')
 				when PPM2.RACE_EARTH
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
-					\SetBodygroup(@@BODYGROUP_WINGS, 1)
+					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_PEGASUS
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
-					\SetBodygroup(@@BODYGROUP_WINGS, 0)
+					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_UNICORN
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-					\SetBodygroup(@@BODYGROUP_WINGS, 1)
+					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
 				when PPM2.RACE_ALICORN
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-					\SetBodygroup(@@BODYGROUP_WINGS, 0)
+					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or not \GetNWBool('PPM2.IsDeathRagdoll')
 
 	ResetTail: =>
 		return if not CLIENT
@@ -491,19 +491,22 @@ class CPPMBodygroupController extends DefaultBodygroupController
 
 	ApplyRace: =>
 		return unless @isValid
+		ent = @GetEntity()
+		return if not IsValid(ent)
+
 		switch @GrabData('Race')
 			when PPM2.RACE_EARTH
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, 1)
+				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, 1) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_PEGASUS
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 1)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, 0)
+				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, 0) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_UNICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 0)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, 1)
+				ent\SetBodygroup(@@BODYGROUP_HORN, 0)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, 1) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_ALICORN
-				@GetEntity()\SetBodygroup(@@BODYGROUP_HORN, 2)
-				@GetEntity()\SetBodygroup(@@BODYGROUP_WINGS, 3)
+				ent\SetBodygroup(@@BODYGROUP_HORN, 2)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, 3) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 
 -- 0    LrigPelvis
 -- 1    Lrig_LEG_BL_Femur
@@ -736,25 +739,26 @@ class NewBodygroupController extends DefaultBodygroupController
 		@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GrabData('MaleBuff'))
 
 	SlowUpdate: (createModels = CLIENT, force = false) =>
-		return if not IsValid(@GetEntity())
-		return if not @GetEntity()\IsPony()
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == PPM2.EYELASHES_NONE and 1 or 0)
+		ent = @GetEntity()
+		return if not IsValid(ent)
+		return if not ent\IsPony()
+		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == PPM2.EYELASHES_NONE and 1 or 0)
 		@_UpdateMaleBuff()
 
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GrabData('ClawTeeth') and @GrabData('ClawTeethStrength') or 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_HOOF_FLUFF,    @GrabData('HoofFluffers') and @GrabData('HoofFluffersStrength') or 0)
+		ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
+		ent\SetFlexWeight(@@FLEX_ID_CLAW_TEETH,    @GrabData('ClawTeeth') and @GrabData('ClawTeethStrength') or 0)
+		ent\SetFlexWeight(@@FLEX_ID_HOOF_FLUFF,    @GrabData('HoofFluffers') and @GrabData('HoofFluffersStrength') or 0)
 
 		if @GrabData('Fangs')
 			if @GrabData('AlternativeFangs')
-				@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS, 0)
-				@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS2, @GrabData('FangsStrength'))
+				ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+				ent\SetFlexWeight(@@FLEX_ID_FANGS2, @GrabData('FangsStrength'))
 			else
-				@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS, @GrabData('FangsStrength'))
-				@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
+				ent\SetFlexWeight(@@FLEX_ID_FANGS, @GrabData('FangsStrength'))
+				ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
 		else
-			@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS, 0)
-			@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
+			ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+			ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
 
 		@ApplyRace()
 
@@ -798,18 +802,18 @@ class NewBodygroupController extends DefaultBodygroupController
 		switch @GrabData('Race')
 			when PPM2.RACE_EARTH
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
-				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_PEGASUS
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				-- strictly prop_ragdoll and not death body
-				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or not ent\GetNWBool('PPM2.IsDeathRagdoll')
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_UNICORN
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
-				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2)
+				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 			when PPM2.RACE_ALICORN
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				-- strictly prop_ragdoll and not death body
-				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or not ent\GetNWBool('PPM2.IsDeathRagdoll')
+				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 
 	DataChanges: (state) =>
 		return unless @isValid
