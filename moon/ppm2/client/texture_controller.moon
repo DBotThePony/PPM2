@@ -128,9 +128,7 @@ texture_compile_worker = ->
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
-			--print('Start task', name)
 			task[1](task[2]) if IsValid(task[2])
-			--print('Completed task', name)
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 texture_compile_thread = coroutine.create(texture_compile_worker)
@@ -182,7 +180,7 @@ url_thread = coroutine.create ->
 					PPM2.ALREADY_DOWNLOADING[data.index] = nil
 
 					for resolve in *data.resolve
-						resolve(newMat\GetTexture('$basetexture'), nil, newMat)
+						resolve(newMat\GetTexture('$basetexture'), newMat)
 
 					break
 
@@ -216,7 +214,7 @@ url_thread = coroutine.create ->
 					PPM2.ALREADY_DOWNLOADING[data.index] = nil
 
 					for resolve in *data.resolve
-						resolve(texture, panel, newMat)
+						resolve(texture, newMat)
 
 				coroutine_yield()
 				panel\Remove() if IsValid(panel)
@@ -227,10 +225,10 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	index = url .. '_' .. width .. '_' .. height
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
-		return DLib.Promise (resolve) -> resolve(data.texture, nil, data.material)
+		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
 
 	if data = PPM2.URL_MATERIAL_CACHE[index]
-		return DLib.Promise (resolve) -> resolve(data.texture, nil, data.material)
+		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
 
 	if data = PPM2.ALREADY_DOWNLOADING[index]
 		return DLib.Promise (resolve) -> table.insert(data.resolve, resolve)
@@ -255,6 +253,7 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 	status, err = coroutine_resume(texture_compile_thread)
 
 	if not status
+		PPM2.PonyTextureController.LOCKED_RENDERTARGETS = {}
 		texture_compile_thread = coroutine.create(texture_compile_worker)
 		error(err)
 
@@ -512,6 +511,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		--render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 		--render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		cam.Start2D()
+
+		surface.SetDrawColor(r, g, b, a)
 
 		return rt
 
@@ -1164,7 +1165,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if geturl = PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
 					return unless @isValid
 
 			@UpdatePhongData()
@@ -1421,7 +1422,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		for i = 1, 3
 			if geturl = PPM2.IsValidURL(@GrabData("HornURL#{i}"))
-				urlTextures[i] = select(3, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
+				urlTextures[i] = select(2, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
 				return unless @isValid
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
@@ -1433,30 +1434,36 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		@UpdatePhongData()
 
-		hash = PPM2.TextureTableHash(@MakeHashTable({
-			'BodyColor'
-			'HornColor'
-			'SeparateHorn'
-			'HornDetailColor'
-			'HornURLColor1'
-			'HornURLColor2'
-			'HornURLColor3'
-			'HornURL1'
-			'HornURL2'
-			'HornURL3'
-		}))
+		{:r, :g, :b} = @GrabData('BodyColor')
+		{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
+
+		hash = PPM2.TextureTableHash({
+			'horn'
+			r, g, b
+			@GrabData('SeparateHorn')
+			@GrabData('HornDetailColor')
+			@GrabData('HornURLColor1')
+			@GrabData('HornURLColor2')
+			@GrabData('HornURLColor3')
+			@GrabData('HornURL1')
+			@GrabData('HornURL2')
+			@GrabData('HornURL3')
+		})
+
+		@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+
+		do
+			local r, g, b
+			{:r, :g, :b} = @GrabData('HornDetailColor')
+			@HornMaterial2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		if getcache = @@GetCacheH(hash)
 			@HornMaterial\SetTexture('$basetexture', getcache)
 			@HornMaterial\GetTexture('$basetexture')\Download()
 		else
-			{:r, :g, :b} = @GrabData('BodyColor')
-			{:r, :g, :b} = @GrabData('HornColor') if @GrabData('SeparateHorn')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
 
-			@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 			{:r, :g, :b} = @GrabData('HornDetailColor')
-			@HornMaterial2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 			surface.SetDrawColor(r, g, b)
 			surface.SetMaterial(@@HORN_DETAIL_COLOR)
@@ -1853,8 +1860,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			hash = PPM2.TextureTableHash(hash)
 
 			if getcache = @@GetCacheH(hash)
-				@SocksMaterial\SetTexture('$bumpmap', getcache)
-				@SocksMaterial\GetTexture('$bumpmap')\Download()
+				@SocksMaterial\SetTexture('$basetexture', getcache)
+				@SocksMaterial\GetTexture('$basetexture')\Download()
 			else
 				@@LockRenderTarget(texSize, texSize, r, g, b)
 
@@ -1908,7 +1915,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		for i = 1, 3
 			if url = PPM2.IsValidURL(@GrabData("WingsURL#{i}"))
-				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
 		@WingsMaterialName = "!#{textureData.name\lower()}"
@@ -1998,7 +2005,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		for i = 1, 6
 			if url = PPM2.IsValidURL(@GrabData("ManeURL#{i}"))
-				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
 		hash = {
@@ -2058,8 +2065,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = PPM2.TextureTableHash(hash)
 
 		if getcache = @@GetCacheH(hash)
-			@HairColor1Material\SetTexture('$basetexture', getcache)
-			@HairColor1Material\GetTexture('$basetexture')\Download()
+			@HairColor2Material\SetTexture('$basetexture', getcache)
+			@HairColor2Material\GetTexture('$basetexture')\Download()
 		else
 			{:r, :g, :b} = @GrabData('ManeColor2')
 			@@LockRenderTarget(texSize, texSize, r, g, b)
@@ -2128,7 +2135,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		for i = 1, 6
 			if url = PPM2.IsValidURL(@GrabData("TailURL#{i}"))
-				urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
 		hash = {
@@ -2385,8 +2392,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		})
 
 		if getcache = @@GetCacheH(hash)
-			createdMaterial\SetTexture('$basetexture', getcache)
-			createdMaterial\GetTexture('$basetexture')\Download()
+			createdMaterial\SetTexture('$iris', getcache)
+			createdMaterial\GetTexture('$iris')\Download()
 		else
 			{:r, :g, :b, :a} = EyeBackground
 			@@LockRenderTarget(texSize, texSize, r, g, b)
@@ -2486,7 +2493,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@CMarkTexture\GetTexture('$basetexture')\Download()
 				@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 			else
-				material = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+				material = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
 				@@LockRenderTarget(texSize, texSize, 0, 0, 0, 0)

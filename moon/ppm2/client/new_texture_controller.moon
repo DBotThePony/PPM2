@@ -174,7 +174,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 			for i = 1, 6
 				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
@@ -224,7 +224,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 			for i = 1, 6
 				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
@@ -334,7 +334,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		else
 			for i = 1, 3
 				if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
 			@@LockRenderTarget(texSize, texSize, r, g, b)
@@ -407,7 +407,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 			for i = 1, 3
 				if url = PPM2.IsValidURL(@GrabData("BatWingSkinURL#{i}"))
-					urlTextures[i] = select(3, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
+					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
 			@@LockRenderTarget(texSize, texSize, r, g, b)
