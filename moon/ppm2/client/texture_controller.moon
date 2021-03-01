@@ -36,19 +36,6 @@
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
-hook.Remove 'PreRender', 'PPM2.ReflectionsUpdate'
-hook.Remove 'PreDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PostDrawEffects', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PreDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PostDrawHalos', 'PPM2.ReflectionsUpdate', (-> return true if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PreDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PostDrawOpaqueRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PreDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-hook.Remove 'PostDrawTranslucentRenderables', 'PPM2.ReflectionsUpdate', (-> return false if PPM2.__RENDERING_REFLECTIONS), -10
-
-mat_picmip = GetConVar('mat_picmip')
-RT_SIZES = [math.pow(2, i) for i = 1, 24]
-
 file.mkdir('ppm2_cache')
 
 PPM2.IsValidURL = (url) ->
@@ -267,44 +254,10 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.ALREADY_DOWNLOADING = {}
 	PPM2.FAILED_TO_DOWNLOAD = {}
 
-hook.Remove 'PreRender', 'PPM2.CompileTextures'
-hook.Remove 'Think', 'PPM2.WebMaterialThink'
-
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
 	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
 	return hash\Digest()
-
-PPM2.GetTextureQuality = ->
-	mult = 1
-
-	switch math.Clamp(mat_picmip\GetInt(), -2, 2)
-		when -2
-			mult *= 2
-		when 0
-			mult *= 0.75
-		when 1
-			mult *= 0.5
-		when 2
-			mult *= 0.25
-
-	if USE_HIGHRES_TEXTURES\GetBool()
-		mult *= 2
-
-	return mult
-
-PPM2.GetTextureSize = (texSize) ->
-	texSize *= PPM2.GetTextureQuality(texSize)
-	delta = 9999
-	nsize = texSize
-
-	for _, size in ipairs RT_SIZES
-		ndelta = math.abs(size - texSize)
-		if ndelta < delta
-			delta = ndelta
-			nsize = size
-
-	return nsize
 
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
