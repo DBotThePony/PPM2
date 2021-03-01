@@ -2608,7 +2608,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 				@_CaptureAlphaClosure(texSize, mat, vtf)
 
-				vtf\AutoGenerateMips(false)
+				vtf\AutoGenerateMips(true)
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@CMarkTexture\SetTexture('$basetexture', path)
@@ -2645,7 +2645,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			@_CaptureAlphaClosure(texSize, mat, vtf)
 
-			vtf\AutoGenerateMips(false)
+			vtf\AutoGenerateMips(true)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@CMarkTexture\SetTexture('$basetexture', path)
