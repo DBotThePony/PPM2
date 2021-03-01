@@ -107,7 +107,7 @@ PPM2.TEXTURE_TASKS = PPM2.TEXTURE_TASKS or {}
 coroutine_yield = coroutine.yield
 coroutine_resume = coroutine.resume
 
-texture_compile_worker = ->
+PPM2.TextureCompileWorker = ->
 	while true
 		name, task = next(PPM2.TEXTURE_TASKS)
 
@@ -121,7 +121,7 @@ texture_compile_worker = ->
 				task[2].unfinished_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
-PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(texture_compile_worker)
+PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
 
 PPM2.URLThread = PPM2.URLThread or coroutine.create ->
 	while true
@@ -244,7 +244,7 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 
 	if not status
 		PPM2.PonyTextureController.LOCKED_RENDERTARGETS = {}
-		PPM2.TextureCompileThread = coroutine.create(texture_compile_worker)
+		PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
 		error(err)
 
 	return
