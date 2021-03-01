@@ -327,8 +327,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		}
 
 		for i = 1, 3
-			if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
-				table.insert(hash, url)
+			table.insert(hash, PPM2.IsValidURL(@GrabData("BatWingURL#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
