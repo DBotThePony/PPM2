@@ -1279,10 +1279,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(@@PONY_SOCKS)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@BodyMaterial\SetTexture('$basetexture', path)
 			@BodyMaterial\GetTexture('$basetexture')\Download()
@@ -1304,10 +1307,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash_bump, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash_bump, vtf\ToString())
 
 			@BodyMaterial\SetTexture('$bumpmap', path)
 			@BodyMaterial\GetTexture('$bumpmap')\Download()
@@ -1369,10 +1374,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if @GrabData("TattooOverDetail#{i}")
 					@DrawTattoo(i, true)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash_glow, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash_glow, vtf\ToString())
 
 			@BodyMaterial\SetTexture('$selfillummask', path)
 			@BodyMaterial\GetTexture('$selfillummask')\Download()
@@ -1512,10 +1519,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color()})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$basetexture', path)
 			@HornMaterial\GetTexture('$basetexture')\Download()
@@ -1541,10 +1550,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			else
 				@HornMaterial2\SetTexture('$selfillummask', 'null')
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$selfillummask', path)
 			@HornMaterial\GetTexture('$selfillummask')\Download()
@@ -1564,10 +1575,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			surface.SetMaterial(PPM2.MaterialsRegistry.HORN_DETAIL_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HornMaterial\SetTexture('$bumpmap', path)
 			@HornMaterial\GetTexture('$bumpmap')\Download()
@@ -1715,10 +1728,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 							nextindex += 1
 							surface.DrawTexturedRect(0, 0, rtsize, rtsize)
 
-					vtf = DLib.VTF.Create(2, rtsize, rtsize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+					vtf = DLib.VTF.Create(2, rtsize, rtsize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
-					path = @@SetCacheH(hash, vtf\ToString())
 					@@ReleaseRenderTarget(rtsize, rtsize)
+
+					vtf\AutoGenerateMips(true)
+					path = @@SetCacheH(hash, vtf\ToString())
 
 					mat\SetTexture('$basetexture', path)
 					mat\GetTexture('$basetexture')\Download()
@@ -1913,10 +1928,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						surface.SetMaterial(details[i])
 						surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				path = @@SetCacheH(hash, vtf\ToString())
 				@@ReleaseRenderTarget(texSize, texSize)
+
+				vtf\AutoGenerateMips(true)
+				path = @@SetCacheH(hash, vtf\ToString())
 
 				@SocksMaterial\SetTexture('$basetexture', path)
 				@SocksMaterial\GetTexture('$basetexture')\Download()
@@ -1988,10 +2005,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@WingsMaterial\SetTexture('$basetexture', path)
 			@WingsMaterial\GetTexture('$basetexture')\Download()
@@ -2081,10 +2100,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HairColor1Material\SetTexture('$basetexture', path)
 			@HairColor1Material\GetTexture('$basetexture')\Download()
@@ -2123,10 +2144,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@HairColor2Material\SetTexture('$basetexture', path)
 			@HairColor2Material\GetTexture('$basetexture')\Download()
@@ -2209,10 +2232,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@TailColor1Material\SetTexture('$basetexture', path)
 			@TailColor1Material\GetTexture('$basetexture')\Download()
@@ -2252,10 +2277,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			@TailColor2Material\SetTexture('$basetexture', path)
 			@TailColor2Material\GetTexture('$basetexture')\Download()
@@ -2381,10 +2408,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					surface.SetDrawColor(255, 255, 255)
 					DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
 
-					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
-					path = @@SetCacheH(hash, vtf\ToString())
 					@@ReleaseRenderTarget(texSize, texSize)
+
+					vtf\AutoGenerateMips(true)
+					path = @@SetCacheH(hash, vtf\ToString())
 
 					createdMaterial\SetTexture('$corneatexture', path)
 					createdMaterial\SetTexture('$corneatexture')\Download()
@@ -2466,10 +2495,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType + 1])
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
-			path = @@SetCacheH(hash, vtf\ToString())
 			@@ReleaseRenderTarget(texSize, texSize)
+
+			vtf\AutoGenerateMips(true)
+			path = @@SetCacheH(hash, vtf\ToString())
 
 			createdMaterial\SetTexture('$iris', path)
 			createdMaterial\GetTexture('$iris')\Download()
@@ -2573,13 +2604,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(material)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b)})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				cam.End2D()
 				render.PopRenderTarget()
 
 				@_CaptureAlphaClosure(texSize, mat, vtf)
 
+				vtf\AutoGenerateMips(true)
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@CMarkTexture\SetTexture('$basetexture', path)
@@ -2609,13 +2641,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mark)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b)})
+			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 			vtf\CaptureRenderTargetCoroutine()
 			cam.End2D()
 			render.PopRenderTarget()
 
 			@_CaptureAlphaClosure(texSize, mat, vtf)
 
+			vtf\AutoGenerateMips(true)
 			path = @@SetCacheH(hash, vtf\ToString())
 
 			@CMarkTexture\SetTexture('$basetexture', path)
