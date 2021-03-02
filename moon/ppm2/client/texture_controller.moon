@@ -907,8 +907,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PhongFront = @GrabData(prefix .. 'PhongFront')
 		PhongMiddle = @GrabData(prefix .. 'PhongMiddle')
 		Lightwarp = @GrabData(prefix .. 'Lightwarp')
-		LightwarpURL = @GrabData(prefix .. 'LightwarpURL')
-		BumpmapURL = @GrabData(prefix .. 'BumpmapURL')
+		LightwarpURL = PPM2.IsValidURL(@GrabData(prefix .. 'LightwarpURL'))
+		BumpmapURL = PPM2.IsValidURL(@GrabData(prefix .. 'BumpmapURL'))
 		PhongSliding = @GrabData(prefix .. 'PhongSliding')
 		{:r, :g, :b} = PhongTint
 		r /= 255
@@ -924,29 +924,25 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				\SetVector('$phongtint', PhongTint)
 				\SetVector('$phongfresnelranges', PhongFresnel)
 
-		if LightwarpURL == '' or not LightwarpURL\find('^https?://')
+		if LightwarpURL
+			ticket = @PutTicket(prefix .. '_phong')
+
+			PPM2.GetURLMaterial(LightwarpURL, 256, 16)\Then (tex, mat) ->
+				return if not @CheckTicket(prefix .. '_phong', ticket)
+				matTarget\SetTexture('$lightwarptexture', tex)
+		else
 			myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
 			matTarget\SetTexture('$lightwarptexture', myTex)
-		--else
-		--  ticket = @PutTicket(prefix .. '_phong')
-		--  @url_processes += 1
-		--
-		--  @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
-		--      @url_processes -= 1
-		--      return if not @CheckTicket(prefix .. '_phong', ticket)
-		--      matTarget\SetTexture('$lightwarptexture', tex)
 
 		if not noBump
-			if BumpmapURL == '' or not BumpmapURL\find('^https?://')
-				matTarget\SetUndefined('$bumpmap')
-			--else
-			--  ticket = @PutTicket(prefix .. '_bump')
-			--  @url_processes += 1
-			--
-			--  @@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
-			--      @url_processes -= 1
-			--      return if not @CheckTicket(prefix .. '_bump', ticket)
-			--      matTarget\SetTexture('$bumpmap', tex)
+			if BumpmapURL
+				ticket = @PutTicket(prefix .. '_bump')
+
+			    PPM2.GetURLMaterial(BumpmapURL, matTarget\Width(), matTarget\Height())\Then (tex, mat) ->
+			        return if not @CheckTicket(prefix .. '_bump', ticket)
+			        matTarget\SetTexture('$bumpmap', tex)
+			else
+			    matTarget\SetUndefined('$bumpmap')
 
 	GetBodyPhongMaterials: (output = {}) =>
 		table.insert(output, {@BodyMaterial, false, false}) if @BodyMaterial
@@ -955,6 +951,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		table.insert(output, {@HornMaterial2, false, true}) if @HornMaterial2 and not @GrabData('SeparateHornPhong')
 		table.insert(output, {@WingsMaterial, false, false}) if @WingsMaterial and not @GrabData('SeparateWingsPhong')
 		table.insert(output, {@Eyelashes, false, false}) if @Eyelashes and not @GrabData('SeparateEyelashesPhong')
+
 		if not @GrabData('SeparateManePhong')
 			table.insert(output, {@HairColor1Material, false, false}) if @HairColor1Material
 			table.insert(output, {@HairColor2Material, false, false}) if @HairColor2Material
