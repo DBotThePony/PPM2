@@ -118,7 +118,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureFirst = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1_#{prefix}"
+			'name': "PPM2_#{@GetID()}_Mane_1_#{prefix}"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -141,7 +141,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2_#{prefix}"
+			'name': "PPM2_#{@GetID()}_Mane_2_#{prefix}"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -288,7 +288,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWings"
+			'name': "PPM2_#{@GetID()}_BatWings"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -362,7 +362,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_BatWingsSkin"
+			'name': "PPM2_#{@GetID()}_BatWingsSkin"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -468,20 +468,20 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		}
 
 		{:r, :g, :b} = @GrabData('TeethColor')
-		@TeethMaterialName = "!ppm2_#{@@SessionID}_#{@GetID()}_teeth"
-		@TeethMaterial = CreateMaterial("ppm2_#{@@SessionID}_#{@GetID()}_teeth", 'VertexLitGeneric', textureData)
+		@TeethMaterialName = "!PPM2_#{@GetID()}_teeth"
+		@TeethMaterial = CreateMaterial("PPM2_#{@GetID()}_teeth", 'VertexLitGeneric', textureData)
 		@TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		{:r, :g, :b} = @GrabData('MouthColor')
-		@MouthMaterialName = "!ppm2_#{@@SessionID}_#{@GetID()}_mouth"
-		@MouthMaterial = CreateMaterial("ppm2_#{@@SessionID}_#{@GetID()}_mouth", 'VertexLitGeneric', textureData)
+		@MouthMaterialName = "!PPM2_#{@GetID()}_mouth"
+		@MouthMaterial = CreateMaterial("PPM2_#{@GetID()}_mouth", 'VertexLitGeneric', textureData)
 		@MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		{:r, :g, :b} = @GrabData('TongueColor')
-		@TongueMaterialName = "!ppm2_#{@@SessionID}_#{@GetID()}_tongue"
-		@TongueMaterial = CreateMaterial("ppm2_#{@@SessionID}_#{@GetID()}_tongue", 'VertexLitGeneric', textureData)
+		@TongueMaterialName = "!PPM2_#{@GetID()}_tongue"
+		@TongueMaterial = CreateMaterial("PPM2_#{@GetID()}_tongue", 'VertexLitGeneric', textureData)
 		@TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 

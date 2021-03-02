@@ -288,9 +288,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@EYE_LINE_R_2 = PPM2.MaterialsRegistry.EYE_LINE_R_2
 	@PONY_SOCKS = PPM2.MaterialsRegistry.PONY_SOCKS
 
-	--@SessionID = math.random(1, 1000)
-	@SessionID = 0
-
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
 	@MAT_INDEX_BODY = 2
@@ -1000,7 +997,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Body"
+			'name': "PPM2_#{@GetID()}_Body"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/ppm2/base/body'
@@ -1254,7 +1251,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn"
+			'name': "PPM2_#{@GetID()}_Horn"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/ppm2/base/horn'
@@ -1279,7 +1276,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureData_New1 = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn1"
+			'name': "PPM2_#{@GetID()}_Horn1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1302,7 +1299,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureData_New2 = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Horn2"
+			'name': "PPM2_#{@GetID()}_Horn2"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1495,7 +1492,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			return
 
 		if matregistry[clothes + 1].size == 0
-			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_1"
+			name = "PPM2_#{@GetID()}_Clothes_#{iName}_1"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 			@[iName .. 'Clothes_Mat'] = {mat}
 			@[iName .. 'Clothes_MatName'] = {"!#{name}"}
@@ -1528,7 +1525,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		nextindex = 1
 
 		for matIndex = 1, matregistry[clothes + 1].size
-			name = "PPM2_#{@@SessionID}_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
+			name = "PPM2_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 
 			tab1[matIndex] = mat
@@ -1637,19 +1634,19 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureColor1 = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Color1"
+			'name': "PPM2_#{@GetID()}_NewSocks_Color1"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
 
 		textureColor2 = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Color2"
+			'name': "PPM2_#{@GetID()}_NewSocks_Color2"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
 
 		textureBase = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_NewSocks_Base"
+			'name': "PPM2_#{@GetID()}_NewSocks_Base"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
@@ -1689,7 +1686,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Eyelashes"
+			'name': "PPM2_#{@GetID()}_Eyelashes"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1724,7 +1721,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Socks"
+			'name': "PPM2_#{@GetID()}_Socks"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -1809,7 +1806,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Wings"
+			'name': "PPM2_#{@GetID()}_Wings"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1890,7 +1887,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureFirst = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_1"
+			'name': "PPM2_#{@GetID()}_Mane_1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1912,7 +1909,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Mane_2"
+			'name': "PPM2_#{@GetID()}_Mane_2"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -2031,7 +2028,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	CompileTail: =>
 		return unless @isValid
 		textureFirst = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_1"
+			'name': "PPM2_#{@GetID()}_Tail_1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -2053,7 +2050,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_Tail_2"
+			'name': "PPM2_#{@GetID()}_Tail_2"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -2226,7 +2223,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
+			'name': "PPM2_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
 			'shader': EyeRefract and 'EyeRefract' or 'Eyes'
 			'data': {
 				'$iris': 'models/ppm2/base/face/p_base'
@@ -2424,7 +2421,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark3"
+			'name': "PPM2_#{@GetID()}_CMark3"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'null'
@@ -2435,7 +2432,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureDataGUI = {
-			'name': "PPM2_#{@@SessionID}_#{@GetID()}_CMark_GUI3"
+			'name': "PPM2_#{@GetID()}_CMark_GUI3"
 			'shader': 'UnlitGeneric'
 			'data': {
 				'$basetexture': 'null'
