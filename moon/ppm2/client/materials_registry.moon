@@ -25,34 +25,10 @@ PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE
 
 _Material = Material
 
-RELOADABLE_MATERIALS = {}
-PPM2.RELOADABLE_MATERIALS = RELOADABLE_MATERIALS
-
-concommand.Add 'ppm2_reload_materials', ->
-	cTime = SysTime()
-	for _, mat in ipairs RELOADABLE_MATERIALS
-		if texname = mat\GetString('$basetexture')
-			mat\SetTexture('$basetexture', texname)
-		if texture = mat\GetTexture('$basetexture')
-			texture\Download()
-		mat\Recompute()
-	PPM2.PonyTextureController.URL_MATERIAL_CACHE = {}
-	PPM2.Message('Reloaded textures in ', math.floor((SysTime() - cTime) * 100000) / 100, ' milliseconds.')
-	RunConsoleCommand('ppm2_reload')
-	RunConsoleCommand('ppm2_require')
-
-_CreateMaterial = CreateMaterial
-
 Material = (path) ->
 	return path if not PPM2.FORCE_PRECACHE\GetBool()
 	matNew = _Material(path)
-	table.insert(RELOADABLE_MATERIALS, matNew)
 	return matNew
-
-CreateMaterial = (name, shader, data) ->
-	matNew, time = _CreateMaterial(name, shader, data)
-	table.insert(RELOADABLE_MATERIALS, matNew)
-	return matNew, time
 
 module = {
 	BODY_DETAILS: {
