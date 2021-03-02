@@ -2388,8 +2388,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
 
 	_CaptureAlphaClosure: (texSize, mat, vtf) =>
-		surface.SetDrawColor(255, 255, 255)
 		rt1, rt2, mat1, mat2 = @@LockRenderTargetMask(texSize, texSize)
+		surface.SetDrawColor(255, 255, 255)
 
 		-- capture alpha
 		render.PushRenderTarget(rt1)
