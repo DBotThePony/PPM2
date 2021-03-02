@@ -927,26 +927,26 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		if LightwarpURL == '' or not LightwarpURL\find('^https?://')
 			myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
 			matTarget\SetTexture('$lightwarptexture', myTex)
-		else
-			ticket = @PutTicket(prefix .. '_phong')
-			@url_processes += 1
-
-			@@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
-				@url_processes -= 1
-				return if not @CheckTicket(prefix .. '_phong', ticket)
-				matTarget\SetTexture('$lightwarptexture', tex)
+		--else
+		--  ticket = @PutTicket(prefix .. '_phong')
+		--  @url_processes += 1
+		--
+		--  @@LoadURL LightwarpURL, 256, 16, (tex, panel, mat) ->
+		--      @url_processes -= 1
+		--      return if not @CheckTicket(prefix .. '_phong', ticket)
+		--      matTarget\SetTexture('$lightwarptexture', tex)
 
 		if not noBump
 			if BumpmapURL == '' or not BumpmapURL\find('^https?://')
 				matTarget\SetUndefined('$bumpmap')
-			else
-				ticket = @PutTicket(prefix .. '_bump')
-				@url_processes += 1
-
-				@@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
-					@url_processes -= 1
-					return if not @CheckTicket(prefix .. '_bump', ticket)
-					matTarget\SetTexture('$bumpmap', tex)
+			--else
+			--  ticket = @PutTicket(prefix .. '_bump')
+			--  @url_processes += 1
+			--
+			--  @@LoadURL BumpmapURL, matTarget\Width(), matTarget\Height(), (tex, panel, mat) ->
+			--      @url_processes -= 1
+			--      return if not @CheckTicket(prefix .. '_bump', ticket)
+			--      matTarget\SetTexture('$bumpmap', tex)
 
 	GetBodyPhongMaterials: (output = {}) =>
 		table.insert(output, {@BodyMaterial, false, false}) if @BodyMaterial
@@ -2388,6 +2388,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
 
 	_CaptureAlphaClosure: (texSize, mat, vtf) =>
+		surface.SetDrawColor(255, 255, 255)
 		rt1, rt2, mat1, mat2 = @@LockRenderTargetMask(texSize, texSize)
 
 		-- capture alpha
