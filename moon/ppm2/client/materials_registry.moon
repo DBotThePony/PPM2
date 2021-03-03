@@ -19,7 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires', '0', {FCVAR_ARCHIVE}, 'Double the texture resolution. Can take ages at texture encoding if CPU is slow!')
+PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires', '0', {FCVAR_ARCHIVE}, 'Double the texture resolution. Can take ages at texture encoding if CPU is slow, and require a lot of RAM for encoding and a lot of VRAM for textures!')
 PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of loading them when needed')
 
 _Material = Material
