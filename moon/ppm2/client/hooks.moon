@@ -172,14 +172,7 @@ cvars.AddChangeCallback('mat_picmip', (->
 	)
 ), 'ppm2')
 
-cvars.AddChangeCallback('ppm2_cl_hires_generic', (->
-	timer.Simple 0, (->
-		RunConsoleCommand('ppm2_require')
-		RunConsoleCommand('ppm2_reload')
-	)
-), 'ppm2')
-
-cvars.AddChangeCallback('ppm2_cl_hires_body', (->
+cvars.AddChangeCallback('ppm2_cl_hires', (->
 	timer.Simple 0, (->
 		RunConsoleCommand('ppm2_require')
 		RunConsoleCommand('ppm2_reload')

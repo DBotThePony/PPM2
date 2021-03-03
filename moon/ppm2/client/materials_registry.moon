@@ -19,8 +19,7 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-PPM2.USE_HIGHRES_BODY = CreateConVar('ppm2_cl_hires_body', '0', {FCVAR_ARCHIVE}, 'Use high resoluation when rendering pony bodies. AFFECTS ONLY TEXTURE COMPILATION TIME (increases lag spike on pony data load)')
-PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires_generic', '0', {FCVAR_ARCHIVE}, 'Create 1024x1024 textures instead of 512x512 on texture compiling')
+PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires', '0', {FCVAR_ARCHIVE}, 'Double the texture resolution. Can take ages at texture encoding if CPU is slow!')
 PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of loading them when needed')
 
 _Material = Material

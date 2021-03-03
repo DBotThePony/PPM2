@@ -872,7 +872,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_BODY = 2048
 	@TATTOO_DEF_SIZE = 128
 
-	DrawTattoo: (index = 1, drawingGlow = false, texSize = @@QUAD_SIZE_BODY) =>
+	DrawTattoo: (index = 1, drawingGlow = false, texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY) =>
 		mat = PPM2.MaterialsRegistry.TATTOOS[@GrabData("TattooType#{index}")]
 		return if not mat
 
@@ -892,7 +892,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(0, 0, 0)
 
 		surface.SetMaterial(mat)
-		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_BODY\GetInt() + 1)
+		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1)
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
@@ -1032,6 +1032,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@GrabData('Socks')
 			@GrabData('Bodysuit')
 			@GrabData('EyebrowsColor')
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
@@ -1050,7 +1051,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hash, @GrabData("TattooColor#{i}"))
 
 		hash = PPM2.TextureTableHash(hash)
-		texSize = @@QUAD_SIZE_BODY
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY
 
 		@BodyMaterialName = "!#{textureData.name\lower()}"
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1156,6 +1157,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash_bump = PPM2.TextureTableHash({
 			'body bump'
 			math.floor(@GrabData('BodyBumpStrength') * 255)
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash_bump)
@@ -1182,6 +1184,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'body illum'
 			@GrabData('GlowingEyebrows')
 			math.floor(@GrabData('EyebrowsGlowStrength') * 255)
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
@@ -1322,7 +1325,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = @@QUAD_SIZE_HORN
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HORN
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
 		@HornMaterialName1 = "!#{textureData_New1.name\lower()}"
@@ -1347,6 +1350,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			PPM2.IsValidURL(@GrabData('HornURL1'))
 			PPM2.IsValidURL(@GrabData('HornURL2'))
 			PPM2.IsValidURL(@GrabData('HornURL3'))
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -1395,6 +1399,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'horn illum'
 			@GrabData('HornGlow')
 			math.floor(@GrabData('HornGlowSrength') * 255)
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -1425,6 +1430,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = PPM2.TextureTableHash({
 			'horn bump'
 			@GrabData('HornDetailColor').a
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -1568,6 +1574,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					opaque
 					iName
 					@GrabData(iName .. 'Clothes')
+					USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 				}
 
 				for i = 1, PPM2.MAX_CLOTHES_COLORS
@@ -1659,7 +1666,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@NewSocksColor2 = CreateMaterial(textureColor2.name, textureColor2.shader, textureColor2.data)
 		@NewSocksBase = CreateMaterial(textureBase.name, textureBase.shader, textureBase.data)
 
-		texSize = @@QUAD_SIZE_SOCKS
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
 
 		@UpdatePhongData()
 
@@ -1746,7 +1753,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@SocksMaterialName = "!#{textureData.name\lower()}"
 		@SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_SOCKS
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
 
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
@@ -1771,6 +1778,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@GrabData('SocksDetailColor4')
 				@GrabData('SocksDetailColor5')
 				@GrabData('SocksDetailColor6')
+				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			}
 
 			hash = PPM2.TextureTableHash(hash)
@@ -1827,7 +1835,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = @@QUAD_SIZE_WING
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		@WingsMaterialName = "!#{textureData.name\lower()}"
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1839,6 +1847,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = {
 			'wings',
 			r, g, b
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
@@ -1919,11 +1928,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_HAIR
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
 
 		hash = {
 			'mane 1',
 			@GrabData('ManeColor1')
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -1977,6 +1987,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = {
 			'mane 2',
 			@GrabData('ManeColor2')
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2060,11 +2071,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_TAIL
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_TAIL
 
 		hash = {
 			'tail 1',
 			@GrabData('TailColor1')
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2116,6 +2128,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = {
 			'tail 2',
 			@GrabData('TailColor2')
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2216,7 +2229,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
-		texSize = @@QUAD_SIZE_EYES
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_EYES
 
 		shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
 		shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
@@ -2272,6 +2285,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if EyeCornerA
 				hash = PPM2.TextureTableHash({
 					'eye cornera',
+					USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 					IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation
 				})
 
@@ -2331,6 +2345,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			math.round(EyeRotation)
 			EyeLineDirection
 			math.round(PonySize * 100)
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -2454,7 +2469,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
 
-		texSize = @@QUAD_SIZE_CMARK
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_CMARK
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
@@ -2464,6 +2479,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				url
 				@GrabData('CMarkColor')
 				shift\floor(), sizeQuad\floor()
+				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			})
 
 			if getcache = @@GetCacheH(hash)
@@ -2503,6 +2519,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@GrabData('CMarkType')
 			@GrabData('CMarkColor')
 			shift\floor(), sizeQuad\floor()
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)

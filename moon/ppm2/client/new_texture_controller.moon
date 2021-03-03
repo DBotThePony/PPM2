@@ -19,8 +19,6 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-
-USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
 -- [ 1] = "models/ppm2/base/cmark",
@@ -152,11 +150,12 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = @@QUAD_SIZE_HAIR
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
 
 		hash = {
 			'mane ' .. prefix .. ' 1',
 			@GrabData("#{prefix}ManeColor1")
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -209,6 +208,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		hash = {
 			'mane ' .. prefix .. ' 2',
 			@GrabData("#{prefix}ManeColor2")
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -314,7 +314,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_WING
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		urlTextures = {}
 
@@ -324,6 +324,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		hash = {
 			'bat wings',
 			r, g, b
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
@@ -388,7 +389,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = @@QUAD_SIZE_WING
+		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		{:r, :g, :b} = @GrabData('BodyColor')
 		{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
@@ -396,6 +397,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		hash = {
 			'bat wings skin',
 			r, g, b
+			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
