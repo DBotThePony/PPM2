@@ -410,7 +410,6 @@ __index = (key) =>
 	value = rawget(getmetatable(@).original, key)
 	return value if not isstring(value)
 	mat = _Material(value, 'smooth')
-	table.insert(RELOADABLE_MATERIALS, mat)
 	rawset(@, key, mat)
 	return mat
 
