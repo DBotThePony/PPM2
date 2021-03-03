@@ -35,7 +35,7 @@
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
-file.mkdir('ppm2_cache')
+PPM2.CacheManager = DLib.CacheManager('ppm2_cache', 1024 * 0x00100000, 'vtf')
 
 developer = ConVar('developer')
 
@@ -422,29 +422,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
-	@GetCache = (index) =>
-		hash = DLib.Util.QuickSHA1(index)
-		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
-		return if not file.Exists(path, 'DATA')
-		return '../data/' .. path
-
-	@SetCache = (index, value) =>
-		hash = DLib.Util.QuickSHA1(index)
-		file.mkdir('ppm2_cache/' .. hash\sub(1, 2))
-		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
-		file.Write(path, value)
-		return '../data/' .. path
-
 	@GetCacheH = (hash) =>
-		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
-		return if not file.Exists(path, 'DATA')
+		path = PPM2.CacheManager\HasGetHash(hash)
+		return if not path
 		return '../data/' .. path
 
-	@SetCacheH = (hash, value) =>
-		file.mkdir('ppm2_cache/' .. hash\sub(1, 2))
-		path = 'ppm2_cache/' .. hash\sub(1, 2) .. '/' .. hash .. '.vtf'
-		file.Write(path, value)
-		return '../data/' .. path
+	@SetCacheH = (hash, value) => '../data/' .. PPM2.CacheManager\SetHash(hash, value)
 
 	@LOCKED_RENDERTARGETS = LOCKED_RENDERTARGETS or {}
 	@LOCKED_RENDERTARGETS_MASK = LOCKED_RENDERTARGETS_MASK or {}
