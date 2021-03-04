@@ -36,6 +36,7 @@ USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
 PPM2.CacheManager = DLib.CacheManager('ppm2_cache', 1024 * 0x00100000, 'vtf')
+PPM2.CacheManager\AddCommands()
 
 developer = ConVar('developer')
 
