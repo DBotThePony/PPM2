@@ -153,7 +153,7 @@ class PonyDataInstance
 			error("Attempt to apply data to object #{target} at unknown index #{key}!") if not target["Set#{key}"]
 			target["Set#{key}"](target, value, ...)
 
-	UpdateController: (...) => @ApplyDataToObject(@nwObj, ...)
+	UpdateController: (...) => @ApplyDataToObject(@nwObj, @networkNWObject, ...)
 	CreateController: (...) => @CreateNetworkObject(false, ...)
 	CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
 
