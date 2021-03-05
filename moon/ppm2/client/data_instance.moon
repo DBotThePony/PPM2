@@ -317,7 +317,7 @@ class PonyDataInstance
 				ctrl = data\GetRenderController()
 
 				if textures = ctrl\GetTextureController()
-					textures\CompileTextures(true)
+					textures\CompileTextures()
 
 				if bg = data\GetBodygroupController()
 					bg\ApplyBodygroups()

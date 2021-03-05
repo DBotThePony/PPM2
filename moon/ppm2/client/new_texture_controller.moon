@@ -112,7 +112,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 	GetManeTypeLower: => @GrabData('ManeTypeLowerNew')
 	GetTailType: => @GrabData('TailTypeNew')
 
-	CompileHairInternal: (prefix = 'Upper') =>
+	CompileHairInternal: (prefix = 'Upper', isEditor, lock, release) =>
 		return unless @isValid
 
 		textureFirst = {
@@ -177,7 +177,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
-			@@LockRenderTarget(texSize, texSize, r, g, b)
+			lock(@, prefix .. '_hair_1_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
@@ -195,15 +195,18 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-			vtf\CaptureRenderTargetCoroutine()
-			@@ReleaseRenderTarget(texSize, texSize)
+			if isEditor
+				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
+			else
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine()
+				@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(false)
-			path = @@SetCacheH(hash, vtf\ToString())
+				vtf\AutoGenerateMips(false)
+				path = @@SetCacheH(hash, vtf\ToString())
 
-			HairColor1Material\SetTexture('$basetexture', path)
-			HairColor1Material\GetTexture('$basetexture')\Download()
+				HairColor1Material\SetTexture('$basetexture', path)
+				HairColor1Material\GetTexture('$basetexture')\Download()
 
 		hash = {
 			'mane ' .. prefix .. ' 2',
@@ -230,7 +233,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
-			@@LockRenderTarget(texSize, texSize, r, g, b)
+			lock(@, prefix .. '_hair_2_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
@@ -248,15 +251,18 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-			vtf\CaptureRenderTargetCoroutine()
-			@@ReleaseRenderTarget(texSize, texSize)
+			if isEditor
+				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
+			else
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine()
+				@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(false)
-			path = @@SetCacheH(hash, vtf\ToString())
+				vtf\AutoGenerateMips(false)
+				path = @@SetCacheH(hash, vtf\ToString())
 
-			HairColor2Material\SetTexture('$basetexture', path)
-			HairColor2Material\GetTexture('$basetexture')\Download()
+				HairColor2Material\SetTexture('$basetexture', path)
+				HairColor2Material\GetTexture('$basetexture')\Download()
 
 		return HairColor1Material, HairColor2Material, HairColor1MaterialName, HairColor2MaterialName
 
@@ -284,7 +290,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@ApplyPhongData(@MouthMaterial, 'Mouth') if @MouthMaterial
 		@ApplyPhongData(@TongueMaterial, 'Tongue') if @TongueMaterial
 
-	CompileBatWings: =>
+	CompileBatWings: (isEditor, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -341,7 +347,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			@@LockRenderTarget(texSize, texSize, r, g, b)
+			lock(@, 'bat_wing', texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GrabData("BatWingURLColor#{i}")
@@ -349,17 +355,20 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-			vtf\CaptureRenderTargetCoroutine()
-			@@ReleaseRenderTarget(texSize, texSize)
+			if isEditor
+				@BatWingsMaterial\SetTexture('$basetexture', release(@, 'bat_wing', texSize, texSize))
+			else
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine()
+				@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(false)
-			path = @@SetCacheH(hash, vtf\ToString())
+				vtf\AutoGenerateMips(false)
+				path = @@SetCacheH(hash, vtf\ToString())
 
-			@BatWingsMaterial\SetTexture('$basetexture', path)
-			@BatWingsMaterial\GetTexture('$basetexture')\Download()
+				@BatWingsMaterial\SetTexture('$basetexture', path)
+				@BatWingsMaterial\GetTexture('$basetexture')\Download()
 
-	CompileBatWingsSkin: =>
+	CompileBatWingsSkin: (isEditor, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -417,7 +426,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			@@LockRenderTarget(texSize, texSize, r, g, b)
+			lock(@, 'bat_wing_skin', texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
@@ -425,22 +434,25 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-			vtf\CaptureRenderTargetCoroutine()
-			@@ReleaseRenderTarget(texSize, texSize)
+			if isEditor
+				@BatWingsSkinMaterial\SetTexture('$basetexture', release(@, 'bat_wing_skin', texSize, texSize))
+			else
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine()
+				@@ReleaseRenderTarget(texSize, texSize)
 
-			vtf\AutoGenerateMips(false)
-			path = @@SetCacheH(hash, vtf\ToString())
+				vtf\AutoGenerateMips(false)
+				path = @@SetCacheH(hash, vtf\ToString())
 
-			@BatWingsSkinMaterial\SetTexture('$basetexture', path)
-			@BatWingsSkinMaterial\GetTexture('$basetexture')\Download()
+				@BatWingsSkinMaterial\SetTexture('$basetexture', path)
+				@BatWingsSkinMaterial\GetTexture('$basetexture')\Download()
 
-	CompileHair: =>
+	CompileHair: (isEditor, lock, release) =>
 		return unless @isValid
-		return super() if not @GrabData('SeparateMane')
+		return super(isEditor, lock, release) if not @GrabData('SeparateMane')
 
-		mat1, mat2, name1, name2 = @CompileHairInternal('Upper')
-		mat3, mat4, name3, name4 = @CompileHairInternal('Lower')
+		mat1, mat2, name1, name2 = @CompileHairInternal('Upper', isEditor, lock, release)
+		mat3, mat4, name3, name4 = @CompileHairInternal('Lower', isEditor, lock, release)
 
 		@UpperManeColor1, @UpperManeColor2 = mat1, mat2
 		@LowerManeColor1, @LowerManeColor2 = mat3, mat4
@@ -448,7 +460,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@UpperManeColor1Name, @UpperManeColor2Name = name1, name2
 		@LowerManeColor1Name, @LowerManeColor2Name = name3, name4
 
-	CompileMouth: =>
+	CompileMouth: (isEditor, lock, release) =>
 		textureData = {
 			'$basetexture': 'models/debug/debugwhite'
 			'$lightwarptexture': 'models/ppm2/base/lightwrap'
@@ -489,19 +501,14 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		@UpdatePhongData()
 
-	CompileTextures: (now = false) =>
+	CompileTextures: (isEditor, lock, release) =>
 		return if not @GetData()\IsValid()
 
-		super(now)
+		super()
 
-		if now
-			@CreateInstantRenderTask('CompileMouth')
-			@CreateInstantRenderTask('CompileBatWingsSkin')
-			@CreateInstantRenderTask('CompileBatWings')
-		else
-			@CreateRenderTask('CompileMouth')
-			@CreateRenderTask('CompileBatWingsSkin')
-			@CreateRenderTask('CompileBatWings')
+		@CreateRenderTask('CompileMouth')
+		@CreateRenderTask('CompileBatWingsSkin')
+		@CreateRenderTask('CompileBatWings')
 
 	GetTeeth: => @TeethMaterial
 	GetMouth: => @MouthMaterial

@@ -498,6 +498,9 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		if scale = @GetSizeController()
 			scale\ModifyScale()
 
+	GetIsEditor: => @is_editor_data or false
+	SetIsEditor: (value = false) => @is_editor_data = value
+
 	Reset: =>
 		if scale = @GetSizeController()
 			scale\Reset()

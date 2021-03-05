@@ -609,8 +609,9 @@ PPM2.EditorBuildNewFilesPanel = =>
 	openFile = (fil) ->
 		confirm = ->
 			@frame.data\SetFilename(fil)
-			@frame.data\ReadFromDisk(true)
+			@frame.data\ReadFromDisk()
 			@frame.data\UpdateController()
+			print(@frame.data)
 			@frame.DoUpdate()
 			@unsavedChanges = false
 			@frame.unsavedChanges = false
@@ -1894,11 +1895,14 @@ PPM2.OpenNewEditor = ->
 				\Remove()
 				return PPM2.OpenNewEditor()
 			\SetVisible(true)
+
 			.controller = LocalPlayer()\GetPonyData() or .controller
+			.controller\SetIsEditor(true)
 			.data\ApplyDataToObject(.controller, false)
 			.data\SetNetworkObject(.controller)
 			.leftPanel\SetVisible(true)
 			.calcPanel\SetVisible(true)
+
 			net.Start('PPM2.EditorStatus')
 			net.WriteBool(true)
 			net.SendToServer()
@@ -1909,6 +1913,8 @@ PPM2.OpenNewEditor = ->
 	if not controller
 		Derma_Message('gui.ppm2.editor.generic.wtf', 'gui.ppm2.editor.generic.ohno', 'gui.ppm2.editor.generic.okay')
 		return
+
+	controller\SetIsEditor(true)
 
 	PPM2.EditorTopFrame = vgui.Create('EditablePanel')
 	PPM2.EditorTopFrame\SetSkin('DLib_Black')
@@ -1942,6 +1948,7 @@ PPM2.OpenNewEditor = ->
 	@SetDeleteOnClose = (val = false) => @deleteOnClose = val
 
 	@Close = =>
+		@controller\SetIsEditor(false) if IsValid(controller)
 		data = PPM2.GetMainData()
 		data\ApplyDataToObject(@controller, false)
 		@SetVisible(false)
@@ -2068,6 +2075,7 @@ PPM2.OpenOldEditor = ->
 	editorModelSelect = EditorModels[editorModelSelect] and editorModelSelect or 'DEFAULT'
 	ent = @model\ResetModel(nil, EditorModels[editorModelSelect])
 	controller = copy\CreateCustomController(ent)
+	controller\SetIsEditor(true)
 	controller\SetFlexLerpMultiplier(1.3)
 	copy\SetNetworkObject(controller)
 	@controller = controller
