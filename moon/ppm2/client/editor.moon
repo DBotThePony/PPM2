@@ -611,7 +611,6 @@ PPM2.EditorBuildNewFilesPanel = =>
 			@frame.data\SetFilename(fil)
 			@frame.data\ReadFromDisk()
 			@frame.data\UpdateController()
-			print(@frame.data)
 			@frame.DoUpdate()
 			@unsavedChanges = false
 			@frame.unsavedChanges = false
