@@ -2568,8 +2568,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				else
 					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
-					cam.End2D()
-					render.PopRenderTarget()
 
 					@_CaptureAlphaClosure(texSize, mat, vtf)
 
@@ -2604,18 +2602,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(mark)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
-			vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
-			vtf\CaptureRenderTargetCoroutine()
-			cam.End2D()
-			render.PopRenderTarget()
-
-			@_CaptureAlphaClosure(texSize, mat, vtf)
-
 			if isEditor
 				rt = release(@, 'cmark', texSize, texSize)
 				@CMarkTexture\SetTexture('$basetexture', rt)
 				@CMarkTextureGUI\SetTexture('$basetexture', rt)
 			else
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine()
+				@_CaptureAlphaClosure(texSize, mat, vtf)
+
 				vtf\AutoGenerateMips(true)
 				path = @@SetCacheH(hash, vtf\ToString())
 
