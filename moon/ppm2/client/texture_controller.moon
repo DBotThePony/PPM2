@@ -252,15 +252,14 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 		error('Texture task thread failed: ' .. err)
 
 	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS_EDITOR)
-		status, err = coroutine_resume(thread, self, isEditor, lock, release)
-
-		if not status
-			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
-			error(name .. ' editor texture task failed: ' .. err)
-
 		if coroutine_status(thread) == 'dead'
 			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
-			break
+		else
+			status, err = coroutine_resume(thread, self, isEditor, lock, release)
+
+			if not status
+				PPM2.TEXTURE_TASKS_EDITOR[name] = nil
+				error(name .. ' editor texture task failed: ' .. err)
 
 hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.HTML_MATERIAL_QUEUE = {}
