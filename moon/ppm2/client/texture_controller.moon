@@ -120,9 +120,8 @@ PPM2.TextureCompileWorker = ->
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
-			if IsValid(task[2])
-				task[1](task[2], task[3], task[4], task[5])
-				task[2].unfinished_tasks -= 1
+			task[1](task[2], task[3], task[4], task[5]) if IsValid(task[2])
+			task[2].unfinished_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
