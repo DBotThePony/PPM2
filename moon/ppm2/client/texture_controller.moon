@@ -1612,7 +1612,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					'cloth part'
 					opaque
 					iName
-					@GrabData(iName .. 'Clothes')
+					clothes
 					USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 				}
 
