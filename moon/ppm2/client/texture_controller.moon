@@ -41,6 +41,10 @@ PPM2.CacheManager\SetConVar()
 
 developer = ConVar('developer')
 
+grind_down_color = (r, g, b, a) ->
+	return "#{math.round(r.r * 0.12156862745098)}_#{math.round(r.g * 0.24705882352941)}-#{math.round(r.b * 0.12156862745098)}_#{math.round(r.a * 0.12156862745098)}" if IsColor(r)
+	return "#{math.round(r * 0.12156862745098)}_#{math.round(g * 0.24705882352941)}_#{math.round(b * 0.12156862745098)}_#{math.round((a or 255) * 0.12156862745098)}"
+
 PPM2.IsValidURL = (url) ->
 	print(debug.traceback()) if not isstring(url)
 	url ~= '' and url\find('^https?://') and url or false
@@ -1044,11 +1048,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'body'
-			@GrabData('BodyColor')
+			grind_down_color(@GrabData('BodyColor'))
 			@GrabData('LipsColorInherit')
-			@GrabData('LipsColor')
+			@GrabData('LipsColorInherit') and grind_down_color(@GrabData('LipsColor'))
 			@GrabData('NoseColorInherit')
-			@GrabData('NoseColor')
+			@GrabData('NoseColorInherit') and grind_down_color(@GrabData('NoseColor'))
 			@GrabData('Socks')
 			@GrabData('Bodysuit')
 			@GrabData('EyebrowsColor')
@@ -1059,7 +1063,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hash, PPM2.IsValidURL(@GrabData("BodyDetailURL#{i}")))
 			table.insert(hash, @GrabData("BodyDetailFirst#{i}"))
 			table.insert(hash, @GrabData("BodyDetail#{i}"))
-			table.insert(hash, @GrabData("BodyDetailColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("BodyDetailColor#{i}")))
 
 		for i = 1, PPM2.MAX_TATTOOS
 			table.insert(hash, @GrabData("TattooType#{i}"))
@@ -1068,7 +1072,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hash, @GrabData("TattooRotate#{i}"))
 			table.insert(hash, @GrabData("TattooScaleX#{i}"))
 			table.insert(hash, @GrabData("TattooScaleY#{i}"))
-			table.insert(hash, @GrabData("TattooColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("TattooColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY
@@ -1370,9 +1374,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = PPM2.TextureTableHash({
 			'horn'
-			r, g, b
-			@GrabData('SeparateHorn')
-			@GrabData('HornDetailColor')
+			grind_down_color(r, g, b)
+			grind_down_color(@GrabData('HornDetailColor'))
 			@GrabData('HornURLColor1')
 			@GrabData('HornURLColor2')
 			@GrabData('HornURLColor3')
@@ -1450,7 +1453,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@HornMaterial2\SetTexture('$selfillummask', 'null')
 
 			if isEditor
-				@HornMaterial\SetTexture('$basetexture', release(@, 'horn_illum', texSize, texSize))
+				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
@@ -1605,8 +1608,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					mat\SetFloat('$alpha', a / 255)
 					mat\SetInt('$translucent', 1)
 
-				nextindex += 1
-
 				hash = {
 					'cloth part'
 					opaque
@@ -1616,13 +1617,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				}
 
 				for i = 1, PPM2.MAX_CLOTHES_COLORS
-					table.insert(hash, @GrabData(iName .. 'ClothesColor' .. i))
+					table.insert(hash, grind_down_color(@GrabData(iName .. 'ClothesColor' .. i)))
 
 				hash = PPM2.TextureTableHash(hash)
 
 				if getcache = @@GetCacheH(hash)
-					mat\SetTexture('$bumpmap', getcache)
-					mat\GetTexture('$bumpmap')\Download() if developer\GetBool()
+					mat\SetTexture('$basetexture', getcache)
+					mat\GetTexture('$basetexture')\Download() if developer\GetBool()
 				else
 					lock(@, 'cloth_' .. iName, rtsize, rtsize, r, g, b)
 
@@ -1813,12 +1814,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			hash = {
 				'socks'
 				@GrabData('SocksTexture')
-				@GrabData('SocksDetailColor1')
-				@GrabData('SocksDetailColor2')
-				@GrabData('SocksDetailColor3')
-				@GrabData('SocksDetailColor4')
-				@GrabData('SocksDetailColor5')
-				@GrabData('SocksDetailColor6')
+				grind_down_color(@GrabData('SocksDetailColor1'))
+				grind_down_color(@GrabData('SocksDetailColor2'))
+				grind_down_color(@GrabData('SocksDetailColor3'))
+				grind_down_color(@GrabData('SocksDetailColor4'))
+				grind_down_color(@GrabData('SocksDetailColor5'))
+				grind_down_color(@GrabData('SocksDetailColor6'))
 				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			}
 
@@ -1890,7 +1891,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'wings',
-			r, g, b
+			grind_down_color(r, g, b)
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
@@ -1979,14 +1980,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'mane 1',
-			@GrabData('ManeColor1')
+			@GetManeType()
+			grind_down_color(@GrabData('ManeColor1'))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("ManeURL#{i}")))
-			table.insert(hash, @GrabData("ManeURLColor#{i}"))
-			table.insert(hash, @GrabData("ManeDetailColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("ManeURLColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("ManeDetailColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -2036,14 +2038,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'mane 2',
-			@GrabData('ManeColor2')
+			@GetManeTypeLower()
+			grind_down_color(@GrabData('ManeColor2'))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, @GrabData("ManeURL#{i}"))
-			table.insert(hash, @GrabData("ManeURLColor#{i}"))
-			table.insert(hash, @GrabData("ManeDetailColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("ManeURLColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("ManeDetailColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -2128,14 +2131,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'tail 1',
-			@GrabData('TailColor1')
+			@GetTailType()
+			grind_down_color(@GrabData('TailColor1'))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("TailURL#{i}")))
-			table.insert(hash, @GrabData("TailDetailColor#{i}"))
-			table.insert(hash, @GrabData("TailURLColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("TailDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("TailURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -2183,14 +2187,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		hash = {
 			'tail 2',
-			@GrabData('TailColor2')
+			@GetTailType()
+			grind_down_color(@GrabData('TailColor2'))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("TailURL#{i}")))
-			table.insert(hash, @GrabData("TailDetailColor#{i}"))
-			table.insert(hash, @GrabData("TailURLColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("TailDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("TailURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -2380,17 +2385,16 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'eye',
 			prefixUpper
 			EyeType
-			EyeBackground
-			EyeHole
+			grind_down_color(EyeBackground)
+			grind_down_color(EyeHole)
 			HoleWidth * 100
 			math.round(IrisSize * 100)
-			EyeIris1
-			EyeIris2
-			EyeIrisLine1
-			EyeIrisLine2
-			EyeLines
+			grind_down_color(EyeIris1)
+			grind_down_color(EyeIris2)
+			EyeLines and grind_down_color(EyeIrisLine1)
+			EyeLines and grind_down_color(EyeIrisLine2)
 			math.round(HoleSize * 100)
-			EyeReflection
+			grind_down_color(EyeReflection)
 			EyeReflectionType
 			EyeEffect
 			DerpEyes
@@ -2539,7 +2543,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			hash = PPM2.TextureTableHash({
 				'cutie mark url'
 				url
-				@GrabData('CMarkColor')
+				grind_down_color(@GrabData('CMarkColor'))
 				shift\floor(), sizeQuad\floor()
 				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			})
@@ -2582,7 +2586,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = PPM2.TextureTableHash({
 			'cutie mark'
 			@GrabData('CMarkType')
-			@GrabData('CMarkColor')
+			grind_down_color(@GrabData('CMarkColor'))
 			shift\floor(), sizeQuad\floor()
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})

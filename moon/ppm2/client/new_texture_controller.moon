@@ -21,6 +21,10 @@
 
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
+grind_down_color = (r, g, b, a) ->
+	return "#{math.round(r.r * 0.12156862745098)}_#{math.round(r.g * 0.24705882352941)}-#{math.round(r.b * 0.12156862745098)}_#{math.round(r.a * 0.12156862745098)}" if IsColor(r)
+	return "#{math.round(r * 0.12156862745098)}_#{math.round(g * 0.24705882352941)}_#{math.round(b * 0.12156862745098)}_#{math.round((a or 255) * 0.12156862745098)}"
+
 -- [ 1] = "models/ppm2/base/cmark",
 -- [ 2] = "models/ppm2/base/tongue",
 -- [ 3] = "models/ppm2/base/body",
@@ -154,14 +158,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'mane ' .. prefix .. ' 1',
-			@GrabData("#{prefix}ManeColor1")
+			@GetManeType()
+			grind_down_color(@GrabData("#{prefix}ManeColor1"))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, @GrabData("#{prefix}ManeDetailColor#{i}"))
-			table.insert(hash, @GrabData("#{prefix}ManeURLColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -210,14 +215,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'mane ' .. prefix .. ' 2',
-			@GrabData("#{prefix}ManeColor2")
+			@GetManeTypeLower()
+			grind_down_color(@GrabData("#{prefix}ManeColor2"))
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
 			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, @GrabData("#{prefix}ManeDetailColor#{i}"))
-			table.insert(hash, @GrabData("#{prefix}ManeURLColor#{i}"))
+			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -329,12 +335,14 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'bat wings',
-			r, g, b
+			grind_down_color(r, g, b)
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
-			table.insert(hash, PPM2.IsValidURL(@GrabData("BatWingURL#{i}")))
+			if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
+				table.insert(hash, url)
+				table.insert(hash, grind_down_color(@GrabData("BatWingURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -405,13 +413,14 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'bat wings skin',
-			r, g, b
+			grind_down_color(r, g, b)
 			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
 			if url = PPM2.IsValidURL(@GrabData("BatWingSkinURL#{i}"))
 				table.insert(hash, url)
+				table.insert(hash, grind_down_color(@GrabData("BatWingSkinURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -429,7 +438,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			lock(@, 'bat_wing_skin', texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
-				{:r, :g, :b, :a} = @GetData()["GetBatWingSkinURLColor#{i}"](@GetData())
+				{:r, :g, :b, :a} = @GrabData("BatWingSkinURLColor#{i}")
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
