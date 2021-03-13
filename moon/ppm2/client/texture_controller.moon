@@ -201,7 +201,6 @@ PPM2.URLThreadWorker = ->
 					vtf\CaptureRenderTargetCoroutine()
 					PPM2.PonyTextureController\_CaptureAlphaClosure(data.width, mat, vtf)
 
-					vtf\AutoGenerateMips(true)
 					path = '../data/' .. PPM2.CacheManager\Set(data.index, vtf\ToString())
 
 					newMat = CreateMaterial("PPM2_URLMaterial_#{data.hash}", 'UnlitGeneric', {
