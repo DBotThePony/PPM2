@@ -130,7 +130,7 @@ PPM2.TextureCompileWorker = ->
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
 
-PPM2.URLThread = PPM2.URLThread or coroutine.create ->
+PPM2.URLThreadWorker = ->
 	while true
 		if not PPM2.HTML_MATERIAL_QUEUE[1]
 			coroutine_yield()
@@ -188,21 +188,32 @@ PPM2.URLThread = PPM2.URLThread or coroutine.create ->
 				htmlmat = panel\GetHTMLMaterial()
 
 				if htmlmat
-					texture = htmlmat\GetTexture('$basetexture')
-					texture\Download()
+					--texture = htmlmat\GetTexture('$basetexture')
+					--texture\Download()
+
+					rt, mat = PPM2.PonyTextureController\LockRenderTarget(data.width, data.height, 0, 0, 0, 0)
+
+					surface.SetDrawColor(255, 255, 255)
+					surface.SetMaterial(htmlmat)
+					surface.DrawTexturedRect(0, 0, data.width, data.height)
+
+					vtf = DLib.VTF.Create(2, data.width, data.height, IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
+					vtf\CaptureRenderTargetCoroutine()
+					PPM2.PonyTextureController\_CaptureAlphaClosure(data.width, mat, vtf)
+
+					vtf\AutoGenerateMips(true)
+					path = '../data/' .. PPM2.CacheManager\Set(data.index, vtf\ToString())
 
 					newMat = CreateMaterial("PPM2_URLMaterial_#{data.hash}", 'UnlitGeneric', {
-						'$basetexture': 'models/debug/debugwhite'
+						'$basetexture': '../data/' .. path
 						'$ignorez': 1
 						'$vertexcolor': 1
 						'$vertexalpha': 1
 						'$nolod': 1
 					})
 
-					newMat\SetTexture('$basetexture', texture)
-
 					PPM2.URL_MATERIAL_CACHE[data.index] = {
-						texture: texture
+						texture: newMat\GetTexture('$basetexture')
 						material: newMat
 						index: data.index
 						hash: data.hash
@@ -211,10 +222,12 @@ PPM2.URLThread = PPM2.URLThread or coroutine.create ->
 					PPM2.ALREADY_DOWNLOADING[data.index] = nil
 
 					for resolve in *data.resolve
-						resolve(texture, newMat)
+						resolve(newMat\GetTexture('$basetexture'), newMat)
 
 				coroutine_yield()
 				panel\Remove() if IsValid(panel)
+
+PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
 
 PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
@@ -229,6 +242,29 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 
 	if data = PPM2.ALREADY_DOWNLOADING[index]
 		return DLib.Promise (resolve) -> table.insert(data.resolve, resolve)
+
+	if getcache = PPM2.CacheManager\HasGet(index)
+		return DLib.Promise (resolve) ->
+			hash = DLib.Util.QuickSHA1(index)
+
+			newMat = CreateMaterial("PPM2_URLMaterial_#{hash}", 'UnlitGeneric', {
+				'$basetexture': '../data/' .. getcache
+				'$ignorez': 1
+				'$vertexcolor': 1
+				'$vertexalpha': 1
+				'$nolod': 1
+			})
+
+			newMat\SetTexture('$basetexture', '../data/' .. getcache)
+
+			PPM2.URL_MATERIAL_CACHE[index] = {
+				texture: newMat\GetTexture('$basetexture')
+				material: newMat
+				index: index
+				:hash
+			}
+
+			resolve(newMat\GetTexture('$basetexture'), newMat)
 
 	return DLib.Promise (resolve) ->
 		data = {
@@ -245,7 +281,10 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 
 hook.Add 'Think', 'PPM2 Material Tasks', ->
 	status, err = coroutine_resume(PPM2.URLThread)
-	error(err) if not status
+
+	if not status
+		PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
+		error(err)
 
 	status, err = coroutine_resume(PPM2.TextureCompileThread)
 
@@ -269,6 +308,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.URL_MATERIAL_CACHE = {}
 	PPM2.ALREADY_DOWNLOADING = {}
 	PPM2.FAILED_TO_DOWNLOAD = {}
+	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
 
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
@@ -2462,8 +2502,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				createdMaterial\SetTexture('$iris', path)
 				createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
 
-	_CaptureAlphaClosure: (texSize, mat, vtf) =>
-		rt1, rt2, mat1, mat2 = @@LockRenderTargetMask(texSize, texSize)
+	_CaptureAlphaClosure: (...) => @@_CaptureAlphaClosure(...)
+	@_CaptureAlphaClosure: (texSize, mat, vtf) =>
+		rt1, rt2, mat1, mat2 = @LockRenderTargetMask(texSize, texSize)
 		surface.SetDrawColor(255, 255, 255)
 
 		-- capture alpha
@@ -2479,7 +2520,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		render.PopRenderTarget()
 
-		@@ReleaseRenderTarget(texSize, texSize, true)
+		@ReleaseRenderTarget(texSize, texSize, true)
 
 		-- compute alpha
 		render.PushRenderTarget(rt2)
@@ -2496,7 +2537,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		vtf\CaptureRenderTargetAsAlphaCoroutine()
 		render.PopRenderTarget()
 
-		@@ReleaseRenderTargetMask(texSize, texSize)
+		@ReleaseRenderTargetMask(texSize, texSize)
 
 	CompileCMark: (isEditor, lock, release) =>
 		return unless @isValid
