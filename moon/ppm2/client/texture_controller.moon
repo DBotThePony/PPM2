@@ -188,9 +188,6 @@ PPM2.URLThreadWorker = ->
 				htmlmat = panel\GetHTMLMaterial()
 
 				if htmlmat
-					--texture = htmlmat\GetTexture('$basetexture')
-					--texture\Download()
-
 					rt, mat = PPM2.PonyTextureController\LockRenderTarget(data.width, data.height, 0, 0, 0, 0)
 
 					surface.SetDrawColor(255, 255, 255)
@@ -210,6 +207,9 @@ PPM2.URLThreadWorker = ->
 						'$vertexalpha': 1
 						'$nolod': 1
 					})
+
+					newMat\SetTexture('$basetexture', '../data/' .. path)
+					newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
 
 					PPM2.URL_MATERIAL_CACHE[data.index] = {
 						texture: newMat\GetTexture('$basetexture')
@@ -231,7 +231,7 @@ PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
 PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
-	index = url .. '_' .. width .. '_' .. height
+	index = url .. '__' .. width .. '_' .. height
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
 		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
@@ -255,6 +255,7 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 			})
 
 			newMat\SetTexture('$basetexture', '../data/' .. getcache)
+			newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
 
 			PPM2.URL_MATERIAL_CACHE[index] = {
 				texture: newMat\GetTexture('$basetexture')
