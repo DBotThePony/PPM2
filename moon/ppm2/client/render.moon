@@ -179,26 +179,11 @@ timer.Create 'PPM2.CheckDXLevel', 180, 0, ->
 	PPM2.Message('Direct3D Level is LESS THAN 9.1! This will not work!')
 
 IN_DRAW = false
-MARKED_FOR_DRAW = {}
 
 player_GetAll = player.GetAll
 
 PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
-
-	MARKED_FOR_DRAW = {}
-
-	for ply in *player_GetAll()
-		if not IsDormant(ply)
-			p = IsPony(ply)
-			ply.__cachedIsPony = p
-			if p
-				data = GetPonyData(ply)
-				if data
-					renderController = data\GetRenderController()
-					if renderController
-						renderController\PreDraw()
-						table.insert(MARKED_FOR_DRAW, renderController)
 
 	if bDrawingDepth and DRAW_LEGS_DEPTH\GetBool()
 		with LocalPlayer()
@@ -219,10 +204,6 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					IN_DRAW = false
 
 PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
-	if not bDrawingDepth and not bDrawingSkybox
-		for _, draw in ipairs MARKED_FOR_DRAW
-			draw\PostDraw()
-
 	if LEGS_RENDER_TYPE\GetBool()
 		with LocalPlayer()
 			if .__cachedIsPony and \Alive()
@@ -294,6 +275,11 @@ PPM2.PrePlayerDraw = =>
 		return if not @__cachedIsPony
 		f = FrameNumberL()
 		return if @__ppm2_last_draw == f
+
+		renderController = data\GetRenderController()
+		if renderController
+			renderController\PreDraw()
+
 		@__ppm2_last_draw = f
 		bones = PPMBonesModifier(@)
 		if data and bones\CanThink()
