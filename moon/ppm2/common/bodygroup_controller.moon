@@ -738,10 +738,8 @@ class NewBodygroupController extends DefaultBodygroupController
 
 		@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_BODY,     maleModifier * @GrabData('MaleBuff'))
 
-	SlowUpdate: (createModels = CLIENT, force = false) =>
+	_UpdateFlex: =>
 		ent = @GetEntity()
-		return if not IsValid(ent)
-		return if not ent\IsPony()
 		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == PPM2.EYELASHES_NONE and 1 or 0)
 		@_UpdateMaleBuff()
 
@@ -760,6 +758,12 @@ class NewBodygroupController extends DefaultBodygroupController
 			ent\SetFlexWeight(@@FLEX_ID_FANGS, 0)
 			ent\SetFlexWeight(@@FLEX_ID_FANGS2, 0)
 
+
+	SlowUpdate: (createModels = CLIENT, force = false) =>
+		ent = @GetEntity()
+		return if not IsValid(ent)
+		return if not ent\IsPony()
+		@_UpdateFlex()
 		@ApplyRace()
 
 		if createModels
@@ -889,6 +893,7 @@ if CLIENT
 			bodygroup\UpdateManeSize()
 			bodygroup\UpdateWings() if bodygroup.UpdateWings
 			bodygroup\UpdateEars() if bodygroup.UpdateEars
+			bodygroup\_UpdateFlex() if bodygroup._UpdateFlex
 			bodygroup.lastPAC3BoneReset = RealTimeL() + 1
 
 	ppm2_sv_allow_resize = ->

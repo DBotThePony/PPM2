@@ -674,6 +674,14 @@ hook.Add 'NotifyShouldTransmit', 'PPM2.RenderController', (should) =>
 		if renderer = data\GetRenderController()
 			renderer\HideModels(not should)
 
+if CLIENT
+	hook.Add 'PPM2.SetupBones', 'PPM2.RenderController', (ent, data) ->
+		if controller = data\GetRenderController()
+			controller.ent = ent
+			controller.flexes\Think(ent) if controller.flexes
+			-- controller.emotes\Think(ent) if controller.emotes
+			controller.lastPAC3BoneReset = RealTimeL() + 1
+
 PPM2.PonyRenderController = PonyRenderController
 PPM2.NewPonyRenderController = NewPonyRenderController
 PPM2.GetPonyRenderController = (model = 'models/ppm/player_default_base.mdl') -> PonyRenderController.AVALIABLE_CONTROLLERS[model\lower()] or PonyRenderController
