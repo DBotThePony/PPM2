@@ -314,6 +314,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 		@bonesIterable = {}
 		@boneCount = 0
 		@isValid = false
+		@defferReset = 0
 		table.insert(@@OBJECTS, @)
 		@lastCall = RealTimeL()
 		@Setup() if IsValid(ent)
@@ -353,7 +354,7 @@ class PPM2.EntityBonesModifier extends PPM2.SequenceHolder
 	CanThink: =>
 		return true if SERVER
 		return false if @isLocalPlayer and not @ent\ShouldDrawLocalPlayer()
-		return @callFrame ~= FrameNumberL() and (not @defferReset or @defferReset < RealTimeL())
+		return @callFrame ~= FrameNumberL() and @defferReset < RealTimeL()
 
 	Think: (force = false) =>
 		return if not super() or not force and CLIENT and @callFrame == FrameNumberL()

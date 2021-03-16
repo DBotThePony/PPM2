@@ -715,15 +715,18 @@ class NewBodygroupController extends DefaultBodygroupController
 	ResetBodygroups: =>
 		return unless @isValid
 		return unless IsValid(@GetEntity())
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_EYELASHES, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_BODY, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS, 0)
-		@GetEntity()\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
-		@ResetWings()
-		@ResetEars()
+
+		if @lastPAC3BoneReset < RealTimeL()
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_EYELASHES, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_2, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_MALE_BODY, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_FANGS, 0)
+			@GetEntity()\SetFlexWeight(@@FLEX_ID_CLAW_TEETH, 0)
+			@ResetWings()
+			@ResetEars()
+
 		super()
 
 	_UpdateMaleBuff: =>

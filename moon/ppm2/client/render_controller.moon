@@ -61,6 +61,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@idleEyesActive = false
 		@nextRollEyes = 0
 		@rollEyesDelta = CurTimeL()
+		@lastPAC3BoneReset = 0
 		if @GetEntity()\IsValid()
 			@CreateFlexController()
 			@CreateEmotesController()
@@ -506,7 +507,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 				\Think(true)
 				ent.__ppmBonesModified = true
 
-		@flexes\Think(ent) if @flexes
+		@flexes\Think(ent) if @flexes and @lastPAC3BoneReset < RealTimeL()
 		@emotes\Think(ent) if @emotes
 
 		if ent\IsPlayer()
