@@ -82,10 +82,12 @@ do
 			ent.__PPM2_PonyData = nil
 
 	nullify()
-	hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', ->
-		ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
-		timer.Simple 0, -> ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
-		return
+
+	if game.SinglePlayer()
+		hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', ->
+			ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and not ent.__PPM2_PonyData.Remove
+			timer.Simple 0, -> ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and not ent.__PPM2_PonyData.Remove
+			return
 
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)
