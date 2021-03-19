@@ -312,6 +312,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
+	hash\Update('post intel fix')
 	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
 	return hash\Digest()
 
@@ -539,6 +540,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		cam.Start2D()
 
 		surface.SetDrawColor(r, g, b, a)
+		surface.DrawRect(0, 0, width + 1, height + 1)
 
 		mat = CreateMaterial(index .. 'a', 'UnlitGeneric', {
 			'$basetexture': '!' .. index,

@@ -203,8 +203,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine()
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor1"), mipmap_count: -2})
+				vtf\CaptureRenderTargetCoroutine({fuck: true})
 				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
@@ -260,7 +260,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
