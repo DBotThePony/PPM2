@@ -115,21 +115,6 @@ coroutine_yield = coroutine.yield
 coroutine_resume = coroutine.resume
 coroutine_status = coroutine.status
 
-PPM2.TextureCompileWorker = ->
-	while true
-		name, task = next(PPM2.TEXTURE_TASKS)
-
-		if not name
-			coroutine_yield()
-		else
-			PPM2.TEXTURE_TASKS[name] = nil
-			PPM2.TEXTURE_TASK_CURRENT = name
-			task[1](task[2], task[3], task[4], task[5]) if IsValid(task[2])
-			task[2].unfinished_tasks -= 1
-			PPM2.TEXTURE_TASK_CURRENT = nil
-
-PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
-
 PPM2.URLThreadWorker = ->
 	while true
 		if not PPM2.HTML_MATERIAL_QUEUE[1]
@@ -312,13 +297,6 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 		PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
 		error(err)
 
-	status, err = coroutine_resume(PPM2.TextureCompileThread)
-
-	if not status
-		table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS)
-		PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
-		error('Texture task thread failed: ' .. err)
-
 	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS_EDITOR)
 		if coroutine_status(thread) == 'dead'
 			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
@@ -328,6 +306,18 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 			if not status
 				PPM2.TEXTURE_TASKS_EDITOR[name] = nil
 				error(name .. ' editor texture task failed: ' .. err)
+
+	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS)
+		if coroutine_status(thread) == 'dead'
+			PPM2.TEXTURE_TASKS[name] = nil
+			self.unfinished_tasks -= 1
+		else
+			status, err = coroutine_resume(thread, self, isEditor, lock, release)
+
+			if not status
+				PPM2.TEXTURE_TASKS[name] = nil
+				self.unfinished_tasks -= 1
+				error(name .. ' texture task failed: ' .. err)
 
 hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.HTML_MATERIAL_QUEUE = {}
@@ -646,15 +636,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	CreateRenderTask: (func = '', ...) =>
 		index = string.format('%p%s', @, func)
 		isEditor, lock, release = @SelectLockFuncs()
+		thread = coroutine.create(@[func])
 
 		if isEditor
 			return if PPM2.TEXTURE_TASKS_EDITOR[index]
-			thread = coroutine.create(@[func])
 			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, isEditor, lock, release} if coroutine_status(thread) ~= 'dead'
 		else
 			return if PPM2.TEXTURE_TASKS[index]
 			@unfinished_tasks += 1
-			PPM2.TEXTURE_TASKS[index] = {@[func], @, isEditor, lock, release}
+			PPM2.TEXTURE_TASKS[index] = {thread, @, isEditor, lock, release}
 
 	IsBeingProcessed: => @unfinished_tasks > 0
 
