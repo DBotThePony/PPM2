@@ -181,11 +181,16 @@ PPM2.URLThreadWorker = ->
 
 					break
 
-				coroutine_yield()
+				coroutine_yield('yield from isloading')
 
 			if not timeout
 				panel\UpdateHTMLTexture()
 				htmlmat = panel\GetHTMLMaterial()
+
+				systime = SysTime() + 1
+
+				while not htmlmat and systime <= SysTime()
+					htmlmat = panel\GetHTMLMaterial()
 
 				if htmlmat
 					rt, mat = PPM2.PonyTextureController\LockRenderTarget(data.width, data.height, 0, 0, 0, 0)
@@ -212,6 +217,27 @@ PPM2.URLThreadWorker = ->
 					newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
 
 					PPM2.URL_MATERIAL_CACHE[data.index] = {
+						texture: newMat\GetTexture('$basetexture')
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(newMat\GetTexture('$basetexture'), newMat)
+				else
+					newMat = CreateMaterial("PPM2_URLMaterial_Failed_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': 'null'
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+						'$translucent': 1
+					})
+
+					PPM2.FAILED_TO_DOWNLOAD[data.index] = {
 						texture: newMat\GetTexture('$basetexture')
 						material: newMat
 						index: data.index
