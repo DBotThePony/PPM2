@@ -181,7 +181,7 @@ PPM2.URLThreadWorker = ->
 
 					break
 
-				coroutine_yield('yield from isloading')
+				coroutine_yield()
 
 			if not timeout
 				panel\UpdateHTMLTexture()
