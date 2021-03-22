@@ -71,7 +71,9 @@ doPatch = =>
 			if IsValid(@Entity) and oldPonyData
 				oldPonyData\SetupEntity(@Entity)
 				oldPonyData\ModelChanges(oldModel, model)
+
 		targetModel.PreDrawModel = (ent) =>
+			return if not IsValid(ent)
 			controller = @ponyController
 			return if not controller
 			return if not ent\IsPony()
