@@ -324,6 +324,8 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	PPM2.URL_MATERIAL_CACHE = {}
 	PPM2.ALREADY_DOWNLOADING = {}
 	PPM2.FAILED_TO_DOWNLOAD = {}
+	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS)
+	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS_MASK)
 	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
 
 PPM2.TextureTableHash = (input) ->
