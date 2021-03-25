@@ -351,7 +351,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		@hornModel\DrawModel() if IsValid(@hornModel)
 		@clothesModel\DrawModel() if IsValid(@clothesModel)
 
-	ShouldHideModels: => @hideModels or @GetEntity()\GetNoDraw()
+	ShouldHideModels: => @hideModels or @GetEntity()\GetNoDraw() or @GetEntity()\IsDormant()
 
 	DoHideModels: (status) =>
 		@socksModel\SetNoDraw(status) if IsValid(@socksModel)
@@ -555,22 +555,22 @@ class PonyRenderController extends PPM2.ControllerChildren
 				@GrabData('WeightController')\UpdateWeight(@legsModel) if IsValid(@legsModel)
 			when 'SocksModel'
 				@socksModel = state\GetValue()
-				-- @socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
+				@socksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@socksModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateSocks(@GetEntity(), @socksModel) if @GetTextureController() and IsValid(@socksModel)
 			when 'NewSocksModel'
 				@newSocksModel = state\GetValue()
-				-- @newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
+				@newSocksModel\SetNoDraw(@ShouldHideModels()) if IsValid(@newSocksModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateNewSocks(@GetEntity(), @newSocksModel) if @GetTextureController() and IsValid(@newSocksModel)
 			when 'HornModel'
 				@hornModel = state\GetValue()
-				-- @hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
+				@hornModel\SetNoDraw(@ShouldHideModels()) if IsValid(@hornModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateNewHorn(@GetEntity(), @hornModel) if @GetTextureController() and IsValid(@hornModel)
 			when 'ClothesModel'
 				@clothesModel = state\GetValue()
-				-- @clothesModel\SetNoDraw(@ShouldHideModels()) if IsValid(@clothesModel)
+				@clothesModel\SetNoDraw(@ShouldHideModels()) if IsValid(@clothesModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateClothes(@GetEntity(), @clothesModel) if @GetTextureController() and IsValid(@clothesModel)
 			when 'NoFlex'
@@ -631,17 +631,17 @@ class NewPonyRenderController extends PonyRenderController
 		switch state\GetKey()
 			when 'UpperManeModel'
 				@upperManeModel = @GrabData('UpperManeModel')
-				--@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
+				@upperManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@upperManeModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateUpperMane(@GetEntity(), @upperManeModel) if @GetTextureController() and IsValid(@upperManeModel)
 			when 'LowerManeModel'
 				@lowerManeModel = @GrabData('LowerManeModel')
-				--@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
+				@lowerManeModel\SetNoDraw(@ShouldHideModels()) if IsValid(@lowerManeModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateLowerMane(@GetEntity(), @lowerManeModel) if @GetTextureController() and IsValid(@lowerManeModel)
 			when 'TailModel'
 				@tailModel = @GrabData('TailModel')
-				--@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
+				@tailModel\SetNoDraw(@ShouldHideModels()) if IsValid(@tailModel)
 				@CheckModelHide()
 				@GetTextureController()\UpdateTail(@GetEntity(), @tailModel) if @GetTextureController() and IsValid(@tailModel)
 		super(state)

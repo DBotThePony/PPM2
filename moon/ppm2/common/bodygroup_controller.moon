@@ -170,8 +170,17 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		for _, ent in ipairs ents_GetAll()
 			if ent.isPonyPropModel and ent[fModelIndex] and ent.manePlayer == @GetEntity()
 				@[mIndex] = ent
+
+				with ent
+					\DrawShadow(true)
+					\SetPos(@GetEntity()\EyePos())
+					\SetBodygroup(1, bodygroupID) if bodygroupID
+					\SetNoDraw(true)
+					\SetParent(@GetEntity())
+					\AddEffects(EF_BONEMERGE)
+
 				@SetData(mName, @[mIndex])
-				PPM2.DebugPrint('Resuing ', @[mIndex], ' as ', mName, ' for ', @GetEntity())
+
 				return ent
 
 		model, modelID, bodygroupID = mTranslateModelName(@GrabData(mCallType)) if mCallType
