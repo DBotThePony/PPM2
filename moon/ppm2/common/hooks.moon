@@ -82,12 +82,13 @@ do
 	import Alive from FindMetaTable('Player')
 	import IsPonyCached, IsDormant, GetPonyData from FindMetaTable('Entity')
 	timer.Create 'PPM2.SlowUpdate', CLIENT and 0.5 or 5, 0, ->
-		for _, ply in ipairs player.GetAll()
+		for ply in *player.GetAll()
 			if not IsDormant(ply) and Alive(ply) and IsPonyCached(ply) and GetPonyData(ply)
 				data = GetPonyData(ply)
 				xpcall(data.SlowUpdate, catchError, data, CLIENT) if data.SlowUpdate
-		for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
-			if IsValid(task.ent) and task.ent\IsPony()
+
+		for task in *PPM2.NetworkedPonyData.RenderTasks
+			if IsValid(task.ent) and not IsDormant(task.ent) and task.ent\IsPony()
 				xpcall(task.SlowUpdate, catchError, task, CLIENT) if task.SlowUpdate
 
 ENABLE_TOOLGUN = CreateConVar('ppm2_sv_ragdoll_toolgun', '0', {FCVAR_REPLICATED, FCVAR_NOTIFY}, 'Allow toolgun usage on player death ragdolls')
