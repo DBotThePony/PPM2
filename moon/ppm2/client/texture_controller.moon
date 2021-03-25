@@ -186,7 +186,11 @@ PPM2.URLThreadWorker = ->
 
 					vtf = DLib.VTF.Create(2, data.width, data.height, IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
 					vtf\CaptureRenderTargetCoroutine()
-					PPM2.PonyTextureController\_CaptureAlphaClosure(data.width, mat, vtf)
+
+					if select('#', render.ReadPixel(0, 0)) == 3
+						PPM2.PonyTextureController\_CaptureAlphaClosure(data.width, mat, vtf)
+					else
+						PPM2.PonyTextureController\ReleaseRenderTarget(data.width, data.height)
 
 					path = '../data/' .. PPM2.CacheManager\Set(data.index, vtf\ToString())
 
@@ -2632,7 +2636,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
 
-					@_CaptureAlphaClosure(texSize, mat, vtf)
+					if select('#', render.ReadPixel(0, 0)) == 3
+						@_CaptureAlphaClosure(texSize, mat, vtf)
+					else
+						@@ReleaseRenderTarget(texSize, texSize)
 
 					vtf\AutoGenerateMips(true)
 					path = @@SetCacheH(hash, vtf\ToString())
@@ -2672,7 +2679,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@_CaptureAlphaClosure(texSize, mat, vtf)
+
+				if select('#', render.ReadPixel(0, 0)) == 3
+					@_CaptureAlphaClosure(texSize, mat, vtf)
+				else
+					@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(true)
 				path = @@SetCacheH(hash, vtf\ToString())
