@@ -85,7 +85,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 			.isPonyLegsModel = true
 			.lastRedrawFix = 0
 			\SetNoDraw(true)
-			.__PPM2_PonyData = @GetData()
+			\SetPonyData(@GetData())
 			--\PPMBonesModifier()
 
 		@GrabData('WeightController')\UpdateWeight(@legsModel)

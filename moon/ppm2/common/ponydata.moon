@@ -72,23 +72,6 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
-do
-	nullify = ->
-		for _, ent in ipairs ents.GetAll()
-			if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
-				ProtectedCall -> ent.__PPM2_PonyData\Remove()
-
-		for _, ent in ipairs ents.GetAll()
-			ent.__PPM2_PonyData = nil
-
-	nullify()
-
-	if game.SinglePlayer()
-		hook.Add 'InitPostEntity', 'PPM2.FixSingleplayer', ->
-			ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and not ent.__PPM2_PonyData.Remove
-			timer.Simple 0, -> ent.__PPM2_PonyData = nil for _, ent in ipairs ents.GetAll() when ent.__PPM2_PonyData and not ent.__PPM2_PonyData.Remove
-			return
-
 wUInt = (def = 0, size = 8) ->
 	return (arg = def) -> net.WriteUInt(arg, size)
 
@@ -113,6 +96,8 @@ rString = net.ReadString
 wString = net.WriteString
 
 class NetworkedPonyData extends PPM2.ModifierBase
+	@REGISTRY = {}
+
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
 		defFunc = defValue
 		defFunc = (-> defValue) if type(defValue) ~= 'function'
@@ -150,64 +135,28 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			state.networkChange = false
 			@SetLocalChange(state)
 
-	@NW_WAIT = {}
-
 	if CLIENT
 		hook.Add 'OnEntityCreated', 'PPM2.NW_WAIT', (ent) -> timer.Simple 0, ->
 			return if not IsValid(ent)
+			return if not @REGISTRY[ent\EntIndex()]
+			return if @REGISTRY[ent\EntIndex()].done_setup or IsValid(@REGISTRY[ent\EntIndex()].ent)
+			@REGISTRY[ent\EntIndex()]\SetupEntity(ent)
 
-			dirty = false
-			entid = ent\EntIndex()
-			ttl = RealTimeL()
+		hook.Add 'NotifyShouldTransmit', 'PPM2.NW_WAIT', (ent, should) ->
+			return if not should
+			return if not @REGISTRY[ent\EntIndex()]
+			return if @REGISTRY[ent\EntIndex()].done_setup or IsValid(@REGISTRY[ent\EntIndex()].ent)
+			@REGISTRY[ent\EntIndex()]\SetupEntity(ent)
 
-			for controller in *@NW_WAIT
-				if controller.removed
-					controller.isNWWaiting = false
-					dirty = true
-				elseif controller.waitEntID == entid
-					controller.isNWWaiting = false
-					controller.ent = ent
-					controller.modelCached = ent\GetModel()
-					controller\SetupEntity(ent)
-					--print('FOUND', ent)
-					dirty = true
-				elseif controller.waitTTL < ttl
-					dirty = true
-					controller.isNWWaiting = false
-
-			if dirty
-				@NW_WAIT = [controller for controller in *@NW_WAIT when controller.isNWWaiting]
-
-		hook.Add 'NotifyShouldTransmit', 'PPM2.NW_WAIT', (ent, should) -> timer.Simple 0, ->
-			return if not IsValid(ent)
-
-			dirty = false
-			entid = ent\EntIndex()
-			ttl = RealTimeL()
-
-			for controller in *@NW_WAIT
-				if controller.removed
-					controller.isNWWaiting = false
-					dirty = true
-				elseif controller.waitEntID == entid
-					controller.isNWWaiting = false
-					controller.ent = ent
-					controller.modelCached = ent\GetModel()
-					controller\SetupEntity(ent)
-					--print('FOUND', ent)
-					dirty = true
-				elseif controller.waitTTL < ttl
-					dirty = true
-					controller.isNWWaiting = false
-
-			if dirty
-				@NW_WAIT = [controller for controller in *@NW_WAIT when controller.isNWWaiting]
+		-- clientside entities
+		hook.Add 'EntityRemoved', 'PPM2.NW_WAIT', (ent) -> @REGISTRY[ent]\Remove() if @REGISTRY[ent]
 
 	@OnNetworkedCreated = (ply = NULL, len = 0, nwobj) =>
 		if CLIENT
 			netID = net.ReadUInt16()
 			entid = net.ReadUInt16()
 			obj = @NW_Objects[netID] or @(netID, entid)
+			@REGISTRY[entid] = obj
 			obj.NETWORKED = true
 			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
@@ -413,31 +362,17 @@ class NetworkedPonyData extends PPM2.ModifierBase
 					@@O_Slots[i] = @
 					break
 
-			if not @slotID
-				error('dafuq? No empty slots are available')
+			error('no more free pony data edicts') if not @slotID
 
-		@isNWWaiting = false
-
-		if type(ent) == 'number'
-			entid = ent
-			@waitEntID = entid
-			ent = Entity(entid)
-			--print(ent, entid)
-
-			if not IsValid(ent)
-				@isNWWaiting = true
-				@waitTTL = RealTimeL() + 3600
-				table.insert(@@NW_WAIT, @)
-				PPM2.LMessage('message.ppm2.debug.race_condition')
-				--print('WAITING ON ', entid)
-				return
+		@entID = isnumber(ent) and ent or ent\EntIndex()
+		ent = Entity(ent) if isnumber(ent)
 
 		return if not IsValid(ent)
 		@ent = ent
 		@modelCached = ent\GetModel() if IsValid(ent)
 		@SetupEntity(ent)
 
-	GetEntity: => @ent
+	GetEntity: => @ent or NULL
 	IsValid: => @isValid
 	GetModel: => @modelCached
 	EntIndex: => @entID
@@ -450,20 +385,30 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return copy
 
 	SetupEntity: (ent) =>
-		if ent.__PPM2_PonyData
-			return if ent.__PPM2_PonyData\GetOwner() and IsValid(ent.__PPM2_PonyData\GetOwner()) and ent.__PPM2_PonyData\GetOwner() ~= @GetOwner()
-			ent.__PPM2_PonyData\Remove() if ent.__PPM2_PonyData.Remove and ent.__PPM2_PonyData ~= @
+		if @@REGISTRY[ent]
+			return if @@REGISTRY[ent]\GetOwner() and IsValid(@@REGISTRY[ent]\GetOwner()) and @@REGISTRY[ent]\GetOwner() ~= @GetOwner()
+			@@REGISTRY[ent]\Remove() if @@REGISTRY[ent].Remove and @@REGISTRY[ent] ~= @
 
-		ent.__PPM2_PonyData = @
-		@entTable = @ent\GetTable()
 		return unless IsValid(ent)
+
+		if @@REGISTRY[ent\EntIndex()]
+			return if @@REGISTRY[ent\EntIndex()]\GetOwner() and IsValid(@@REGISTRY[ent\EntIndex()]\GetOwner()) and @@REGISTRY[ent\EntIndex()]\GetOwner() ~= @GetOwner()
+			@@REGISTRY[ent\EntIndex()]\Remove() if @@REGISTRY[ent\EntIndex()].Remove and @@REGISTRY[ent\EntIndex()] ~= @
+
+		@ent = ent
+		@done_setup = true
+		ent\SetPonyData(@)
+		@entTable = @ent\GetTable()
+
 		@modelCached = ent\GetModel()
 		ent\PPMBonesModifier()
 		@flightController = PPM2.PonyflyController(@)
 		@entID = ent\EntIndex()
 		@lastLerpThink = RealTimeL()
+
 		@ModelChanges(@modelCached, @modelCached)
 		@Reset()
+
 		timer.Simple(0, -> @GetRenderController()\CompileTextures() if @GetRenderController()) if CLIENT
 		PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
@@ -691,7 +636,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@@O_Slots[@slotID] = nil if @slotID
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
-		@entTable.__PPM2_PonyData = nil if IsValid(@ent) and @ent.__PPM2_PonyData == @
+		@@REGISTRY[@ent] = nil if IsValid(@ent) and @@REGISTRY[@ent] == @
+		@@REGISTRY[@entID] = nil if @@REGISTRY[@entID] == @
 		@GetWeightController()\Remove() if @GetWeightController()
 
 		if CLIENT
@@ -820,12 +766,39 @@ else
 _G.LocalPonyData = () -> LocalPlayer()\GetPonyData()
 _G.LocalPonydata = () -> LocalPlayer()\GetPonyData()
 
-entMeta = FindMetaTable('Entity')
-entMeta.GetPonyData = =>
-	self2 = @
-	self = entMeta.GetTable(@)
-	return if not @
-	if @__PPM2_PonyData and @__PPM2_PonyData.ent ~= self2
-		@__PPM2_PonyData.ent = self2
-		@__PPM2_PonyData\SetupEntity(self2) if CLIENT
-	return @__PPM2_PonyData
+do
+	REGISTRY = NetworkedPonyData.REGISTRY
+
+	nullify = ->
+		for _, ent in ipairs ents.GetAll()
+			if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
+				ProtectedCall -> ent.__PPM2_PonyData\Remove()
+
+		for _, ent in ipairs ents.GetAll()
+			ent.__PPM2_PonyData = nil
+
+		for key, obj in pairs(REGISTRY)
+			if obj.Remove
+				ProtectedCall -> obj\Remove()
+
+			REGISTRY[key] = nil
+
+	nullify()
+
+	entMeta = FindMetaTable('Entity')
+	EntIndex = entMeta.EntIndex
+
+	entMeta.GetPonyData = =>
+		index = EntIndex(@)
+		return REGISTRY[index] if index > 0
+		return REGISTRY[@]
+
+	entMeta.SetPonyData = (data) =>
+		index = EntIndex(@)
+
+		if index > 0
+			REGISTRY[index] = data
+			return
+
+		REGISTRY[@] = data
+

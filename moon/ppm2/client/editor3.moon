@@ -330,7 +330,7 @@ MODEL_BOX_PANEL = {
 
 		with @model = ClientsideModel(model)
 			\SetNoDraw(true)
-			.__PPM2_PonyData = ponydata
+			\SetPonyData(ponydata)
 			\SetSequence(@seq)
 			\FrameAdvance(0)
 			\SetPos(Vector())

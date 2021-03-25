@@ -110,11 +110,13 @@ hook.Add 'PlayerDeath', 'PPM2.Hooks', =>
 hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
 	return if @IsPlayer()
 	return if not @GetPonyData()
+
 	with @GetPonyData()
 		net.Start('PPM2.PonyDataRemove')
 		net.WriteUInt(.netID, 16)
 		net.Broadcast()
 		\Remove()
+
 	return
 
 hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>

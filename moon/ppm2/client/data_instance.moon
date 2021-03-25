@@ -288,7 +288,7 @@ class PonyDataInstance
 		with model
 			\SetNoDraw(true)
 			data = @CreateCustomController(model)
-			.__PPM2_PonyData = data
+			\SetPonyData(data)
 			ctrl = data\GetRenderController()
 
 			if bg = data\GetBodygroupController()
@@ -313,7 +313,7 @@ class PonyDataInstance
 			buildingModel\DrawModel()
 
 			with model
-				data = .__PPM2_PonyData
+				data = \GetPonyData()
 				ctrl = data\GetRenderController()
 
 				if textures = ctrl\GetTextureController()
