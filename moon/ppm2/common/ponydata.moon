@@ -95,6 +95,25 @@ wColor = net.WriteColor
 rString = net.ReadString
 wString = net.WriteString
 
+if PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.REGISTRY
+	REGISTRY = PPM2.NetworkedPonyData.REGISTRY
+
+	nullify = ->
+		for _, ent in ipairs ents.GetAll()
+			if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
+				ProtectedCall -> ent.__PPM2_PonyData\Remove()
+
+		for _, ent in ipairs ents.GetAll()
+			ent.__PPM2_PonyData = nil
+
+		for key, obj in pairs(REGISTRY)
+			if obj.Remove
+				ProtectedCall -> obj\Remove()
+
+			REGISTRY[key] = nil
+
+	nullify()
+
 class NetworkedPonyData extends PPM2.ModifierBase
 	@REGISTRY = {}
 

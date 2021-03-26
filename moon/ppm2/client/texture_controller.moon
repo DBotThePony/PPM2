@@ -636,7 +636,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@unfinished_tasks = 0
 		@processing_first = true
 		@CompileTextures() if compile
-		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache)
+		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache, 100)
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
 
 	CreateRenderTask: (func = '', ...) =>
