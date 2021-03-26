@@ -1241,7 +1241,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@BodyMaterial\SetTexture('$basetexture', path)
-				@BodyMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@BodyMaterial\GetTexture('$basetexture')\Download()
 
 		texSize = texSize / 2
 
@@ -1272,7 +1272,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash_bump, vtf\ToString())
 
 				@BodyMaterial\SetTexture('$bumpmap', path)
-				@BodyMaterial\GetTexture('$bumpmap')\Download() if developer\GetBool()
+				@BodyMaterial\GetTexture('$bumpmap')\Download()
 
 		hash_glow = {
 			'body illum'
@@ -1343,7 +1343,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash_glow, vtf\ToString())
 
 				@BodyMaterial\SetTexture('$selfillummask', path)
-				@BodyMaterial\GetTexture('$selfillummask')\Download() if developer\GetBool()
+				@BodyMaterial\GetTexture('$selfillummask')\Download()
 
 	@BUMP_COLOR = Color(127, 127, 255)
 
@@ -1492,7 +1492,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@HornMaterial\SetTexture('$basetexture', path)
-				@HornMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@HornMaterial\GetTexture('$basetexture')\Download()
 
 		hash = PPM2.TextureTableHash({
 			'horn illum'
@@ -1527,7 +1527,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@HornMaterial\SetTexture('$selfillummask', path)
-				@HornMaterial\GetTexture('$selfillummask')\Download() if developer\GetBool()
+				@HornMaterial\GetTexture('$selfillummask')\Download()
 
 		hash = PPM2.TextureTableHash({
 			'horn bump'
@@ -1556,7 +1556,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@HornMaterial\SetTexture('$bumpmap', path)
-				@HornMaterial\GetTexture('$bumpmap')\Download() if developer\GetBool()
+				@HornMaterial\GetTexture('$bumpmap')\Download()
 
 	CompileClothPart: (iName, matregistry, indexregistry, rtsize, opaque = true, isEditor, lock, release) =>
 		return unless @isValid
@@ -1711,7 +1711,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						path = @@SetCacheH(hash, vtf\ToString())
 
 						mat\SetTexture('$basetexture', path)
-						mat\GetTexture('$basetexture')\Download() if developer\GetBool()
+						mat\GetTexture('$basetexture')\Download()
 
 			else
 				tab1[matIndex] = nil
@@ -1917,7 +1917,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					path = @@SetCacheH(hash, vtf\ToString())
 
 					@SocksMaterial\SetTexture('$basetexture', path)
-					@SocksMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
+					@SocksMaterial\GetTexture('$basetexture')\Download()
 
 	CompileWings: (isEditor, lock, release) =>
 		return unless @isValid
@@ -1998,7 +1998,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@WingsMaterial\SetTexture('$basetexture', path)
-				@WingsMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@WingsMaterial\GetTexture('$basetexture')\Download()
 
 	GetManeType: => @GrabData('ManeType')
 	GetManeTypeLower: => @GrabData('ManeTypeLower')
@@ -2098,7 +2098,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@HairColor1Material\SetTexture('$basetexture', path)
-				@HairColor1Material\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@HairColor1Material\GetTexture('$basetexture')\Download()
 
 		hash = {
 			'mane 2',
@@ -2154,7 +2154,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@HairColor2Material\SetTexture('$basetexture', path)
-				@HairColor2Material\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@HairColor2Material\GetTexture('$basetexture')\Download()
 
 	CompileTail: (isEditor, lock, release) =>
 		return unless @isValid
@@ -2247,7 +2247,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@TailColor1Material\SetTexture('$basetexture', path)
-				@TailColor1Material\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@TailColor1Material\GetTexture('$basetexture')\Download()
 
 		hash = {
 			'tail 2',
@@ -2265,7 +2265,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		if getcache = @@GetCacheH(hash)
 			@TailColor2Material\SetTexture('$basetexture', getcache)
-			@TailColor2Material\GetTexture('$basetexture')\Download() if developer\GetBool()
+			@TailColor2Material\GetTexture('$basetexture')\Download()
 		else
 			urlTextures = {}
 
@@ -2303,7 +2303,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@TailColor2Material\SetTexture('$basetexture', path)
-				@TailColor2Material\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@TailColor2Material\GetTexture('$basetexture')\Download()
 
 	@REFLECT_RENDER_SIZE = 64
 	@GetReflectionsScale: =>
@@ -2435,7 +2435,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						path = @@SetCacheH(hash, vtf\ToString())
 
 						createdMaterial\SetTexture('$corneatexture', path)
-						createdMaterial\SetTexture('$corneatexture')\Download() if developer\GetBool()
+						createdMaterial\SetTexture('$corneatexture')\Download()
 			else
 				createdMaterial\SetTexture('$corneatexture', 'null')
 
@@ -2524,7 +2524,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				createdMaterial\SetTexture('$iris', path)
-				createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
+				createdMaterial\GetTexture('$iris')\Download()
 
 	_CaptureAlphaClosure: (...) => @@_CaptureAlphaClosure(...)
 	@_CaptureAlphaClosure: (texSize, mat, vtf) =>
@@ -2645,9 +2645,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					path = @@SetCacheH(hash, vtf\ToString())
 
 					@CMarkTexture\SetTexture('$basetexture', path)
-					@CMarkTexture\GetTexture('$basetexture')\Download() if developer\GetBool()
+					@CMarkTexture\GetTexture('$basetexture')\Download()
 					@CMarkTextureGUI\SetTexture('$basetexture', path)
-					@CMarkTextureGUI\GetTexture('$basetexture')\Download() if developer\GetBool()
+					@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 
 			return
 
@@ -2689,9 +2689,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				path = @@SetCacheH(hash, vtf\ToString())
 
 				@CMarkTexture\SetTexture('$basetexture', path)
-				@CMarkTexture\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@CMarkTexture\GetTexture('$basetexture')\Download()
 				@CMarkTextureGUI\SetTexture('$basetexture', path)
-				@CMarkTextureGUI\GetTexture('$basetexture')\Download() if developer\GetBool()
+				@CMarkTextureGUI\GetTexture('$basetexture')\Download()
 
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') ->
 	PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController

@@ -21,6 +21,8 @@
 
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
+developer = ConVar('developer')
+
 grind_down_color = (r, g, b, a) ->
 	return "#{math.round(r.r * 0.12156862745098)}_#{math.round(r.g * 0.24705882352941)}-#{math.round(r.b * 0.12156862745098)}_#{math.round(r.a * 0.12156862745098)}" if IsColor(r)
 	return "#{math.round(r * 0.12156862745098)}_#{math.round(g * 0.24705882352941)}_#{math.round(b * 0.12156862745098)}_#{math.round((a or 255) * 0.12156862745098)}"
@@ -172,7 +174,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		if getcache = @@GetCacheH(hash)
 			HairColor1Material\SetTexture('$basetexture', getcache)
-			HairColor1Material\GetTexture('$basetexture')\Download()
+			HairColor1Material\GetTexture('$basetexture')\Download() if developer\GetBool()
 		else
 			urlTextures = {}
 
@@ -229,7 +231,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		if getcache = @@GetCacheH(hash)
 			HairColor2Material\SetTexture('$basetexture', getcache)
-			HairColor2Material\GetTexture('$basetexture')\Download()
+			HairColor2Material\GetTexture('$basetexture')\Download() if developer\GetBool()
 		else
 			urlTextures = {}
 
@@ -348,7 +350,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		if getcache = @@GetCacheH(hash)
 			@BatWingsMaterial\SetTexture('$basetexture', getcache)
-			@BatWingsMaterial\GetTexture('$basetexture')\Download()
+			@BatWingsMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
 		else
 			for i = 1, 3
 				if url = PPM2.IsValidURL(@GrabData("BatWingURL#{i}"))
@@ -426,7 +428,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		if getcache = @@GetCacheH(hash)
 			@BatWingsSkinMaterial\SetTexture('$basetexture', getcache)
-			@BatWingsSkinMaterial\GetTexture('$basetexture')\Download()
+			@BatWingsSkinMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
 		else
 			urlTextures = {}
 
