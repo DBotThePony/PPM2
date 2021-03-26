@@ -402,15 +402,15 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		@modelCached = ent\GetModel()
 		ent\PPMBonesModifier()
-		@flightController = PPM2.PonyflyController(@)
-		@entID = ent\EntIndex()
-		@lastLerpThink = RealTimeL()
+		@flightController = PPM2.PonyflyController(@) if not @flightController
+		@entID = ent\EntIndex() if not @entID
+		@lastLerpThink = RealTimeL() if not @lastLerpThink
 
 		@ModelChanges(@modelCached, @modelCached)
 		@Reset()
 
 		timer.Simple(0, -> @GetRenderController()\CompileTextures() if @GetRenderController()) if CLIENT
-		PPM2.DebugPrint('Ponydata ', @, ' was updated to use for ', @ent)
+
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
 		@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
 
