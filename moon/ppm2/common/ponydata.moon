@@ -72,28 +72,12 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
-wUInt = (def = 0, size = 8) ->
-	return (arg = def) -> net.WriteUInt(arg, size)
-
-wInt = (def = 0, size = 8) ->
-	return (arg = def) -> net.WriteInt(arg, size)
-
-rUInt = (size = 8, min = 0, max = 255) ->
-	return -> math.Clamp(net.ReadUInt(size), min, max)
-
-rInt = (size = 8, min = -128, max = 127) ->
-	return -> math.Clamp(net.ReadInt(size), min, max)
-
 rFloat = (min = 0, max = 255) ->
 	return -> math.Clamp(net.ReadFloat(), min, max)
 
 wFloat = net.WriteFloat
 rBool = net.ReadBool
 wBool = net.WriteBool
-rColor = net.ReadColor
-wColor = net.WriteColor
-rString = net.ReadString
-wString = net.WriteString
 
 if PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.REGISTRY
 	REGISTRY = PPM2.NetworkedPonyData.REGISTRY
