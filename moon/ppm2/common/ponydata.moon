@@ -94,11 +94,10 @@ if PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.REGISTRY
 			if obj.Remove
 				ProtectedCall -> obj\Remove()
 
-			REGISTRY[key] = nil
-
 	nullify()
 
-_NW_NextVarID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextVarID or -1
+_NW_NextObjectID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID or -1
+_NW_NextObjectID_CL = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID_CL or 0x60000
 
 class NetworkedPonyData extends PPM2.ModifierBase
 	@REGISTRY = {}
@@ -248,7 +247,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@O_Slots = {} if CLIENT
 	@NW_Waiting = {}
 	@NW_WaitID = -1
-	@NW_NextVarID = _NW_NextVarID
+	@NW_NextVarID = -1
 	@NW_Create = 'PPM2.NW.Created'
 	@NW_Modify = 'PPM2.NW.Modified'
 	@NW_Broadcast = 'PPM2.NW.ModifiedBroadcast'
@@ -258,8 +257,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@NW_CooldownTimerCount = 'ppm2_NW_CooldownTimerCount'
 	@NW_CooldownTimer = 'ppm2_NW_CooldownTimer'
 	@NW_CooldownMessage = 'ppm2_NW_CooldownMessage'
-	@NW_NextObjectID = 0
-	@NW_NextObjectID_CL = 0x60000
+	@NW_NextObjectID = _NW_NextObjectID
+	@NW_NextObjectID_CL = _NW_NextObjectID_CL
 
 	if SERVER
 		net.pool(@NW_Create)
