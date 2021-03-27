@@ -122,7 +122,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureFirst = {
-			'name': "PPM2_#{@GetID()}_Mane_1_#{prefix}"
+			'name': "PPM2_#{@TextureSlotID()}_Mane_1_#{prefix}"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -145,7 +145,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@GetID()}_Mane_2_#{prefix}"
+			'name': "PPM2_#{@TextureSlotID()}_Mane_2_#{prefix}"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -184,7 +184,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
-			lock(@, prefix .. '_hair_1_color', texSize, texSize, r, g, b)
+			lock(prefix .. '_hair_1_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
@@ -203,11 +203,11 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
+				HairColor1Material\SetTexture('$basetexture', release(prefix .. '_hair_1_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor1"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine({fuck: true})
-				@@ReleaseRenderTarget(texSize, texSize)
+				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -241,7 +241,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
-			lock(@, prefix .. '_hair_2_color', texSize, texSize, r, g, b)
+			lock(prefix .. '_hair_2_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
@@ -260,11 +260,11 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
+				HairColor2Material\SetTexture('$basetexture', release(prefix .. '_hair_2_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -302,7 +302,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@GetID()}_BatWings"
+			'name': "PPM2_#{@TextureSlotID()}_BatWings"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -357,7 +357,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			lock(@, 'bat_wing', texSize, texSize, r, g, b)
+			lock('bat_wing', texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GrabData("BatWingURLColor#{i}")
@@ -366,11 +366,11 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@BatWingsMaterial\SetTexture('$basetexture', release(@, 'bat_wing', texSize, texSize))
+				@BatWingsMaterial\SetTexture('$basetexture', release('bat_wing', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -382,7 +382,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@GetID()}_BatWingsSkin"
+			'name': "PPM2_#{@TextureSlotID()}_BatWingsSkin"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -437,7 +437,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			lock(@, 'bat_wing_skin', texSize, texSize, r, g, b)
+			lock('bat_wing_skin', texSize, texSize, r, g, b)
 
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GrabData("BatWingSkinURLColor#{i}")
@@ -446,11 +446,11 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@BatWingsSkinMaterial\SetTexture('$basetexture', release(@, 'bat_wing_skin', texSize, texSize))
+				@BatWingsSkinMaterial\SetTexture('$basetexture', release('bat_wing_skin', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -493,20 +493,20 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		}
 
 		{:r, :g, :b} = @GrabData('TeethColor')
-		@TeethMaterialName = "!PPM2_#{@GetID()}_teeth"
-		@TeethMaterial = CreateMaterial("PPM2_#{@GetID()}_teeth", 'VertexLitGeneric', textureData)
+		@TeethMaterialName = "!PPM2_#{@TextureSlotID()}_teeth"
+		@TeethMaterial = CreateMaterial("PPM2_#{@TextureSlotID()}_teeth", 'VertexLitGeneric', textureData)
 		@TeethMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@TeethMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		{:r, :g, :b} = @GrabData('MouthColor')
-		@MouthMaterialName = "!PPM2_#{@GetID()}_mouth"
-		@MouthMaterial = CreateMaterial("PPM2_#{@GetID()}_mouth", 'VertexLitGeneric', textureData)
+		@MouthMaterialName = "!PPM2_#{@TextureSlotID()}_mouth"
+		@MouthMaterial = CreateMaterial("PPM2_#{@TextureSlotID()}_mouth", 'VertexLitGeneric', textureData)
 		@MouthMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@MouthMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
 		{:r, :g, :b} = @GrabData('TongueColor')
-		@TongueMaterialName = "!PPM2_#{@GetID()}_tongue"
-		@TongueMaterial = CreateMaterial("PPM2_#{@GetID()}_tongue", 'VertexLitGeneric', textureData)
+		@TongueMaterialName = "!PPM2_#{@TextureSlotID()}_tongue"
+		@TongueMaterial = CreateMaterial("PPM2_#{@TextureSlotID()}_tongue", 'VertexLitGeneric', textureData)
 		@TongueMaterial\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@TongueMaterial\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
