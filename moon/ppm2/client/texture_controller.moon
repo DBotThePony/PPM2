@@ -134,7 +134,7 @@ PPM2.URLThreadWorker = ->
 				if msg == 'FRAME'
 					frame += 1
 
-			systime = SysTime() + 8
+			systime = SysTime() + 16
 
 			timeout = false
 
