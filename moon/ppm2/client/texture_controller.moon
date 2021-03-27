@@ -19,13 +19,25 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+-- Texture indexes (-1)
+-- 1    =   models/ppm2/base/eye_l
+-- 2    =   models/ppm2/base/eye_r
+-- 3    =   models/ppm2/base/body
+-- 4    =   models/ppm2/base/horn
+-- 5    =   models/ppm2/base/wings
+-- 6    =   models/ppm2/base/hair_color_1
+-- 7    =   models/ppm2/base/hair_color_2
+-- 8    =   models/ppm2/base/tail_color_1
+-- 9    =   models/ppm2/base/tail_color_2
+-- 10   =   models/ppm2/base/cmark
+-- 11   =   models/ppm2/base/eyelashes
+
 USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
 USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
 
-if CLIENT
-	PPM2.CacheManager = DLib.CacheManager('ppm2_cache', 1024 * 0x00100000, 'vtf')
-	PPM2.CacheManager\AddCommands()
-	PPM2.CacheManager\SetConVar()
+PPM2.CacheManager = DLib.CacheManager('ppm2_cache', 1024 * 0x00100000, 'vtf')
+PPM2.CacheManager\AddCommands()
+PPM2.CacheManager\SetConVar()
 
 developer = ConVar('developer')
 
@@ -33,32 +45,326 @@ grind_down_color = (r, g, b, a) ->
 	return "#{math.round(r.r * 0.12156862745098)}_#{math.round(r.g * 0.24705882352941)}-#{math.round(r.b * 0.12156862745098)}_#{math.round(r.a * 0.12156862745098)}" if IsColor(r)
 	return "#{math.round(r * 0.12156862745098)}_#{math.round(g * 0.24705882352941)}_#{math.round(b * 0.12156862745098)}_#{math.round((a or 255) * 0.12156862745098)}"
 
+PPM2.IsValidURL = (url) ->
+	print(debug.traceback()) if not isstring(url)
+	url ~= '' and url\find('^https?://') and url or false
+
+PPM2.BuildURLHTML = (url, width, height) ->
+	url = url\Replace('%', '%25')\Replace(' ', '%20')\Replace('"', '%22')\Replace("'", '%27')\Replace('#', '%23')\Replace('<', '%3C')\Replace('=', '%3D')\Replace('>', '%3E')
+
+	return "<html>
+				<head>
+					<style>
+						html, body {
+							background: transparent;
+							margin: 0;
+							padding: 0;
+							overflow: hidden;
+						}
+
+						#mainimage {
+							max-width: #{width};
+							height: auto;
+							width: 100%;
+							margin: 0;
+							padding: 0;
+							max-height: #{height};
+						}
+
+						#imgdiv {
+							width: #{width};
+							height: #{height};
+							overflow: hidden;
+							margin: 0;
+							padding: 0;
+							text-align: center;
+						}
+					</style>
+					<script>
+						window.onload = function() {
+							var img = document.getElementById('mainimage');
+							if (img.naturalWidth < img.naturalHeight) {
+								img.style.setProperty('height', '100%');
+								img.style.setProperty('width', 'auto');
+							}
+
+							img.style.setProperty('margin-top', (#{height} - img.height) / 2);
+
+							setInterval(function() {
+								console.log('FRAME');
+							}, 50);
+						};
+					</script>
+				</head>
+				<body>
+					<div id='imgdiv'>
+						<img src='#{url}' id='mainimage' />
+					</div>
+				</body>
+			</html>"
+
+PPM2.HTML_MATERIAL_QUEUE =  PPM2.HTML_MATERIAL_QUEUE or {}
+PPM2.URL_MATERIAL_CACHE =   PPM2.URL_MATERIAL_CACHE  or {}
+PPM2.ALREADY_DOWNLOADING =  PPM2.ALREADY_DOWNLOADING or {}
+PPM2.FAILED_TO_DOWNLOAD =   PPM2.FAILED_TO_DOWNLOAD  or {}
+
+PPM2.TEXTURE_TASKS = PPM2.TEXTURE_TASKS or {}
+PPM2.TEXTURE_TASKS_EDITOR = PPM2.TEXTURE_TASKS_EDITOR or {}
+
+coroutine_yield = coroutine.yield
+coroutine_resume = coroutine.resume
+coroutine_status = coroutine.status
+
+PPM2.URLThreadWorker = ->
+	while true
+		if not PPM2.HTML_MATERIAL_QUEUE[1]
+			coroutine_yield()
+		else
+			data = table.remove(PPM2.HTML_MATERIAL_QUEUE, 1)
+
+			panel = vgui.Create('DHTML')
+			panel\SetVisible(false)
+			panel\SetSize(data.width, data.height)
+			panel\SetHTML(PPM2.BuildURLHTML(data.url, data.width, data.height))
+			panel\Refresh()
+
+			frame = 0
+
+			panel.ConsoleMessage = (pnl, msg) ->
+				if msg == 'FRAME'
+					frame += 1
+
+			systime = SysTime() + 16
+
+			timeout = false
+
+			while panel\IsLoading() or frame < 20
+				if systime <= SysTime()
+					timeout = true
+					panel\Remove() if IsValid(panel)
+
+					newMat = CreateMaterial("PPM2_URLMaterial_Failed_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': 'null'
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+						'$translucent': 1
+					})
+
+					PPM2.FAILED_TO_DOWNLOAD[data.index] = {
+						texture: newMat\GetTexture('$basetexture')
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(newMat\GetTexture('$basetexture'), newMat)
+
+					break
+
+				coroutine_yield()
+
+			if not timeout
+				panel\UpdateHTMLTexture()
+				htmlmat = panel\GetHTMLMaterial()
+
+				systime = SysTime() + 1
+
+				while not htmlmat and systime <= SysTime()
+					htmlmat = panel\GetHTMLMaterial()
+
+				if htmlmat
+					rt, mat = PPM2.PonyTextureController\LockRenderTarget(data.width, data.height, 0, 0, 0, 0)
+
+					surface.SetDrawColor(255, 255, 255)
+					surface.SetMaterial(htmlmat)
+					surface.DrawTexturedRect(0, 0, data.width, data.height)
+
+					vtf = DLib.VTF.Create(2, data.width, data.height, IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
+					vtf\CaptureRenderTargetCoroutine()
+
+					if select('#', render.ReadPixel(0, 0)) == 3
+						PPM2.PonyTextureController\_CaptureAlphaClosure(data.width, mat, vtf)
+					else
+						PPM2.PonyTextureController\ReleaseRenderTarget(data.width, data.height)
+
+					path = '../data/' .. PPM2.CacheManager\Set(data.index, vtf\ToString())
+
+					newMat = CreateMaterial("PPM2_URLMaterial_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': '../data/' .. path
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+					})
+
+					newMat\SetTexture('$basetexture', '../data/' .. path)
+					newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
+
+					PPM2.URL_MATERIAL_CACHE[data.index] = {
+						texture: newMat\GetTexture('$basetexture')
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(newMat\GetTexture('$basetexture'), newMat)
+				else
+					newMat = CreateMaterial("PPM2_URLMaterial_Failed_#{data.hash}", 'UnlitGeneric', {
+						'$basetexture': 'null'
+						'$ignorez': 1
+						'$vertexcolor': 1
+						'$vertexalpha': 1
+						'$nolod': 1
+						'$translucent': 1
+					})
+
+					PPM2.FAILED_TO_DOWNLOAD[data.index] = {
+						texture: newMat\GetTexture('$basetexture')
+						material: newMat
+						index: data.index
+						hash: data.hash
+					}
+
+					PPM2.ALREADY_DOWNLOADING[data.index] = nil
+
+					for resolve in *data.resolve
+						resolve(newMat\GetTexture('$basetexture'), newMat)
+
+				coroutine_yield()
+				panel\Remove() if IsValid(panel)
+
+PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
+
+PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
+	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
+
+	index = url .. '__' .. width .. '_' .. height
+
+	if data = PPM2.FAILED_TO_DOWNLOAD[index]
+		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
+
+	if data = PPM2.URL_MATERIAL_CACHE[index]
+		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
+
+	if data = PPM2.ALREADY_DOWNLOADING[index]
+		return DLib.Promise (resolve) -> table.insert(data.resolve, resolve)
+
+	if getcache = PPM2.CacheManager\HasGet(index)
+		return DLib.Promise (resolve) ->
+			hash = DLib.Util.QuickSHA1(index)
+
+			newMat = CreateMaterial("PPM2_URLMaterial_#{hash}", 'UnlitGeneric', {
+				'$basetexture': '../data/' .. getcache
+				'$ignorez': 1
+				'$vertexcolor': 1
+				'$vertexalpha': 1
+				'$nolod': 1
+			})
+
+			newMat\SetTexture('$basetexture', '../data/' .. getcache)
+			newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
+
+			PPM2.URL_MATERIAL_CACHE[index] = {
+				texture: newMat\GetTexture('$basetexture')
+				material: newMat
+				index: index
+				:hash
+			}
+
+			resolve(newMat\GetTexture('$basetexture'), newMat)
+
+	return DLib.Promise (resolve) ->
+		data = {
+			:url
+			:width
+			:height
+			:index
+			hash: DLib.Util.QuickSHA1(index)
+			resolve: {resolve}
+		}
+
+		PPM2.ALREADY_DOWNLOADING[index] = data
+		table.insert(PPM2.HTML_MATERIAL_QUEUE, data)
+
+hook.Add 'Think', 'PPM2 Material Tasks', ->
+	status, err = coroutine_resume(PPM2.URLThread)
+
+	if not status
+		PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
+		error(err)
+
+	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS_EDITOR)
+		if coroutine_status(thread) == 'dead'
+			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
+		else
+			status, err = coroutine_resume(thread, self, isEditor, lock, release)
+
+			if not status
+				PPM2.TEXTURE_TASKS_EDITOR[name] = nil
+				error(name .. ' editor texture task failed: ' .. err)
+
+	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS)
+		if coroutine_status(thread) == 'dead'
+			PPM2.TEXTURE_TASKS[name] = nil
+			self.unfinished_tasks -= 1
+		else
+			status, err = coroutine_resume(thread, self, isEditor, lock, release)
+
+			if not status
+				PPM2.TEXTURE_TASKS[name] = nil
+				self.unfinished_tasks -= 1
+				error(name .. ' texture task failed: ' .. err)
+
+hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
+	PPM2.HTML_MATERIAL_QUEUE = {}
+	PPM2.URL_MATERIAL_CACHE = {}
+	PPM2.ALREADY_DOWNLOADING = {}
+	PPM2.FAILED_TO_DOWNLOAD = {}
+	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS)
+	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS_MASK)
+	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
+
+PPM2.TextureTableHash = (input) ->
+	hash = DLib.Util.SHA1()
+	hash\Update('post intel fix')
+	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
+	return hash\Digest()
+
 DrawTexturedRectRotated = (x = 0, y = 0, width = 0, height = 0, rotation = 0) -> surface.DrawTexturedRectRotated(x + width / 2, y + height / 2, width, height, rotation)
 
 GetMat = (matIn) ->
 	return matIn if not isstring(matIn)
 	return Material(matIn, 'smooth'), nil
 
+LOCKED_RENDERTARGETS = PPM2.PonyTextureController and PPM2.PonyTextureController.LOCKED_RENDERTARGETS
+
 class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@AVALIABLE_CONTROLLERS = {}
 	@MODELS = {'models/ppm/player_default_base.mdl', 'models/ppm/player_default_base_nj.mdl', 'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
-	if CLIENT
-		@HAIR_MATERIAL_COLOR = PPM2.MaterialsRegistry.HAIR_MATERIAL_COLOR
-		@TAIL_MATERIAL_COLOR = PPM2.MaterialsRegistry.TAIL_MATERIAL_COLOR
-		@WINGS_MATERIAL_COLOR = PPM2.MaterialsRegistry.WINGS_MATERIAL_COLOR
-		@HORN_MATERIAL_COLOR = PPM2.MaterialsRegistry.HORN_MATERIAL_COLOR
-		@BODY_MATERIAL = PPM2.MaterialsRegistry.BODY_MATERIAL
-		@HORN_DETAIL_COLOR = PPM2.MaterialsRegistry.HORN_DETAIL_COLOR
-		@EYE_OVAL = PPM2.MaterialsRegistry.EYE_OVAL
-		@EYE_OVALS = PPM2.MaterialsRegistry.EYE_OVALS
-		@EYE_GRAD = PPM2.MaterialsRegistry.EYE_GRAD
-		@EYE_EFFECT = PPM2.MaterialsRegistry.EYE_EFFECT
-		@EYE_LINE_L_1 = PPM2.MaterialsRegistry.EYE_LINE_L_1
-		@EYE_LINE_R_1 = PPM2.MaterialsRegistry.EYE_LINE_R_1
-		@EYE_LINE_L_2 = PPM2.MaterialsRegistry.EYE_LINE_L_2
-		@EYE_LINE_R_2 = PPM2.MaterialsRegistry.EYE_LINE_R_2
-		@PONY_SOCKS = PPM2.MaterialsRegistry.PONY_SOCKS
+	@HAIR_MATERIAL_COLOR = PPM2.MaterialsRegistry.HAIR_MATERIAL_COLOR
+	@TAIL_MATERIAL_COLOR = PPM2.MaterialsRegistry.TAIL_MATERIAL_COLOR
+	@WINGS_MATERIAL_COLOR = PPM2.MaterialsRegistry.WINGS_MATERIAL_COLOR
+	@HORN_MATERIAL_COLOR = PPM2.MaterialsRegistry.HORN_MATERIAL_COLOR
+	@BODY_MATERIAL = PPM2.MaterialsRegistry.BODY_MATERIAL
+	@HORN_DETAIL_COLOR = PPM2.MaterialsRegistry.HORN_DETAIL_COLOR
+	@EYE_OVAL = PPM2.MaterialsRegistry.EYE_OVAL
+	@EYE_OVALS = PPM2.MaterialsRegistry.EYE_OVALS
+	@EYE_GRAD = PPM2.MaterialsRegistry.EYE_GRAD
+	@EYE_EFFECT = PPM2.MaterialsRegistry.EYE_EFFECT
+	@EYE_LINE_L_1 = PPM2.MaterialsRegistry.EYE_LINE_L_1
+	@EYE_LINE_R_1 = PPM2.MaterialsRegistry.EYE_LINE_R_1
+	@EYE_LINE_L_2 = PPM2.MaterialsRegistry.EYE_LINE_L_2
+	@EYE_LINE_R_2 = PPM2.MaterialsRegistry.EYE_LINE_R_2
+	@PONY_SOCKS = PPM2.MaterialsRegistry.PONY_SOCKS
 
 	@MAT_INDEX_EYE_LEFT = 0
 	@MAT_INDEX_EYE_RIGHT = 1
@@ -194,19 +500,121 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@BODY_UPDATE_TRIGGER["TattooGlowStrength#{i}"] = true
 		@BODY_UPDATE_TRIGGER["TattooOverDetail#{i}"] = true
 
-	if CLIENT
-		@GetCacheH = (hash) =>
-			path = PPM2.CacheManager\HasGetHash(hash)
-			return if not path
-			return '../data/' .. path
+	@GetCacheH = (hash) =>
+		path = PPM2.CacheManager\HasGetHash(hash)
+		return if not path
+		return '../data/' .. path
 
-		@SetCacheH = (hash, value) => '../data/' .. PPM2.CacheManager\SetHash(hash, value)
+	@SetCacheH = (hash, value) => '../data/' .. PPM2.CacheManager\SetHash(hash, value)
+
+	@LOCKED_RENDERTARGETS = LOCKED_RENDERTARGETS or {}
+	@LOCKED_RENDERTARGETS_MASK = LOCKED_RENDERTARGETS_MASK or {}
 
 	SelectLockFuncs: =>
 		if @GrabData('IsEditor')
-			return true, PPM2.LockRenderTargetEditor, PPM2.ReleaseRenderTargetEditor
+			return true, @LockRenderTargetEditor, @ReleaseRenderTargetEditor
 
-		return false, PPM2.LockRenderTarget, PPM2.ReleaseRenderTarget
+		return false, @LockRenderTarget, @ReleaseRenderTarget
+
+	LockRenderTargetEditor: (name, width, height, r = 0, g = 0, b = 0, a = 255) =>
+		index = string.format('PPM2_editor_%s_%d_%d', name, width, height)
+		rt = GetRenderTarget(index, width, height)
+
+		render.PushRenderTarget(rt)
+		render.Clear(r, g, b, a, true, true)
+
+		cam.Start2D()
+
+		surface.SetDrawColor(r, g, b, a)
+
+		mat = CreateMaterial(index .. 'a', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		})
+
+		mat\SetTexture('$basetexture', rt)
+
+		return rt, mat
+
+	ReleaseRenderTargetEditor: (name, width, height, no_pop = false) =>
+		index = string.format('PPM2_editor_%s_%d_%d', name, width, height)
+
+		if not no_pop
+			cam.End2D()
+			render.PopRenderTarget()
+
+		return GetRenderTarget(index, width, height)
+
+	LockRenderTarget: (name, ...) => @@LockRenderTarget(...)
+	@LockRenderTarget = (width, height, r = 0, g = 0, b = 0, a = 255) =>
+		index = string.format('PPM2_buffer_%d_%d', width, height)
+
+		while @LOCKED_RENDERTARGETS[index]
+			coroutine_yield()
+
+		@LOCKED_RENDERTARGETS[index] = true
+
+		rt = GetRenderTarget(index, width, height)
+
+		render.PushRenderTarget(rt)
+		render.Clear(r, g, b, a, true, true)
+
+		cam.Start2D()
+
+		surface.SetDrawColor(r, g, b, a)
+		surface.DrawRect(0, 0, width + 1, height + 1)
+
+		mat = CreateMaterial(index .. 'a', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		})
+
+		mat\SetTexture('$basetexture', rt)
+
+		return rt, mat
+
+	ReleaseRenderTarget: (name, ...) => @@ReleaseRenderTarget(...)
+	@ReleaseRenderTarget = (width, height, no_pop = false) =>
+		index = string.format('PPM2_buffer_%d_%d', width, height)
+		@LOCKED_RENDERTARGETS[index] = false
+
+		if not no_pop
+			cam.End2D()
+			render.PopRenderTarget()
+
+		return GetRenderTarget(index, width, height)
+
+	LockRenderTargetMask: (name, ...) => @@LockRenderTargetMask(...)
+	@LockRenderTargetMask = (width, height) =>
+		index = string.format('PPM2_mask_%d_%d', width, height)
+
+		while @LOCKED_RENDERTARGETS_MASK[index]
+			coroutine_yield()
+
+		@LOCKED_RENDERTARGETS_MASK[index] = true
+
+		index2 = string.format('PPM2_mask2_%d_%d', width, height)
+		rt1, rt2 = GetRenderTarget(index, width, height), GetRenderTarget(index2, width, height)
+
+		mat1, mat2 = CreateMaterial(index .. 'b', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		}), CreateMaterial(index2 .. 'b', 'UnlitGeneric', {
+			'$basetexture': '!' .. index2,
+			'$translucent': '1',
+		})
+
+		mat1\SetTexture('$basetexture', rt1)
+		mat2\SetTexture('$basetexture', rt2)
+
+		return rt1, rt2, mat1, mat2
+
+	ReleaseRenderTargetMask: (name, ...) => @@ReleaseRenderTargetMask(...)
+	@ReleaseRenderTargetMask = (width, height) =>
+		index = string.format('PPM2_mask_%d_%d', width, height)
+		index2 = string.format('PPM2_mask2_%d_%d', width, height)
+		@LOCKED_RENDERTARGETS_MASK[index] = false
+		return GetRenderTarget(index, width, height), GetRenderTarget(index2, width, height)
 
 	new: (controller, compile = true) =>
 		super(controller\GetData())
@@ -232,7 +640,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
 
 	CreateRenderTask: (func = '', ...) =>
-		return if SERVER
 		index = string.format('%p%s', @, func)
 		isEditor, lock, release = @SelectLockFuncs()
 		thread = coroutine.create(@[func])
@@ -248,7 +655,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	IsBeingProcessed: => @unfinished_tasks > 0
 
 	DataChanges: (state) =>
-		return if SERVER
 		return unless @isValid
 		return if not @GetEntity()
 		key = state\GetKey()
@@ -312,7 +718,20 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@ResetTextures()
 
 	IsValid: => IsValid(@GetEntity()) and @isValid and @compiled and @GetData()\IsValid()
-	TextureSlotID: => @controller\TextureSlotID()
+
+	GetID: =>
+		return @GetObjectSlot() if @GetObjectSlot()
+		return @id if @clientsideID
+
+		if @GetEntity() ~= @cachedENT
+			@cachedENT = @GetEntity()
+			@id = @GetEntity()\EntIndex()
+			if @id == -1
+				@id = @@NEXT_GENERATED_ID
+				@@NEXT_GENERATED_ID += 1
+				@CompileTextures() if @compiled
+
+		return @id
 
 	GetBody: => @BodyMaterial
 	GetBodyName: => @BodyMaterialName
@@ -666,7 +1085,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_Body"
+			'name': "PPM2_#{@GetID()}_Body"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/ppm2/base/body'
@@ -740,7 +1159,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			{:r, :g, :b} = @GrabData('BodyColor')
 
-			lock('body', texSize, texSize, r, g, b)
+			lock(@, 'body', texSize, texSize, r, g, b)
 
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if @GrabData('BodyDetailFirst' .. i)
@@ -811,11 +1230,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@BodyMaterial\SetTexture('$basetexture', release('body', texSize, texSize))
+				@BodyMaterial\SetTexture('$basetexture', release(@, 'body', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 
@@ -836,18 +1255,18 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$bumpmap', getcache)
 			@BodyMaterial\GetTexture('$bumpmap')\Download() if developer\GetBool()
 		else
-			lock('body_bump', texSize, texSize, 127, 127, 255)
+			lock(@, 'body_bump', texSize, texSize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@BodyMaterial\SetTexture('$bumpmap', release('body_bump', texSize, texSize))
+				@BodyMaterial\SetTexture('$bumpmap', release(@, 'body_bump', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash_bump, vtf\ToString())
@@ -883,7 +1302,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@BodyMaterial\SetTexture('$selfillummask', getcache)
 			@BodyMaterial\GetTexture('$selfillummask')\Download() if developer\GetBool()
 		else
-			lock('body_illum', texSize, texSize)
+			lock(@, 'body_illum', texSize, texSize)
 
 			surface.SetDrawColor(255, 255, 255)
 
@@ -914,11 +1333,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					@DrawTattoo(i, true)
 
 			if isEditor
-				@BodyMaterial\SetTexture('$selfillummask', release('body_illum', texSize, texSize))
+				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash_glow, vtf\ToString())
@@ -932,7 +1351,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_Horn"
+			'name': "PPM2_#{@GetID()}_Horn"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/ppm2/base/horn'
@@ -957,7 +1376,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureData_New1 = {
-			'name': "PPM2_#{@TextureSlotID()}_Horn1"
+			'name': "PPM2_#{@GetID()}_Horn1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -980,7 +1399,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureData_New2 = {
-			'name': "PPM2_#{@TextureSlotID()}_Horn2"
+			'name': "PPM2_#{@GetID()}_Horn2"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1048,7 +1467,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(geturl, texSize, texSize)\Await())
 					return unless @isValid
 
-			lock('horn', texSize, texSize, r, g, b)
+			lock(@, 'horn', texSize, texSize, r, g, b)
 
 			{:r, :g, :b} = @GrabData('HornDetailColor')
 
@@ -1063,11 +1482,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@HornMaterial\SetTexture('$basetexture', release('horn', texSize, texSize))
+				@HornMaterial\SetTexture('$basetexture', release(@, 'horn', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1086,7 +1505,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@HornMaterial\SetTexture('$selfillummask', getcache)
 			@HornMaterial\GetTexture('$selfillummask')\Download() if developer\GetBool()
 		else
-			lock('horn_illum', texSize, texSize)
+			lock(@, 'horn_illum', texSize, texSize)
 
 			if @GrabData('HornGlow')
 				@HornMaterial2\SetTexture('$selfillummask', 'models/debug/debugwhite')
@@ -1098,11 +1517,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@HornMaterial2\SetTexture('$selfillummask', 'null')
 
 			if isEditor
-				@HornMaterial\SetTexture('$selfillummask', release('horn_illum', texSize, texSize))
+				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1120,18 +1539,18 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@HornMaterial\SetTexture('$bumpmap', getcache)
 			@HornMaterial\GetTexture('$bumpmap')\Download() if developer\GetBool()
 		else
-			lock('horn_bump', texSize, texSize, 127, 127, 255)
+			lock(@, 'horn_bump', texSize, texSize, 127, 127, 255)
 
 			surface.SetDrawColor(255, 255, 255, @GrabData('HornDetailColor').a)
 			surface.SetMaterial(PPM2.MaterialsRegistry.HORN_DETAIL_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@HornMaterial\SetTexture('$bumpmap', release('horn_bump', texSize, texSize))
+				@HornMaterial\SetTexture('$bumpmap', release(@, 'horn_bump', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1184,7 +1603,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			return
 
 		if matregistry[clothes + 1].size == 0
-			name = "PPM2_#{@TextureSlotID()}_Clothes_#{iName}_1"
+			name = "PPM2_#{@GetID()}_Clothes_#{iName}_1"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 			@[iName .. 'Clothes_Mat'] = {mat}
 			@[iName .. 'Clothes_MatName'] = {"!#{name}"}
@@ -1217,7 +1636,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		nextindex = 1
 
 		for matIndex = 1, matregistry[clothes + 1].size
-			name = "PPM2_#{@TextureSlotID()}_Clothes_#{iName}_#{matIndex}"
+			name = "PPM2_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 
 			tab1[matIndex] = mat
@@ -1270,7 +1689,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					mat\SetTexture('$basetexture', getcache)
 					mat\GetTexture('$basetexture')\Download() if developer\GetBool()
 				else
-					lock('cloth_' .. iName, rtsize, rtsize, r, g, b)
+					lock(@, 'cloth_' .. iName, rtsize, rtsize, r, g, b)
 
 					for i2 = 1, matregistry[clothes + 1][matIndex].size
 						texture = matregistry[clothes + 1][matIndex][i2]
@@ -1282,11 +1701,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 							surface.DrawTexturedRect(0, 0, rtsize, rtsize)
 
 					if isEditor
-						mat\SetTexture('$basetexture', release('cloth_' .. iName, rtsize, rtsize))
+						mat\SetTexture('$basetexture', release(@, 'cloth_' .. iName, rtsize, rtsize))
 					else
 						vtf = DLib.VTF.Create(2, rtsize, rtsize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
-						PPM2.ReleaseRenderTarget(nil, rtsize, rtsize)
+						@@ReleaseRenderTarget(rtsize, rtsize)
 
 						vtf\AutoGenerateMips(false)
 						path = @@SetCacheH(hash, vtf\ToString())
@@ -1328,19 +1747,19 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureColor1 = {
-			'name': "PPM2_#{@TextureSlotID()}_NewSocks_Color1"
+			'name': "PPM2_#{@GetID()}_NewSocks_Color1"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
 
 		textureColor2 = {
-			'name': "PPM2_#{@TextureSlotID()}_NewSocks_Color2"
+			'name': "PPM2_#{@GetID()}_NewSocks_Color2"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
 
 		textureBase = {
-			'name': "PPM2_#{@TextureSlotID()}_NewSocks_Base"
+			'name': "PPM2_#{@GetID()}_NewSocks_Base"
 			'shader': 'VertexLitGeneric'
 			'data': data
 		}
@@ -1380,7 +1799,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_Eyelashes"
+			'name': "PPM2_#{@GetID()}_Eyelashes"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1415,7 +1834,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_Socks"
+			'name': "PPM2_#{@GetID()}_Socks"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/props_pony/ppm/ppm_socks/socks_striped'
@@ -1474,7 +1893,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@SocksMaterial\SetTexture('$basetexture', getcache)
 				@SocksMaterial\GetTexture('$basetexture')\Download() if developer\GetBool()
 			else
-				lock('sock', texSize, texSize, r, g, b)
+				lock(@, 'sock', texSize, texSize, r, g, b)
 
 				socksType = @GrabData('SocksTexture') + 1
 				surface.SetMaterial(PPM2.MaterialsRegistry.SOCKS_MATERIALS[socksType] or PPM2.MaterialsRegistry.SOCKS_MATERIALS[1])
@@ -1488,11 +1907,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 				if isEditor
-					@SocksMaterial\SetTexture('$basetexture', release('sock', texSize, texSize))
+					@SocksMaterial\SetTexture('$basetexture', release(@, 'sock', texSize, texSize))
 				else
 					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
-					PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+					@@ReleaseRenderTarget(texSize, texSize)
 
 					vtf\AutoGenerateMips(false)
 					path = @@SetCacheH(hash, vtf\ToString())
@@ -1504,7 +1923,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_Wings"
+			'name': "PPM2_#{@GetID()}_Wings"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1557,7 +1976,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			lock('wings', texSize, texSize, r, g, b)
+			lock(@, 'wings', texSize, texSize, r, g, b)
 
 			surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
@@ -1569,11 +1988,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@WingsMaterial\SetTexture('$basetexture', release('wings', texSize, texSize))
+				@WingsMaterial\SetTexture('$basetexture', release(@, 'wings', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1589,7 +2008,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureFirst = {
-			'name': "PPM2_#{@TextureSlotID()}_Mane_1"
+			'name': "PPM2_#{@GetID()}_Mane_1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1611,7 +2030,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@TextureSlotID()}_Mane_2"
+			'name': "PPM2_#{@GetID()}_Mane_2"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -1649,7 +2068,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData('ManeColor1')
-			lock('hair_1_color', texSize, texSize, r, g, b)
+			lock(@, 'hair_1_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
@@ -1669,11 +2088,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@HairColor1Material\SetTexture('$basetexture', release('hair_1_color', texSize, texSize))
+				@HairColor1Material\SetTexture('$basetexture', release(@, 'hair_1_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1707,7 +2126,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData('ManeColor2')
-			lock('hair_2_color', texSize, texSize, r, g, b)
+			lock(@, 'hair_2_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
@@ -1725,11 +2144,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@HairColor2Material\SetTexture('$basetexture', release('hair_2_color', texSize, texSize))
+				@HairColor2Material\SetTexture('$basetexture', release(@, 'hair_2_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1740,7 +2159,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	CompileTail: (isEditor, lock, release) =>
 		return unless @isValid
 		textureFirst = {
-			'name': "PPM2_#{@TextureSlotID()}_Tail_1"
+			'name': "PPM2_#{@GetID()}_Tail_1"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'models/debug/debugwhite'
@@ -1762,7 +2181,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureSecond = {
-			'name': "PPM2_#{@TextureSlotID()}_Tail_2"
+			'name': "PPM2_#{@GetID()}_Tail_2"
 			'shader': 'VertexLitGeneric'
 			'data': {k, v for k, v in pairs textureFirst.data}
 		}
@@ -1800,7 +2219,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData('TailColor1')
-			lock('tail_1_color', texSize, texSize, r, g, b)
+			lock(@, 'tail_1_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
 				i = 1
@@ -1818,11 +2237,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@TailColor1Material\SetTexture('$basetexture', release('tail_1_color', texSize, texSize))
+				@TailColor1Material\SetTexture('$basetexture', release(@, 'tail_1_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1856,7 +2275,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					return unless @isValid
 
 			{:r, :g, :b} = @GrabData('TailColor2')
-			lock('tail_2_color', texSize, texSize, r, g, b)
+			lock(@, 'tail_2_color', texSize, texSize, r, g, b)
 
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
 				i = 1
@@ -1874,11 +2293,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
 			if isEditor
-				@TailColor2Material\SetTexture('$basetexture', release('tail_2_color', texSize, texSize))
+				@TailColor2Material\SetTexture('$basetexture', release(@, 'tail_2_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1942,7 +2361,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
+			'name': "PPM2_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
 			'shader': EyeRefract and 'EyeRefract' or 'Eyes'
 			'data': {
 				'$iris': 'models/ppm2/base/face/p_base'
@@ -1999,18 +2418,18 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					createdMaterial\SetTexture('$corneatexture', getcache)
 					createdMaterial\GetTexture('$corneatexture')\Download() if developer\GetBool()
 				else
-					lock('eye_cornera', texSize, texSize)
+					lock(@, 'eye_cornera', texSize, texSize)
 
 					surface.SetMaterial(PPM2.MaterialsRegistry.EYE_CORNERA_OVAL)
 					surface.SetDrawColor(255, 255, 255)
 					DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
 
 					if isEditor
-						createdMaterial\SetTexture('$corneatexture', release('eye_cornera', texSize, texSize))
+						createdMaterial\SetTexture('$corneatexture', release(@, 'eye_cornera', texSize, texSize))
 					else
 						vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
-						PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+						@@ReleaseRenderTarget(texSize, texSize)
 
 						vtf\AutoGenerateMips(false)
 						path = @@SetCacheH(hash, vtf\ToString())
@@ -2061,7 +2480,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
 		else
 			{:r, :g, :b, :a} = EyeBackground
-			lock('eye_' .. prefixUpper, texSize, texSize, r, g, b)
+			lock(@, 'eye_' .. prefixUpper, texSize, texSize, r, g, b)
 
 			surface.SetDrawColor(EyeIris1)
 			surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
@@ -2095,11 +2514,11 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			if isEditor
-				createdMaterial\SetTexture('$iris', release('eye_' .. prefixUpper, texSize, texSize))
+				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2109,7 +2528,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 	_CaptureAlphaClosure: (...) => @@_CaptureAlphaClosure(...)
 	@_CaptureAlphaClosure: (texSize, mat, vtf) =>
-		rt1, rt2, mat1, mat2 = PPM2.LockRenderTargetMask(texSize, texSize)
+		rt1, rt2, mat1, mat2 = @LockRenderTargetMask(texSize, texSize)
 		surface.SetDrawColor(255, 255, 255)
 
 		-- capture alpha
@@ -2125,7 +2544,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		render.PopRenderTarget()
 
-		PPM2.ReleaseRenderTarget(texSize, texSize, true)
+		@ReleaseRenderTarget(texSize, texSize, true)
 
 		-- compute alpha
 		render.PushRenderTarget(rt2)
@@ -2148,7 +2567,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@TextureSlotID()}_CMark3"
+			'name': "PPM2_#{@GetID()}_CMark3"
 			'shader': 'VertexLitGeneric'
 			'data': {
 				'$basetexture': 'null'
@@ -2159,7 +2578,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureDataGUI = {
-			'name': "PPM2_#{@TextureSlotID()}_CMark_GUI3"
+			'name': "PPM2_#{@GetID()}_CMark_GUI3"
 			'shader': 'UnlitGeneric'
 			'data': {
 				'$basetexture': 'null'
@@ -2203,14 +2622,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				material = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 				return unless @isValid
 
-				rt, mat = lock('cmark', texSize, texSize, 0, 0, 0, 0)
+				rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
 
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(material)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
 				if isEditor
-					rt = release('cmark', texSize, texSize)
+					rt = release(@, 'cmark', texSize, texSize)
 					@CMarkTexture\SetTexture('$basetexture', rt)
 					@CMarkTextureGUI\SetTexture('$basetexture', rt)
 				else
@@ -2220,7 +2639,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if select('#', render.ReadPixel(0, 0)) == 3
 						@_CaptureAlphaClosure(texSize, mat, vtf)
 					else
-						PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+						@@ReleaseRenderTarget(texSize, texSize)
 
 					vtf\AutoGenerateMips(true)
 					path = @@SetCacheH(hash, vtf\ToString())
@@ -2246,7 +2665,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@CMarkTexture\GetTexture('$basetexture')\Download() if developer\GetBool()
 			@CMarkTextureGUI\GetTexture('$basetexture')\Download() if developer\GetBool()
 		else
-			rt, mat = lock('cmark', texSize, texSize, 0, 0, 0, 0)
+			rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
 
 			if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
 				surface.SetDrawColor(@GrabData('CMarkColor'))
@@ -2254,7 +2673,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
 
 			if isEditor
-				rt = release('cmark', texSize, texSize)
+				rt = release(@, 'cmark', texSize, texSize)
 				@CMarkTexture\SetTexture('$basetexture', rt)
 				@CMarkTextureGUI\SetTexture('$basetexture', rt)
 			else
@@ -2264,7 +2683,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if select('#', render.ReadPixel(0, 0)) == 3
 					@_CaptureAlphaClosure(texSize, mat, vtf)
 				else
-					PPM2.ReleaseRenderTarget(nil, texSize, texSize)
+					@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(true)
 				path = @@SetCacheH(hash, vtf\ToString())

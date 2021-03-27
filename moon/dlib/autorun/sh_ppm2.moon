@@ -51,13 +51,10 @@ shared('common/size_controller.lua')
 shared('common/hooks.lua')
 shared('common/hoofsteps.lua')
 
-client('client/texture_helper.lua')
-
-shared('common/texture_controller.lua')
-shared('common/new_texture_controller.lua')
-
 client('client/data_instance.lua')
 client('client/materials_registry.lua')
+client('client/texture_controller.lua')
+client('client/new_texture_controller.lua')
 client('client/hooks.lua')
 client('client/functions.lua')
 client('client/render_controller.lua')

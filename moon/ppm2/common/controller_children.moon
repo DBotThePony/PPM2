@@ -64,6 +64,8 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 	GetEntity: => @controller\GetEntity()
 	GetEntityID: => @entID
 	GetDataID: => @entID
+	GetObjectSlot: => @nwController\GetObjectSlot()
+	ObjectSlot: => @nwController\ObjectSlot()
 
 	RemoveFunc: =>
 	Remove: =>

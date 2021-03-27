@@ -248,11 +248,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@NW_Objects = {}
 	@O_Slots = {} if CLIENT
 	@NW_Waiting = {}
-
 	@NW_WaitID = _NW_WaitID
-	@NW_NextObjectID = _NW_NextObjectID
-	@NW_NextObjectID_CL = _NW_NextObjectID_CL
-
 	@NW_NextVarID = -1
 	@NW_Create = 'PPM2.NW.Created'
 	@NW_Modify = 'PPM2.NW.Modified'
@@ -263,6 +259,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@NW_CooldownTimerCount = 'ppm2_NW_CooldownTimerCount'
 	@NW_CooldownTimer = 'ppm2_NW_CooldownTimer'
 	@NW_CooldownMessage = 'ppm2_NW_CooldownMessage'
+	@NW_NextObjectID = _NW_NextObjectID
+	@NW_NextObjectID_CL = _NW_NextObjectID_CL
 
 	if SERVER
 		net.pool(@NW_Create)
@@ -363,6 +361,15 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 		@@NW_Objects[@netID] = @
 
+		if CLIENT
+			for i = 1, 1024
+				if not @@O_Slots[i]
+					@slotID = i
+					@@O_Slots[i] = @
+					break
+
+			error('no more free pony data edicts') if not @slotID
+
 		@entID = isnumber(ent) and ent or ent\EntIndex()
 		ent = Entity(ent) if isnumber(ent)
 		@SetupEntity(ent) if IsValid(ent)
@@ -371,9 +378,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	IsValid: => @isValid
 	GetModel: => @modelCached
 	EntIndex: => @entID
-	TextureSlotID: =>
-		return @entID if @entID > 0
-		return string.format('%p', @ent)
+	ObjectSlot: => @slotID
+	GetObjectSlot: => @slotID
 
 	Clone: (target = @ent) =>
 		copy = @@(nil, target)
@@ -633,6 +639,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	Remove: (byClient = false) =>
 		@removed = true
 		@@NW_Objects[@netID] = nil if SERVER or @NETWORKED
+		@@O_Slots[@slotID] = nil if @slotID
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
 		@@REGISTRY[@ent] = nil if IsValid(@ent) and @@REGISTRY[@ent] == @
