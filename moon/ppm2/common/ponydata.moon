@@ -340,6 +340,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@m_socksModel = Entity(-1)
 		@m_newSocksModel = Entity(-1)
 
+		@lastLerpThink = RealTimeL()
+
 		@recomputeTextures = true
 		@isValid = true
 		@removed = false
@@ -406,8 +408,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@modelCached = ent\GetModel()
 		ent\PPMBonesModifier()
 		@flightController = PPM2.PonyflyController(@) if not @flightController
-		@entID = ent\EntIndex() if not @entID
-		@lastLerpThink = RealTimeL() if not @lastLerpThink
+		@entID = ent\EntIndex()
+		@lastLerpThink = RealTimeL()
 
 		@ModelChanges(@modelCached, @modelCached)
 		@Reset()
