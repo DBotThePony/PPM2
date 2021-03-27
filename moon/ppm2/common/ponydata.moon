@@ -97,9 +97,10 @@ if PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.REGISTRY
 	nullify()
 
 _NW_NextObjectID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID or -1
-_NW_NextObjectID_CL = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID_CL or 0x60000
+_NW_NextObjectID_CL = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID_CL or 0x70000000
+_NW_WaitID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_WaitID or -1
 
-class NetworkedPonyData extends PPM2.ModifierBase
+class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@REGISTRY = {}
 
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
@@ -114,6 +115,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		@__base[strName] = defFunc()
 
 		@__base["Get#{getName}"] = => @[strName]
+
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
 			oldVal = @[strName]
 			nevVal = onSet(@, val)
@@ -123,8 +125,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			@SetLocalChange(state)
 			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
 			net.Start(@@NW_Modify)
-			net.WriteUInt(@GetNetworkID(), 16)
-			net.WriteUInt(id, 16)
+			net.WriteUInt32(@GetNetworkID())
+			net.WriteUInt16(id)
 			writeFunc(nevVal)
 			net.SendToServer() if CLIENT
 			net.Broadcast() if SERVER
@@ -157,7 +159,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	@OnNetworkedCreated = (ply = NULL, len = 0, nwobj) =>
 		if CLIENT
-			netID = net.ReadUInt16()
+			netID = net.ReadUInt32()
 			entid = net.ReadUInt16()
 			obj = @NW_Objects[netID] or @(netID, entid)
 			@REGISTRY[entid] = obj
@@ -165,71 +167,69 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			obj.CREATED_BY_SERVER = true
 			obj.NETWORKED_PREDICT = true
 			obj\ReadNetworkData()
-		else
-			ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
-			ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
-
-			if ply[@NW_CooldownTimer] < RealTimeL()
-				ply[@NW_CooldownTimerCount] = 1
-				ply[@NW_CooldownTimer] = RealTimeL() + 10
-			else
-				ply[@NW_CooldownTimerCount] += 1
-
-			if ply[@NW_CooldownTimerCount] >= 3
-				ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
-				if ply[@NW_CooldownMessage] < RealTimeL()
-					PPM2.Message 'Player ', ply, " is creating #{@__name} too quickly!"
-					ply[@NW_CooldownMessage] = RealTimeL() + 1
-				return
-
-			waitID = net.ReadUInt16()
-			obj = @(nil, ply)
-			obj.NETWORKED_PREDICT = true
-			obj\ReadNetworkData()
-			obj\Create()
-			timer.Simple 0.5, ->
-				return if not IsValid(ply)
-				net.Start(@NW_ReceiveID)
-				net.WriteUInt(waitID, 16)
-				net.WriteUInt(obj.netID, 16)
-				net.Send(ply)
-
-	@OnNetworkedModify = (ply = NULL, len = 0) =>
-		id = net.ReadUInt16()
-		obj = @NW_Objects[id]
-
-		unless obj
-			return if CLIENT
-			net.Start(@NW_Rejected)
-			net.WriteUInt(id, 16)
-			net.Send(ply)
 			return
 
-		if IsValid(ply) and obj.ent ~= ply
-			error('Invalid realm for player being specified. If you are running on your own net.* library, check up your code') if CLIENT
+		ply[@NW_CooldownTimer] = ply[@NW_CooldownTimer] or 0
+		ply[@NW_CooldownTimerCount] = ply[@NW_CooldownTimerCount] or 0
+
+		if ply[@NW_CooldownTimer] < RealTimeL()
+			ply[@NW_CooldownTimerCount] = 1
+			ply[@NW_CooldownTimer] = RealTimeL() + 10
+		else
+			ply[@NW_CooldownTimerCount] += 1
+
+		if ply[@NW_CooldownTimerCount] >= 3
+			ply[@NW_CooldownMessage] = ply[@NW_CooldownMessage] or 0
+			if ply[@NW_CooldownMessage] < RealTimeL()
+				PPM2.Message 'Player ', ply, " is creating #{@__name} too quickly!"
+				ply[@NW_CooldownMessage] = RealTimeL() + 1
+			return
+
+		waitID = net.ReadUInt32()
+
+		obj = @(nil, ply)
+		obj.NETWORKED_PREDICT = true
+		obj\ReadNetworkData()
+		obj\Create()
+
+		net.Start(@NW_ReceiveID)
+		net.WriteUInt32(waitID)
+		net.WriteUInt32(obj.netID)
+		net.Send(ply)
+
+	@OnNetworkedModify = (ply = NULL, len = 0) =>
+		id = net.ReadUInt32()
+		obj = @NW_Objects[id]
+
+		if not obj or IsValid(ply) and obj.ent ~= ply
+			return if CLIENT
 			net.Start(@NW_Rejected)
-			net.WriteUInt(id, 16)
+			net.WriteUInt32(id)
 			net.Send(ply)
 			return
 
 		varID = net.ReadUInt16()
 		varData = @NW_VarsTable[varID]
 		return unless varData
+
 		{:strName, :getName, :readFunc, :writeFunc, :onSet} = varData
 		newVal = onSet(obj, readFunc())
 		return if newVal == obj["Get#{getName}"](obj)
+
 		state = PPM2.NetworkChangeState(strName, getName, newVal, obj, len, ply)
 		state\Apply()
 		obj\NetworkDataChanges(state)
-		if SERVER
-			net.Start(@NW_Modify)
-			net.WriteUInt(id, 16)
-			net.WriteUInt(varID, 16)
-			writeFunc(newVal)
-			net.SendOmit(ply)
+
+		return if CLIENT
+
+		net.Start(@NW_Modify)
+		net.WriteUInt32(id)
+		net.WriteUInt16(varID)
+		writeFunc(newVal)
+		net.SendOmit(ply)
 
 	@OnNetworkedDelete = (ply = NULL, len = 0) =>
-		id = net.ReadUInt16()
+		id = net.ReadUInt32()
 		obj = @NW_Objects[id]
 		return unless obj
 		obj\Remove(true)
@@ -246,7 +246,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 	@NW_Objects = {}
 	@O_Slots = {} if CLIENT
 	@NW_Waiting = {}
-	@NW_WaitID = -1
+	@NW_WaitID = _NW_WaitID
 	@NW_NextVarID = -1
 	@NW_Create = 'PPM2.NW.Created'
 	@NW_Modify = 'PPM2.NW.Modified'
@@ -278,8 +278,8 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	net.Receive @NW_ReceiveID, (len = 0, ply = NULL) ->
 		return if SERVER
-		waitID = net.ReadUInt16()
-		netID = net.ReadUInt16()
+		waitID = net.ReadUInt32()
+		netID = net.ReadUInt32()
 		obj = @NW_Waiting[waitID]
 		@NW_Waiting[waitID] = nil
 		return unless obj
@@ -291,7 +291,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	net.Receive @NW_Rejected, (len = 0, ply = NULL) ->
 		return if SERVER
-		netID = net.ReadUInt16()
+		netID = net.ReadUInt32()
 		obj = @NW_Objects[netID]
 		return unless obj
 		return if obj.__LastReject and obj.__LastReject > RealTimeL()
@@ -301,7 +301,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	net.Receive @NW_Broadcast, (len = 0, ply = NULL) ->
 		return if SERVER
-		netID = net.ReadUInt16()
+		netID = net.ReadUInt32()
 		obj = @NW_Objects[netID]
 		return unless obj
 		obj\ReadNetworkData(len, ply)
@@ -707,7 +707,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 		return false if not @NETWORKED
 		return false if CLIENT
 		net.Start(@@NW_Broadcast)
-		net.WriteUInt16(@netID)
+		net.WriteUInt32(@netID)
 		@WriteNetworkData()
 		net.Broadcast()
 		return true
@@ -720,7 +720,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 		if SERVER
 			net.Start(@@NW_Create)
-			net.WriteUInt16(@netID)
+			net.WriteUInt32(@netID)
 			net.WriteEntity(@ent)
 			@WriteNetworkData()
 			filter = RecipientFilter()
@@ -734,7 +734,7 @@ class NetworkedPonyData extends PPM2.ModifierBase
 			net.Start(@@NW_Create)
 			before = net.BytesWritten()
 
-			net.WriteUInt16(@waitID)
+			net.WriteUInt32(@waitID)
 			@WriteNetworkData()
 			after = net.BytesWritten()
 
@@ -744,23 +744,21 @@ class NetworkedPonyData extends PPM2.ModifierBase
 
 	NetworkTo: (targets = {}) =>
 		net.Start(@@NW_Create)
-		net.WriteUInt16(@netID)
+		net.WriteUInt32(@netID)
 		net.WriteEntity(@ent)
 		@WriteNetworkData()
 		net.Send(targets)
 
-PPM2.NetworkedPonyData = NetworkedPonyData
-
 if CLIENT
 	net.Receive 'PPM2.NotifyDisconnect', ->
-		netID = net.ReadUInt16()
-		data = NetworkedPonyData.NW_Objects[netID]
+		netID = net.ReadUInt32()
+		data = PPM2.NetworkedPonyData.NW_Objects[netID]
 		return if not data
 		data\Remove()
 
 	net.Receive 'PPM2.PonyDataRemove', ->
-		netID = net.ReadUInt16()
-		data = NetworkedPonyData.NW_Objects[netID]
+		netID = net.ReadUInt32()
+		data = PPM2.NetworkedPonyData.NW_Objects[netID]
 		return if not data
 		data\Remove()
 else
@@ -773,23 +771,7 @@ _G.LocalPonyData = () -> LocalPlayer()\GetPonyData()
 _G.LocalPonydata = () -> LocalPlayer()\GetPonyData()
 
 do
-	REGISTRY = NetworkedPonyData.REGISTRY
-
-	nullify = ->
-		for _, ent in ipairs ents.GetAll()
-			if ent.__PPM2_PonyData and ent.__PPM2_PonyData.Remove
-				ProtectedCall -> ent.__PPM2_PonyData\Remove()
-
-		for _, ent in ipairs ents.GetAll()
-			ent.__PPM2_PonyData = nil
-
-		for key, obj in pairs(REGISTRY)
-			if obj.Remove
-				ProtectedCall -> obj\Remove()
-
-			REGISTRY[key] = nil
-
-	nullify()
+	REGISTRY = PPM2.NetworkedPonyData.REGISTRY
 
 	entMeta = FindMetaTable('Entity')
 	EntIndex = entMeta.EntIndex

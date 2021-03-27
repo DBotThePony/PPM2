@@ -113,7 +113,7 @@ hook.Add 'EntityRemoved', 'PPM2.PonyDataRemove', =>
 
 	with @GetPonyData()
 		net.Start('PPM2.PonyDataRemove')
-		net.WriteUInt(.netID, 16)
+		net.WriteUInt32(.netID)
 		net.Broadcast()
 		\Remove()
 
@@ -124,7 +124,7 @@ hook.Add 'PlayerDisconnected', 'PPM2.NotifyClients', =>
 	data = @GetPonyData()
 	return if not data
 	net.Start('PPM2.NotifyDisconnect')
-	net.WriteUInt(data.netID, 16)
+	net.WriteUInt32(data.netID)
 	net.Broadcast()
 
 BOTS_ARE_PONIES = CreateConVar('ppm2_bots', '1', {FCVAR_ARCHIVE, FCVAR_NOTIFY}, 'Whatever spawn bots as ponies')
