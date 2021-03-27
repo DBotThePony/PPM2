@@ -76,6 +76,12 @@ lastDataReceived = 0
 
 net.Receive 'PPM2.PlayerRespawn', PlayerRespawn
 net.Receive 'PPM2.PlayerDeath', PlayerDeath
+net.Receive 'ppm2_force_wear', ->
+	lastDataSend = RealTimeL() + 10
+	instance = PPM2.GetMainData()
+	newData = instance\CreateNetworkObject()
+	newData\Create()
+	instance\SetNetworkObject(newData)
 
 concommand.Add 'ppm2_require', ->
 	net.Start('PPM2.Require')

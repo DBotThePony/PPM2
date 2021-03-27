@@ -808,3 +808,10 @@ do
 
 		REGISTRY[@] = data
 
+if SERVER
+	net.pool('ppm2_force_wear')
+
+	if player.GetCount() ~= 0
+		for ply in *player.GetHumans()
+			net.Start('ppm2_force_wear')
+			net.Send(ply)
