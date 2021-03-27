@@ -138,13 +138,13 @@ class PonyDataInstance
 
 	CreateCustomNetworkObject: (goingToNetwork = false, ply = LocalPlayer(), ...) =>
 		newData = PPM2.NetworkedPonyData(nil, ply)
-		newData\SetIsGoingToNetwork(goingToNetwork)
+		newData\SetShouldNetwork(goingToNetwork)
 		@ApplyDataToObject(newData, ...)
 		return newData
 
 	CreateNetworkObject: (goingToNetwork = true, ...) =>
 		newData = PPM2.NetworkedPonyData(nil, LocalPlayer())
-		newData\SetIsGoingToNetwork(goingToNetwork)
+		newData\SetShouldNetwork(goingToNetwork)
 		@ApplyDataToObject(newData, ...)
 		return newData
 

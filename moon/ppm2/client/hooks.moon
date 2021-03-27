@@ -59,25 +59,9 @@ timer.Create 'PPM2.ModelChecks', 1, 0, ->
 							wep\SetNoDraw(false)
 							ply.__ppm2_weapon_hit = false
 
-PlayerRespawn = ->
-	ent = net.ReadEntity()
-	return if not IsValid(ent)
-	return if not ent\GetPonyData()
-	ent\GetPonyData()\PlayerRespawn()
-
-PlayerDeath = ->
-	ent = net.ReadEntity()
-	return if not IsValid(ent)
-	return if not ent\GetPonyData()
-	ent\GetPonyData()\PlayerDeath()
-
-lastDataSend = 0
-lastDataReceived = 0
-
-net.Receive 'PPM2.PlayerRespawn', PlayerRespawn
-net.Receive 'PPM2.PlayerDeath', PlayerDeath
+net.Receive 'PPM2.PlayerRespawn', -> assert(PPM2.NetworkedPonyData\Get(net.ReadUInt32()), 'pony data is missing')\PlayerRespawn()
+net.Receive 'PPM2.PlayerDeath', -> assert(PPM2.NetworkedPonyData\Get(net.ReadUInt32()), 'pony data is missing')\PlayerDeath()
 net.Receive 'ppm2_force_wear', ->
-	lastDataSend = RealTimeL() + 10
 	instance = PPM2.GetMainData()
 	newData = instance\CreateNetworkObject()
 	newData\Create()
@@ -89,8 +73,6 @@ concommand.Add 'ppm2_require', ->
 	PPM2.Message 'Requesting pony data...'
 
 concommand.Add 'ppm2_reload', ->
-	return if lastDataSend > RealTimeL()
-	lastDataSend = RealTimeL() + 10
 	instance = PPM2.GetMainData()
 	newData = instance\CreateNetworkObject()
 	newData\Create()
@@ -99,14 +81,11 @@ concommand.Add 'ppm2_reload', ->
 
 if IsValid(LocalPlayer())
 	RunConsoleCommand('ppm2_reload')
-	timer.Simple 3, -> RunConsoleCommand('ppm2_require')
+	RunConsoleCommand('ppm2_require')
 else
 	hook.Add 'InitPostEntity', 'PPM2.LocalPonydataInit', ->
 		RunConsoleCommand('ppm2_reload')
-		timer.Simple 3, -> RunConsoleCommand('ppm2_require')
-
-PPM_HINT_COLOR_FIRST = Color(255, 255, 255)
-PPM_HINT_COLOR_SECOND = Color(0, 0, 0)
+		RunConsoleCommand('ppm2_require')
 
 net.receive 'PPM2.EditorCamPos', ->
 	ply = net.ReadPlayer()
@@ -166,10 +145,7 @@ concommand.Add 'ppm2_cleanup', ->
 			ent\Remove()
 	PPM2.Message('All unused models were removed')
 
-timer.Create 'PPM2.ModelCleanup', 60, 0, ->
-	for _, ent in ipairs ents.GetAll()
-		if ent.isPonyPropModel and not IsValid(ent.manePlayer)
-			ent\Remove()
+timer.Create 'PPM2.ModelCleanup', 60, 0, -> ent\Remove() for ent in *ents.GetAll() when ent.isPonyPropModel and not IsValid(ent.manePlayer)
 
 cvars.AddChangeCallback('mat_picmip', (->
 	timer.Simple 0, (->
@@ -205,8 +181,5 @@ timer.Simple 0, ->
 							newdata\SetHideManes(false)
 							newdata\SetHideManesSocks(false)
 
-
-
 					return ent
-
 return

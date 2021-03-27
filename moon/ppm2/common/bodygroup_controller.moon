@@ -141,9 +141,10 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 	Remap: =>
 		@validSkeleton = true
+		ent = @GetEntity()
 
-		for _, name in ipairs @@_BONE_REMAP_R
-			@[name] = @GetEntity()\LookupBone(@@[name])
+		for name in *@@_BONE_REMAP_R
+			@[name] = ent\LookupBone(@@[name])
 
 			if not @[name]
 				@validSkeleton = false
@@ -155,8 +156,6 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 		@Remap()
-
-		PPM2.DebugPrint('Created new bodygroups controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @objID)
 
 	IsValid: => @isValid
 

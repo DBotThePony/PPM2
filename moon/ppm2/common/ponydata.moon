@@ -161,11 +161,11 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		if CLIENT
 			netID = net.ReadUInt32()
 			entid = net.ReadUInt16()
-			obj = @NW_Objects[netID] or @(netID, entid)
+			obj = @Get(netID) or @(netID, entid)
 			@REGISTRY[entid] = obj
 			obj.NETWORKED = true
 			obj.CREATED_BY_SERVER = true
-			obj.NETWORKED_PREDICT = true
+			obj.SHOULD_NETWORK = true
 			obj\ReadNetworkData()
 			return
 
@@ -188,7 +188,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		waitID = net.ReadUInt32()
 
 		obj = @(nil, ply)
-		obj.NETWORKED_PREDICT = true
+		obj.SHOULD_NETWORK = true
 		obj\ReadNetworkData()
 		obj\Create()
 
@@ -199,7 +199,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	@OnNetworkedModify = (ply = NULL, len = 0) =>
 		id = net.ReadUInt32()
-		obj = @NW_Objects[id]
+		obj = @Get(id)
 
 		if not obj or IsValid(ply) and obj.ent ~= ply
 			return if CLIENT
@@ -230,7 +230,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	@OnNetworkedDelete = (ply = NULL, len = 0) =>
 		id = net.ReadUInt32()
-		obj = @NW_Objects[id]
+		obj = @Get(id)
 		return unless obj
 		obj\Remove(true)
 
@@ -240,6 +240,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	@RenderTasks = {}
 	@CheckTasks = {}
+
+	@Get = (nwID) => @NW_Objects[nwID] or false
 
 	@NW_Vars = {}
 	@NW_VarsTable = {}
@@ -292,9 +294,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	net.Receive @NW_Rejected, (len = 0, ply = NULL) ->
 		return if SERVER
 		netID = net.ReadUInt32()
-		obj = @NW_Objects[netID]
-		return unless obj
-		return if obj.__LastReject and obj.__LastReject > RealTimeL()
+		obj = @Get(netID)
+		return if not obj or obj.__LastReject and obj.__LastReject > RealTimeL()
 		obj.__LastReject = RealTimeL() + 3
 		obj.NETWORKED = false
 		obj\Create()
@@ -314,7 +315,6 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
 
-	-- @NetworkVar('Fly',                  rBool,   wBool,                 false)
 	@NetworkVar('DisableTask',          rBool,   wBool,                 false)
 	@NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
 	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
@@ -335,11 +335,11 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	new: (netID, ent) =>
 		super()
 
-		@m_upperManeModel = Entity(-1)
-		@m_lowerManeModel = Entity(-1)
-		@m_tailModel = Entity(-1)
-		@m_socksModel = Entity(-1)
-		@m_newSocksModel = Entity(-1)
+		@m_upperManeModel       = NULL
+		@m_lowerManeModel       = NULL
+		@m_tailModel            = NULL
+		@m_socksModel           = NULL
+		@m_newSocksModel        = NULL
 
 		@lastLerpThink = RealTimeL()
 
@@ -348,7 +348,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@removed = false
 		@valid = true
 		@NETWORKED = false
-		@NETWORKED_PREDICT = false
+		@SHOULD_NETWORK = false
 
 		@[data.strName] = data.defFunc() for _, data in ipairs @@NW_Vars when data.defFunc
 
@@ -372,11 +372,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 		@entID = isnumber(ent) and ent or ent\EntIndex()
 		ent = Entity(ent) if isnumber(ent)
-
-		return if not IsValid(ent)
-		@ent = ent
-		@modelCached = ent\GetModel() if IsValid(ent)
-		@SetupEntity(ent)
+		@SetupEntity(ent) if IsValid(ent)
 
 	GetEntity: => @ent or NULL
 	IsValid: => @isValid
@@ -391,15 +387,15 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		return copy
 
 	SetupEntity: (ent) =>
-		if @@REGISTRY[ent]
-			return if @@REGISTRY[ent]\GetOwner() and IsValid(@@REGISTRY[ent]\GetOwner()) and @@REGISTRY[ent]\GetOwner() ~= @GetOwner()
-			@@REGISTRY[ent]\Remove() if @@REGISTRY[ent].Remove and @@REGISTRY[ent] ~= @
+		if getdata = @@REGISTRY[ent]
+			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= @GetOwner()
+			getdata\Remove() if getdata.Remove and getdata ~= @
 
 		return unless IsValid(ent)
 
-		if @@REGISTRY[ent\EntIndex()]
-			return if @@REGISTRY[ent\EntIndex()]\GetOwner() and IsValid(@@REGISTRY[ent\EntIndex()]\GetOwner()) and @@REGISTRY[ent\EntIndex()]\GetOwner() ~= @GetOwner()
-			@@REGISTRY[ent\EntIndex()]\Remove() if @@REGISTRY[ent\EntIndex()].Remove and @@REGISTRY[ent\EntIndex()] ~= @
+		if getdata = @@REGISTRY[ent\EntIndex()]
+			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= @GetOwner()
+			getdata\Remove() if getdata.Remove and getdata ~= @
 
 		@ent = ent
 		@done_setup = true
@@ -473,6 +469,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	PlayerRespawn: =>
 		return if not IsValid(@ent)
 		@entTable.__cachedIsPony = @ent\IsPony()
+
 		if not @entTable.__cachedIsPony
 			return if @alreadyCalledRespawn
 			@alreadyCalledRespawn = true
@@ -480,6 +477,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		else
 			@alreadyCalledRespawn = false
 			@alreadyCalledDeath = false
+
 		@ApplyBodygroups(CLIENT, true)
 
 		@ent\SetNW2Bool('ppm2_fly', false)
@@ -552,6 +550,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	SlowUpdate: =>
 		@GetBodygroupController()\SlowUpdate() if @GetBodygroupController()
 		@GetWeightController()\SlowUpdate() if @GetWeightController()
+
 		if scale = @GetSizeController()
 			scale\SlowUpdate()
 
@@ -563,10 +562,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 				arms\SetBodygroup(PPM2.HAND_BODYGROUP_ID, cond)
 
 	Think: =>
+
 	RenderScreenspaceEffects: =>
 		time = RealTimeL()
+
 		delta = time - @lastLerpThink
 		@lastLerpThink = time
+
 		if @isValid and IsValid(@ent)
 			for _, change in ipairs @TriggerLerpAll(delta * 5)
 				state = PPM2.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
@@ -576,63 +578,61 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	GetFlightController: => @flightController
 
 	GetRenderController: =>
-		return if SERVER
-		return @renderController if not @isValid
-		if not @renderController or @modelCached ~= @modelRender
+		return @renderController if SERVER or not @isValid or not @modelCached
+
+		if not @renderController or @modelRender ~= @modelCached
 			@modelRender = @modelCached
+
 			cls = PPM2.GetRenderController(@modelCached)
-			if @renderController and cls == @renderController.__class
-				@renderController.ent = @ent
-				PPM2.DebugPrint('Skipping render controller recreation for ', @ent, ' as part of ', @)
-				return @renderController
+			return @renderController if @renderController and cls == @renderController.__class
+
 			@renderController\Remove() if @renderController
 			@renderController = cls(@)
-		@renderController.ent = @ent
+
 		return @renderController
 
 	GetWeightController: =>
-		return @weightController if not @isValid
-		if not @weightController or @modelCached ~= @modelWeight
-			@modelCached = @modelCached or @ent\GetModel()
+		return @weightController if not @isValid or not @modelCached
+
+		if not @weightController or @modelWeight ~= @modelCached
 			@modelWeight = @modelCached
+
 			cls = PPM2.GetPonyWeightController(@modelCached)
-			if @weightController and cls == @weightController.__class
-				@weightController.ent = @ent
-				PPM2.DebugPrint('Skipping weight controller recreation for ', @ent, ' as part of ', @)
-				return @weightController
+			return @weightController if @weightController and cls == @weightController.__class
+
 			@weightController\Remove() if @weightController
 			@weightController = cls(@)
-		@weightController.ent = @ent
+
 		return @weightController
 
 	GetSizeController: =>
-		return @scaleController if not @isValid
-		if not @scaleController or @modelCached ~= @modelScale
-			@modelCached = @modelCached or @ent\GetModel()
+		return @scaleController if not @isValid or not @modelCached
+
+		if not @scaleController or @modelScale ~= @modelCached
 			@modelScale = @modelCached
+
 			cls = PPM2.GetSizeController(@modelCached)
-			if @scaleController and cls == @scaleController.__class
-				@scaleController.ent = @ent
-				PPM2.DebugPrint('Skipping size controller recreation for ', @ent, ' as part of ', @)
-				return @scaleController
+			return @scaleController if @scaleController and cls == @scaleController.__class
+
 			@scaleController\Remove() if @scaleController
 			@scaleController = cls(@)
-		@scaleController.ent = @ent
+
 		return @scaleController
+
 	GetScaleController: => @GetSizeController()
 
 	GetBodygroupController: =>
-		return @bodygroups if not @isValid
+		return @bodygroups if not @isValid or not @modelCached
+
 		if not @bodygroups or @modelBodygroups ~= @modelCached
-			@modelCached = @modelCached or @ent\GetModel()
 			@modelBodygroups = @modelCached
+
 			cls = PPM2.GetBodygroupController(@modelCached)
-			if @bodygroups and cls == @bodygroups.__class
-				@bodygroups.ent = @ent
-				PPM2.DebugPrint('Skipping bodygroup controller recreation for ', @ent, ' as part of ', @)
-				return @bodygroups
+			return @bodygroups if @bodygroups and cls == @bodygroups.__class
+
 			@bodygroups\Remove() if @bodygroups
 			@bodygroups = cls(@)
+
 		@bodygroups.ent = @ent
 		return @bodygroups
 
@@ -648,6 +648,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 		if CLIENT
 			@GetRenderController()\Remove() if @GetRenderController()
+
 			if IsValid(@ent) and @ent.__ppm2_task_hit
 				@entTable.__ppm2_task_hit = false
 				@ent\SetNoDraw(false)
@@ -659,12 +660,17 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@@RenderTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task.ent\IsPlayer() and not task\GetDisableTask()]
 		@@CheckTasks = [task for i, task in pairs @@NW_Objects when task\IsValid() and IsValid(task.ent) and not task\GetDisableTask()]
 
+		if SERVER and @NETWORKED
+			net.Start('PPM2.PonyDataRemove')
+			net.WriteUInt32(@netID)
+			net.Broadcast()
+
 	__tostring: => "[#{@@__name}:#{@netID}|#{@ent}]"
 
 	GetOwner: => @ent
 	IsNetworked: => @NETWORKED
-	IsGoingToNetwork: => @NETWORKED_PREDICT
-	SetIsGoingToNetwork: (val = @NETWORKED) => @NETWORKED_PREDICT = val
+	ShouldNetwork: => @SHOULD_NETWORK
+	SetShouldNetwork: (val = @NETWORKED) => @SHOULD_NETWORK = val
 	IsLocal: => @isLocal
 	IsLocalObject: => @isLocal
 	GetNetworkID: => @netID
@@ -703,44 +709,34 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	WriteNetworkData: => writeFunc(@[strName]) for _, {:strName, :writeFunc} in ipairs @@NW_Vars
 
-	ReBroadcast: =>
-		return false if not @NETWORKED
-		return false if CLIENT
-		net.Start(@@NW_Broadcast)
-		net.WriteUInt32(@netID)
-		@WriteNetworkData()
-		net.Broadcast()
-		return true
-
 	Create: =>
 		return if @NETWORKED
 		return if CLIENT and @CREATED_BY_SERVER -- wtf
+
 		@NETWORKED = true if SERVER
-		@NETWORKED_PREDICT = true
+		@SHOULD_NETWORK = true
 
 		if SERVER
 			net.Start(@@NW_Create)
 			net.WriteUInt32(@netID)
 			net.WriteEntity(@ent)
 			@WriteNetworkData()
-			filter = RecipientFilter()
-			filter\AddAllPlayers()
-			filter\RemovePlayer(@ent) if IsValid(@ent) and @ent\IsPlayer()
-			net.Send(filter)
-		else
-			@@NW_WaitID += 1
-			@waitID = @@NW_WaitID
 
-			net.Start(@@NW_Create)
-			before = net.BytesWritten()
+			if IsValid(@ent) and @ent\IsPlayer()
+				net.SendOmit(@ent)
+			else
+				net.Broadcast()
 
-			net.WriteUInt32(@waitID)
-			@WriteNetworkData()
-			after = net.BytesWritten()
+			return
 
-			net.SendToServer()
-			@@NW_Waiting[@waitID] = @
-			return after - before
+		@@NW_WaitID += 1
+		@waitID = @@NW_WaitID
+		@@NW_Waiting[@waitID] = @
+
+		net.Start(@@NW_Create)
+		net.WriteUInt32(@waitID)
+		@WriteNetworkData()
+		net.SendToServer()
 
 	NetworkTo: (targets = {}) =>
 		net.Start(@@NW_Create)
@@ -750,20 +746,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		net.Send(targets)
 
 if CLIENT
-	net.Receive 'PPM2.NotifyDisconnect', ->
-		netID = net.ReadUInt32()
-		data = PPM2.NetworkedPonyData.NW_Objects[netID]
-		return if not data
-		data\Remove()
-
 	net.Receive 'PPM2.PonyDataRemove', ->
-		netID = net.ReadUInt32()
-		data = PPM2.NetworkedPonyData.NW_Objects[netID]
-		return if not data
-		data\Remove()
+		readid = net.ReadUInt32()
+		assert(PPM2.NetworkedPonyData\Get(readid), 'unknown ponydata ' .. readid .. ' to remove')\Remove()
 else
 	hook.Add 'PlayerJoinTeam', 'PPM2.TeamWaypoint', (ply, new) ->
 		ply.__ppm2_modified_jump = false
+
 	hook.Add 'OnPlayerChangedTeam', 'PPM2.TeamWaypoint', (ply, old, new) ->
 		ply.__ppm2_modified_jump = false
 

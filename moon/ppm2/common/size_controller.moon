@@ -19,7 +19,6 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-
 -- 0    LrigPelvis
 -- 1    LrigSpine1
 -- 2    LrigSpine2
@@ -95,32 +94,25 @@ class PonySizeController extends PPM2.ControllerChildren
 
 	@NEXT_OBJ_ID = 0
 
-	Remap: =>
-		mapping = {
-			'NECK_BONE_1'
-			'NECK_BONE_2'
-			'NECK_BONE_3'
-			'NECK_BONE_4'
-			'LEGS_BONE_ROOT'
-			'LEGS_FRONT_1'
-			'LEGS_FRONT_2'
-			'LEGS_FRONT_3'
-			'LEGS_FRONT_4'
-			'LEGS_FRONT_5'
-			'LEGS_FRONT_6'
-			'LEGS_BEHIND_1_1'
-			'LEGS_BEHIND_2_1'
-			'LEGS_BEHIND_3_1'
-			'LEGS_BEHIND_1_2'
-			'LEGS_BEHIND_2_2'
-			'LEGS_BEHIND_3_2'
-		}
-
-		@validSkeleton = true
-
-		for _, name in ipairs mapping
-			@[name] = @GetEntity()\LookupBone(@@[name])
-			@validSkeleton = false if not @[name]
+	@@skelton_mapping = {
+		'NECK_BONE_1'
+		'NECK_BONE_2'
+		'NECK_BONE_3'
+		'NECK_BONE_4'
+		'LEGS_BONE_ROOT'
+		'LEGS_FRONT_1'
+		'LEGS_FRONT_2'
+		'LEGS_FRONT_3'
+		'LEGS_FRONT_4'
+		'LEGS_FRONT_5'
+		'LEGS_FRONT_6'
+		'LEGS_BEHIND_1_1'
+		'LEGS_BEHIND_2_1'
+		'LEGS_BEHIND_3_1'
+		'LEGS_BEHIND_1_2'
+		'LEGS_BEHIND_2_2'
+		'LEGS_BEHIND_3_2'
+	}
 
 	new: (controller) =>
 		super(controller)
@@ -129,8 +121,18 @@ class PonySizeController extends PPM2.ControllerChildren
 		@@NEXT_OBJ_ID += 1
 		@lastPAC3BoneReset = 0
 		@Remap()
-		PPM2.DebugPrint('Created new size controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @objID)
 		@GetEntity()\SetModelScale(1) if not @GetEntity()\IsPlayer() and @GetEntity()\GetModelScale() ~= 1
+
+	Remap: =>
+		@validSkeleton = true
+		ent = @GetEntity()
+
+		for name in *@@skelton_mapping
+			@[name] = ent\LookupBone(@@[name])
+
+			if not @[name]
+				@validSkeleton = false
+				break
 
 	IsValid: => @controller\IsValid()
 	GetEntity: => @controller\GetEntity()

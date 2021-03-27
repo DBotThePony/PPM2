@@ -42,22 +42,14 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
 
 	if useLocal
 		return if not ply\GetPonyData()
-		if not ent\GetPonyData()
-			data = PPM2.NetworkedPonyData(nil, ent)
-
-		data = ent\GetPonyData()
+		data = ent\GetPonyData() or PPM2.NetworkedPonyData(nil, ent)
 		plydata = ply\GetPonyData()
 		plydata\ApplyDataToObject(data)
-
-		data\Create() if not data\IsNetworked()
+		data\Create()
 	else
-		if not ent\GetPonyData()
-			data = PPM2.NetworkedPonyData(nil, ent)
-
-		data = ent\GetPonyData()
+		data = ent\GetPonyData() or PPM2.NetworkedPonyData(nil, ent)
 		data\ReadNetworkData(len, ply, false, false)
-		data\ReBroadcast()
-		data\Create() if not data\IsNetworked()
+		data\Create()
 
 	duplicator.StoreEntityModifier(ent, 'ppm2_ragdolledit', ent\GetPonyData()\NetworkedIterable(false))
 
@@ -98,5 +90,4 @@ duplicator.RegisterEntityModifier 'ppm2_ragdolledit', (ply = NULL, ent = NULL, s
 
 	data = ent\GetPonyData()
 	data["Set#{key}"](data, value, false) for _, {key, value} in ipairs storeddata when data["Set#{key}"]
-	data\ReBroadcast()
-	timer.Simple 0.5, -> data\Create() if not data\IsNetworked()
+	data\Create()
