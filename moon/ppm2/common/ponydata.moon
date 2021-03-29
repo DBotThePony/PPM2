@@ -96,7 +96,7 @@ if PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.REGISTRY
 
 	nullify()
 
-_NW_NextObjectID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID or -1
+_NW_NextObjectID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID or 0
 _NW_NextObjectID_CL = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_NextObjectID_CL or 0x70000000
 _NW_WaitID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_WaitID or -1
 
