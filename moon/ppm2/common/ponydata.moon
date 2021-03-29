@@ -388,13 +388,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	SetupEntity: (ent) =>
 		if getdata = @@REGISTRY[ent]
-			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= @GetOwner()
+			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= ent
 			getdata\Remove() if getdata.Remove and getdata ~= @
 
 		return unless IsValid(ent)
 
 		if getdata = @@REGISTRY[ent\EntIndex()]
-			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= @GetOwner()
+			return if getdata\GetOwner() and IsValid(getdata\GetOwner()) and getdata\GetOwner() ~= ent
 			getdata\Remove() if getdata.Remove and getdata ~= @
 
 		@ent = ent
