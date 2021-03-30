@@ -49,7 +49,7 @@ net.Receive 'PPM2.RagdollEdit', (len = 0, ply = NULL) ->
 	else
 		data = ent\GetPonyData() or PPM2.NetworkedPonyData(nil, ent)
 		data\ReadNetworkData(len, ply, false, false)
-		data\Create()
+		data\NetworkAll()
 
 	duplicator.StoreEntityModifier(ent, 'ppm2_ragdolledit', ent\GetPonyData()\NetworkedIterable(false))
 

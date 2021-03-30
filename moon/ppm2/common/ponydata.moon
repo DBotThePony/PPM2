@@ -37,6 +37,7 @@ class PPM2.NetworkChangeState
 		@rlen = len - 24 -- ID - 16 bits, variable id - 8 bits
 		@cantApply = false
 		@networkChange = true
+
 	GetPlayer: => @ply
 	ChangedByClient: => not @networkChange or IsValid(@ply)
 	ChangedByPlayer: => not @networkChange or IsValid(@ply)
@@ -72,6 +73,16 @@ class PPM2.NetworkChangeState
 	Revert: => @obj[@key] = @oldValue if not @cantApply
 	Apply: => @obj[@key] = @newValue if not @cantApply
 
+	Notify: =>
+		return unless @obj.NETWORKED and (CLIENT and @obj.ent == LocalPlayer() or SERVER)
+		net.Start(PPM2.NetworkedPonyData.NW_Modify)
+		net.WriteUInt32(@obj\GetNetworkID())
+		{:id, :writeFunc} = PPM2.NetworkedPonyData\GetVarInfo(@key)
+		net.WriteUInt16(id)
+		writeFunc(@newValue)
+		net.SendToServer() if CLIENT
+		net.Broadcast() if SERVER
+
 rFloat = (min = 0, max = 255) ->
 	return -> math.Clamp(net.ReadFloat(), min, max)
 
@@ -103,6 +114,8 @@ _NW_WaitID = PPM2.NetworkedPonyData and PPM2.NetworkedPonyData.NW_WaitID or -1
 class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@REGISTRY = {}
 
+	@GetVarInfo: (strName) => @NW_VarsTable[strName] or false
+
 	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
 		defFunc = defValue
 		defFunc = (-> defValue) if type(defValue) ~= 'function'
@@ -112,6 +125,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id, :onSet}
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
+		@NW_VarsTable[strName] = tab
 		@__base[strName] = defFunc()
 
 		@__base["Get#{getName}"] = => @[strName]
@@ -694,10 +708,22 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
 		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+
 		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())
 				state\Apply()
 				@NetworkDataChanges(state) unless silent
+
+	ReadNetworkDataNotify: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
+		data = @@ReadNetworkData()
+		validPly = IsValid(ply)
+		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+
+		for _, state in ipairs states
+			if not validPly or applyEntities or not isentity(state\GetValue())
+				state\Apply()
+				@NetworkDataChanges(state) unless silent
+				state\Notify()
 
 	NetworkedIterable: (grabEntities = true) =>
 		data = [{getName, @[strName]} for _, {:strName, :getName} in ipairs @@NW_Vars when grabEntities or not isentity(@[strName])]
@@ -744,6 +770,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		net.WriteEntity(@ent)
 		@WriteNetworkData()
 		net.Send(targets)
+
+	NetworkAll: =>
+		net.Start(@@NW_Create)
+		net.WriteUInt32(@netID)
+		net.WriteEntity(@ent)
+		@WriteNetworkData()
+		net.Broadcast()
 
 if CLIENT
 	net.Receive 'PPM2.PonyDataRemove', ->
