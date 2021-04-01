@@ -653,7 +653,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	Remove: (byClient = false) =>
 		@removed = true
 		@@NW_Objects[@netID] = nil if SERVER or @NETWORKED
-		@@O_Slots[@slotID] = nil if @slotID
+		@@O_Slots[@slotID] = nil if @slotID and @@O_Slots[@slotID] == @
 		@isValid = false
 		@ent = @GetEntity() if not IsValid(@ent)
 		@@REGISTRY[@ent] = nil if IsValid(@ent) and @@REGISTRY[@ent] == @
