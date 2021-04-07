@@ -345,6 +345,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS)
 	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS_MASK)
 	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
+	PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
 
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
