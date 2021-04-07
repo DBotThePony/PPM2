@@ -192,9 +192,15 @@ PPM2.URLThreadWorker = ->
 				if htmlmat
 					rt, mat = PPM2.PonyTextureController\LockRenderTarget(data.width, data.height, 0, 0, 0, 0)
 
+					render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 					surface.SetDrawColor(255, 255, 255)
 					surface.SetMaterial(htmlmat)
 					surface.DrawTexturedRect(0, 0, data.width, data.height)
+
+					render.PopFilterMag()
+					render.PopFilterMin()
 
 					vtf = DLib.VTF.Create(2, data.width, data.height, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
 					vtf\CaptureRenderTargetCoroutine()
@@ -1170,6 +1176,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			lock(@, 'body', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			for i = 1, PPM2.MAX_BODY_DETAILS
 				if @GrabData('BodyDetailFirst' .. i)
 					if mat = PPM2.MaterialsRegistry.BODY_DETAILS[@GrabData("BodyDetail#{i}")]
@@ -1238,6 +1247,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(@@PONY_SOCKS)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
+			render.PopFilterMag()
+			render.PopFilterMin()
+
 			if isEditor
 				@BodyMaterial\SetTexture('$basetexture', release(@, 'body', texSize, texSize))
 			else
@@ -1266,9 +1278,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		else
 			lock(@, 'body_bump', texSize, texSize, 127, 127, 255)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			surface.SetDrawColor(255, 255, 255, @GrabData('BodyBumpStrength') * 255)
 			surface.SetMaterial(PPM2.MaterialsRegistry.BODY_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@BodyMaterial\SetTexture('$bumpmap', release(@, 'body_bump', texSize, texSize))
@@ -1313,6 +1331,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		else
 			lock(@, 'body_illum', texSize, texSize)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			surface.SetDrawColor(255, 255, 255)
 
 			if @GrabData('GlowingEyebrows')
@@ -1340,6 +1361,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			for i = 1, PPM2.MAX_TATTOOS
 				if @GrabData("TattooOverDetail#{i}")
 					@DrawTattoo(i, true)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
@@ -1478,6 +1502,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			lock(@, 'horn', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			{:r, :g, :b} = @GrabData('HornDetailColor')
 
 			surface.SetDrawColor(r, g, b)
@@ -1489,6 +1516,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@HornMaterial\SetTexture('$basetexture', release(@, 'horn', texSize, texSize))
@@ -1516,6 +1546,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		else
 			lock(@, 'horn_illum', texSize, texSize)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if @GrabData('HornGlow')
 				@HornMaterial2\SetTexture('$selfillummask', 'models/debug/debugwhite')
 
@@ -1524,6 +1557,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 			else
 				@HornMaterial2\SetTexture('$selfillummask', 'null')
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
@@ -1550,9 +1586,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		else
 			lock(@, 'horn_bump', texSize, texSize, 127, 127, 255)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			surface.SetDrawColor(255, 255, 255, @GrabData('HornDetailColor').a)
 			surface.SetMaterial(PPM2.MaterialsRegistry.HORN_DETAIL_BUMP)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@HornMaterial\SetTexture('$bumpmap', release(@, 'horn_bump', texSize, texSize))
@@ -1700,6 +1742,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				else
 					lock(@, 'cloth_' .. iName, rtsize, rtsize, r, g, b)
 
+					render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 					for i2 = 1, matregistry[clothes + 1][matIndex].size
 						texture = matregistry[clothes + 1][matIndex][i2]
 
@@ -1708,6 +1753,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 							surface.SetDrawColor(@GrabData("#{iName}ClothesColor#{nextindex}"))
 							nextindex += 1
 							surface.DrawTexturedRect(0, 0, rtsize, rtsize)
+
+					render.PopFilterMag()
+					render.PopFilterMin()
 
 					if isEditor
 						mat\SetTexture('$basetexture', release(@, 'cloth_' .. iName, rtsize, rtsize))
@@ -1904,6 +1952,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			else
 				lock(@, 'sock', texSize, texSize, r, g, b)
 
+				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 				socksType = @GrabData('SocksTexture') + 1
 				surface.SetMaterial(PPM2.MaterialsRegistry.SOCKS_MATERIALS[socksType] or PPM2.MaterialsRegistry.SOCKS_MATERIALS[1])
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
@@ -1914,6 +1965,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						surface.SetDrawColor(r, g, b)
 						surface.SetMaterial(details[i])
 						surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+				render.PopFilterMag()
+				render.PopFilterMin()
 
 				if isEditor
 					@SocksMaterial\SetTexture('$basetexture', release(@, 'sock', texSize, texSize))
@@ -1987,6 +2041,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			lock(@, 'wings', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			surface.SetMaterial(@@WINGS_MATERIAL_COLOR)
 			surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -1995,6 +2052,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@WingsMaterial\SetTexture('$basetexture', release(@, 'wings', texSize, texSize))
@@ -2079,6 +2139,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('ManeColor1')
 			lock(@, 'hair_1_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
 
@@ -2095,6 +2158,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(@GrabData("ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@HairColor1Material\SetTexture('$basetexture', release(@, 'hair_1_color', texSize, texSize))
@@ -2137,6 +2203,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('ManeColor2')
 			lock(@, 'hair_2_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
 
@@ -2151,6 +2220,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(@GrabData("ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@HairColor2Material\SetTexture('$basetexture', release(@, 'hair_2_color', texSize, texSize))
@@ -2230,6 +2302,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('TailColor1')
 			lock(@, 'tail_1_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
 				i = 1
 
@@ -2244,6 +2319,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(@GrabData("TailURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@TailColor1Material\SetTexture('$basetexture', release(@, 'tail_1_color', texSize, texSize))
@@ -2286,6 +2364,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b} = @GrabData('TailColor2')
 			lock(@, 'tail_2_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.TAIL_DETAILS[@GetTailType()]
 				i = 1
 
@@ -2300,6 +2381,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(@GrabData("TailURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				@TailColor2Material\SetTexture('$basetexture', release(@, 'tail_2_color', texSize, texSize))
@@ -2429,6 +2513,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				else
 					lock(@, 'eye_cornera', texSize, texSize)
 
+					render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 					surface.SetMaterial(PPM2.MaterialsRegistry.EYE_CORNERA_OVAL)
 					surface.SetDrawColor(255, 255, 255)
 					DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
@@ -2491,6 +2578,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b, :a} = EyeBackground
 			lock(@, 'eye_' .. prefixUpper, texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			surface.SetDrawColor(EyeIris1)
 			surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
@@ -2522,6 +2612,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType + 1])
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
+			render.PopFilterMag()
+			render.PopFilterMin()
+
 			if isEditor
 				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
 			else
@@ -2545,10 +2638,16 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		render.Clear(255, 255, 255, 0, true, true)
 
 		cam.Start2D()
+		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 		render.OverrideBlend(true, BLEND_DST_COLOR, BLEND_DST_COLOR, BLENDFUNC_ADD, BLEND_SRC_ALPHA, BLEND_DST_ALPHA, BLENDFUNC_ADD)
 		surface.SetMaterial(mat)
 		surface.DrawTexturedRectUV(0, 0, texSize - 1, texSize - 1, -0.016129032258065, -0.016129032258065, 1.0161290322581, 1.0161290322581)
 		render.OverrideBlend(false)
+
+		render.PopFilterMag()
+		render.PopFilterMin()
 		cam.End2D()
 
 		render.PopRenderTarget()
@@ -2560,8 +2659,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		render.Clear(0, 0, 0, 255, true, true)
 
 		cam.Start2D()
+		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 		surface.SetMaterial(mat1)
 		surface.DrawTexturedRectUV(0, 0, texSize - 1, texSize - 1, -0.016129032258065, -0.016129032258065, 1.0161290322581, 1.0161290322581)
+
+		render.PopFilterMag()
+		render.PopFilterMin()
 		cam.End2D()
 
 		PPM2.LATEST_MASK_ = mat1
@@ -2633,9 +2738,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 				rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
 
+				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(material)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
+
+				render.PopFilterMag()
+				render.PopFilterMin()
 
 				if isEditor
 					rt = release(@, 'cmark', texSize, texSize)
@@ -2676,10 +2787,16 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		else
 			rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
 				surface.SetDrawColor(@GrabData('CMarkColor'))
 				surface.SetMaterial(mark)
 				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
+
+			render.PopFilterMag()
+			render.PopFilterMin()
 
 			if isEditor
 				rt = release(@, 'cmark', texSize, texSize)

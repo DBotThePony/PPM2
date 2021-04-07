@@ -184,6 +184,9 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
 			lock(@, prefix .. '_hair_1_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
 				i = 1
 
@@ -199,6 +202,9 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PopFilterMin(TEXFILTER.ANISOTROPIC)
 
 			if isEditor
 				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
@@ -241,6 +247,9 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
 			lock(@, prefix .. '_hair_2_color', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
 				i = 1
 
@@ -256,6 +265,9 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PopFilterMin(TEXFILTER.ANISOTROPIC)
 
 			if isEditor
 				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
@@ -357,11 +369,17 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 			lock(@, 'bat_wing', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GrabData("BatWingURLColor#{i}")
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PopFilterMin(TEXFILTER.ANISOTROPIC)
 
 			if isEditor
 				@BatWingsMaterial\SetTexture('$basetexture', release(@, 'bat_wing', texSize, texSize))
@@ -437,11 +455,17 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 			lock(@, 'bat_wing_skin', texSize, texSize, r, g, b)
 
+			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 			for i, mat in pairs urlTextures
 				{:r, :g, :b, :a} = @GrabData("BatWingSkinURLColor#{i}")
 				surface.SetDrawColor(r, g, b, a)
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
+
+			render.PopFilterMag(TEXFILTER.ANISOTROPIC)
+			render.PopFilterMin(TEXFILTER.ANISOTROPIC)
 
 			if isEditor
 				@BatWingsSkinMaterial\SetTexture('$basetexture', release(@, 'bat_wing_skin', texSize, texSize))
