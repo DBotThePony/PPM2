@@ -265,6 +265,7 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
 	index = url .. '__' .. width .. '_' .. height
+	index ..= '_rgba8888' if PPM2.NO_COMPRESSION\GetBool()
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
 		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
