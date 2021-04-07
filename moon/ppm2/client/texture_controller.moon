@@ -442,6 +442,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@PHONG_UPDATE_TRIGGER[ttype .. 'LightwarpURL'] = true
 
 	for _, publicName in ipairs {'', 'Left', 'Right'}
+		@EYE_UPDATE_TRIGGER["EyeReflectionType#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["EyeType#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["HoleWidth#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["IrisSize#{publicName}"] = true
