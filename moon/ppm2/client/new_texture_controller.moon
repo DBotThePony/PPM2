@@ -19,8 +19,6 @@
 -- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
-USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
-
 developer = ConVar('developer')
 
 grind_down_color = (r, g, b, a) ->
@@ -156,13 +154,13 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
 
 		hash = {
 			'mane ' .. prefix .. ' 1',
 			@GetManeType()
 			grind_down_color(@GrabData("#{prefix}ManeColor1"))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -205,7 +203,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor1"), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor1"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine({fuck: true})
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -219,7 +217,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			'mane ' .. prefix .. ' 2',
 			@GetManeTypeLower()
 			grind_down_color(@GrabData("#{prefix}ManeColor2"))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -262,7 +260,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor2"), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -328,7 +326,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		urlTextures = {}
 
@@ -338,7 +336,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		hash = {
 			'bat wings',
 			grind_down_color(r, g, b)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
@@ -368,7 +366,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				@BatWingsMaterial\SetTexture('$basetexture', release(@, 'bat_wing', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -408,7 +406,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		@BatWingsSkinMaterialName = "!#{textureData.name\lower()}"
 		@BatWingsSkinMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		{:r, :g, :b} = @GrabData('BodyColor')
 		{:r, :g, :b} = @GrabData('BatWingSkinColor') if @GrabData('SeparateWings')
@@ -416,7 +414,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 		hash = {
 			'bat wings skin',
 			grind_down_color(r, g, b)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
@@ -448,7 +446,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				@BatWingsSkinMaterial\SetTexture('$basetexture', release(@, 'bat_wing_skin', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 

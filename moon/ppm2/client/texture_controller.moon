@@ -32,9 +32,6 @@
 -- 10   =   models/ppm2/base/cmark
 -- 11   =   models/ppm2/base/eyelashes
 
-USE_HIGHRES_BODY = PPM2.USE_HIGHRES_BODY
-USE_HIGHRES_TEXTURES = PPM2.USE_HIGHRES_TEXTURES
-
 PPM2.CacheManager = DLib.CacheManager('ppm2_cache', 1024 * 0x00100000, 'vtf')
 PPM2.CacheManager\AddCommands()
 PPM2.CacheManager\SetConVar()
@@ -199,7 +196,7 @@ PPM2.URLThreadWorker = ->
 					surface.SetMaterial(htmlmat)
 					surface.DrawTexturedRect(0, 0, data.width, data.height)
 
-					vtf = DLib.VTF.Create(2, data.width, data.height, IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
+					vtf = DLib.VTF.Create(2, data.width, data.height, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
 					vtf\CaptureRenderTargetCoroutine()
 
 					if select('#', render.ReadPixel(0, 0)) == 3
@@ -218,7 +215,7 @@ PPM2.URLThreadWorker = ->
 					})
 
 					newMat\SetTexture('$basetexture', '../data/' .. path)
-					newMat\GetTexture('$basetexture')\Download() if developer\GetBool()
+					newMat\GetTexture('$basetexture')\Download()
 
 					PPM2.URL_MATERIAL_CACHE[data.index] = {
 						texture: newMat\GetTexture('$basetexture')
@@ -345,6 +342,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
 	hash\Update('post intel fix')
+	hash\Update('rgba8888') if PPM2.NO_COMPRESSION\GetBool()
 	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
 	return hash\Digest()
 
@@ -970,7 +968,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@QUAD_SIZE_BODY = 2048
 	@TATTOO_DEF_SIZE = 128
 
-	DrawTattoo: (index = 1, drawingGlow = false, texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY) =>
+	DrawTattoo: (index = 1, drawingGlow = false, texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY) =>
 		mat = PPM2.MaterialsRegistry.TATTOOS[@GrabData("TattooType#{index}")]
 		return if not mat
 
@@ -990,7 +988,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetDrawColor(0, 0, 0)
 
 		surface.SetMaterial(mat)
-		tSize = @@TATTOO_DEF_SIZE * (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1)
+		tSize = @@TATTOO_DEF_SIZE * (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1)
 		sizeX, sizeY = tSize * TattooScaleX, tSize * TattooScaleY
 		surface.DrawTexturedRectRotated((X * texSize / 2) / 100 + texSize / 2, -(Y * texSize / 2) / 100 + texSize / 2, sizeX, sizeY, TattooRotate)
 
@@ -1130,7 +1128,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@GrabData('Socks')
 			@GrabData('Bodysuit')
 			@GrabData('EyebrowsColor')
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
@@ -1149,7 +1147,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			table.insert(hash, grind_down_color(@GrabData("TattooColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_BODY
 
 		@BodyMaterialName = "!#{textureData.name\lower()}"
 		@BodyMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1242,7 +1240,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@BodyMaterial\SetTexture('$basetexture', release(@, 'body', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1258,7 +1256,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash_bump = PPM2.TextureTableHash({
 			'body bump'
 			math.floor(@GrabData('BodyBumpStrength') * 255)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash_bump)
@@ -1274,7 +1272,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@BodyMaterial\SetTexture('$bumpmap', release(@, 'body_bump', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1288,7 +1286,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'body illum'
 			@GrabData('GlowingEyebrows')
 			math.floor(@GrabData('EyebrowsGlowStrength') * 255)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, PPM2.MAX_BODY_DETAILS
@@ -1345,7 +1343,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1432,7 +1430,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HORN
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HORN
 
 		@HornMaterialName = "!#{textureData.name\lower()}"
 		@HornMaterialName1 = "!#{textureData_New1.name\lower()}"
@@ -1456,7 +1454,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			PPM2.IsValidURL(@GrabData('HornURL1'))
 			PPM2.IsValidURL(@GrabData('HornURL2'))
 			PPM2.IsValidURL(@GrabData('HornURL3'))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		@HornMaterial1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
@@ -1494,7 +1492,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HornMaterial\SetTexture('$basetexture', release(@, 'horn', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1508,7 +1506,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'horn illum'
 			@GrabData('HornGlow')
 			math.floor(@GrabData('HornGlowSrength') * 255)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -1529,7 +1527,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1542,7 +1540,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = PPM2.TextureTableHash({
 			'horn bump'
 			@GrabData('HornDetailColor').a
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -1558,7 +1556,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HornMaterial\SetTexture('$bumpmap', release(@, 'horn_bump', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1687,7 +1685,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					opaque
 					iName
 					clothes
-					USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+					PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 				}
 
 				for i = 1, PPM2.MAX_CLOTHES_COLORS
@@ -1713,7 +1711,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if isEditor
 						mat\SetTexture('$basetexture', release(@, 'cloth_' .. iName, rtsize, rtsize))
 					else
-						vtf = DLib.VTF.Create(2, rtsize, rtsize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+						vtf = DLib.VTF.Create(2, rtsize, rtsize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
 						@@ReleaseRenderTarget(rtsize, rtsize)
 
@@ -1782,7 +1780,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@NewSocksColor2 = CreateMaterial(textureColor2.name, textureColor2.shader, textureColor2.data)
 		@NewSocksBase = CreateMaterial(textureBase.name, textureBase.shader, textureBase.data)
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
 
 		@UpdatePhongData()
 
@@ -1869,7 +1867,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@SocksMaterialName = "!#{textureData.name\lower()}"
 		@SocksMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@UpdatePhongData()
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_SOCKS
 
 		{:r, :g, :b} = @GrabData('SocksColor')
 		@SocksMaterial\SetFloat('$alpha', 1)
@@ -1894,7 +1892,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				grind_down_color(@GrabData('SocksDetailColor4'))
 				grind_down_color(@GrabData('SocksDetailColor5'))
 				grind_down_color(@GrabData('SocksDetailColor6'))
-				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+				PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			}
 
 			hash = PPM2.TextureTableHash(hash)
@@ -1919,7 +1917,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if isEditor
 					@SocksMaterial\SetTexture('$basetexture', release(@, 'sock', texSize, texSize))
 				else
-					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+					vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
 					@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1954,7 +1952,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			}
 		}
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_WING
 
 		@WingsMaterialName = "!#{textureData.name\lower()}"
 		@WingsMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
@@ -1966,7 +1964,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		hash = {
 			'wings',
 			grind_down_color(r, g, b)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 3
@@ -2000,7 +1998,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@WingsMaterial\SetTexture('$basetexture', release(@, 'wings', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2050,13 +2048,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@HairColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@HairColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_HAIR
 
 		hash = {
 			'mane 1',
 			@GetManeType()
 			grind_down_color(@GrabData('ManeColor1'))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2100,7 +2098,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HairColor1Material\SetTexture('$basetexture', release(@, 'hair_1_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2114,7 +2112,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'mane 2',
 			@GetManeTypeLower()
 			grind_down_color(@GrabData('ManeColor2'))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2156,7 +2154,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HairColor2Material\SetTexture('$basetexture', release(@, 'hair_2_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2201,13 +2199,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@TailColor1Material = CreateMaterial(textureFirst.name, textureFirst.shader, textureFirst.data)
 		@TailColor2Material = CreateMaterial(textureSecond.name, textureSecond.shader, textureSecond.data)
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_TAIL
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_TAIL
 
 		hash = {
 			'tail 1',
 			@GetTailType()
 			grind_down_color(@GrabData('TailColor1'))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2249,7 +2247,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@TailColor1Material\SetTexture('$basetexture', release(@, 'tail_1_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2263,7 +2261,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'tail 2',
 			@GetTailType()
 			grind_down_color(@GrabData('TailColor2'))
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
@@ -2305,7 +2303,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@TailColor2Material\SetTexture('$basetexture', release(@, 'tail_2_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2364,7 +2362,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_EYES
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_EYES
 
 		shiftX, shiftY = (1 - IrisWidth) * texSize / 2, (1 - IrisHeight) * texSize / 2
 		shiftY += DerpEyesStrength * .15 * texSize if DerpEyes and left
@@ -2420,7 +2418,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if EyeCornerA
 				hash = PPM2.TextureTableHash({
 					'eye cornera',
-					USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+					PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 					IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation
 				})
 
@@ -2437,7 +2435,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if isEditor
 						createdMaterial\SetTexture('$corneatexture', release(@, 'eye_cornera', texSize, texSize))
 					else
-						vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+						vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
 						@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2482,7 +2480,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			math.round(EyeRotation)
 			EyeLineDirection
 			math.round(PonySize * 100)
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -2526,7 +2524,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -2610,7 +2608,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		URL = @GrabData('CMarkURL')
 		size = @GrabData('CMarkSize')
 
-		texSize = (USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_CMARK
+		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_CMARK
 		sizeQuad = texSize * size
 		shift = (texSize - sizeQuad) / 2
 
@@ -2620,7 +2618,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				url
 				grind_down_color(@GrabData('CMarkColor'))
 				shift\floor(), sizeQuad\floor()
-				USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+				PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 			})
 
 			if getcache = @@GetCacheH(hash)
@@ -2643,7 +2641,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					@CMarkTexture\SetTexture('$basetexture', rt)
 					@CMarkTextureGUI\SetTexture('$basetexture', rt)
 				else
-					vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
+					vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
 
 					if select('#', render.ReadPixel(0, 0)) == 3
@@ -2666,7 +2664,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@GrabData('CMarkType')
 			grind_down_color(@GrabData('CMarkColor'))
 			shift\floor(), sizeQuad\floor()
-			USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
+			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		})
 
 		if getcache = @@GetCacheH(hash)
@@ -2687,7 +2685,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@CMarkTexture\SetTexture('$basetexture', rt)
 				@CMarkTextureGUI\SetTexture('$basetexture', rt)
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 
 				if select('#', render.ReadPixel(0, 0)) == 3
