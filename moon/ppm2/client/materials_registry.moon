@@ -21,13 +21,14 @@
 
 PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires', '0', {FCVAR_ARCHIVE}, 'Double the texture resolution. Can take ages at texture encoding if CPU is slow, and require a lot of RAM for encoding and a lot of VRAM for textures!')
 PPM2.NO_COMPRESSION = CreateConVar('ppm2_cl_use_rgba', '0', {FCVAR_ARCHIVE}, 'Use RGB888/RGBA8888 instead of DXT1/DXT5. This option is experimental and is VERY memory/videomemory hungry!')
-PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of loading them when needed')
+PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of precaching them when required')
 
 _Material = Material
 
 Material = (path) ->
 	return path if not PPM2.FORCE_PRECACHE\GetBool()
-	matNew = _Material(path)
+	matNew = _Material(path) if not path\find('png')
+	matNew = _Material(path, 'smooth ignorez') if path\find('png')
 	return matNew
 
 module = {
@@ -409,7 +410,8 @@ __index = (key) =>
 
 	value = rawget(getmetatable(@).original, key)
 	return value if not isstring(value)
-	mat = _Material(value, 'smooth')
+	mat = _Material(value, 'smooth ignorez') if value\find('png')
+	mat = _Material(value) if not value\find('png')
 	rawset(@, key, mat)
 	return mat
 
