@@ -1370,7 +1370,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -1566,7 +1566,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isEditor
 				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(0, 0, 0), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
