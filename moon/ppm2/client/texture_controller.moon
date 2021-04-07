@@ -350,6 +350,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
 	hash\Update('post intel fix')
+	hash\Update('post sampling fix')
 	hash\Update('rgba8888') if PPM2.NO_COMPRESSION\GetBool()
 	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
 	return hash\Digest()
@@ -1304,7 +1305,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@BodyMaterial\GetTexture('$bumpmap')\Download()
 
 		hash_glow = {
-			'body illum'
+			'body illum i8'
 			@GrabData('GlowingEyebrows')
 			math.floor(@GrabData('EyebrowsGlowStrength') * 255)
 			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
@@ -1536,7 +1537,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@HornMaterial\GetTexture('$basetexture')\Download()
 
 		hash = PPM2.TextureTableHash({
-			'horn illum'
+			'horn illum i8'
 			@GrabData('HornGlow')
 			math.floor(@GrabData('HornGlowSrength') * 255)
 			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
