@@ -202,7 +202,11 @@ PPM2.URLThreadWorker = ->
 					render.PopFilterMag()
 					render.PopFilterMin()
 
-					vtf = DLib.VTF.Create(2, data.width, data.height, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(0, 0, 0, 0)})
+					vtf = DLib.VTF.Create(2, data.width, data.height, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {
+						fill: Color(0, 0, 0, 0)
+						flags: TEXTUREFLAGS_CLAMPS\bor(TEXTUREFLAGS_CLAMPT)
+					})
+
 					vtf\CaptureRenderTargetCoroutine()
 
 					if select('#', render.ReadPixel(0, 0)) == 3
@@ -264,7 +268,7 @@ PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
 PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
-	index = url .. '__' .. width .. '_' .. height
+	index = url .. '__' .. width .. '_' .. height .. '_clamp'
 	index ..= '_rgba8888' if PPM2.NO_COMPRESSION\GetBool()
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
@@ -2684,10 +2688,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return unless @isValid
 
 		textureData = {
-			'name': "PPM2_#{@GetID()}_CMark3"
+			'name': "PPM2_#{@GetID()}_CMark"
 			'shader': 'VertexLitGeneric'
 			'data': {
-				'$basetexture': 'null'
+				'$basetexture': '__error'
 				'$translucent': '1'
 				'$vertexalpha': '1' -- this is required for DXT3/DXT5 textures
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
@@ -2695,10 +2699,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		}
 
 		textureDataGUI = {
-			'name': "PPM2_#{@GetID()}_CMark_GUI3"
+			'name': "PPM2_#{@GetID()}_CMark_GUI"
 			'shader': 'UnlitGeneric'
 			'data': {
-				'$basetexture': 'null'
+				'$basetexture': '__error'
 				'$vertexalpha': '1' -- this is required for DXT3/DXT5 textures
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 			}
@@ -2715,112 +2719,38 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			return
 
 		URL = @GrabData('CMarkURL')
-		size = @GrabData('CMarkSize')
+		size = 1 / @GrabData('CMarkSize')
 
 		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_CMARK
-		sizeQuad = texSize * size
-		shift = (texSize - sizeQuad) / 2
+
+		matrix = Matrix()
+		matrix\Translate(Vector(0.5, 0.5))
+		matrix\Scale(Vector(size, size))
+		matrix\Translate(Vector(-0.5, -0.5))
+
+		@CMarkTexture\SetMatrix('$basetexturetransform', matrix)
+		@CMarkTextureGUI\SetMatrix('$basetexturetransform', matrix)
+
+		CMarkColor = @GrabData('CMarkColor')
+
+		@CMarkTexture\SetVector('$color2', CMarkColor\ToVector())
+		@CMarkTextureGUI\SetVector('$color2', CMarkColor\ToVector())
 
 		if url = PPM2.IsValidURL(URL)
-			hash = PPM2.TextureTableHash({
-				'cutie mark url'
-				url
-				grind_down_color(@GrabData('CMarkColor'))
-				shift\floor(), sizeQuad\floor()
-				PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
-			})
+			texture = PPM2.GetURLMaterial(url, texSize, texSize)\Await()
+			return unless @isValid
 
-			if getcache = @@GetCacheH(hash)
-				@CMarkTexture\SetTexture('$basetexture', getcache)
-				@CMarkTextureGUI\SetTexture('$basetexture', getcache)
-				@CMarkTexture\GetTexture('$basetexture')\Download() if developer\GetBool()
-				@CMarkTextureGUI\GetTexture('$basetexture')\Download() if developer\GetBool()
-			else
-				material = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
-				return unless @isValid
-
-				rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
-
-				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
-				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-				surface.SetDrawColor(@GrabData('CMarkColor'))
-				surface.SetMaterial(material)
-				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
-
-				render.PopFilterMag()
-				render.PopFilterMin()
-
-				if isEditor
-					rt = release(@, 'cmark', texSize, texSize)
-					@CMarkTexture\SetTexture('$basetexture', rt)
-					@CMarkTextureGUI\SetTexture('$basetexture', rt)
-				else
-					vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
-					vtf\CaptureRenderTargetCoroutine()
-
-					if select('#', render.ReadPixel(0, 0)) == 3
-						@_CaptureAlphaClosure(texSize, mat, vtf)
-					else
-						@@ReleaseRenderTarget(texSize, texSize)
-
-					vtf\AutoGenerateMips(true)
-					path = @@SetCacheH(hash, vtf\ToString())
-
-					@CMarkTexture\SetTexture('$basetexture', path)
-					@CMarkTexture\GetTexture('$basetexture')\Download()
-					@CMarkTextureGUI\SetTexture('$basetexture', path)
-					@CMarkTextureGUI\GetTexture('$basetexture')\Download()
+			@CMarkTexture\SetTexture('$basetexture', texture)
+			@CMarkTextureGUI\SetTexture('$basetexture', texture)
 
 			return
 
-		hash = PPM2.TextureTableHash({
-			'cutie mark'
-			@GrabData('CMarkType')
-			grind_down_color(@GrabData('CMarkColor'))
-			shift\floor(), sizeQuad\floor()
-			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
-		})
-
-		if getcache = @@GetCacheH(hash)
-			@CMarkTexture\SetTexture('$basetexture', getcache)
-			@CMarkTextureGUI\SetTexture('$basetexture', getcache)
-			@CMarkTexture\GetTexture('$basetexture')\Download() if developer\GetBool()
-			@CMarkTextureGUI\GetTexture('$basetexture')\Download() if developer\GetBool()
+		if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
+			@CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
+			@CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
 		else
-			rt, mat = lock(@, 'cmark', texSize, texSize, 0, 0, 0, 0)
-
-			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
-			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-			if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
-				surface.SetDrawColor(@GrabData('CMarkColor'))
-				surface.SetMaterial(mark)
-				surface.DrawTexturedRect(shift, shift, sizeQuad, sizeQuad)
-
-			render.PopFilterMag()
-			render.PopFilterMin()
-
-			if isEditor
-				rt = release(@, 'cmark', texSize, texSize)
-				@CMarkTexture\SetTexture('$basetexture', rt)
-				@CMarkTextureGUI\SetTexture('$basetexture', rt)
-			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {fill: Color(r, g, b), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine()
-
-				if select('#', render.ReadPixel(0, 0)) == 3
-					@_CaptureAlphaClosure(texSize, mat, vtf)
-				else
-					@@ReleaseRenderTarget(texSize, texSize)
-
-				vtf\AutoGenerateMips(true)
-				path = @@SetCacheH(hash, vtf\ToString())
-
-				@CMarkTexture\SetTexture('$basetexture', path)
-				@CMarkTexture\GetTexture('$basetexture')\Download()
-				@CMarkTextureGUI\SetTexture('$basetexture', path)
-				@CMarkTextureGUI\GetTexture('$basetexture')\Download()
+			@CMarkTexture\SetTexture('$basetexture', 'null')
+			@CMarkTextureGUI\SetTexture('$basetexture', 'null')
 
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') ->
 	PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController

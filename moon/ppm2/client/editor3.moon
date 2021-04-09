@@ -867,7 +867,7 @@ EDIT_TREE = {
 						surface.DrawRect(0, 0, w, h)
 						surface.SetDrawColor(255, 255, 255)
 						surface.SetMaterial(mat)
-						surface.DrawTexturedRect(0, 0, w, h)
+						surface.DrawTexturedRectUV(0, 0, w, h, -0.016129032258065, -0.016129032258065, 1.0161290322581, 1.0161290322581)
 
 				@NumSlider('gui.ppm2.editor.cutiemark.size', 'CMarkSize', 2)
 				@ColorBox('gui.ppm2.editor.cutiemark.color', 'CMarkColor')

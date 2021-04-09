@@ -243,7 +243,7 @@ PPM2.PonyDataRegistry = {
 	'cmark_size': {
 		default: -> 1
 		getFunc: 'CMarkSize'
-		min: 0
+		min: 0.1
 		max: 1
 		type: 'FLOAT'
 	}
