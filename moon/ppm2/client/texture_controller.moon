@@ -739,7 +739,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@isValid = false
 		@ResetTextures()
 
-	IsValid: => IsValid(@GetEntity()) and @isValid and @compiled and @GetData()\IsValid()
+	IsValid: => @isValid and @GetData()\IsValid()
 
 	GetID: =>
 		return @GetObjectSlot() if @GetObjectSlot()

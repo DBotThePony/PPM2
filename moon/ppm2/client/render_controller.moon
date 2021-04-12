@@ -316,7 +316,7 @@ class PonyRenderController extends PPM2.ControllerChildren
 		cam.End3D() if start3D
 		render.EnableClipping(oldClip)
 
-	IsValid: => IsValid(@GetEntity()) and @isValid
+	IsValid: => @isValid and @GetData()\IsValid()
 
 	Reset: =>
 		@flexes\Reset() if @flexes and @flexes.Reset
