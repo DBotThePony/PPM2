@@ -78,6 +78,9 @@ module = {
 		['POOFEH']: {Material('models/ppm2/partrender/upmane_13_mask0.png')}
 		['CURLY']: {Material('models/ppm2/partrender/upmane_14_mask0.png')}
 		['INSTRUCTOR']: {Material('models/ppm2/partrender/upmane_15_mask0.png')}
+		['SECRETARY']: {Material('models/ppm2/partrender/mane_secretary_mask_01.png')}
+		['BRAIDS']: {Material('models/ppm2/partrender/mane_braids_mask_01.png')}
+		['GLASS']: {Material('models/ppm2/partrender/mane_glass_mask_01.png')}
 	}
 
 	LOWER_MANE_DETAILS: {
@@ -89,7 +92,6 @@ module = {
 		['CURLY']: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
 		['BRAIDS']: {Material('models/ppm2/partrender/mane_braids_mask_01.png')}
 		['GLASS']: {Material('models/ppm2/partrender/mane_glass_mask_01.png')}
-		['SECRETARY']: {Material('models/ppm2/partrender/mane_secretary_mask_01.png')}
 	}
 
 	TAIL_DETAILS: {

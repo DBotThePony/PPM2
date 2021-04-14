@@ -443,6 +443,12 @@ PPM2.AvaliableUpperManesNew = {
 	'CLOUD'
 	'DRUNK'
 	'EMO'
+	'AZU'
+	'BRAIDS'
+	'CYBERPUNK'
+	'GLASS'
+	'SECRETARY'
+	'SIA'
 	'NONE'
 }
 
