@@ -87,6 +87,9 @@ module = {
 		['BOOKWORM']: {Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
 		['BUMPKIN']: {Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
 		['CURLY']: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
+		['BRAIDS']: {Material('models/ppm2/partrender/mane_braids_mask_01.png')}
+		['GLASS']: {Material('models/ppm2/partrender/mane_glass_mask_01.png')}
+		['SECRETARY']: {Material('models/ppm2/partrender/mane_secretary_mask_01.png')}
 	}
 
 	TAIL_DETAILS: {

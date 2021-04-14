@@ -464,6 +464,11 @@ PPM2.AvaliableLowerManesNew = {
 	'BUN'
 	'CLOUD'
 	'EMO'
+	'AZU'
+	'BRAIDS'
+	'CYBERPUNK'
+	'GLASS'
+	'SIA'
 	'NONE'
 }
 
