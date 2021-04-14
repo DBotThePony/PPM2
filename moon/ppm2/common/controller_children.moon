@@ -57,6 +57,10 @@ class PPM2.ControllerChildren extends PPM2.SequenceHolder
 		error('Get' .. str .. ' - no such a function') if not @nwController['Get' .. str]
 		@nwController['Get' .. str](@nwController, ...)
 
+	GrabDataRef: (str, ...) =>
+		error('Get' .. str .. 'Ref - no such a function') if not @nwController['Get' .. str .. 'Ref']
+		@nwController['Get' .. str .. 'Ref'](@nwController, ...)
+
 	SetData: (str, ...) =>
 		error('Set' .. str .. ' - no such a function') if not @nwController['Set' .. str]
 		@nwController['Set' .. str](@nwController, ...)

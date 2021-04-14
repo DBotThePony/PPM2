@@ -129,9 +129,10 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@__base[strName] = defFunc()
 
 		@__base["Get#{getName}"] = => @[strName]
+		@__base["Get#{getName}Ref"] = => @[strName]
 
-		--if enum_runtime_map
-			--@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
+		if enum_runtime_map
+			@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
 
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
 			if enum_runtime_map
@@ -562,13 +563,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	GetPonyRaceFlags: =>
 		switch @GetRace()
-			when PPM2.RACE_EARTH
+			when 'EARTH'
 				return 0
-			when PPM2.RACE_PEGASUS
+			when 'PEGASUS'
 				return PPM2.RACE_HAS_WINGS
-			when PPM2.RACE_UNICORN
+			when 'UNICORN'
 				return PPM2.RACE_HAS_HORN
-			when PPM2.RACE_ALICORN
+			when 'ALICORN'
 				return PPM2.RACE_HAS_HORN + PPM2.RACE_HAS_WINGS
 
 	SlowUpdate: =>

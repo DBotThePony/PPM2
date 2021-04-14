@@ -79,6 +79,9 @@ class PonyDataInstance
 
 		if enum_runtime_map
 			@__base["Get#{key}"] = => enum_runtime_map[@dataTable[key]]
+			def_old = default()
+			def_old = enum_runtime_map[def_old] if isnumber(def_old)
+			@__base["GetDefault#{key}"] = => def_old
 
 		@__base["Reset#{key}"] = => @["Set#{key}"](@, default())
 

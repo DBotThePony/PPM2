@@ -84,7 +84,7 @@ PPM2.PonyDataRegistry = {
 
 	'Race': {
 		old: 'race'
-		default: -> PPM2.RACE_EARTH
+		default: -> 'EARTH'
 		enum: [arg for _, arg in ipairs PPM2.RACE_ENUMS]
 	}
 
@@ -1303,67 +1303,61 @@ for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 		type: 'BOOLEAN'
 	}
 
-for key, data in pairs PPM2.PonyDataRegistry
-	if data.enum
-		data.enum = [arg\upper() for _, arg in ipairs data.enum]
-		data.enum_runtime_map = {}
-
-		for i, enumVal in ipairs data.enum
-			data.enum_runtime_map[i - 1] = enumVal
-			data.enum_runtime_map[enumVal] = i - 1
-
-testMinimalBits = 0
-
 for key, value in pairs PPM2.PonyDataRegistry
 	if value.enum
+		value.enum = [arg\upper() for _, arg in ipairs value.enum]
+		value.enum_runtime_map = {}
+
+		for i, enumVal in ipairs value.enum
+			value.enum_runtime_map[i - 1] = enumVal
+			value.enum_runtime_map[enumVal] = i - 1
+
 		value.min = 0
 		value.max = #value.enum - 1
 		value.type = 'INT'
+
+		def_old = value.default()
+		def_old = value.enum_runtime_map[def_old] if isstring(def_old)
+		value.default = -> def_old
 
 	switch value.type
 		when 'INT'
 			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
 			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
+
 			value.fix = INT_FIXER(value.default, value.min, value.max)
+
 			if value.min >= 0
 				selectBits = net.ChooseOptimalBits(value.max - value.min)
-				testMinimalBits += selectBits
 				value.read = rUInt(selectBits, value.min, value.max)
 				value.write = wUInt(value.default(), selectBits)
 			else
 				selectBits = net.ChooseOptimalBits(math.abs(value.max - value.min))
-				testMinimalBits += selectBits
 				value.read = rInt(selectBits, value.min, value.max)
 				value.write = wInt(value.default(), selectBits)
+
 		when 'FLOAT'
 			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
 			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
 			value.fix = FLOAT_FIXER(value.default, value.min, value.max)
 			value.read = rFloat(value.min, value.max)
 			value.write = (arg = value.default()) -> wFloat(arg)
-			testMinimalBits += 32
 		when 'URL'
 			value.fix = URL_FIXER
 			value.read = rURL
 			value.write = wString
-			testMinimalBits += 8
 		when 'BOOLEAN'
 			if not value.fix
 				value.fix = (arg = value.default()) -> tobool(arg)
 			value.read = rBool
 			value.write = wBool
-			testMinimalBits += 1
 		when 'COLOR'
 			{:r, :g, :b, :a} = value.default()
 			value.fix = COLOR_FIXER(r, g, b, a)
 			value.read = rColor
 			value.write = wColor
-			testMinimalBits += 32
 		else
 			error("Unknown variable type - #{value.type} for #{key}")
-
--- print('Minimal required bits - ' .. testMinimalBits)
-PPM2.testMinimalBits = testMinimalBits
 
 for key, value in pairs PPM2.PonyDataRegistry
 	error("Data has no fix function: #{key}") if not value.fix

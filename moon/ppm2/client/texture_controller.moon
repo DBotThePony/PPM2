@@ -1038,7 +1038,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				return if not @CheckTicket(prefix .. '_phong', ticket)
 				matTarget\SetTexture('$lightwarptexture', tex)
 		else
-			myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp + 1] or PPM2.AvaliableLightwarpsPaths[1]
+			myTex = PPM2.AvaliableLightwarpsPaths[Lightwarp] or PPM2.AvaliableLightwarpsPaths[1]
 			matTarget\SetTexture('$lightwarptexture', myTex)
 
 		if not noBump
@@ -1641,9 +1641,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			data['$translucent'] = '1'
 
 		clothes = @GrabData(iName .. 'Clothes')
-		return if not matregistry[clothes + 1] or not indexregistry[clothes + 1]
+		return if not matregistry[clothes] or not indexregistry[clothes]
 
-		@[iName .. 'Clothes_Index'] = indexregistry[clothes + 1]
+		@[iName .. 'Clothes_Index'] = indexregistry[clothes]
 
 		urls = {}
 
@@ -1660,7 +1660,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 			return
 
-		if matregistry[clothes + 1].size == 0
+		if matregistry[clothes].size == 0
 			name = "PPM2_#{@GetID()}_Clothes_#{iName}_1"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 			@[iName .. 'Clothes_Mat'] = {mat}
@@ -1693,7 +1693,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		tab2 = @[iName .. 'Clothes_MatName']
 		nextindex = 1
 
-		for matIndex = 1, matregistry[clothes + 1].size
+		for matIndex = 1, matregistry[clothes].size
 			name = "PPM2_#{@GetID()}_Clothes_#{iName}_#{matIndex}"
 			mat = CreateMaterial(name, 'VertexLitGeneric', data)
 
@@ -1705,7 +1705,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				mat\SetTexture('$basetexture', urls[matIndex])
 				@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 
-			elseif colored and matregistry[clothes + 1][matIndex].size == 0
+			elseif colored and matregistry[clothes][matIndex].size == 0
 				mat\SetTexture('$basetexture', 'models/debug/debugwhite')
 				col = @GrabData("#{iName}ClothesColor#{nextindex}")
 				nextindex += 1
@@ -1752,8 +1752,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-					for i2 = 1, matregistry[clothes + 1][matIndex].size
-						texture = matregistry[clothes + 1][matIndex][i2]
+					for i2 = 1, matregistry[clothes][matIndex].size
+						texture = matregistry[clothes][matIndex][i2]
 
 						if not isnumber(texture)
 							surface.SetMaterial(texture)
@@ -1962,7 +1962,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-				socksType = @GrabData('SocksTexture') + 1
+				socksType = @GrabData('SocksTexture')
 				surface.SetMaterial(PPM2.MaterialsRegistry.SOCKS_MATERIALS[socksType] or PPM2.MaterialsRegistry.SOCKS_MATERIALS[1])
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -2150,16 +2150,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
 			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
-				i = 1
-
 				-- using moonscripts iterator will call index metamethods while iterating
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GrabData("ManeDetailColor#{i}")
+					{:r, :g, :b, :a} = @GrabData("ManeDetailColor#{i2}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
-					i += 1
 
 			for i, mat in pairs urlTextures
 				surface.SetDrawColor(@GrabData("ManeURLColor#{i}"))
@@ -2589,7 +2586,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
 			surface.SetDrawColor(EyeIris1)
-			surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
+			surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			surface.SetDrawColor(EyeIris2)
@@ -2608,7 +2605,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			surface.SetDrawColor(EyeHole)
-			surface.SetMaterial(@@EYE_OVALS[EyeType + 1] or @EYE_OVAL)
+			surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
 			DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
 			surface.SetDrawColor(EyeEffect)
@@ -2616,7 +2613,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			surface.SetDrawColor(EyeReflection)
-			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType + 1])
+			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType])
 			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
 			render.PopFilterMag()
@@ -2745,7 +2742,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			return
 
-		if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType') + 1]
+		if mark = PPM2.MaterialsRegistry.CUTIEMARKS[@GrabData('CMarkType')]
 			@CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
 			@CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
 		else
