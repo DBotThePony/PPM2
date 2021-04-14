@@ -22,21 +22,20 @@
 net = DLib.net
 
 class PPM2.NetworkChangeState
-	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
+	new: (key = '', keyValid = '', newValue, obj, refValue) =>
 		@key = key
 		@keyValid = keyValid
 		@oldValue = obj[key]
 		@newValue = newValue
-		@ply = ply
-		@time = CurTimeL()
-		@rtime = RealTimeL()
-		@stime = SysTime()
+		@refValue = refValue
 		@obj = obj
 		@objID = obj.netID
-		@len = len
-		@rlen = len - 24 -- ID - 16 bits, variable id - 8 bits
 		@cantApply = false
 		@networkChange = true
+
+	GetValueRef: =>
+		return @newValue if @refValue == nil
+		return @refValue
 
 	GetPlayer: => @ply
 	ChangedByClient: => not @networkChange or IsValid(@ply)
@@ -55,14 +54,6 @@ class PPM2.NetworkChangeState
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
-	CurTime: => @time
-	GetCurTime: => @time
-	GetReceiveTime: => @time
-	GetReceiveStamp: => @time
-	RealTimeL: => @rtime
-	GetRealTimeL: => @rtime
-	SysTime: => @stime
-	GetSysTime: => @stime
 	GetObject: => @obj
 	GetNWObject: => @obj
 	GetNetworkedObject: => @obj
@@ -135,18 +126,26 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 			@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
 
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
+			local refvalue, setvalue
+
 			if enum_runtime_map
 				if isstring(val)
+					setvalue = val
 					i = val
 					val = enum_runtime_map[val]
+					refvalue = val
 					error('No such enum value ' .. i) if val == nil
 
 				if isnumber(val)
+					refvalue = val
+					setvalue = enum_runtime_map[val]
 					error('No such enum index ' .. val) if enum_runtime_map[val] == nil
+			else
+				setvalue = val
 
 			oldVal = @[strName]
 			@[strName] = val
-			state = PPM2.NetworkChangeState(strName, getName, val, @)
+			state = PPM2.NetworkChangeState(strName, getName, setvalue, @, refvalue)
 			state.networkChange = false
 			@SetLocalChange(state)
 			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
@@ -158,18 +157,26 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 			net.Broadcast() if SERVER
 
 		@__base["Set#{getName}Safe"] = (val = defFunc(), networkNow = networkByDefault) =>
+			local refvalue, setvalue
+
 			if enum_runtime_map
 				if isstring(val)
+					setvalue = val
 					i = val
 					val = enum_runtime_map[val]
 					val = 1 if val == nil
+					refvalue = val
 
 				if isnumber(val)
 					val = 1 if enum_runtime_map[val] == nil
+					setvalue = enum_runtime_map[val]
+					refvalue = val
+			else
+				setvalue = val
 
 			oldVal = @[strName]
 			@[strName] = val
-			state = PPM2.NetworkChangeState(strName, getName, val, @)
+			state = PPM2.NetworkChangeState(strName, getName, setvalue, @, refvalue)
 			state.networkChange = false
 			@SetLocalChange(state)
 			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
@@ -264,7 +271,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		newVal = readFunc()
 		return if newVal == obj["Get#{getName}"](obj)
 
-		state = PPM2.NetworkChangeState(strName, getName, newVal, obj, len, ply)
+		state = PPM2.NetworkChangeState(strName, getName, newVal, obj)
 		state\Apply()
 		obj\NetworkDataChanges(state)
 
@@ -741,7 +748,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	ReadNetworkData: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
-		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @) for key, {keyValid, newVal} in pairs data]
 
 		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())
@@ -751,7 +758,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	ReadNetworkDataNotify: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
-		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @) for key, {keyValid, newVal} in pairs data]
 
 		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())

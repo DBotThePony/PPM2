@@ -428,11 +428,11 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not IsValid(ent)
 		return if not ent\IsPony()
 		with ent
-			\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GrabData('ManeType'))
-			\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GrabData('ManeTypeLower'))
-			\SetBodygroup(@@BODYGROUP_TAIL, @GrabData('TailType'))
-			\SetBodygroup(@@BODYGROUP_EYELASH, @GrabData('EyelashType'))
-			\SetBodygroup(@@BODYGROUP_GENDER, @GrabData('Gender'))
+			\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GrabDataRef('ManeType'))
+			\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GrabDataRef('ManeTypeLower'))
+			\SetBodygroup(@@BODYGROUP_TAIL, @GrabDataRef('TailType'))
+			\SetBodygroup(@@BODYGROUP_EYELASH, @GrabDataRef('EyelashType'))
+			\SetBodygroup(@@BODYGROUP_GENDER, @GrabData('Gender') and 1 or 0)
 
 		@ApplyRace()
 		if createModels
@@ -462,17 +462,17 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			when 'HeadClothes', 'NeckClothes', 'BodyClothes', 'EyeClothes'
 				@UpdateClothesModel()
 			when 'ManeType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_UPPER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_UPPER, state\GetValueRef())
 			when 'ManeTypeLower'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_LOWER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_LOWER, state\GetValueRef())
 			when 'TailType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_TAIL, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_TAIL, state\GetValueRef())
 			when 'TailSize', 'PonySize'
 				@UpdateTailSize()
 			when 'EyelashType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_EYELASH, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_EYELASH, state\GetValueRef())
 			when 'Gender'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_GENDER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_GENDER, state\GetValue() and 1 or 0)
 			when 'SocksAsModel'
 				if state\GetValue()
 					@UpdateSocksModel()
@@ -492,6 +492,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 					@newSocksModel\Remove() if IsValid(@newSocksModel)
 			when 'Race'
 				@ApplyRace()
+
+		return
 
 class CPPMBodygroupController extends DefaultBodygroupController
 	@MODELS = {'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
