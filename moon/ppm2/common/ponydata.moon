@@ -116,13 +116,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	@GetVarInfo: (strName) => @NW_VarsTable[strName] or false
 
-	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
+	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, enum_runtime_map) =>
 		defFunc = defValue
 		defFunc = (-> defValue) if type(defValue) ~= 'function'
 		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
-		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id, :onSet}
+		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id}
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
 		@NW_VarsTable[strName] = tab
@@ -130,22 +130,32 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 		@__base["Get#{getName}"] = => @[strName]
 
+		--if enum_runtime_map
+			--@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
+
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
+			if enum_runtime_map
+				if isstring(val)
+					i = val
+					val = enum_runtime_map[val]
+					error('No such enum value ' .. i) if val == nil
+
+				if isnumber(val)
+					error('No such enum index ' .. val) if enum_runtime_map[val] == nil
+
 			oldVal = @[strName]
-			nevVal = onSet(@, val)
-			@[strName] = nevVal
-			state = PPM2.NetworkChangeState(strName, getName, nevVal, @)
+			@[strName] = val
+			state = PPM2.NetworkChangeState(strName, getName, val, @)
 			state.networkChange = false
 			@SetLocalChange(state)
 			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
 			net.Start(@@NW_Modify)
 			net.WriteUInt32(@GetNetworkID())
 			net.WriteUInt16(id)
-			writeFunc(nevVal)
+			writeFunc(val)
 			net.SendToServer() if CLIENT
 			net.Broadcast() if SERVER
 
-	@NetworkVar = (...) => @AddNetworkVar(...)
 	@GetSet = (fname, fvalue) =>
 		@__base["Get#{fname}"] = => @[fvalue]
 		@__base["Set#{fname}"] = (fnewValue = @[fvalue]) =>
@@ -226,8 +236,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		varData = @NW_VarsTable[varID]
 		return unless varData
 
-		{:strName, :getName, :readFunc, :writeFunc, :onSet} = varData
-		newVal = onSet(obj, readFunc())
+		{:strName, :getName, :readFunc, :writeFunc} = varData
+		newVal = readFunc()
 		return if newVal == obj["Get#{getName}"](obj)
 
 		state = PPM2.NetworkChangeState(strName, getName, newVal, obj, len, ply)
@@ -329,9 +339,9 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
 
-	@NetworkVar('DisableTask',          rBool,   wBool,                 false)
-	@NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
-	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
+	@AddNetworkVar('DisableTask',          rBool,   wBool,                 false)
+	@AddNetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
+	@AddNetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
 
 	@SetupModifiers: =>
 		for key, value in SortedPairs PPM2.PonyDataRegistry
@@ -344,7 +354,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 				@__base['Get' .. key] = => @[funcLerp](@, @[strName])
 
 	for key, value in SortedPairs PPM2.PonyDataRegistry
-		@NetworkVar(key, value.read, value.write, value.default)
+		@AddNetworkVar(key, value.read, value.write, value.default, value.enum_runtime_map)
 
 	new: (netID, ent) =>
 		super()

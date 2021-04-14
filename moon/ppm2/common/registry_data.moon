@@ -1303,6 +1303,15 @@ for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 		type: 'BOOLEAN'
 	}
 
+for key, data in pairs PPM2.PonyDataRegistry
+	if data.enum
+		data.enum = [arg\upper() for _, arg in ipairs data.enum]
+		data.enum_runtime_map = {}
+
+		for i, enumVal in ipairs data.enum
+			data.enum_runtime_map[i - 1] = enumVal
+			data.enum_runtime_map[enumVal] = i - 1
+
 testMinimalBits = 0
 
 for key, value in pairs PPM2.PonyDataRegistry
