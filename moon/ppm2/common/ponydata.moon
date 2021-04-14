@@ -334,17 +334,17 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
 
 	@SetupModifiers: =>
-		for key, value in pairs PPM2.PonyDataRegistry
+		for key, value in SortedPairs PPM2.PonyDataRegistry
 			if value.modifiers
-				@RegisterModifier(value.getFunc, 0, 0)
-				@SetModifierMinMaxFinal(value.getFunc, value.min, value.max) if value.min or value.max
-				@SetupLerpTables(value.getFunc)
-				strName = '_NW_' .. value.getFunc
-				funcLerp = 'Calculate' .. value.getFunc
-				@__base['Get' .. value.getFunc] = => @[funcLerp](@, @[strName])
+				@RegisterModifier(key, 0, 0)
+				@SetModifierMinMaxFinal(key, value.min, value.max) if value.min or value.max
+				@SetupLerpTables(key)
+				strName = '_NW_' .. key
+				funcLerp = 'Calculate' .. key
+				@__base['Get' .. key] = => @[funcLerp](@, @[strName])
 
-	for key, value in pairs PPM2.PonyDataRegistry
-		@NetworkVar(value.getFunc, value.read, value.write, value.default)
+	for key, value in SortedPairs PPM2.PonyDataRegistry
+		@NetworkVar(key, value.read, value.write, value.default)
 
 	new: (netID, ent) =>
 		super()

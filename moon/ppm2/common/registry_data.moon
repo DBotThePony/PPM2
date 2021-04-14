@@ -76,1229 +76,1230 @@ INT_FIXER = (def = 1, min = 0, max = 1) ->
 	return (arg = defFunc()) -> math.floor(math.Clamp(tonumber(arg) or defFunc(), min, max))
 
 PPM2.PonyDataRegistry = {
-	'age': {
+	'Age': {
+		old: 'age'
 		default: -> PPM2.AGE_ADULT
-		getFunc: 'Age'
 		enum: {'FILLY', 'ADULT', 'MATURE'}
 	}
 
-	'race': {
+	'Race': {
+		old: 'race'
 		default: -> PPM2.RACE_EARTH
-		getFunc: 'Race'
 		enum: [arg for _, arg in ipairs PPM2.RACE_ENUMS]
 	}
 
-	'wings_type': {
+	'WingsType': {
+		old: 'wings_type'
 		default: -> 0
-		getFunc: 'WingsType'
 		enum: [arg for _, arg in ipairs PPM2.AvaliablePonyWings]
 	}
 
-	'gender': {
+	'Gender': {
+		old: 'gender'
 		default: -> PPM2.GENDER_FEMALE
-		getFunc: 'Gender'
-		enum: [arg for _, arg in ipairs PPM2.AGE_ENUMS]
+		type: 'BOOLEAN'
+		fix: (value) -> value == true or isstring(value) and value ~= 'FILLY'
 	}
 
-	'weight': {
+	'Weight': {
+		old: 'weight'
 		default: -> 1
-		getFunc: 'Weight'
 		min: PPM2.MIN_WEIGHT
 		max: PPM2.MAX_WEIGHT
 		type: 'FLOAT'
 	}
 
-	'ponysize': {
+	'PonySize': {
+		old: 'ponysize'
 		default: -> 1
-		getFunc: 'PonySize'
 		min: PPM2.MIN_SCALE
 		max: PPM2.MAX_SCALE
 		type: 'FLOAT'
 	}
 
-	'necksize': {
+	'NeckSize': {
+		old: 'necksize'
 		default: -> 1
-		getFunc: 'NeckSize'
 		min: PPM2.MIN_NECK
 		max: PPM2.MAX_NECK
 		type: 'FLOAT'
 	}
 
-	'legssize': {
+	'LegsSize': {
+		old: 'legssize'
 		default: -> 1
-		getFunc: 'LegsSize'
 		min: PPM2.MIN_LEGS
 		max: PPM2.MAX_LEGS
 		type: 'FLOAT'
 	}
 
-	'spinesize': {
+	'BackSize': {
+		old: 'spinesize'
 		default: -> 1
-		getFunc: 'BackSize'
 		min: PPM2.MIN_SPINE
 		max: PPM2.MAX_SPINE
 		type: 'FLOAT'
 	}
 
-	'male_buff': {
+	'MaleBuff': {
+		old: 'male_buff'
 		default: -> PPM2.DEFAULT_MALE_BUFF
-		getFunc: 'MaleBuff'
 		min: PPM2.MIN_MALE_BUFF
 		max: PPM2.MAX_MALE_BUFF
 		type: 'FLOAT'
 	}
 
-	'clothes_head': {
+	'HeadClothes': {
+		old: 'clothes_head'
 		default: -> 0
-		getFunc: 'HeadClothes'
 		enum: [piece for piece in *PPM2.AvailableClothesHead]
 	}
 
-	'clothes_neck': {
+	'NeckClothes': {
+		old: 'clothes_neck'
 		default: -> 0
-		getFunc: 'NeckClothes'
 		enum: [piece for piece in *PPM2.AvailableClothesNeck]
 	}
 
-	'clothes_body': {
+	'BodyClothes': {
+		old: 'clothes_body'
 		default: -> 0
-		getFunc: 'BodyClothes'
 		enum: [piece for piece in *PPM2.AvailableClothesBody]
 	}
 
-	'clothes_eye': {
+	'EyeClothes': {
+		old: 'clothes_eye'
 		default: -> 0
-		getFunc: 'EyeClothes'
 		enum: [piece for piece in *PPM2.AvailableClothesEye]
 	}
 
-	'eyelash': {
+	'EyelashType': {
+		old: 'eyelash'
 		default: -> 0
-		getFunc: 'EyelashType'
 		enum: [arg for _, arg in ipairs PPM2.EyelashTypes]
 	}
 
-	'tail': {
+	'TailType': {
+		old: 'tail'
 		default: -> 2
-		getFunc: 'TailType'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableTails]
 	}
 
-	'tail_new': {
+	'TailTypeNew': {
+		old: 'tail_new'
 		default: -> 2
-		getFunc: 'TailTypeNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableTailsNew]
 	}
 
-	'mane': {
+	'ManeType': {
+		old: 'mane'
 		default: -> 2
-		getFunc: 'ManeType'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManes]
 	}
 
-	'mane_new': {
+	'ManeTypeNew': {
+		old: 'mane_new'
 		default: -> 2
-		getFunc: 'ManeTypeNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableUpperManesNew]
 	}
 
-	'manelower': {
+	'ManeTypeLower': {
+		old: 'manelower'
 		default: -> 2
-		getFunc: 'ManeTypeLower'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManes]
 	}
 
-	'manelower_new': {
+	'ManeTypeLowerNew': {
+		old: 'manelower_new'
 		default: -> 2
-		getFunc: 'ManeTypeLowerNew'
 		enum: [arg for _, arg in ipairs PPM2.AvaliableLowerManesNew]
 	}
 
-	'socks_texture': {
+	'SocksTexture': {
+		old: 'socks_texture'
 		default: -> 0
-		getFunc: 'SocksTexture'
 		enum: [arg for _, arg in ipairs PPM2.SocksTypes]
 	}
 
-	'socks_texture_url': {
+	'SocksTextureURL': {
+		old: 'socks_texture_url'
 		default: -> ''
-		getFunc: 'SocksTextureURL'
 		type: 'URL'
 	}
 
-	'tailsize': {
+	'TailSize': {
+		old: 'tailsize'
 		default: -> 1
-		getFunc: 'TailSize'
 		min: PPM2.MIN_TAIL_SIZE
 		max: PPM2.MAX_TAIL_SIZE
 		type: 'FLOAT'
 	}
 
-	'cmark': {
+	'CMark': {
+		old: 'cmark'
 		default: -> true
-		getFunc: 'CMark'
 		type: 'BOOLEAN'
 	}
 
-	'cmark_size': {
+	'CMarkSize': {
+		old: 'cmark_size'
 		default: -> 1
-		getFunc: 'CMarkSize'
 		min: 0.1
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'cmark_color': {
+	'CMarkColor': {
+		old: 'cmark_color'
 		default: -> Color()
-		getFunc: 'CMarkColor'
 		type: 'COLOR'
 	}
 
-	'eyelash_color': {
+	'EyelashesColor': {
+		old: 'eyelash_color'
 		default: -> Color(0, 0, 0)
-		getFunc: 'EyelashesColor'
 		type: 'COLOR'
 	}
 
-	'eyelashes_phong_separate': {
+	'SeparateEyelashesPhong': {
+		old: 'eyelashes_phong_separate'
 		default: -> false
-		getFunc: 'SeparateEyelashesPhong'
 		type: 'BOOLEAN'
 	}
 
-	'fangs': {
+	'Fangs': {
+		old: 'fangs'
 		default: -> false
-		getFunc: 'Fangs'
 		type: 'BOOLEAN'
 	}
 
-	'bat_pony_ears': {
+	'BatPonyEars': {
+		old: 'bat_pony_ears'
 		default: -> false
-		getFunc: 'BatPonyEars'
 		type: 'BOOLEAN'
 	}
 
-	'claw_teeth': {
+	'ClawTeeth': {
+		old: 'claw_teeth'
 		default: -> false
-		getFunc: 'ClawTeeth'
 		type: 'BOOLEAN'
 	}
 
-	'cmark_type': {
+	'CMarkType': {
+		old: 'cmark_type'
 		default: -> 4
-		getFunc: 'CMarkType'
 		enum: [arg for _, arg in ipairs PPM2.DefaultCutiemarks]
 	}
 
-	'cmark_url': {
+	'CMarkURL': {
+		old: 'cmark_url'
 		default: -> ''
-		getFunc: 'CMarkURL'
 		type: 'URL'
 	}
 
-	'body': {
+	'BodyColor': {
+		old: 'body'
 		default: -> Color(0xEE321F)
-		getFunc: 'BodyColor'
 		type: 'COLOR'
 	}
 
-	'body_bump': {
+	'BodyBumpStrength': {
+		old: 'body_bump'
 		default: -> 0.5
-		getFunc: 'BodyBumpStrength'
 		type: 'FLOAT'
 		min: 0
 		max: 1
 	}
 
-	'eyebrows': {
+	'EyebrowsColor': {
+		old: 'eyebrows'
 		default: -> Color(0, 0, 0)
-		getFunc: 'EyebrowsColor'
 		type: 'COLOR'
 	}
 
-	'eyebrows_glow': {
+	'GlowingEyebrows': {
+		old: 'eyebrows_glow'
 		default: -> false
-		getFunc: 'GlowingEyebrows'
 		type: 'BOOLEAN'
 	}
 
-	'eyebrows_glow_strength': {
+	'EyebrowsGlowStrength': {
+		old: 'eyebrows_glow_strength'
 		default: -> 1
-		getFunc: 'EyebrowsGlowStrength'
 		type: 'FLOAT'
 		min: 0
 		max: 1
 	}
 
-	'hide_manes': {
+	'HideManes': {
+		old: 'hide_manes'
 		default: -> true
-		getFunc: 'HideManes'
 		type: 'BOOLEAN'
 	}
 
-	'hide_manes_socks': {
+	'HideManesSocks': {
+		old: 'hide_manes_socks'
 		default: -> true
-		getFunc: 'HideManesSocks'
 		type: 'BOOLEAN'
 	}
 
-	'hide_manes_mane': {
+	'HideManesMane': {
+		old: 'hide_manes_mane'
 		default: -> true
-		getFunc: 'HideManesMane'
 		type: 'BOOLEAN'
 	}
 
-	'hide_manes_tail': {
+	'HideManesTail': {
+		old: 'hide_manes_tail'
 		default: -> true
-		getFunc: 'HideManesTail'
 		type: 'BOOLEAN'
 	}
 
-	'new_horn': {
+	'UseNewHorn': {
+		old: 'new_horn'
 		default: -> false
-		getFunc: 'UseNewHorn'
 		type: 'BOOLEAN'
 	}
 
-	'new_horn_type': {
+	'NewHornType': {
+		old: 'new_horn_type'
 		default: -> 2
-		getFunc: 'NewHornType'
 		enum: [type for type in *PPM2.AvailableHorns]
 	}
 
-	'horn_color': {
+	'HornColor': {
+		old: 'horn_color'
 		default: -> Color()
-		getFunc: 'HornColor'
 		type: 'COLOR'
 	}
 
-	'wings_color': {
+	'WingsColor': {
+		old: 'wings_color'
 		default: -> Color()
-		getFunc: 'WingsColor'
 		type: 'COLOR'
 	}
 
-	'separate_wings': {
+	'SeparateWings': {
+		old: 'separate_wings'
 		default: -> false
-		getFunc: 'SeparateWings'
 		type: 'BOOLEAN'
 	}
 
-	'separate_horn': {
+	'SeparateHorn': {
+		old: 'separate_horn'
 		default: -> false
-		getFunc: 'SeparateHorn'
 		type: 'BOOLEAN'
 	}
 
-	'separate_magic_color': {
+	'SeparateMagicColor': {
+		old: 'separate_magic_color'
 		default: -> false
-		getFunc: 'SeparateMagicColor'
 		type: 'BOOLEAN'
 	}
 
-	'horn_magic_color': {
+	'HornMagicColor': {
+		old: 'horn_magic_color'
 		default: -> Color()
-		getFunc: 'HornMagicColor'
 		type: 'COLOR'
 	}
 
-	'horn_glow': {
+	'HornGlow': {
+		old: 'horn_glow'
 		default: -> false
-		getFunc: 'HornGlow'
 		type: 'BOOLEAN'
 	}
 
-	'horn_glow_strength': {
+	'HornGlowSrength': {
+		old: 'horn_glow_strength'
 		default: -> 1
-		getFunc: 'HornGlowSrength'
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'horn_detail_color': {
+	'HornDetailColor': {
+		old: 'horn_detail_color'
 		default: -> Color(90, 90, 90)
-		getFunc: 'HornDetailColor'
 		type: 'COLOR'
 	}
 
-	'separate_eyes': {
+	'SeparateEyes': {
+		old: 'separate_eyes'
 		default: -> false
-		getFunc: 'SeparateEyes'
 		type: 'BOOLEAN'
 	}
 
-	'separate_mane': {
+	'SeparateMane': {
+		old: 'separate_mane'
 		default: -> false
-		getFunc: 'SeparateMane'
 		type: 'BOOLEAN'
 	}
 
-	'call_playerfootstep': {
+	'CallPlayerFootstepHook': {
+		old: 'call_playerfootstep'
 		default: -> true
-		getFunc: 'CallPlayerFootstepHook'
 		type: 'BOOLEAN'
 	}
 
-	'disable_hoofsteps': {
+	'DisableHoofsteps': {
+		old: 'disable_hoofsteps'
 		default: -> false
-		getFunc: 'DisableHoofsteps'
 		type: 'BOOLEAN'
 	}
 
-	'disable_wander_sounds': {
+	'DisableWanderSounds': {
+		old: 'disable_wander_sounds'
 		default: -> false
-		getFunc: 'DisableWanderSounds'
 		type: 'BOOLEAN'
 	}
 
-	'disable_new_step_sounds': {
+	'DisableStepSounds': {
+		old: 'disable_new_step_sounds'
 		default: -> false
-		getFunc: 'DisableStepSounds'
 		type: 'BOOLEAN'
 	}
 
-	'disable_jump_sound': {
+	'DisableJumpSound': {
+		old: 'disable_jump_sound'
 		default: -> false
-		getFunc: 'DisableJumpSound'
 		type: 'BOOLEAN'
 	}
 
-	'disable_falldown_sound': {
+	'DisableFalldownSound': {
+		old: 'disable_falldown_sound'
 		default: -> false
-		getFunc: 'DisableFalldownSound'
 		type: 'BOOLEAN'
 	}
 
-	'socks': {
+	'Socks': {
+		old: 'socks'
 		default: -> false
-		getFunc: 'Socks'
 		type: 'BOOLEAN'
 	}
 
-	'new_male_muzzle': {
+	'NewMuzzle': {
+		old: 'new_male_muzzle'
 		default: -> true
-		getFunc: 'NewMuzzle'
 		type: 'BOOLEAN'
 	}
 
-	'noflex': {
+	'NoFlex': {
+		old: 'noflex'
 		default: -> false
-		getFunc: 'NoFlex'
 		type: 'BOOLEAN'
 	}
 
-	'socks_model': {
+	'SocksAsModel': {
+		old: 'socks_model'
 		default: -> false
-		getFunc: 'SocksAsModel'
 		type: 'BOOLEAN'
 	}
 
-	'socks_model_new': {
+	'SocksAsNewModel': {
+		old: 'socks_model_new'
 		default: -> false
-		getFunc: 'SocksAsNewModel'
 		type: 'BOOLEAN'
 	}
 
-	'socks_model_color': {
+	'SocksColor': {
+		old: 'socks_model_color'
 		default: -> Color()
-		getFunc: 'SocksColor'
 		type: 'COLOR'
 	}
 
-	'socks_new_model_color1': {
+	'NewSocksColor1': {
+		old: 'socks_new_model_color1'
 		default: -> Color()
-		getFunc: 'NewSocksColor1'
 		type: 'COLOR'
 	}
 
-	'socks_new_model_color2': {
+	'NewSocksColor2': {
+		old: 'socks_new_model_color2'
 		default: -> Color(0, 0, 0)
-		getFunc: 'NewSocksColor2'
 		type: 'COLOR'
 	}
 
-	'socks_new_model_color3': {
+	'NewSocksColor3': {
+		old: 'socks_new_model_color3'
 		default: -> Color(0, 0, 0)
-		getFunc: 'NewSocksColor3'
 		type: 'COLOR'
 	}
 
-	'socks_new_texture_url': {
+	'NewSocksTextureURL': {
+		old: 'socks_new_texture_url'
 		default: -> ''
-		getFunc: 'NewSocksTextureURL'
 		type: 'URL'
 	}
 
-	'suit': {
+	'Bodysuit': {
+		old: 'suit'
 		default: -> 0
-		getFunc: 'Bodysuit'
 		enum: [arg for _, arg in ipairs PPM2.AvaliablePonySuits]
 	}
 
-	'left_wing_size': {
+	'LWingSize': {
+		old: 'left_wing_size'
 		default: -> 1
-		getFunc: 'LWingSize'
 		min: PPM2.MIN_WING
 		max: PPM2.MAX_WING
 		type: 'FLOAT'
 	}
 
-	'left_wing_x': {
+	'LWingX': {
+		old: 'left_wing_x'
 		default: -> 0
-		getFunc: 'LWingX'
 		min: PPM2.MIN_WINGX
 		max: PPM2.MAX_WINGX
 		type: 'FLOAT'
 	}
 
-	'left_wing_y': {
+	'LWingY': {
+		old: 'left_wing_y'
 		default: -> 0
-		getFunc: 'LWingY'
 		min: PPM2.MIN_WINGY
 		max: PPM2.MAX_WINGY
 		type: 'FLOAT'
 	}
 
-	'left_wing_z': {
+	'LWingZ': {
+		old: 'left_wing_z'
 		default: -> 0
-		getFunc: 'LWingZ'
 		min: PPM2.MIN_WINGZ
 		max: PPM2.MAX_WINGZ
 		type: 'FLOAT'
 	}
 
-	'right_wing_size': {
+	'RWingSize': {
+		old: 'right_wing_size'
 		default: -> 1
-		getFunc: 'RWingSize'
 		min: PPM2.MIN_WING
 		max: PPM2.MAX_WING
 		type: 'FLOAT'
 	}
 
-	'right_wing_x': {
+	'RWingX': {
+		old: 'right_wing_x'
 		default: -> 0
-		getFunc: 'RWingX'
 		min: PPM2.MIN_WINGX
 		max: PPM2.MAX_WINGX
 		type: 'FLOAT'
 	}
 
-	'right_wing_y': {
+	'RWingY': {
+		old: 'right_wing_y'
 		default: -> 0
-		getFunc: 'RWingY'
 		min: PPM2.MIN_WINGY
 		max: PPM2.MAX_WINGY
 		type: 'FLOAT'
 	}
 
-	'right_wing_z': {
+	'RWingZ': {
+		old: 'right_wing_z'
 		default: -> 0
-		getFunc: 'RWingZ'
 		min: PPM2.MIN_WINGZ
 		max: PPM2.MAX_WINGZ
 		type: 'FLOAT'
 	}
 
-	'teeth_color': {
+	'TeethColor': {
+		old: 'teeth_color'
 		default: -> Color()
-		getFunc: 'TeethColor'
 		type: 'COLOR'
 	}
 
-	'mouth_color': {
+	'MouthColor': {
+		old: 'mouth_color'
 		default: -> Color(219, 65, 155)
-		getFunc: 'MouthColor'
 		type: 'COLOR'
 	}
 
-	'tongue_color': {
+	'TongueColor': {
+		old: 'tongue_color'
 		default: -> Color(235, 131, 59)
-		getFunc: 'TongueColor'
 		type: 'COLOR'
 	}
 
-	'bat_wing_color': {
+	'BatWingColor': {
+		old: 'bat_wing_color'
 		default: -> Color()
-		getFunc: 'BatWingColor'
 		type: 'COLOR'
 	}
 
-	'bat_wing_skin_color': {
+	'BatWingSkinColor': {
+		old: 'bat_wing_skin_color'
 		default: -> Color()
-		getFunc: 'BatWingSkinColor'
 		type: 'COLOR'
 	}
 
-	'separate_horn_phong': {
+	'SeparateHornPhong': {
+		old: 'separate_horn_phong'
 		default: -> false
-		getFunc: 'SeparateHornPhong'
 		type: 'BOOLEAN'
 	}
 
-	'separate_wings_phong': {
+	'SeparateWingsPhong': {
+		old: 'separate_wings_phong'
 		default: -> false
-		getFunc: 'SeparateWingsPhong'
 		type: 'BOOLEAN'
 	}
 
-	'separate_mane_phong': {
+	'SeparateManePhong': {
+		old: 'separate_mane_phong'
 		default: -> false
-		getFunc: 'SeparateManePhong'
 		type: 'BOOLEAN'
 	}
 
-	'separate_tail_phong': {
+	'SeparateTailPhong': {
+		old: 'separate_tail_phong'
 		default: -> false
-		getFunc: 'SeparateTailPhong'
 		type: 'BOOLEAN'
 	}
 
-	'alternative_fangs': {
+	'AlternativeFangs': {
+		old: 'alternative_fangs'
 		default: -> false
-		getFunc: 'AlternativeFangs'
 		type: 'BOOLEAN'
 	}
 
-	'hoof_fluffers': {
+	'HoofFluffers': {
+		old: 'hoof_fluffers'
 		default: -> false
-		getFunc: 'HoofFluffers'
 		type: 'BOOLEAN'
 	}
 
-	'hoof_fluffers_strength': {
+	'HoofFluffersStrength': {
+		old: 'hoof_fluffers_strength'
 		default: -> 1
-		getFunc: 'HoofFluffersStrength'
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'ears_size': {
+	'EarsSize': {
+		old: 'ears_size'
 		default: -> 1
-		getFunc: 'EarsSize'
 		min: 0.1
 		max: 2
 		type: 'FLOAT'
 	}
 
-	'bat_pony_ears_strength': {
+	'BatPonyEarsStrength': {
+		old: 'bat_pony_ears_strength'
 		default: -> 1
-		getFunc: 'BatPonyEarsStrength'
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'fangs_strength': {
+	'FangsStrength': {
+		old: 'fangs_strength'
 		default: -> 1
-		getFunc: 'FangsStrength'
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'clawteeth_strength': {
+	'ClawTeethStrength': {
+		old: 'clawteeth_strength'
 		default: -> 1
-		getFunc: 'ClawTeethStrength'
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	'lips_color_inherit': {
+	'LipsColorInherit': {
+		old: 'lips_color_inherit'
 		default: -> true
-		getFunc: 'LipsColorInherit'
 		type: 'BOOLEAN'
 	}
 
-	'nose_color_inherit': {
+	'NoseColorInherit': {
+		old: 'nose_color_inherit'
 		default: -> true
-		getFunc: 'NoseColorInherit'
 		type: 'BOOLEAN'
 	}
 
-	'lips_color': {
+	'LipsColor': {
+		old: 'lips_color'
 		default: -> Color(172, 92, 92)
-		getFunc: 'LipsColor'
 		type: 'COLOR'
 	}
 
-	'nose_color': {
+	'NoseColor': {
+		old: 'nose_color'
 		default: -> Color(77, 84, 83)
-		getFunc: 'NoseColor'
 		type: 'COLOR'
 	}
 
-	'weapon_hide': {
+	'HideWeapons': {
+		old: 'weapon_hide'
 		default: -> true
-		getFunc: 'HideWeapons'
 		type: 'BOOLEAN'
 	}
 }
 
 for {internal, publicName} in *{{'_head', 'Head'}, {'_neck', 'Neck'}, {'_body', 'Body'}, {'_eye', 'Eye'}}
-	PPM2.PonyDataRegistry["clothes#{internal}_color_nil"] = {
+	PPM2.PonyDataRegistry["#{publicName}ClothesUseColor"] = {
+		old: "clothes#{internal}_color_nil"
 		default: -> false
-		getFunc: "#{publicName}ClothesUseColor"
 		type: 'BOOLEAN'
 	}
 
 	for i = 1, PPM2.MAX_CLOTHES_URLS
-		PPM2.PonyDataRegistry["clothes#{internal}_url_#{i}"] = {
+		PPM2.PonyDataRegistry["#{publicName}ClothesURL#{i}"] = {
+			old: "clothes#{internal}_url_#{i}"
 			default: -> ''
-			getFunc: "#{publicName}ClothesURL#{i}"
 			type: 'URL'
 		}
 
 	for num = 1, PPM2.MAX_CLOTHES_COLORS
-		PPM2.PonyDataRegistry["clothes#{internal}_color_#{num}"] = {
+		PPM2.PonyDataRegistry["#{publicName}ClothesColor#{num}"] = {
+			old: "clothes#{internal}_color_#{num}"
 			default: -> Color()
-			getFunc: "#{publicName}ClothesColor#{num}"
 			type: 'COLOR'
 		}
 
 for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'}, {'', ''}}
-	PPM2.PonyDataRegistry["eye_url#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeURL#{publicName}"] = {
 		default: -> ''
-		getFunc: "EyeURL#{publicName}"
+		old: "eye_url#{internal}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["eye_bg#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeBackground#{publicName}"] = {
 		default: -> Color()
-		getFunc: "EyeBackground#{publicName}"
+		old: "eye_bg#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_hole#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeHole#{publicName}"] = {
 		default: -> Color(0, 0, 0)
-		getFunc: "EyeHole#{publicName}"
+		old: "eye_hole#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_iris1#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeIrisTop#{publicName}"] = {
 		default: -> Color(0xEE9620)
-		getFunc: "EyeIrisTop#{publicName}"
+		old: "eye_iris1#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_iris2#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeIrisBottom#{publicName}"] = {
 		default: -> Color(0xEE9620)
-		getFunc: "EyeIrisBottom#{publicName}"
+		old: "eye_iris2#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_irisline1#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeIrisLine1#{publicName}"] = {
 		default: -> Color()
-		getFunc: "EyeIrisLine1#{publicName}"
+		old: "eye_irisline1#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_irisline_direction#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeLineDirection#{publicName}"] = {
 		default: -> false
-		getFunc: "EyeLineDirection#{publicName}"
+		old: "eye_irisline_direction#{internal}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["eye_irisline2#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeIrisLine2#{publicName}"] = {
 		default: -> Color()
-		getFunc: "EyeIrisLine2#{publicName}"
+		old: "eye_irisline2#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_reflection#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeReflection#{publicName}"] = {
 		default: -> Color(255, 255, 255, 127)
-		getFunc: "EyeReflection#{publicName}"
+		old: "eye_reflection#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_effect#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeEffect#{publicName}"] = {
 		default: -> Color()
-		getFunc: "EyeEffect#{publicName}"
+		old: "eye_effect#{internal}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["eye_lines#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeLines#{publicName}"] = {
 		default: -> true
-		getFunc: "EyeLines#{publicName}"
+		old: "eye_lines#{internal}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["eye_iris_size#{internal}"] = {
+	PPM2.PonyDataRegistry["IrisSize#{publicName}"] = {
 		default: -> 1
-		getFunc: "IrisSize#{publicName}"
+		old: "eye_iris_size#{internal}"
 		min: PPM2.MIN_IRIS
 		max: PPM2.MAX_IRIS
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["eye_derp#{internal}"] = {
+	PPM2.PonyDataRegistry["DerpEyes#{publicName}"] = {
 		default: -> false
-		getFunc: "DerpEyes#{publicName}"
+		old: "eye_derp#{internal}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["eye_use_refract#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeRefract#{publicName}"] = {
 		default: -> false
-		getFunc: "EyeRefract#{publicName}"
+		old: "eye_use_refract#{internal}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["eye_cornera#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeCornerA#{publicName}"] = {
 		default: -> false
-		getFunc: "EyeCornerA#{publicName}"
+		old: "eye_cornera#{internal}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["eye_derp_strength#{internal}"] = {
+	PPM2.PonyDataRegistry["DerpEyesStrength#{publicName}"] = {
 		default: -> 1
-		getFunc: "DerpEyesStrength#{publicName}"
+		old: "eye_derp_strength#{internal}"
 		min: PPM2.MIN_DERP_STRENGTH
 		max: PPM2.MAX_DERP_STRENGTH
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["eye_type#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeType#{publicName}"] = {
 		default: -> 0
-		getFunc: "EyeType#{publicName}"
+		old: "eye_type#{internal}"
 		enum: [arg for _, arg in ipairs PPM2.AvaliableEyeTypes]
 	}
 
-	PPM2.PonyDataRegistry["eye_reflection_type#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeReflectionType#{publicName}"] = {
 		default: -> 0
-		getFunc: "EyeReflectionType#{publicName}"
+		old: "eye_reflection_type#{internal}"
 		enum: [arg for _, arg in ipairs PPM2.AvaliableEyeReflections]
 	}
 
-	PPM2.PonyDataRegistry["hole_width#{internal}"] = {
+	PPM2.PonyDataRegistry["HoleWidth#{publicName}"] = {
 		default: -> 1
-		getFunc: "HoleWidth#{publicName}"
+		old: "hole_width#{internal}"
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["hole_height#{internal}"] = {
+	PPM2.PonyDataRegistry["HoleHeight#{publicName}"] = {
 		default: -> 1
-		getFunc: "HoleHeight#{publicName}"
+		old: "hole_height#{internal}"
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["iris_width#{internal}"] = {
+	PPM2.PonyDataRegistry["IrisWidth#{publicName}"] = {
 		default: -> 1
-		getFunc: "IrisWidth#{publicName}"
+		old: "iris_width#{internal}"
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["iris_height#{internal}"] = {
+	PPM2.PonyDataRegistry["IrisHeight#{publicName}"] = {
 		default: -> 1
-		getFunc: "IrisHeight#{publicName}"
+		old: "iris_height#{internal}"
 		min: PPM2.MIN_PUPIL_SIZE
 		max: PPM2.MAX_PUPIL_SIZE
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["eye_glossy_reflection#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeGlossyStrength#{publicName}"] = {
 		default: -> 0.16
-		getFunc: "EyeGlossyStrength#{publicName}"
+		old: "eye_glossy_reflection#{internal}"
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["hole_shiftx#{internal}"] = {
+	PPM2.PonyDataRegistry["HoleShiftX#{publicName}"] = {
 		default: -> 0
-		getFunc: "HoleShiftX#{publicName}"
+		old: "hole_shiftx#{internal}"
 		min: PPM2.MIN_HOLE_SHIFT
 		max: PPM2.MAX_HOLE_SHIFT
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["hole_shifty#{internal}"] = {
+	PPM2.PonyDataRegistry["HoleShiftY#{publicName}"] = {
 		default: -> 0
-		getFunc: "HoleShiftY#{publicName}"
+		old: "hole_shifty#{internal}"
 		min: PPM2.MIN_HOLE_SHIFT
 		max: PPM2.MAX_HOLE_SHIFT
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["eye_hole_size#{internal}"] = {
+	PPM2.PonyDataRegistry["HoleSize#{publicName}"] = {
 		default: -> .8
-		getFunc: "HoleSize#{publicName}"
+		old: "eye_hole_size#{internal}"
 		min: PPM2.MIN_HOLE
 		max: PPM2.MAX_HOLE
 		type: 'FLOAT'
 		modifiers: true
 	}
 
-	PPM2.PonyDataRegistry["eye_rotation#{internal}"] = {
+	PPM2.PonyDataRegistry["EyeRotation#{publicName}"] = {
 		default: -> 0
-		getFunc: "EyeRotation#{publicName}"
+		old: "eye_rotation#{internal}"
 		min: PPM2.MIN_EYE_ROTATION
 		max: PPM2.MAX_EYE_ROTATION
 		type: 'INT'
 	}
 
 for i = 1, 3
-	PPM2.PonyDataRegistry["horn_url_#{i}"] = {
+	PPM2.PonyDataRegistry["HornURL#{i}"] = {
 		default: -> ''
-		getFunc: "HornURL#{i}"
+		old: "horn_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["bat_wing_url_#{i}"] = {
+	PPM2.PonyDataRegistry["BatWingURL#{i}"] = {
 		default: -> ''
-		getFunc: "BatWingURL#{i}"
+		old: "bat_wing_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["bat_wing_skin_url_#{i}"] = {
+	PPM2.PonyDataRegistry["BatWingSkinURL#{i}"] = {
 		default: -> ''
-		getFunc: "BatWingSkinURL#{i}"
+		old: "bat_wing_skin_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["wings_url_#{i}"] = {
+	PPM2.PonyDataRegistry["WingsURL#{i}"] = {
 		default: -> ''
-		getFunc: "WingsURL#{i}"
+		old: "wings_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["horn_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["HornURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "HornURLColor#{i}"
+		old: "horn_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["bat_wing_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["BatWingURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "BatWingURLColor#{i}"
+		old: "bat_wing_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["bat_wing_skin_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["BatWingSkinURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "BatWingSkinURLColor#{i}"
+		old: "bat_wing_skin_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["wings_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["WingsURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "WingsURLColor#{i}"
+		old: "wings_url_color_#{i}"
 		type: 'COLOR'
 	}
 
 for i = 1, 6
-	PPM2.PonyDataRegistry["socks_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["SocksDetailColor#{i}"] = {
 		default: -> Color()
-		getFunc: "SocksDetailColor#{i}"
+		old: "socks_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["mane_color_#{i}"] = {
+	PPM2.PonyDataRegistry["ManeColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "ManeColor#{i}"
+		old: "mane_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["mane_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["ManeDetailColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "ManeDetailColor#{i}"
+		old: "mane_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["mane_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["ManeURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "ManeURLColor#{i}"
+		old: "mane_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["mane_url_#{i}"] = {
+	PPM2.PonyDataRegistry["ManeURL#{i}"] = {
 		default: -> ''
-		getFunc: "ManeURL#{i}"
+		old: "mane_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["tail_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["TailDetailColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "TailDetailColor#{i}"
+		old: "tail_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["tail_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["TailURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "TailURLColor#{i}"
+		old: "tail_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["tail_url_#{i}"] = {
+	PPM2.PonyDataRegistry["TailURL#{i}"] = {
 		default: -> ''
-		getFunc: "TailURL#{i}"
+		old: "tail_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["tail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["TailColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "TailColor#{i}"
+		old: "tail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["lower_mane_color_#{i}"] = {
+	PPM2.PonyDataRegistry["LowerManeColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "LowerManeColor#{i}"
+		old: "lower_mane_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["lower_mane_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["LowerManeURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "LowerManeURLColor#{i}"
+		old: "lower_mane_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["lower_mane_url_#{i}"] = {
+	PPM2.PonyDataRegistry["LowerManeURL#{i}"] = {
 		default: -> ''
-		getFunc: "LowerManeURL#{i}"
+		old: "lower_mane_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["upper_mane_color_#{i}"] = {
+	PPM2.PonyDataRegistry["UpperManeColor#{i}"] = {
 		default: -> i == 1 and Color(0xFFD117) or i == 2 and Color(0xE3C23C) or Color()
-		getFunc: "UpperManeColor#{i}"
+		old: "upper_mane_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["upper_mane_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["UpperManeURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "UpperManeURLColor#{i}"
+		old: "upper_mane_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["upper_mane_url_#{i}"] = {
+	PPM2.PonyDataRegistry["UpperManeURL#{i}"] = {
 		default: -> ''
-		getFunc: "UpperManeURL#{i}"
+		old: "upper_mane_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["lower_mane_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["LowerManeDetailColor#{i}"] = {
 		default: -> Color()
-		getFunc: "LowerManeDetailColor#{i}"
+		old: "lower_mane_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["upper_mane_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["UpperManeDetailColor#{i}"] = {
 		default: -> Color()
-		getFunc: "UpperManeDetailColor#{i}"
+		old: "upper_mane_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
 for i = 1, PPM2.MAX_BODY_DETAILS
-	PPM2.PonyDataRegistry["body_detail_color_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetailColor#{i}"] = {
 		default: -> Color()
-		getFunc: "BodyDetailColor#{i}"
+		old: "body_detail_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["body_detail_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetail#{i}"] = {
 		default: -> 0
-		getFunc: "BodyDetail#{i}"
+		old: "body_detail_#{i}"
 		enum: [arg for _, arg in ipairs PPM2.BodyDetailsEnum]
 	}
 
-	PPM2.PonyDataRegistry["body_detail_#{i}_first"] = {
+	PPM2.PonyDataRegistry["BodyDetailFirst#{i}"] = {
 		default: -> false
-		getFunc: "BodyDetailFirst#{i}"
+		old: "body_detail_#{i}_first"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["body_url_detail_#{i}_first"] = {
+	PPM2.PonyDataRegistry["BodyDetailURLFirst#{i}"] = {
 		default: -> false
-		getFunc: "BodyDetailURLFirst#{i}"
+		old: "body_url_detail_#{i}_first"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["body_detail_url_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetailURL#{i}"] = {
 		default: -> ''
-		getFunc: "BodyDetailURL#{i}"
+		old: "body_detail_url_#{i}"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry["body_detail_url_color_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetailURLColor#{i}"] = {
 		default: -> Color()
-		getFunc: "BodyDetailURLColor#{i}"
+		old: "body_detail_url_color_#{i}"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry["body_detail_glow_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetailGlow#{i}"] = {
 		default: -> false
-		getFunc: "BodyDetailGlow#{i}"
+		old: "body_detail_glow_#{i}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["body_detail_glow_strength_#{i}"] = {
+	PPM2.PonyDataRegistry["BodyDetailGlowStrength#{i}"] = {
 		default: -> 1
-		getFunc: "BodyDetailGlowStrength#{i}"
+		old: "body_detail_glow_strength_#{i}"
 		type: 'FLOAT'
 		min: 0
 		max: 1
 	}
 
 for i = 1, PPM2.MAX_TATTOOS
-	PPM2.PonyDataRegistry["tattoo_type_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooType#{i}"] = {
 		default: -> 0
-		getFunc: "TattooType#{i}"
+		old: "tattoo_type_#{i}"
 		enum: [arg for _, arg in ipairs PPM2.TATTOOS_REGISTRY]
 	}
 
-	PPM2.PonyDataRegistry["tattoo_posx_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooPosX#{i}"] = {
 		default: -> 0
-		getFunc: "TattooPosX#{i}"
+		old: "tattoo_posx_#{i}"
 		min: -100
 		max: 100
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_posy_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooPosY#{i}"] = {
 		default: -> 0
-		getFunc: "TattooPosY#{i}"
+		old: "tattoo_posy_#{i}"
 		fix: (arg = 0) -> math.Clamp(tonumber(arg) or 0, -100, 100)
 		min: -100
 		max: 100
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_rotate_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooRotate#{i}"] = {
 		default: -> 0
-		getFunc: "TattooRotate#{i}"
+		old: "tattoo_rotate_#{i}"
 		min: -180
 		max: 180
 		type: 'INT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_scalex_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooScaleX#{i}"] = {
 		default: -> 1
-		getFunc: "TattooScaleX#{i}"
+		old: "tattoo_scalex_#{i}"
 		min: 0
 		max: 10
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_glow_strength_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooGlowStrength#{i}"] = {
 		default: -> 1
-		getFunc: "TattooGlowStrength#{i}"
+		old: "tattoo_glow_strength_#{i}"
 		min: 0
 		max: 1
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_scaley_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooScaleY#{i}"] = {
 		default: -> 1
-		getFunc: "TattooScaleY#{i}"
+		old: "tattoo_scaley_#{i}"
 		min: 0
 		max: 10
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_glow_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooGlow#{i}"] = {
 		default: -> false
-		getFunc: "TattooGlow#{i}"
+		old: "tattoo_glow_#{i}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_over_detail_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooOverDetail#{i}"] = {
 		default: -> false
-		getFunc: "TattooOverDetail#{i}"
+		old: "tattoo_over_detail_#{i}"
 		type: 'BOOLEAN'
 	}
 
-	PPM2.PonyDataRegistry["tattoo_color_#{i}"] = {
+	PPM2.PonyDataRegistry["TattooColor#{i}"] = {
 		default: -> Color()
-		getFunc: "TattooColor#{i}"
+		old: "tattoo_color_#{i}"
 		type: 'COLOR'
 	}
 
 for _, ttype in ipairs {'Body', 'Horn', 'Wings', 'BatWingsSkin', 'Socks', 'Mane', 'Tail', 'UpperMane', 'LowerMane', 'LEye', 'REye', 'BEyes', 'Eyelashes', 'Mouth', 'Teeth', 'Tongue'}
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_exponent'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongExponent'] = {
 		default: -> 3
-		getFunc: ttype .. 'PhongExponent'
+		old: "#{ttype\lower()}_phong_exponent"
 		min: 0.04
 		max: 10
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_boost'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongBoost'] = {
 		default: -> 0.09
-		getFunc: ttype .. 'PhongBoost'
+		old: "#{ttype\lower()}_phong_boost"
 		min: 0.01
 		max: 1
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_front'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongFront'] = {
 		default: -> 1
-		getFunc: ttype .. 'PhongFront'
+		old: "#{ttype\lower()}_phong_front"
 		min: 0
 		max: 20
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_middle'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongMiddle'] = {
 		default: -> 5
-		getFunc: ttype .. 'PhongMiddle'
+		old: "#{ttype\lower()}_phong_middle"
 		min: 0
 		max: 20
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_sliding'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongSliding'] = {
 		default: -> 10
-		getFunc: ttype .. 'PhongSliding'
+		old: "#{ttype\lower()}_phong_sliding"
 		min: 0
 		max: 20
 		type: 'FLOAT'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_phong_tint'] = {
+	PPM2.PonyDataRegistry[ttype .. 'PhongTint'] = {
 		default: -> Color(255, 200, 200)
-		getFunc: ttype .. 'PhongTint'
+		old: "#{ttype\lower()}_phong_tint"
 		type: 'COLOR'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_lightwarp_texture'] = {
+	PPM2.PonyDataRegistry[ttype .. 'Lightwarp'] = {
 		default: -> 0
-		getFunc: ttype .. 'Lightwarp'
+		old: "#{ttype\lower()}_lightwarp_texture"
 		enum: [arg for _, arg in ipairs PPM2.AvaliableLightwarps]
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_lightwarp_texture_url'] = {
+	PPM2.PonyDataRegistry[ttype .. 'LightwarpURL'] = {
 		default: -> ''
-		getFunc: ttype .. 'LightwarpURL'
+		old: "#{ttype\lower()}_lightwarp_texture_url"
 		type: 'URL'
 	}
 
-	PPM2.PonyDataRegistry[ttype\lower() .. '_bumpmap_texture_url'] = {
+	PPM2.PonyDataRegistry[ttype .. 'BumpmapURL'] = {
 		default: -> ''
-		getFunc: ttype .. 'BumpmapURL'
+		old: "#{ttype\lower()}_bumpmap_texture_url"
 		type: 'URL'
 	}
 
 for _, {:flex, :active} in ipairs PPM2.PonyFlexController.FLEX_LIST
 	continue if not active
-	PPM2.PonyDataRegistry["flex_disable_#{flex\lower()}"] = {
+	PPM2.PonyDataRegistry["DisableFlex#{flex}"] = {
 		default: -> false
-		getFunc: "DisableFlex#{flex}"
+		old: "flex_disable_#{flex\lower()}"
 		type: 'BOOLEAN'
 	}
 
@@ -1338,7 +1339,8 @@ for key, value in pairs PPM2.PonyDataRegistry
 			value.write = wString
 			testMinimalBits += 8
 		when 'BOOLEAN'
-			value.fix = (arg = value.default()) -> tobool(arg)
+			if not value.fix
+				value.fix = (arg = value.default()) -> tobool(arg)
 			value.read = rBool
 			value.write = wBool
 			testMinimalBits += 1

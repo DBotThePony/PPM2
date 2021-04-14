@@ -63,40 +63,46 @@ class PonyDataInstance
 
 	@PONY_DATA = PPM2.PonyDataRegistry
 
-	@PONY_DATA_MAPPING = {getFunc\lower(), key for key, {:getFunc} in pairs @PONY_DATA}
+	@PONY_DATA_MAPPING = {old, key for key, {:old} in pairs @PONY_DATA}
 	@PONY_DATA_MAPPING[key] = key for key, value in pairs @PONY_DATA
 
 	for key, data in pairs @PONY_DATA
-		continue unless data.enum
-		data.enum = [arg\upper() for _, arg in ipairs data.enum]
-		data.enumMapping = {}
-		data.enumMappingBackward = {}
-		i = -1
-		for _, enumVal in ipairs data.enum
-			i += 1
-			data.enumMapping[i] = enumVal
-			data.enumMappingBackward[enumVal] = i
-	for key, {:getFunc, :fix, :enumMappingBackward, :enumMapping, :enum, :min, :max, :default} in pairs @PONY_DATA
-		@__base["Get#{getFunc}"] = => @dataTable[key]
-		@__base["GetMin#{getFunc}"] = => min if min
-		@__base["GetMax#{getFunc}"] = => max if max
-		@__base["Enum#{getFunc}"] = => enum if enum
-		@__base["Get#{getFunc}Types"] = => enum if enum
+		if data.enum
+			data.enum = [arg\upper() for _, arg in ipairs data.enum]
+			data.enumMapping = {}
+			data.enumMappingBackward = {}
 
-		@["GetMin#{getFunc}"] = => min if min
-		@["GetMax#{getFunc}"] = => max if max
-		@["GetDefault#{getFunc}"] = default
-		@["GetEnum#{getFunc}"] = => enum if enum
-		@["Enum#{getFunc}"] = => enum if enum
+			i = -1
+
+			for _, enumVal in ipairs data.enum
+				i += 1
+				data.enumMapping[i] = enumVal
+				data.enumMappingBackward[enumVal] = i
+
+	for key, {:fix, :enumMappingBackward, :enumMapping, :enum, :min, :max, :default} in pairs @PONY_DATA
+		@__base["Get#{key}"] = => @dataTable[key]
+		@__base["GetMin#{key}"] = => min if min
+		@__base["GetMax#{key}"] = => max if max
+		@__base["Enum#{key}"] = => enum if enum
+		@__base["Get#{key}Types"] = => enum if enum
+
+		@["GetMin#{key}"] = => min if min
+		@["GetMax#{key}"] = => max if max
+		@["GetDefault#{key}"] = default()
+		@["GetEnum#{key}"] = => enum if enum
+		@["Enum#{key}"] = => enum if enum
 
 		if enumMapping
-			@__base["Get#{getFunc}Enum"] = => enumMapping[@dataTable[key]] or enumMapping[0] or @dataTable[key]
-			@__base["GetEnum#{getFunc}"] = @__base["Get#{getFunc}Enum"]
-		@__base["Reset#{getFunc}"] = => @["Set#{getFunc}"](@, default())
-		@__base["Set#{getFunc}"] = (val = defValue, ...) =>
+			@__base["Get#{key}Enum"] = => enumMapping[@dataTable[key]] or enumMapping[0] or @dataTable[key]
+			@__base["GetEnum#{key}"] = @__base["Get#{key}Enum"]
+
+		@__base["Reset#{key}"] = => @["Set#{key}"](@, default())
+
+		@__base["Set#{key}"] = (val = defValue, ...) =>
 			if luatype(val) == 'string' and enumMappingBackward
 				newVal = enumMappingBackward[val\upper()]
 				val = newVal if newVal
+
 			newVal = fix(val)
 			oldVal = @dataTable[key]
 			@dataTable[key] = newVal
@@ -157,7 +163,7 @@ class PonyDataInstance
 	CreateController: (...) => @CreateNetworkObject(false, ...)
 	CreateCustomController: (...) => @CreateCustomNetworkObject(false, ...)
 
-	Reset: => @['Reset' .. getFunc](@) for k, {:getFunc} in pairs @@PONY_DATA
+	Reset: => @['Reset' .. k](@) for k in pairs @@PONY_DATA
 
 	@ERR_MISSING_PARAMETER = 4
 	@ERR_MISSING_CONTENT = 5
@@ -169,7 +175,7 @@ class PonyDataInstance
 	ValueChanges: (key, oldVal, newVal, saveNow = @exists and @saveOnChange) =>
 		if @nwObj and @updateNWObject
 			{:getFunc} = @@PONY_DATA[key]
-			@nwObj["Set#{getFunc}"](@nwObj, newVal, @networkNWObject)
+			@nwObj["Set#{key}"](@nwObj, newVal, @networkNWObject)
 
 		@Save() if saveNow
 
@@ -197,7 +203,7 @@ class PonyDataInstance
 	GetAbsolutePath: => @absolutePath
 	GetBackupPath: => "#{@@DATA_DIR_BACKUP}#{@filename}_bak_#{os.date('%S_%M_%H-%d_%m_%Y', os.time())}.dat"
 
-	GetAsNetworked: => {getFunc, @dataTable[k] for k, {:getFunc} in pairs @@PONY_DATA}
+	GetAsNetworked: => {k, @dataTable[k] for k in pairs @@PONY_DATA}
 
 	Serialize: =>
 		tab = {}
@@ -230,7 +236,7 @@ class PonyDataInstance
 			return @Deserialize(DLib.GON.Deserialize(buf))
 
 	FixNBTValue: (mapData, value) =>
-		if mapData.enum and type(value) == 'string'
+		if mapData.enum and isstring(value)
 			mapData.fix(mapData.enumMappingBackward[value\upper()])
 		elseif mapData.type == 'COLOR'
 			if IsColor(value)
@@ -238,7 +244,7 @@ class PonyDataInstance
 			else
 				mapData.fix(Color(value[1] + 128, value[2] + 128, value[3] + 128, value[4] + 128))
 		elseif mapData.type == 'BOOLEAN'
-			if type(value) == 'boolean'
+			if isbool(value)
 				mapData.fix(value)
 			else
 				mapData.fix(value == 1)
@@ -246,7 +252,7 @@ class PonyDataInstance
 			mapData.fix(value)
 
 	DeserializeValue: (mapData, value) =>
-		if mapData.enum and type(value) == 'string'
+		if mapData.enum and isstring(value)
 			return mapData.fix(mapData.enumMappingBackward[value\upper()])
 
 		return mapData.fix(value)
@@ -261,12 +267,11 @@ class PonyDataInstance
 		dataTable = {k, default() for k, {:default} in pairs @@PONY_DATA}
 
 		for key, value2 in pairs(data)
-			key = key\lower()
-			if map = @@PONY_DATA_MAPPING[key]
-				if mapData = @@PONY_DATA[map]
-					@dataTable[key] = @DeserializeValue(mapData, value2) if not fixNBT
-					@dataTable[key] = @FixNBTValue(mapData, value2) if fixNBT
-					dataTable[key] = nil
+			if remap = @@PONY_DATA_MAPPING[key]
+				if data = @@PONY_DATA[remap]
+					@dataTable[remap] = @DeserializeValue(data, value2) if not fixNBT
+					@dataTable[remap] = @FixNBTValue(data, value2) if fixNBT
+					dataTable[remap] = nil
 
 		@dataTable[k] = v for k, v in pairs(dataTable)
 
