@@ -157,6 +157,29 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 			net.SendToServer() if CLIENT
 			net.Broadcast() if SERVER
 
+		@__base["Set#{getName}Safe"] = (val = defFunc(), networkNow = networkByDefault) =>
+			if enum_runtime_map
+				if isstring(val)
+					i = val
+					val = enum_runtime_map[val]
+					val = 1 if val == nil
+
+				if isnumber(val)
+					val = 1 if enum_runtime_map[val] == nil
+
+			oldVal = @[strName]
+			@[strName] = val
+			state = PPM2.NetworkChangeState(strName, getName, val, @)
+			state.networkChange = false
+			@SetLocalChange(state)
+			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
+			net.Start(@@NW_Modify)
+			net.WriteUInt32(@GetNetworkID())
+			net.WriteUInt16(id)
+			writeFunc(val)
+			net.SendToServer() if CLIENT
+			net.Broadcast() if SERVER
+
 	@GetSet = (fname, fvalue) =>
 		@__base["Get#{fname}"] = => @[fvalue]
 		@__base["Set#{fname}"] = (fnewValue = @[fvalue]) =>

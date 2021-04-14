@@ -100,6 +100,21 @@ class PonyDataInstance
 			@dataTable[key] = newVal
 			@ValueChanges(key, oldVal, newVal, ...) if oldVal ~= newVal
 
+		@__base["Set#{key}Safe"] = (val = defValue, ...) =>
+			if enum_runtime_map
+				if isstring(val)
+					i = val
+					val = enum_runtime_map[val]
+					val = 1 if val == nil
+
+				if isnumber(val)
+					val = 1 if enum_runtime_map[val] == nil
+
+			newVal = fix(val)
+			oldVal = @dataTable[key]
+			@dataTable[key] = newVal
+			@ValueChanges(key, oldVal, newVal, ...) if oldVal ~= newVal
+
 	new: (filename, data, readIfExists = true) =>
 		@SetFilename(filename)
 
