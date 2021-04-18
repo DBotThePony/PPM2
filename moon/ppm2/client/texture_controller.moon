@@ -122,7 +122,6 @@ PPM2.TextureCompileWorker = ->
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
 			task[1](task[2], task[3], task[4], task[5]) if IsValid(task[2])
-			task[2].unfinished_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
@@ -655,7 +654,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
 		@delayCompilation = {}
-		@unfinished_tasks = 0
 		@processing_first = true
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache, 100)
@@ -671,10 +669,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, isEditor, lock, release} if coroutine_status(thread) ~= 'dead'
 		else
 			return if PPM2.TEXTURE_TASKS[index]
-			@unfinished_tasks += 1
 			PPM2.TEXTURE_TASKS[index] = {@[func], @, isEditor, lock, release}
-
-	IsBeingProcessed: => @unfinished_tasks > 0
 
 	DataChanges: (state) =>
 		return unless @isValid
