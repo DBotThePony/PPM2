@@ -201,12 +201,12 @@ PPM2.AvaliableLowerManes = {
 }
 
 PPM2.EyelashTypes = {
-	'Default'
-	'Double'
-	'Coy'
-	'Full'
-	'Mess'
-	'None'
+	'DEFAULT'
+	'DOUBLE'
+	'COY'
+	'FULL'
+	'MESS'
+	'NONE'
 }
 
 PPM2.BodyDetails = {

@@ -754,7 +754,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	_UpdateFlex: =>
 		ent = @GetEntity()
-		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == PPM2.EYELASHES_NONE and 1 or 0)
+		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == 'NONE' and 1 or 0)
 		@_UpdateMaleBuff()
 
 		ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
