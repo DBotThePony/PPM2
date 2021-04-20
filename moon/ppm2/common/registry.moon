@@ -113,55 +113,126 @@ PPM2.AvaliableTails = {
 }
 
 PPM2.AvailableClothesHead = {
-	'EMPTY', 'APPLEJACK_HAT', 'BRAEBURN_HAT', 'TRIXIE_HAT', 'HEADPHONES'
+	'EMPTY'
+	'APPLEJACK_HAT'
+	'BRAEBURN_HAT'
+	'TRIXIE_HAT'
+	'HEADPHONES'
 }
 
 PPM2.AvailableClothesNeck = {
-	'EMPTY', 'SCARF', 'TRIXIE_CAPE', 'TIE', 'BOWTIE'
+	'EMPTY'
+	'SCARF'
+	'TRIXIE_CAPE'
+	'TIE'
+	'BOWTIE'
 }
 
 PPM2.AvailableClothesBody = {
-	'EMPTY', 'VEST', 'SHIRT', 'HOODIE', 'WONDERBOLTS_BADGE'
+	'EMPTY'
+	'VEST'
+	'SHIRT'
+	'HOODIE'
+	'WONDERBOLTS_BADGE'
 }
 
 PPM2.AvailableClothesEye = {
-	'EMPTY', 'GOGGLES_ROUND_FEMALE', 'GOGGLES_ROUND_MALE', 'SHADES_FEMALE', 'SHADES_MALE'
-	'MONOCLE_FEMALE', 'MONOCLE_MALE', 'EYEPATH_FEMALE', 'EYEPATH_MALE'
+	'EMPTY'
+	'GOGGLES_ROUND_FEMALE'
+	'GOGGLES_ROUND_MALE'
+	'SHADES_FEMALE'
+	'SHADES_MALE'
+	'MONOCLE_FEMALE'
+	'MONOCLE_MALE'
+	'EYEPATH_FEMALE'
+	'EYEPATH_MALE'
 }
 
 PPM2.MAX_CLOTHES_COLORS = 6
 PPM2.MAX_CLOTHES_URLS = 4
 
 PPM2.AvailableHorns = {
-	'EMPTY', 'CUSTOM', 'CLASSIC_SHARP', 'CLASSIC', 'BROKEN', 'LONG'
-	'LONG_CURLED', 'POISON_JOKE', 'CHANGELING'
-	'CHANGELING_QUEEN', 'KIRIN'
+	'EMPTY'
+	'CUSTOM'
+	'CLASSIC_SHARP'
+	'CLASSIC'
+	'BROKEN'
+	'LONG'
+	'LONG_CURLED'
+	'POISON_JOKE'
+	'CHANGELING'
+	'CHANGELING_QUEEN'
+	'KIRIN'
 }
 
 PPM2.AvaliableUpperManes = {
-	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
-	'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
-	'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'NONE'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'SPEEDSTER'
+	'RADICAL'
+	'SPIKED'
+	'BOOKWORM'
+	'BUMPKIN'
+	'POOFEH'
+	'CURLY'
+	'INSTRUCTOR'
+	'NONE'
 }
 
 PPM2.AvaliableLowerManes = {
-	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-	'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
-	'BOOKWORM', 'BUMPKIN', 'CURLY', 'NONE'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'HIPPIE'
+	'SPEEDSTER'
+	'BOOKWORM'
+	'BUMPKIN'
+	'CURLY'
+	'NONE'
 }
 
 PPM2.EyelashTypes = {
-	'Default', 'Double', 'Coy', 'Full', 'Mess', 'None'
+	'DEFAULT'
+	'DOUBLE'
+	'COY'
+	'FULL'
+	'MESS'
+	'NONE'
 }
 
 PPM2.BodyDetails = {
-	'None', 'Leg gradient', 'Lines', 'Stripes', 'Head stripes'
-	'Freckles', 'Hooves big', 'Hooves small', 'Head layer'
-	'Hooves big rnd', 'Hooves small rnd', 'Spots 1', 'Robotic'
-	'DASH-E', 'Eye Scar', 'Eye Wound', 'Scars', 'MGS Socks'
-	'Sharp Hooves', 'Sharp Hooves 2', 'Muzzle', 'Eye Scar Left'
+	'None'
+	'Leg gradient'
+	'Lines'
+	'Stripes'
+	'Head stripes'
+	'Freckles'
+	'Hooves big'
+	'Hooves small'
+	'Head layer'
+	'Hooves big rnd'
+	'Hooves small rnd'
+	'Spots 1'
+	'Robotic'
+	'DASH-E'
+	'Eye Scar'
+	'Eye Wound'
+	'Scars'
+	'MGS Socks'
+	'Sharp Hooves'
+	'Sharp Hooves 2'
+	'Muzzle'
+	'Eye Scar Left'
 	'Eye Scar Right'
-
 	'Albedo Printed Plate Skin'
 	'Paintable Printed Plate Skin'
 	'Albedo Printed Plate Strip'
@@ -175,13 +246,29 @@ PPM2.BodyDetails = {
 }
 
 PPM2.BodyDetailsEnum = {
-	'NONE', 'GRADIENT', 'LINES', 'STRIPES', 'HSTRIPES'
-	'FRECKLES', 'HOOF_BIG', 'HOOF_SMALL', 'LAYER'
-	'HOOF_BIG_ROUND', 'HOOF_SMALL_ROUND', 'SPOTS', 'ROBOTIC'
-	'DASH_E', 'EYE_SCAR', 'EYE_WOUND', 'SCARS', 'MGS_SOCKS'
-	'SHARP_HOOVES', 'SHARP_HOOVES_2', 'MUZZLE', 'EYE_SCAR_LEFT'
+	'NONE'
+	'GRADIENT'
+	'LINES'
+	'STRIPES'
+	'HSTRIPES'
+	'FRECKLES'
+	'HOOF_BIG'
+	'HOOF_SMALL'
+	'LAYER'
+	'HOOF_BIG_ROUND'
+	'HOOF_SMALL_ROUND'
+	'SPOTS'
+	'ROBOTIC'
+	'DASH_E'
+	'EYE_SCAR'
+	'EYE_WOUND'
+	'SCARS'
+	'MGS_SOCKS'
+	'SHARP_HOOVES'
+	'SHARP_HOOVES_2'
+	'MUZZLE'
+	'EYE_SCAR_LEFT'
 	'EYE_SCAR_RIGHT'
-
 	'ALBEDO_ANDROID'
 	'PAINT_ANDROID'
 	'ALBEDO_ANDROID_STRIP'
@@ -252,69 +339,190 @@ PPM2.MAX_LIGHTWARP = #PPM2.AvaliableLightwarps - 1
 PPM2.AvaliableLightwarpsPaths = ['models/ppm2/lightwarps/' .. mat\lower() for _, mat in ipairs PPM2.AvaliableLightwarps]
 
 PPM2.DefaultCutiemarks = {
-	'8ball', 'dice', 'magichat',
-	'magichat02', 'record', 'microphone',
-	'bits', 'checkered', 'lumps',
-	'mirror', 'camera', 'magnifier',
-	'padlock', 'binaryfile', 'floppydisk',
-	'cube', 'bulb', 'battery',
-	'deskfan', 'flames', 'alarm',
-	'myon', 'beer', 'berryglass',
-	'roadsign', 'greentree', 'seasons',
-	'palette', 'palette02', 'palette03',
-	'lightningstone', 'partiallycloudy', 'thunderstorm',
-	'storm', 'stoppedwatch', 'twistedclock',
-	'surfboard', 'surfboard02', 'star',
-	'ussr', 'vault', 'anarchy',
-	'suit', 'deathscythe', 'shoop',
-	'smiley', 'dawsome', 'weegee'
-	'applej', 'applem', 'bon_bon', 'carrots', 'celestia', 'cloudy', 'custom01', 'custom02', 'derpy', 'firezap',
-	'fluttershy', 'fruits', 'island', 'lyra', 'mine', 'note', 'octavia', 'pankk', 'pinkie_pie', 'rainbow_dash',
-	'rarity', 'rosen', 'sflowers', 'storm', 'time', 'time2', 'trixie', 'twilight', 'waters', 'weer', 'zecora'
+	'8BALL'
+	'DICE'
+	'MAGICHAT'
+	'MAGICHAT02'
+	'RECORD'
+	'MICROPHONE'
+	'BITS'
+	'CHECKERED'
+	'LUMPS'
+	'MIRROR'
+	'CAMERA'
+	'MAGNIFIER'
+	'PADLOCK'
+	'BINARYFILE'
+	'FLOPPYDISK'
+	'CUBE'
+	'BULB'
+	'BATTERY'
+	'DESKFAN'
+	'FLAMES'
+	'ALARM'
+	'MYON'
+	'BEER'
+	'BERRYGLASS'
+	'ROADSIGN'
+	'GREENTREE'
+	'SEASONS'
+	'PALETTE'
+	'PALETTE02'
+	'PALETTE03'
+	'LIGHTNINGSTONE'
+	'PARTIALLYCLOUDY'
+	'THUNDERSTORM'
+	'STORM'
+	'STOPPEDWATCH'
+	'TWISTEDCLOCK'
+	'SURFBOARD'
+	'SURFBOARD02'
+	'STAR'
+	'USSR'
+	'VAULT'
+	'ANARCHY'
+	'SUIT'
+	'DEATHSCYTHE'
+	'SHOOP'
+	'SMILEY'
+	'DAWSOME'
+	'WEEGEE'
+	'APPLEJ'
+	'APPLEM'
+	'BON_BON'
+	'CARROTS'
+	'CELESTIA'
+	'CLOUDY'
+	'CUSTOM01'
+	'CUSTOM02'
+	'DERPY'
+	'FIREZAP'
+	'FLUTTERSHY'
+	'FRUITS'
+	'ISLAND'
+	'LYRA'
+	'MINE'
+	'NOTE'
+	'OCTAVIA'
+	'PANKK'
+	'PINKIE_PIE'
+	'RAINBOW_DASH'
+	'RARITY'
+	'ROSEN'
+	'SFLOWERS'
+	'STORM'
+	'TIME'
+	'TIME2'
+	'TRIXIE'
+	'TWILIGHT'
+	'WATERS'
+	'WEER'
+	'ZECORA'
 }
 
 PPM2.AvaliableUpperManesNew = {
-	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE'
-	'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED'
-	'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR'
-	'TIMID', 'FILLY', 'MECHANIC', 'MOON', 'CLOUD'
-	'DRUNK', 'EMO'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'SPEEDSTER'
+	'RADICAL'
+	'SPIKED'
+	'BOOKWORM'
+	'BUMPKIN'
+	'POOFEH'
+	'CURLY'
+	'INSTRUCTOR'
+	'TIMID'
+	'FILLY'
+	'MECHANIC'
+	'MOON'
+	'CLOUD'
+	'DRUNK'
+	'EMO'
+	'AZU'
+	'BRAIDS'
+	'CYBERPUNK'
+	'GLASS'
+	'SECRETARY'
+	'SIA'
 	'NONE'
 }
 
 PPM2.AvaliableLowerManesNew = {
-	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-	'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER'
-	'BOOKWORM', 'BUMPKIN', 'CURLY'
-	'TIMID', 'MOON', 'BUN', 'CLOUD', 'EMO'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'HIPPIE'
+	'SPEEDSTER'
+	'BOOKWORM'
+	'BUMPKIN'
+	'CURLY'
+	'TIMID'
+	'MOON'
+	'BUN'
+	'CLOUD'
+	'EMO'
+	'AZU'
+	'BRAIDS'
+	'CYBERPUNK'
+	'GLASS'
+	'SIA'
 	'NONE'
 }
 
 PPM2.AvaliableTailsNew = {
-	'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT'
-	'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'EDGY'
-	'RADICAL', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY'
+	'MAILCALL'
+	'FLOOFEH'
+	'ADVENTUROUS'
+	'SHOWBOAT'
+	'ASSERTIVE'
+	'BOLD'
+	'STUMPY'
+	'SPEEDSTER'
+	'EDGY'
+	'RADICAL'
+	'BOOKWORM'
+	'BUMPKIN'
+	'POOFEH'
+	'CURLY'
 	'NONE'
 }
 
 PPM2.AvaliableEyeTypes = {
-	'DEFAULT', 'APERTURE'
+	'DEFAULT'
+	'APERTURE'
 }
 
 PPM2.AvaliableEyeReflections = {
-	'DEFAULT', 'CRYSTAL_FOAL', 'CRYSTAL'
-	'FOAL', 'MALE'
+	'DEFAULT'
+	'CRYSTAL_FOAL'
+	'CRYSTAL'
+	'FOAL'
+	'MALE'
 }
 
 PPM2.AvaliablePonyWings = {'DEFAULT', 'BATPONY'}
 
-PPM2.AvaliablePonySuits = {'NONE', 'ROYAL_GUARD', 'SHADOWBOLTS_FULL', 'SHADOWBOLTS_LIGHT', 'WONDERBOLTS_FULL', 'WONDERBOLTS_LIGHT', 'SPIDERMANE_LIGHT', 'SPIDERMANE_FULL'}
+PPM2.AvaliablePonySuits = {
+	'NONE'
+	'ROYAL_GUARD'
+	'SHADOWBOLTS_FULL'
+	'SHADOWBOLTS_LIGHT'
+	'WONDERBOLTS_FULL'
+	'WONDERBOLTS_LIGHT'
+	'SPIDERMANE_LIGHT'
+	'SPIDERMANE_FULL'
+}
 
-do
-	i = -1
-	for _, mark in ipairs PPM2.DefaultCutiemarks
-		i += 1
-		PPM2["CMARK_#{mark\upper()}"] = i
+PPM2["CMARK_#{mark}"] = i - 1 for i, mark in ipairs PPM2.DefaultCutiemarks
 
 PPM2.MIN_EYELASHES = 0
 PPM2.MAX_EYELASHES = #PPM2.EyelashTypes - 1
@@ -356,23 +564,16 @@ PPM2.MAX_WINGS = #PPM2.AvaliablePonyWings - 1
 PPM2.MIN_SOCKS = 0
 PPM2.MAX_SOCKS = #PPM2.SocksTypes - 1
 
-PPM2.GENDER_FEMALE = 0
-PPM2.GENDER_MALE = 1
+PPM2.GENDER_FEMALE = false
+PPM2.GENDER_MALE = true
 
 PPM2.MAX_BODY_DETAILS = 8
 
-PPM2.RACE_EARTH = 0
-PPM2.RACE_PEGASUS = 1
-PPM2.RACE_UNICORN = 2
-PPM2.RACE_ALICORN = 3
 PPM2.RACE_ENUMS = {'EARTH', 'PEGASUS', 'UNICORN', 'ALICORN'}
 
 PPM2.RACE_HAS_HORN = 0x1
 PPM2.RACE_HAS_WINGS = 0x2
 
-PPM2.AGE_FILLY = 0
-PPM2.AGE_ADULT = 1
-PPM2.AGE_MATURE = 2
 PPM2.AGE_ENUMS = {'FILLY', 'ADULT', 'MATURE'}
 
 PPM2.MIN_DERP_STRENGTH = 0.1

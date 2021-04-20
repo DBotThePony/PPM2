@@ -157,11 +157,13 @@ class FlexState extends PPM2.ModifierBase
 			@current = math.Clamp(@current, @min, @max) * @scale
 
 		ent\SetFlexWeight(@flexID, @current)
+
 	DataChanges: (state) =>
 		return if state\GetKey() ~= @activeID
 		@SetIsActive(not state\GetValue())
 		@GetController()\RebuildIterableList()
 		@Reset()
+
 	Reset: (resetVars = true) =>
 		for name, id in pairs @modifiersNames
 			@ResetModifiers(name)

@@ -182,7 +182,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 				return ent
 
-		model, modelID, bodygroupID = mTranslateModelName(@GrabData(mCallType)) if mCallType
+		model, modelID, bodygroupID = mTranslateModelName(@GrabDataRef(mCallType)) if mCallType
 		model = mTranslateModelName() if not mCallType
 		with @[mIndex] = ClientsideModel(model)
 			.isPonyPropModel = true
@@ -207,7 +207,7 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@[mIndex] = @[fcallNone](@, force) if not IsValid(@[mIndex])
 		return NULL if not IsValid(@[mIndex])
 
-		model, modelID, bodygroupID = mTranslateModelName(@GrabData(mCallType)) if mCallType
+		model, modelID, bodygroupID = mTranslateModelName(@GrabDataRef(mCallType)) if mCallType
 		model, modelID, bodygroupID = mTranslateModelName() if not mCallType
 		with @[mIndex]
 			\SetModel(model) if model ~= \GetModel()
@@ -252,10 +252,10 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		@clothesModel\SetParent(@GetEntity()) if IsValid(@GetEntity())
 
 		with @clothesModel
-			\SetBodygroup(1, @GrabData('HeadClothes'))
-			\SetBodygroup(2, @GrabData('NeckClothes'))
-			\SetBodygroup(3, @GrabData('BodyClothes'))
-			\SetBodygroup(8, @GrabData('EyeClothes'))
+			\SetBodygroup(1, @GrabDataRef('HeadClothes'))
+			\SetBodygroup(2, @GrabDataRef('NeckClothes'))
+			\SetBodygroup(3, @GrabDataRef('BodyClothes'))
+			\SetBodygroup(8, @GrabDataRef('EyeClothes'))
 
 	MergeModels: (targetEnt = NULL) =>
 		return if SERVER or not @isValid or not IsValid(targetEnt)
@@ -282,18 +282,19 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	ApplyRace: =>
 		return unless @isValid
 		return NULL if not IsValid(@GetEntity())
+
 		with @GetEntity()
 			switch @GrabData('Race')
-				when PPM2.RACE_EARTH
+				when 'EARTH'
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
 					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
-				when PPM2.RACE_PEGASUS
+				when 'PEGASUS'
 					\SetBodygroup(@@BODYGROUP_HORN, 1)
 					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
-				when PPM2.RACE_UNICORN
+				when 'UNICORN'
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 					\SetBodygroup(@@BODYGROUP_WINGS, 1) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
-				when PPM2.RACE_ALICORN
+				when 'ALICORN'
 					\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 					\SetBodygroup(@@BODYGROUP_WINGS, 0) if \GetClass() ~= 'prop_ragdoll' or \GetNWBool('PPM2.IsDeathRagdoll')
 
@@ -427,11 +428,11 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 		return if not IsValid(ent)
 		return if not ent\IsPony()
 		with ent
-			\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GrabData('ManeType'))
-			\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GrabData('ManeTypeLower'))
-			\SetBodygroup(@@BODYGROUP_TAIL, @GrabData('TailType'))
-			\SetBodygroup(@@BODYGROUP_EYELASH, @GrabData('EyelashType'))
-			\SetBodygroup(@@BODYGROUP_GENDER, @GrabData('Gender'))
+			\SetBodygroup(@@BODYGROUP_MANE_UPPER, @GrabDataRef('ManeType'))
+			\SetBodygroup(@@BODYGROUP_MANE_LOWER, @GrabDataRef('ManeTypeLower'))
+			\SetBodygroup(@@BODYGROUP_TAIL, @GrabDataRef('TailType'))
+			\SetBodygroup(@@BODYGROUP_EYELASH, @GrabDataRef('EyelashType'))
+			\SetBodygroup(@@BODYGROUP_GENDER, @GrabData('Gender') and 1 or 0)
 
 		@ApplyRace()
 		if createModels
@@ -461,17 +462,17 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			when 'HeadClothes', 'NeckClothes', 'BodyClothes', 'EyeClothes'
 				@UpdateClothesModel()
 			when 'ManeType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_UPPER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_UPPER, state\GetValueRef())
 			when 'ManeTypeLower'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_LOWER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_MANE_LOWER, state\GetValueRef())
 			when 'TailType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_TAIL, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_TAIL, state\GetValueRef())
 			when 'TailSize', 'PonySize'
 				@UpdateTailSize()
 			when 'EyelashType'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_EYELASH, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_EYELASH, state\GetValueRef())
 			when 'Gender'
-				@GetEntity()\SetBodygroup(@@BODYGROUP_GENDER, state\GetValue())
+				@GetEntity()\SetBodygroup(@@BODYGROUP_GENDER, state\GetValue() and 1 or 0)
 			when 'SocksAsModel'
 				if state\GetValue()
 					@UpdateSocksModel()
@@ -492,6 +493,8 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 			when 'Race'
 				@ApplyRace()
 
+		return
+
 class CPPMBodygroupController extends DefaultBodygroupController
 	@MODELS = {'models/cppm/player_default_base.mdl', 'models/cppm/player_default_base_nj.mdl'}
 
@@ -503,16 +506,16 @@ class CPPMBodygroupController extends DefaultBodygroupController
 		return if not IsValid(ent)
 
 		switch @GrabData('Race')
-			when PPM2.RACE_EARTH
+			when 'EARTH'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, 1) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_PEGASUS
+			when 'PEGASUS'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, 0) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_UNICORN
+			when 'UNICORN'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 0)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, 1) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_ALICORN
+			when 'ALICORN'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 2)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, 3) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
 
@@ -751,7 +754,7 @@ class NewBodygroupController extends DefaultBodygroupController
 
 	_UpdateFlex: =>
 		ent = @GetEntity()
-		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == PPM2.EYELASHES_NONE and 1 or 0)
+		ent\SetFlexWeight(@@FLEX_ID_EYELASHES,     @GrabData('EyelashType') == 'NONE' and 1 or 0)
 		@_UpdateMaleBuff()
 
 		ent\SetFlexWeight(@@FLEX_ID_BAT_PONY_EARS, @GrabData('BatPonyEars') and @GrabData('BatPonyEarsStrength') or 0)
@@ -802,7 +805,7 @@ class NewBodygroupController extends DefaultBodygroupController
 	@NOCLIP_ANIMATIONS = {9, 10, 11}
 
 	SelectWingsType: =>
-		wtype = @GrabData('WingsType')
+		wtype = @GrabDataRef('WingsType')
 
 		if (@GetEntity()\GetNW2Bool('ppm2_fly') or @GetEntity().GetMoveType and @GetEntity()\GetMoveType() == MOVETYPE_NOCLIP) and (not @GetEntity().InVehicle or not @GetEntity()\InVehicle())
 			wtype += PPM2.MAX_WINGS + 1
@@ -815,17 +818,17 @@ class NewBodygroupController extends DefaultBodygroupController
 		return if not IsValid(ent)
 
 		switch @GrabData('Race')
-			when PPM2.RACE_EARTH
+			when 'EARTH'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_PEGASUS
+			when 'PEGASUS'
 				ent\SetBodygroup(@@BODYGROUP_HORN, 1)
 				-- strictly prop_ragdoll and not death body
 				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_UNICORN
+			when 'UNICORN'
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				ent\SetBodygroup(@@BODYGROUP_WINGS, PPM2.MAX_WINGS * 2 + 2) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')
-			when PPM2.RACE_ALICORN
+			when 'ALICORN'
 				ent\SetBodygroup(@@BODYGROUP_HORN, @GrabData('UseNewHorn') and 1 or 0)
 				-- strictly prop_ragdoll and not death body
 				ent\SetBodygroup(@@BODYGROUP_WINGS, @SelectWingsType()) if ent\GetClass() ~= 'prop_ragdoll' or ent\GetNWBool('PPM2.IsDeathRagdoll')

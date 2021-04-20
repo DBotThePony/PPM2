@@ -1047,7 +1047,7 @@ PANEL_SETTINGS_BASE = {
 				\SetSize(170, 0)
 				\DockMargin(0, 0, 5, 0)
 				\SetSortItems(false)
-				\SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+				\SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 				if choices
 					\AddChoice(choice) for _, choice in ipairs choices
 				else
@@ -1059,7 +1059,7 @@ PANEL_SETTINGS_BASE = {
 					data["Set#{option}"](data, index, @GetShouldSaveData())
 					@ValueChanges(option, index, pnl)
 				table.insert @updateFuncs, ->
-					\SetValue(@GetTargetData()["Get#{option}Enum"](@GetTargetData())) if @GetTargetData()
+					\SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			@CreateResetButton(name, option, label)
 		return box, label
 	URLInput: (option = '', parent = @scroll or @) =>

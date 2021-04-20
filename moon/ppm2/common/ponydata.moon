@@ -22,21 +22,20 @@
 net = DLib.net
 
 class PPM2.NetworkChangeState
-	new: (key = '', keyValid = '', newValue, obj, len = 24, ply = NULL) =>
+	new: (key = '', keyValid = '', newValue, obj, refValue) =>
 		@key = key
 		@keyValid = keyValid
 		@oldValue = obj[key]
 		@newValue = newValue
-		@ply = ply
-		@time = CurTimeL()
-		@rtime = RealTimeL()
-		@stime = SysTime()
+		@refValue = refValue
 		@obj = obj
 		@objID = obj.netID
-		@len = len
-		@rlen = len - 24 -- ID - 16 bits, variable id - 8 bits
 		@cantApply = false
 		@networkChange = true
+
+	GetValueRef: =>
+		return @newValue if @refValue == nil
+		return @refValue
 
 	GetPlayer: => @ply
 	ChangedByClient: => not @networkChange or IsValid(@ply)
@@ -55,14 +54,6 @@ class PPM2.NetworkChangeState
 	NewValue: => @newValue
 	GetOldValue: => @oldValue
 	OldValue: => @oldValue
-	CurTime: => @time
-	GetCurTime: => @time
-	GetReceiveTime: => @time
-	GetReceiveStamp: => @time
-	RealTimeL: => @rtime
-	GetRealTimeL: => @rtime
-	SysTime: => @stime
-	GetSysTime: => @stime
 	GetObject: => @obj
 	GetNWObject: => @obj
 	GetNetworkedObject: => @obj
@@ -116,36 +107,86 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	@GetVarInfo: (strName) => @NW_VarsTable[strName] or false
 
-	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, onSet = ((val) => val), networkByDefault = true) =>
+	@AddNetworkVar = (getName = 'Var', readFunc = (->), writeFunc = (->), defValue, enum_runtime_map) =>
 		defFunc = defValue
 		defFunc = (-> defValue) if type(defValue) ~= 'function'
 		strName = "_NW_#{getName}"
 		@NW_NextVarID += 1
 		id = @NW_NextVarID
-		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id, :onSet}
+		tab = {:strName, :readFunc, :getName, :writeFunc, :defValue, :defFunc, :id}
 		table.insert(@NW_Vars, tab)
 		@NW_VarsTable[id] = tab
 		@NW_VarsTable[strName] = tab
 		@__base[strName] = defFunc()
 
 		@__base["Get#{getName}"] = => @[strName]
+		@__base["Get#{getName}Ref"] = => @[strName]
+
+		if enum_runtime_map
+			@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
 
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
+			local refvalue, setvalue
+
+			if enum_runtime_map
+				if isstring(val)
+					setvalue = val
+					i = val
+					val = enum_runtime_map[val]
+					refvalue = val
+					error('No such enum value ' .. i) if val == nil
+
+				if isnumber(val)
+					refvalue = val
+					setvalue = enum_runtime_map[val]
+					error('No such enum index ' .. val) if enum_runtime_map[val] == nil
+			else
+				setvalue = val
+
 			oldVal = @[strName]
-			nevVal = onSet(@, val)
-			@[strName] = nevVal
-			state = PPM2.NetworkChangeState(strName, getName, nevVal, @)
+			@[strName] = val
+			state = PPM2.NetworkChangeState(strName, getName, setvalue, @, refvalue)
 			state.networkChange = false
 			@SetLocalChange(state)
 			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
 			net.Start(@@NW_Modify)
 			net.WriteUInt32(@GetNetworkID())
 			net.WriteUInt16(id)
-			writeFunc(nevVal)
+			writeFunc(val)
 			net.SendToServer() if CLIENT
 			net.Broadcast() if SERVER
 
-	@NetworkVar = (...) => @AddNetworkVar(...)
+		@__base["Set#{getName}Safe"] = (val = defFunc(), networkNow = networkByDefault) =>
+			local refvalue, setvalue
+
+			if enum_runtime_map
+				if isstring(val)
+					setvalue = val
+					i = val
+					val = enum_runtime_map[val]
+					val = 1 if val == nil
+					refvalue = val
+
+				if isnumber(val)
+					val = 1 if enum_runtime_map[val] == nil
+					setvalue = enum_runtime_map[val]
+					refvalue = val
+			else
+				setvalue = val
+
+			oldVal = @[strName]
+			@[strName] = val
+			state = PPM2.NetworkChangeState(strName, getName, setvalue, @, refvalue)
+			state.networkChange = false
+			@SetLocalChange(state)
+			return unless networkNow and @NETWORKED and (CLIENT and @ent == LocalPlayer() or SERVER)
+			net.Start(@@NW_Modify)
+			net.WriteUInt32(@GetNetworkID())
+			net.WriteUInt16(id)
+			writeFunc(val)
+			net.SendToServer() if CLIENT
+			net.Broadcast() if SERVER
+
 	@GetSet = (fname, fvalue) =>
 		@__base["Get#{fname}"] = => @[fvalue]
 		@__base["Set#{fname}"] = (fnewValue = @[fvalue]) =>
@@ -226,11 +267,11 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		varData = @NW_VarsTable[varID]
 		return unless varData
 
-		{:strName, :getName, :readFunc, :writeFunc, :onSet} = varData
-		newVal = onSet(obj, readFunc())
+		{:strName, :getName, :readFunc, :writeFunc} = varData
+		newVal = readFunc()
 		return if newVal == obj["Get#{getName}"](obj)
 
-		state = PPM2.NetworkChangeState(strName, getName, newVal, obj, len, ply)
+		state = PPM2.NetworkChangeState(strName, getName, newVal, obj)
 		state\Apply()
 		obj\NetworkDataChanges(state)
 
@@ -329,22 +370,22 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
 
-	@NetworkVar('DisableTask',          rBool,   wBool,                 false)
-	@NetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
-	@NetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
+	@AddNetworkVar('DisableTask',          rBool,   wBool,                 false)
+	@AddNetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
+	@AddNetworkVar('FlexLerpMultiplier',   rFloat(0, 10),  wFloat,             1)
 
 	@SetupModifiers: =>
-		for key, value in pairs PPM2.PonyDataRegistry
+		for key, value in SortedPairs PPM2.PonyDataRegistry
 			if value.modifiers
-				@RegisterModifier(value.getFunc, 0, 0)
-				@SetModifierMinMaxFinal(value.getFunc, value.min, value.max) if value.min or value.max
-				@SetupLerpTables(value.getFunc)
-				strName = '_NW_' .. value.getFunc
-				funcLerp = 'Calculate' .. value.getFunc
-				@__base['Get' .. value.getFunc] = => @[funcLerp](@, @[strName])
+				@RegisterModifier(key, 0, 0)
+				@SetModifierMinMaxFinal(key, value.min, value.max) if value.min or value.max
+				@SetupLerpTables(key)
+				strName = '_NW_' .. key
+				funcLerp = 'Calculate' .. key
+				@__base['Get' .. key] = => @[funcLerp](@, @[strName])
 
-	for key, value in pairs PPM2.PonyDataRegistry
-		@NetworkVar(value.getFunc, value.read, value.write, value.default)
+	for key, value in SortedPairs PPM2.PonyDataRegistry
+		@AddNetworkVar(key, value.read, value.write, value.default, value.enum_runtime_map)
 
 	new: (netID, ent) =>
 		super()
@@ -552,13 +593,13 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 	GetPonyRaceFlags: =>
 		switch @GetRace()
-			when PPM2.RACE_EARTH
+			when 'EARTH'
 				return 0
-			when PPM2.RACE_PEGASUS
+			when 'PEGASUS'
 				return PPM2.RACE_HAS_WINGS
-			when PPM2.RACE_UNICORN
+			when 'UNICORN'
 				return PPM2.RACE_HAS_HORN
-			when PPM2.RACE_ALICORN
+			when 'ALICORN'
 				return PPM2.RACE_HAS_HORN + PPM2.RACE_HAS_WINGS
 
 	SlowUpdate: =>
@@ -707,7 +748,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	ReadNetworkData: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
-		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @) for key, {keyValid, newVal} in pairs data]
 
 		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())
@@ -717,7 +758,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	ReadNetworkDataNotify: (len = 24, ply = NULL, silent = false, applyEntities = true) =>
 		data = @@ReadNetworkData()
 		validPly = IsValid(ply)
-		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @, len, ply) for key, {keyValid, newVal} in pairs data]
+		states = [PPM2.NetworkChangeState(key, keyValid, newVal, @) for key, {keyValid, newVal} in pairs data]
 
 		for _, state in ipairs states
 			if not validPly or applyEntities or not isentity(state\GetValue())

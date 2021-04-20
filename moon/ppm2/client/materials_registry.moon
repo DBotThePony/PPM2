@@ -33,157 +33,162 @@ Material = (path) ->
 
 module = {
 	BODY_DETAILS: {
-		Material('models/ppm2/partrender/body_leggrad1.png')
-		Material('models/ppm2/partrender/body_lines1.png')
-		Material('models/ppm2/partrender/body_stripes1.png')
-		Material('models/ppm2/partrender/body_headstripes1.png')
-		Material('models/ppm2/partrender/body_freckles.png')
-		Material('models/ppm2/partrender/body_hooves1.png')
-		Material('models/ppm2/partrender/body_hooves2.png')
-		Material('models/ppm2/partrender/body_headmask1.png')
-		Material('models/ppm2/partrender/body_hooves1_crit.png')
-		Material('models/ppm2/partrender/body_hooves2_crit.png')
-		Material('models/ppm2/partrender/body_spots1.png')
-		Material('models/ppm2/partrender/body_robotic.png')
-		Material('models/ppm2/partrender/dash-e.png')
-		Material('models/ppm2/partrender/eye_scar.png')
-		Material('models/ppm2/partrender/eye_wound.png')
-		Material('models/ppm2/partrender/body_scar.png')
-		Material('models/ppm2/partrender/gear_socks.png')
-		Material('models/ppm2/partrender/sharp_hooves.png')
-		Material('models/ppm2/partrender/sharp_hooves2.png')
-		Material('models/ppm2/partrender/separated_muzzle.png')
-		Material('models/ppm2/partrender/eye_scar_left.png')
-		Material('models/ppm2/partrender/eye_scar_right.png')
-		Material('models/ppm2/partrender/android_albedo.png')
-		Material('models/ppm2/partrender/android_paint.png')
-		Material('models/ppm2/partrender/android_albedo_strip.png')
-		Material('models/ppm2/partrender/android_paint_strip.png')
-		Material('models/ppm2/partrender/cow_paint.png')
-		Material('models/ppm2/partrender/deer_paint.png')
-		Material('models/ppm2/partrender/deer_extended_paint.png')
-		Material('models/ppm2/partrender/demonic_paint.png')
-		Material('models/ppm2/partrender/ear_inner_paint.png')
-		Material('models/ppm2/partrender/zebra_detail_paint.png')
+		'GRADIENT':             Material('models/ppm2/partrender/body_leggrad1.png')
+		'LINES':                Material('models/ppm2/partrender/body_lines1.png')
+		'STRIPES':              Material('models/ppm2/partrender/body_stripes1.png')
+		'HSTRIPES':             Material('models/ppm2/partrender/body_headstripes1.png')
+		'FRECKLES':             Material('models/ppm2/partrender/body_freckles.png')
+		'HOOF_BIG':             Material('models/ppm2/partrender/body_hooves1.png')
+		'HOOF_SMALL':           Material('models/ppm2/partrender/body_hooves2.png')
+		'LAYER':                Material('models/ppm2/partrender/body_headmask1.png')
+		'HOOF_BIG_ROUND':       Material('models/ppm2/partrender/body_hooves1_crit.png')
+		'HOOF_SMALL_ROUND':     Material('models/ppm2/partrender/body_hooves2_crit.png')
+		'SPOTS':                Material('models/ppm2/partrender/body_spots1.png')
+		'ROBOTIC':              Material('models/ppm2/partrender/body_robotic.png')
+		'DASH_E':               Material('models/ppm2/partrender/dash-e.png')
+		'EYE_SCAR':             Material('models/ppm2/partrender/eye_scar.png')
+		'EYE_WOUND':            Material('models/ppm2/partrender/eye_wound.png')
+		'SCARS':                Material('models/ppm2/partrender/body_scar.png')
+		'MGS_SOCKS':            Material('models/ppm2/partrender/gear_socks.png')
+		'SHARP_HOOVES':         Material('models/ppm2/partrender/sharp_hooves.png')
+		'SHARP_HOOVES_2':       Material('models/ppm2/partrender/sharp_hooves2.png')
+		'MUZZLE':               Material('models/ppm2/partrender/separated_muzzle.png')
+		'EYE_SCAR_LEFT':        Material('models/ppm2/partrender/eye_scar_left.png')
+		'EYE_SCAR_RIGHT':       Material('models/ppm2/partrender/eye_scar_right.png')
+		'ALBEDO_ANDROID':       Material('models/ppm2/partrender/android_albedo.png')
+		'PAINT_ANDROID':        Material('models/ppm2/partrender/android_paint.png')
+		'ALBEDO_ANDROID_STRIP': Material('models/ppm2/partrender/android_albedo_strip.png')
+		'PAINT_ANDROID_STRIP':  Material('models/ppm2/partrender/android_paint_strip.png')
+		'COW':                  Material('models/ppm2/partrender/cow_paint.png')
+		'DEER':                 Material('models/ppm2/partrender/deer_paint.png')
+		'DEER_EXTENDED':        Material('models/ppm2/partrender/deer_extended_paint.png')
+		'DEMONIC':              Material('models/ppm2/partrender/demonic_paint.png')
+		'EAR_INNER':            Material('models/ppm2/partrender/ear_inner_paint.png')
+		'ZEBRA_DETAILS':        Material('models/ppm2/partrender/zebra_detail_paint.png')
 	}
 
 	UPPER_MANE_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/upmane_5_mask0.png')}
-		[5]: {Material('models/ppm2/partrender/upmane_6_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
-		[8]: {Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
-		[9]: {Material('models/ppm2/partrender/upmane_10_mask0.png')}
-		[10]: {Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
-		[11]: {Material('models/ppm2/partrender/upmane_12_mask0.png')}
-		[12]: {Material('models/ppm2/partrender/upmane_13_mask0.png')}
-		[13]: {Material('models/ppm2/partrender/upmane_14_mask0.png')}
-		[14]: {Material('models/ppm2/partrender/upmane_15_mask0.png')}
+		['ASSERTIVE']: {Material('models/ppm2/partrender/upmane_5_mask0.png')}
+		['BOLD']: {Material('models/ppm2/partrender/upmane_6_mask0.png')}
+		['SPEEDSTER']: {Material('models/ppm2/partrender/upmane_8_mask0.png'), Material('models/ppm2/partrender/upmane_8_mask1.png')}
+		['RADICAL']: {Material('models/ppm2/partrender/upmane_9_mask0.png'), Material('models/ppm2/partrender/upmane_9_mask1.png'), Material('models/ppm2/partrender/upmane_9_mask2.png')}
+		['SPIKED']: {Material('models/ppm2/partrender/upmane_10_mask0.png')}
+		['BOOKWORM']: {Material('models/ppm2/partrender/upmane_11_mask0.png'), Material('models/ppm2/partrender/upmane_11_mask1.png'), Material('models/ppm2/partrender/upmane_11_mask2.png')}
+		['BUMPKIN']: {Material('models/ppm2/partrender/upmane_12_mask0.png')}
+		['POOFEH']: {Material('models/ppm2/partrender/upmane_13_mask0.png')}
+		['CURLY']: {Material('models/ppm2/partrender/upmane_14_mask0.png')}
+		['INSTRUCTOR']: {Material('models/ppm2/partrender/upmane_15_mask0.png')}
+		['SECRETARY']: {Material('models/ppm2/partrender/mane_secretary_mask_01.png')}
+		['BRAIDS']: {Material('models/ppm2/partrender/mane_braids_mask_01.png')}
+		['GLASS']: {Material('models/ppm2/partrender/mane_glass_mask_01.png')}
 	}
 
 	LOWER_MANE_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/dnmane_5_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
-		[8]: {Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
-		[9]: {Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
-		[10]: {Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
-		[11]: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
+		['ASSERTIVE']: {Material('models/ppm2/partrender/dnmane_5_mask0.png')}
+		['HIPPIE']: {Material('models/ppm2/partrender/dnmane_8_mask0.png'), Material('models/ppm2/partrender/dnmane_8_mask1.png')}
+		['SPEEDSTER']: {Material('models/ppm2/partrender/dnmane_9_mask0.png'), Material('models/ppm2/partrender/dnmane_9_mask1.png')}
+		['BOOKWORM']: {Material('models/ppm2/partrender/dnmane_10_mask0.png'), Material('models/ppm2/partrender/dnmane_10_mask1.png'), Material('models/ppm2/partrender/dnmane_10_mask2.png')}
+		['BUMPKIN']: {Material('models/ppm2/partrender/dnmane_11_mask0.png'), Material('models/ppm2/partrender/dnmane_11_mask1.png')}
+		['CURLY']: {Material('models/ppm2/partrender/dnmane_12_mask0.png')}
+		['BRAIDS']: {Material('models/ppm2/partrender/mane_braids_mask_01.png')}
+		['GLASS']: {Material('models/ppm2/partrender/mane_glass_mask_01.png')}
 	}
 
 	TAIL_DETAILS: {
-		[4]: {Material('models/ppm2/partrender/tail_5_mask0.png')}
-		[7]: {Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
-		[9]: {Material('models/ppm2/partrender/tail_10_mask0.png')}
-		[10]: {Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
-		[11]: {Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
-		[12]: {Material('models/ppm2/partrender/tail_13_mask0.png')}
-		[13]: {Material('models/ppm2/partrender/tail_14_mask0.png')}
+		['ASSERTIVE']: {Material('models/ppm2/partrender/tail_5_mask0.png')}
+		['SPEEDSTER']: {Material('models/ppm2/partrender/tail_8_mask0.png'), Material('models/ppm2/partrender/tail_8_mask1.png'), Material('models/ppm2/partrender/tail_8_mask2.png'), Material('models/ppm2/partrender/tail_8_mask3.png'), Material('models/ppm2/partrender/tail_8_mask4.png')}
+		['RADICAL']: {Material('models/ppm2/partrender/tail_10_mask0.png')}
+		['BOOKWORM']: {Material('models/ppm2/partrender/tail_11_mask0.png'), Material('models/ppm2/partrender/tail_11_mask1.png'), Material('models/ppm2/partrender/tail_11_mask2.png')}
+		['BUMPKIN']: {Material('models/ppm2/partrender/tail_12_mask0.png'), Material('models/ppm2/partrender/tail_12_mask1.png')}
+		['POOFEH']: {Material('models/ppm2/partrender/tail_13_mask0.png')}
+		['CURLY']: {Material('models/ppm2/partrender/tail_14_mask0.png')}
 	}
 
-	SOCKS_PATCHS: {
-		'models/props_pony/ppm/ppm_socks/socks_striped_unlit'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric1_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric2_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric3_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric4_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric5_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric6_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric7_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom/geometric8_1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/dark1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers10.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers11.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers12.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers13.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers14.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers15.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers16.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers17.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers18.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers19.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers2.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers20.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers3.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers4.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers5.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers6.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers7.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers8.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/flowers9.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/grey1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/grey2.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/grey3.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/hearts1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/hearts2.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/snow1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper1.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper2.png'
-		'models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper3.png'
+	SOCKS_MATERIALS: {
+		'DEFAULT':    Material('models/props_pony/ppm/ppm_socks/socks_striped_unlit')
+		'GEOMETRIC1': Material('models/props_pony/ppm2/ppm_socks/custom/geometric1_1.png')
+		'GEOMETRIC2': Material('models/props_pony/ppm2/ppm_socks/custom/geometric2_1.png')
+		'GEOMETRIC3': Material('models/props_pony/ppm2/ppm_socks/custom/geometric3_1.png')
+		'GEOMETRIC4': Material('models/props_pony/ppm2/ppm_socks/custom/geometric4_1.png')
+		'GEOMETRIC5': Material('models/props_pony/ppm2/ppm_socks/custom/geometric5_1.png')
+		'GEOMETRIC6': Material('models/props_pony/ppm2/ppm_socks/custom/geometric6_1.png')
+		'GEOMETRIC7': Material('models/props_pony/ppm2/ppm_socks/custom/geometric7_1.png')
+		'GEOMETRIC8': Material('models/props_pony/ppm2/ppm_socks/custom/geometric8_1.png')
+		'DARK1':      Material('models/props_pony/ppm2/ppm_socks/custom_textured/dark1.png')
+		'FLOWERS10':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers10.png')
+		'FLOWERS11':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers11.png')
+		'FLOWERS12':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers12.png')
+		'FLOWERS13':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers13.png')
+		'FLOWERS14':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers14.png')
+		'FLOWERS15':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers15.png')
+		'FLOWERS16':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers16.png')
+		'FLOWERS17':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers17.png')
+		'FLOWERS18':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers18.png')
+		'FLOWERS19':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers19.png')
+		'FLOWERS2':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers2.png')
+		'FLOWERS20':  Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers20.png')
+		'FLOWERS3':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers3.png')
+		'FLOWERS4':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers4.png')
+		'FLOWERS5':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers5.png')
+		'FLOWERS6':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers6.png')
+		'FLOWERS7':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers7.png')
+		'FLOWERS8':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers8.png')
+		'FLOWERS9':   Material('models/props_pony/ppm2/ppm_socks/custom_textured/flowers9.png')
+		'GREY1':      Material('models/props_pony/ppm2/ppm_socks/custom_textured/grey1.png')
+		'GREY2':      Material('models/props_pony/ppm2/ppm_socks/custom_textured/grey2.png')
+		'GREY3':      Material('models/props_pony/ppm2/ppm_socks/custom_textured/grey3.png')
+		'HEARTS1':    Material('models/props_pony/ppm2/ppm_socks/custom_textured/hearts1.png')
+		'HEARTS2':    Material('models/props_pony/ppm2/ppm_socks/custom_textured/hearts2.png')
+		'SNOW1':      Material('models/props_pony/ppm2/ppm_socks/custom_textured/snow1.png')
+		'WALLPAPER1': Material('models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper1.png')
+		'WALLPAPER2': Material('models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper2.png')
+		'WALLPAPER3': Material('models/props_pony/ppm2/ppm_socks/custom_textured/wallpaper3.png')
 	}
 
-	SOCKS_DETAILS_PATCHS: {
-		[2]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric1_4.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric1_5.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric1_6.png'
+	SOCKS_DETAILS: {
+		'GEOMETRIC1': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric1_4.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric1_5.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric1_6.png')
 		}
 
-		[3]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric2_3.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric2_4.png'
+		'GEOMETRIC2': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric2_3.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric2_4.png')
 		}
 
-		[4]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric3_2.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric3_3.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric3_5.png'
+		'GEOMETRIC3': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric3_2.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric3_3.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric3_5.png')
 		}
 
-		[5]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric4_2.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric4_3.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric4_4.png'
+		'GEOMETRIC4': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric4_2.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric4_3.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric4_4.png')
 		}
 
-		[6]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric5_4.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric5_5.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric5_6.png'
+		'GEOMETRIC5': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric5_4.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric5_5.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric5_6.png')
 		}
 
-		[7]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric6_2.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric6_3.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric6_4.png'
+		'GEOMETRIC6': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric6_2.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric6_3.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric6_4.png')
 		}
 
-		[8]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric7_3.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric7_4.png'
+		'GEOMETRIC7': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric7_3.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric7_4.png')
 		}
 
-		[9]: {
-			'models/props_pony/ppm2/ppm_socks/custom/geometric8_2.png'
-			'models/props_pony/ppm2/ppm_socks/custom/geometric8_3.png'
+		'GEOMETRIC8': {
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric8_2.png')
+			Material('models/props_pony/ppm2/ppm_socks/custom/geometric8_3.png')
 		}
 	}
 }
@@ -196,17 +201,20 @@ additionTable = (...) ->
 		tab[key] = val
 	return tab
 
-module.SOCKS_MATERIALS = [Material(id) for _, id in ipairs module.SOCKS_PATCHS]
-module.SOCKS_DETAILS = {i, [Material(path) for path in *data] for i, data in pairs module.SOCKS_DETAILS_PATCHS}
-module.CUTIEMARKS = [Material("models/ppm2/cmarks/#{mark}.png") for _, mark in ipairs PPM2.DefaultCutiemarks]
-module.SUITS = [Material("models/ppm2/texclothes/#{mat}.png") for _, mat in ipairs {
-	'clothes_royalguard', 'clothes_sbs_full'
-	'clothes_sbs_light', 'clothes_wbs_full'
-	'clothes_wbs_light', 'spidermane_light'
-	'spidermane_full'
-}]
+module.CUTIEMARKS = {mark, Material("models/ppm2/cmarks/#{mark\lower()}.png") for mark in *PPM2.DefaultCutiemarks}
 
-module.TATTOOS = [Material("models/ppm2/partrender/tattoo/#{fil\lower()}.png") for _, fil in ipairs PPM2.TATTOOS_REGISTRY when fil ~= 'NONE']
+module.SUITS = {a, Material("models/ppm2/texclothes/#{b}.png") for a, b in pairs {
+	'ROYAL_GUARD': 'clothes_royalguard'
+	'SHADOWBOLTS_FULL': 'clothes_sbs_full'
+	'SHADOWBOLTS_LIGHT': 'clothes_sbs_light'
+	'WONDERBOLTS_FULL': 'clothes_wbs_full'
+	'WONDERBOLTS_LIGHT': 'clothes_wbs_light'
+	'SPIDERMANE_LIGHT': 'spidermane_light'
+	'SPIDERMANE_FULL': 'spidermane_full'
+}}
+
+module.TATTOOS = {fil, Material("models/ppm2/partrender/tattoo/#{fil\lower()}.png") for _, fil in ipairs PPM2.TATTOOS_REGISTRY when fil ~= 'NONE'}
+
 debugwhite = {
 	'$basetexture': 'models/debug/debugwhite'
 	'$ignorez': 1
@@ -216,33 +224,33 @@ debugwhite = {
 }
 
 module.EYE_OVALS = {
-	Material('models/ppm2/partrender/eye_oval.png')
-	Material('models/ppm2/partrender/eye_oval_aperture.png')
+	'DEFAULT':  Material('models/ppm2/partrender/eye_oval.png')
+	'APERTURE': Material('models/ppm2/partrender/eye_oval_aperture.png')
 }
 
 module.EYE_REFLECTIONS = {
-	_Material('models/ppm2/partrender/eye_reflection.png')
-	_Material('models/ppm2/partrender/eye_reflection_crystal_foal.png')
-	_Material('models/ppm2/partrender/eye_reflection_crystal_unisex.png')
-	_Material('models/ppm2/partrender/eye_reflection_foal.png')
-	_Material('models/ppm2/partrender/eye_reflection_male.png')
+	'DEFAULT':      Material('models/ppm2/partrender/eye_reflection.png')
+	'CRYSTAL_FOAL': Material('models/ppm2/partrender/eye_reflection_crystal_foal.png')
+	'CRYSTAL':      Material('models/ppm2/partrender/eye_reflection_crystal_unisex.png')
+	'FOAL':         Material('models/ppm2/partrender/eye_reflection_foal.png')
+	'MALE':         Material('models/ppm2/partrender/eye_reflection_male.png')
 }
 
 module.HEAD_CLOTHES = {
-	[2]: {
+	'APPLEJACK_HAT': {
 		Material('models/ppm2/clothesrender/hat_aj.png')
 	}
 
-	[3]: {
+	'BRAEBURN_HAT': {
 		Material('models/ppm2/clothesrender/hat_braeburn_2.png')
 	}
 
-	[4]: {
+	'TRIXIE_HAT': {
 		Material('models/ppm2/clothesrender/tr_hat_stars_1.png')
 		Material('models/ppm2/clothesrender/tr_hat_stars_2.png')
 	}
 
-	[5]: {
+	'HEADPHONES': {
 		Material('models/ppm2/clothesrender/headphones_1.png')
 		Material('models/ppm2/clothesrender/headphones_2.png')
 		Material('models/ppm2/clothesrender/headphones_note.png')
@@ -250,19 +258,19 @@ module.HEAD_CLOTHES = {
 }
 
 module.HEAD_CLOTHES_INDEX = {
-	[2]: 0
-	[3]: 1
-	[4]: 2
-	[5]: 3
+	'APPLEJACK_HAT': 0
+	'BRAEBURN_HAT': 1
+	'TRIXIE_HAT': 2
+	'HEADPHONES': 3
 }
 
 module.NECK_CLOTHES = {
-	[2]: {
+	'SCARF': {
 		Material('models/ppm2/clothesrender/winter_scarf_1.png')
 		Material('models/ppm2/clothesrender/winter_scarf_2.png')
 	}
 
-	[3]: {
+	'TRIXIE_CAPE': {
 		{
 			Material('models/ppm2/clothesrender/cape_stars_1.png')
 			Material('models/ppm2/clothesrender/cape_stars_2.png')
@@ -272,85 +280,85 @@ module.NECK_CLOTHES = {
 		}
 	}
 
-	[4]: {
+	'TIE': {
 		Material('models/ppm2/clothesrender/tie_1.png')
 		Material('models/ppm2/clothesrender/tie_2.png')
 	}
 
-	[5]: {
+	'BOWTIE': {
 		Material('models/ppm2/clothesrender/bowtie_1.png')
 		Material('models/ppm2/clothesrender/bowtie_2.png')
 	}
 }
 
 module.NECK_CLOTHES_INDEX = {
-	[2]: 4
-	[3]: {5, 6}
-	[4]: 7
-	[5]: 8
+	'SCARF': 4
+	'TRIXIE_CAPE': {5, 6}
+	'TIE': 7
+	'BOWTIE': 8
 }
 
 module.BODY_CLOTHES = {
-	[2]: {
+	'VEST': {
 		Material('models/ppm2/clothesrender/vest_pouches.png')
 		Material('models/ppm2/clothesrender/vest_string.png')
 	}
 
-	[3]: {
+	'SHIRT': {
 		Material('models/ppm2/clothesrender/shirt.png')
 	}
 
-	[4]: {
+	'HOODIE': {
 		Material('models/ppm2/clothesrender/hoodie.png')
 	}
 
-	[5]: {
+	'WONDERBOLTS_BADGE': {
 		Material('models/ppm2/clothesrender/badge.png')
 	}
 }
 
 module.BODY_CLOTHES_INDEX = {
-	[2]: 9
-	[3]: 10
-	[4]: 11
-	[5]: 12
+	'VEST': 9
+	'SHIRT': 10
+	'HOODIE': 11
+	'WONDERBOLTS_BADGE': 12
 }
 
 module.EYE_CLOTHES = {
-	[2]: {
+	'GOGGLES_ROUND_FEMALE': {
 		{}
 		{Material('models/ppm2/clothesrender/lense.png')}
 	}
-	[4]: {
+	['SHADES_FEMALE']: {
 		{}
 		{Material('models/ppm2/clothesrender/shades_lense.png')}
 	}
-	[6]: {
+	['MONOCLE_FEMALE']: {
 		{}
 		{}
 	}
-	[8]: {
+	['EYEPATH_FEMALE']: {
 		{}
 		{}
 	}
 }
 
-module.EYE_CLOTHES[3] = module.EYE_CLOTHES[2]
-module.EYE_CLOTHES[5] = module.EYE_CLOTHES[4]
-module.EYE_CLOTHES[7] = module.EYE_CLOTHES[6]
-module.EYE_CLOTHES[9] = module.EYE_CLOTHES[8]
+module.EYE_CLOTHES['GOGGLES_ROUND_MALE'] = module.EYE_CLOTHES['GOGGLES_ROUND_FEMALE']
+module.EYE_CLOTHES['SHADES_MALE'] = module.EYE_CLOTHES['SHADES_FEMALE']
+module.EYE_CLOTHES['MONOCLE_MALE'] = module.EYE_CLOTHES['MONOCLE_FEMALE']
+module.EYE_CLOTHES['EYEPATH_MALE'] = module.EYE_CLOTHES['EYEPATH_FEMALE']
 
 module.EYE_CLOTHES_INDEX = {
-	[2]: {13, 14}
-	[4]: {15, 16}
-	[6]: {17, 18}
-	[8]: {20, 21}
+	'GOGGLES_ROUND_FEMALE': {13, 14}
+	'SHADES_FEMALE': {15, 16}
+	'MONOCLE_FEMALE': {17, 18}
+	'EYEPATH_FEMALE': {20, 21}
 }
 
-module.EYE_CLOTHES_INDEX[3] = module.EYE_CLOTHES_INDEX[2]
-module.EYE_CLOTHES_INDEX[5] = module.EYE_CLOTHES_INDEX[4]
-module.EYE_CLOTHES_INDEX[7] = module.EYE_CLOTHES_INDEX[6]
-module.EYE_CLOTHES_INDEX[9] = module.EYE_CLOTHES_INDEX[8]
+module.EYE_CLOTHES_INDEX['GOGGLES_ROUND_MALE'] = module.EYE_CLOTHES_INDEX['GOGGLES_ROUND_FEMALE']
+module.EYE_CLOTHES_INDEX['SHADES_MALE'] = module.EYE_CLOTHES_INDEX['SHADES_FEMALE']
+module.EYE_CLOTHES_INDEX['MONOCLE_MALE'] = module.EYE_CLOTHES_INDEX['MONOCLE_FEMALE']
+module.EYE_CLOTHES_INDEX['EYEPATH_MALE'] = module.EYE_CLOTHES_INDEX['EYEPATH_FEMALE']
 
 do
 	_prMaterial = (tab) ->

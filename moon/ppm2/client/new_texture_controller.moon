@@ -113,10 +113,11 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				@CreateRenderTask('CompileBatWingsSkin')
 
 	GetManeType: => @GrabData('ManeTypeNew')
+	GetManeTypeUpper: => @GrabData('ManeTypeNew')
 	GetManeTypeLower: => @GrabData('ManeTypeLowerNew')
 	GetTailType: => @GrabData('TailTypeNew')
 
-	CompileHairInternal: (prefix = 'Upper', isEditor, lock, release) =>
+	CompileHairInternal: (prefix = 'Upper', prefixColor = '', isEditor, lock, release) =>
 		return unless @isValid
 
 		textureFirst = {
@@ -158,15 +159,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'mane ' .. prefix .. ' 1',
-			@GetManeType()
-			grind_down_color(@GrabData("#{prefix}ManeColor1"))
+			@['GetManeType' .. prefix](@)
+			grind_down_color(@GrabData("#{prefixColor}ManeColor1"))
 			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeDetailColor#{i}")))
-			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeURLColor#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefixColor}ManeURL#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefixColor}ManeDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefixColor}ManeURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -177,29 +178,26 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			urlTextures = {}
 
 			for i = 1, 6
-				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
+				if url = PPM2.IsValidURL(@GrabData("#{prefixColor}ManeURL#{i}"))
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			{:r, :g, :b} = @GrabData("#{prefix}ManeColor1")
+			{:r, :g, :b} = @GrabData("#{prefixColor}ManeColor1")
 			lock(@, prefix .. '_hair_1_color', texSize, texSize, r, g, b)
 
 			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@GetManeType()]
-				i = 1
-
+			if registry = PPM2.MaterialsRegistry.UPPER_MANE_DETAILS[@['GetManeType' .. prefix](@)]
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GrabData("#{prefix}ManeDetailColor#{i}")
+					{:r, :g, :b, :a} = @GrabData("#{prefixColor}ManeDetailColor#{i2}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
-					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
+				surface.SetDrawColor(@GrabData("#{prefixColor}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -209,7 +207,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor1"), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor1"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine({fuck: true})
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -221,15 +219,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 		hash = {
 			'mane ' .. prefix .. ' 2',
-			@GetManeTypeLower()
-			grind_down_color(@GrabData("#{prefix}ManeColor2"))
+			@['GetManeType' .. prefix](@)
+			grind_down_color(@GrabData("#{prefixColor}ManeColor2"))
 			PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1)
 		}
 
 		for i = 1, 6
-			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}")))
-			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeDetailColor#{i}")))
-			table.insert(hash, grind_down_color(@GrabData("#{prefix}ManeURLColor#{i}")))
+			table.insert(hash, PPM2.IsValidURL(@GrabData("#{prefixColor}ManeURL#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefixColor}ManeDetailColor#{i}")))
+			table.insert(hash, grind_down_color(@GrabData("#{prefixColor}ManeURLColor#{i}")))
 
 		hash = PPM2.TextureTableHash(hash)
 
@@ -240,29 +238,29 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			urlTextures = {}
 
 			for i = 1, 6
-				if url = PPM2.IsValidURL(@GrabData("#{prefix}ManeURL#{i}"))
+				if url = PPM2.IsValidURL(@GrabData("#{prefixColor}ManeURL#{i}"))
 					urlTextures[i] = select(2, PPM2.GetURLMaterial(url, texSize, texSize)\Await())
 					return unless @isValid
 
-			{:r, :g, :b} = @GrabData("#{prefix}ManeColor2")
+			{:r, :g, :b} = @GrabData("#{prefixColor}ManeColor2")
 			lock(@, prefix .. '_hair_2_color', texSize, texSize, r, g, b)
 
 			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@GetManeTypeLower()]
+			if registry = PPM2.MaterialsRegistry.LOWER_MANE_DETAILS[@['GetManeType' .. prefix](@)]
 				i = 1
 
 				for i2 = 1, registry.size
 					mat = registry[i2]
-					{:r, :g, :b, :a} = @GrabData("#{prefix}ManeDetailColor#{i}")
+					{:r, :g, :b, :a} = @GrabData("#{prefixColor}ManeDetailColor#{i}")
 					surface.SetDrawColor(r, g, b, a)
 					surface.SetMaterial(mat)
 					surface.DrawTexturedRect(0, 0, texSize, texSize)
 					i += 1
 
 			for i, mat in pairs urlTextures
-				surface.SetDrawColor(@GrabData("#{prefix}ManeURLColor#{i}"))
+				surface.SetDrawColor(@GrabData("#{prefixColor}ManeURLColor#{i}"))
 				surface.SetMaterial(mat)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 
@@ -272,7 +270,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefix}ManeColor2"), mipmap_count: -2})
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				@@ReleaseRenderTarget(texSize, texSize)
 
@@ -482,10 +480,16 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 	CompileHair: (isEditor, lock, release) =>
 		return unless @isValid
-		return super(isEditor, lock, release) if not @GrabData('SeparateMane')
 
-		mat1, mat2, name1, name2 = @CompileHairInternal('Upper', isEditor, lock, release)
-		mat3, mat4, name3, name4 = @CompileHairInternal('Lower', isEditor, lock, release)
+		local mat1, mat2, name1, name2
+		local mat3, mat4, name3, name4
+
+		if @GrabData('SeparateMane')
+			mat1, mat2, name1, name2 = @CompileHairInternal('Upper', 'Upper', isEditor, lock, release)
+			mat3, mat4, name3, name4 = @CompileHairInternal('Lower', 'Lower', isEditor, lock, release)
+		else
+			mat1, mat2, name1, name2 = @CompileHairInternal('Upper', '', isEditor, lock, release)
+			mat3, mat4, name3, name4 = @CompileHairInternal('Lower', '', isEditor, lock, release)
 
 		@UpperManeColor1, @UpperManeColor2 = mat1, mat2
 		@LowerManeColor1, @LowerManeColor2 = mat3, mat4
@@ -579,28 +583,17 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 
 	UpdateUpperMane: (ent = @GetEntity(), entMane) =>
 		return unless @isValid
-		--return unless @compiled
 
-		if not @GrabData('SeparateMane')
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
-		else
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
+		entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetUpperHairName(1))
+		entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetUpperHairName(2))
 
 	UpdateLowerMane: (ent = @GetEntity(), entMane) =>
-		--return unless @compiled
 		return unless @isValid
 
-		if not @GrabData('SeparateMane')
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetManeName(1))
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetManeName(2))
-		else
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHairName(1))
-			entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
+		entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetLowerHairName(1))
+		entMane\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetLowerHairName(2))
 
 	UpdateTail: (ent = @GetEntity(), entTail) =>
-		--return unless @compiled
 		return unless @isValid
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR1, @GetTailName(1))
 		entTail\SetSubMaterial(@@MAT_INDEX_HAIR_COLOR2, @GetTailName(2))
