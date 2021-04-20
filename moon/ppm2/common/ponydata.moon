@@ -124,6 +124,22 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 
 		if enum_runtime_map
 			@__base["Get#{getName}"] = => enum_runtime_map[@[strName]]
+			tab.writeMapped = (val, ...) ->
+				if isstring(val)
+					setvalue = val
+					i = val
+					val = enum_runtime_map[val]
+					refvalue = val
+					error('No such enum value ' .. i) if val == nil
+
+				if isnumber(val)
+					refvalue = val
+					setvalue = enum_runtime_map[val]
+					error('No such enum index ' .. val) if enum_runtime_map[val] == nil
+
+				writeFunc(val, ...)
+		else
+			tab.writeMapped = writeFunc
 
 		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
 			local refvalue, setvalue

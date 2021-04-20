@@ -130,11 +130,11 @@ class PonyDataInstance
 			@ReadFromDisk()
 
 	WriteNetworkData: =>
-		for _, {:strName, :writeFunc, :getName, :defValue} in ipairs PPM2.NetworkedPonyData.NW_Vars
+		for {:strName, :writeMapped, :getName, :defFunc} in *PPM2.NetworkedPonyData.NW_Vars
 			if @["Get#{getName}"]
-				writeFunc(@["Get#{getName}"](@))
+				writeMapped(@["Get#{getName}"](@))
 			else
-				writeFunc(defValue)
+				writeMapped(defFunc())
 
 	Copy: (fileName = @filename) =>
 		copyOfData = {}
