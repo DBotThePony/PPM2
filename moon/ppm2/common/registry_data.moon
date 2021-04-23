@@ -78,7 +78,7 @@ INT_FIXER = (def = 1, min = 0, max = 1) ->
 PPM2.PonyDataRegistry = {
 	'Age': {
 		old: 'age'
-		default: -> PPM2.AGE_ADULT
+		default: -> 'ADULT'
 		enum: {'FILLY', 'ADULT', 'MATURE'}
 	}
 
@@ -1317,13 +1317,15 @@ for key, value in pairs PPM2.PonyDataRegistry
 		value.type = 'INT'
 
 		def_old = value.default()
+		_def_old = def_old
 		def_old = value.enum_runtime_map[def_old] if isstring(def_old)
+		error("Invalid value #{_def_old} for enum of #{key}") if not isnumber(def_old)
 		value.default = -> def_old
 
 	switch value.type
 		when 'INT'
-			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
-			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
+			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if not isnumber(value.min)
+			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if not isnumber(value.max)
 
 			value.fix = INT_FIXER(value.default, value.min, value.max)
 
@@ -1337,8 +1339,9 @@ for key, value in pairs PPM2.PonyDataRegistry
 				value.write = wInt(value.default(), selectBits)
 
 		when 'FLOAT'
-			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if type(value.min) ~= 'number'
-			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if type(value.max) ~= 'number'
+			error("Variable #{key} has invalid minimal value (#{type(value.min)})") if not isnumber(value.min)
+			error("Variable #{max} has invalid maximal value (#{type(value.max)})") if not isnumber(value.max)
+
 			value.fix = FLOAT_FIXER(value.default, value.min, value.max)
 			value.read = rFloat(value.min, value.max)
 			value.write = (arg = value.default()) -> wFloat(arg)
