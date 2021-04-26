@@ -98,7 +98,7 @@ PPM2.PonyDataRegistry = {
 		old: 'gender'
 		default: -> PPM2.GENDER_FEMALE
 		type: 'BOOLEAN'
-		fix: (value) -> value == true or isstring(value) and value ~= 'FILLY'
+		fix: (value) -> value == true or isstring(value) and value ~= 'FILLY' or value == 1
 	}
 
 	'Weight': {

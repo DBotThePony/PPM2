@@ -250,11 +250,6 @@ class PonyDataInstance
 				mapData.fix(Color(value))
 			else
 				mapData.fix(Color(value[1] + 128, value[2] + 128, value[3] + 128, value[4] + 128))
-		elseif mapData.type == 'BOOLEAN'
-			if isbool(value)
-				mapData.fix(value)
-			else
-				mapData.fix(value == 1)
 		else
 			mapData.fix(value)
 
