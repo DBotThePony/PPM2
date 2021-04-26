@@ -842,7 +842,7 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["EyeRefract#{publicName}"] = {
-		default: -> false
+		default: -> true
 		old: "eye_use_refract#{internal}"
 		type: 'BOOLEAN'
 	}
@@ -911,10 +911,10 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 	}
 
 	PPM2.PonyDataRegistry["EyeGlossyStrength#{publicName}"] = {
-		default: -> 0.16
+		default: -> 0.4
 		old: "eye_glossy_reflection#{internal}"
-		min: 0
-		max: 1
+		min: -4
+		max: 4
 		type: 'FLOAT'
 	}
 

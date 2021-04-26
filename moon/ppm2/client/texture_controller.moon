@@ -481,6 +481,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@EYE_UPDATE_TRIGGER["EyeRefract#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["EyeCornerA#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["EyeLineDirection#{publicName}"] = true
+		@EYE_UPDATE_TRIGGER["EyeGlossyStrength#{publicName}"] = true
 		@EYE_UPDATE_TRIGGER["LEyeLightwarp"] = true
 		@EYE_UPDATE_TRIGGER["REyeLightwarp"] = true
 		@EYE_UPDATE_TRIGGER["LEyeLightwarpURL"] = true
@@ -2444,6 +2445,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		HoleShiftY =        @GrabData("HoleShiftY#{prefixData}")
 		EyeRotation =       @GrabData("EyeRotation#{prefixData}")
 		EyeLineDirection =  @GrabData("EyeLineDirection#{prefixData}")
+		EyeGlossyStrength = @GrabData("EyeGlossyStrength#{prefixData}")
 		PonySize =          @GrabData('PonySize')
 		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
@@ -2454,7 +2456,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		shiftY -= DerpEyesStrength * .15 * texSize if DerpEyes and not left
 
 		textureData = {
-			'name': "PPM2_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}"
+			'name': "PPM2_#{@GetID()}_#{EyeRefract and 'EyeRefract' or 'Eyes'}_#{prefix}3"
 			'shader': EyeRefract and 'EyeRefract' or 'Eyes'
 			'data': {
 				'$iris': 'models/ppm2/base/face/p_base'
@@ -2465,18 +2467,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				'$corneatexture': 'models/ppm2/eyes/eye_cornea_oval'
 				'$lightwarptexture': 'models/ppm2/clothes/lightwarp'
 
-				'$eyeballradius': '3.7'
 				'$ambientocclcolor': '[0.3 0.3 0.3]'
 				'$dilation': '0.5'
-				'$glossiness': '1'
-				'$parallaxstrength': '0.1'
-				'$corneabumpstrength': '0.1'
+				'$glossiness': tostring(EyeGlossyStrength)
+				'$parallaxstrength': '0.5'
+				'$corneabumpstrength': '0.02'
 
 				'$halflambert': '1'
 				'$nodecal': '1'
 
-				'$raytracesphere': '0'
-				'$spheretexkillcombo': '0'
 				'$eyeorigin': '[0 0 0]'
 				'$irisu': '[0 1 0 0]'
 				'$irisv': '[0 0 1 0]'
@@ -2488,6 +2487,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		createdMaterial = CreateMaterial(textureData.name, textureData.shader, textureData.data)
 		@["EyeMaterial#{prefixUpper}"] = createdMaterial
 		@UpdatePhongData()
+
+		createdMaterial\SetFloat('$glossiness', EyeGlossyStrength)
 
 		IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
 		IrisQuadSize = texSize * IrisSize * PonySize
@@ -2554,6 +2555,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			EyeLines and grind_down_color(EyeIrisLine1)
 			EyeLines and grind_down_color(EyeIrisLine2)
 			math.round(HoleSize * 100)
+			math.round(EyeGlossyStrength * 100)
 			grind_down_color(EyeReflection)
 			EyeReflectionType
 			EyeEffect
