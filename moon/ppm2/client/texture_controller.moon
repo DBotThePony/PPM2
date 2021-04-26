@@ -1057,6 +1057,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		if not @GrabData('SeparateManePhong')
 			table.insert(output, {@HairColor1Material, false, false}) if @HairColor1Material
 			table.insert(output, {@HairColor2Material, false, false}) if @HairColor2Material
+
 		if not @GrabData('SeparateTailPhong')
 			table.insert(output, {@TailColor1Material, false, false}) if @TailColor1Material
 			table.insert(output, {@TailColor2Material, false, false}) if @TailColor2Material

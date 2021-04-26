@@ -1393,7 +1393,7 @@ EditorPages = {
 			return if not ADVANCED_MODE\GetBool()
 
 			@Hr()
-			@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane')
+			@CheckBox('gui.ppm2.editor.mane.phong_sep', 'SeparateMane') if ADVANCED_MODE\GetBool()
 			PPM2.EditorPhongPanels(@, 'UpperMane', 'gui.ppm2.editor.mane.up.phong') if ADVANCED_MODE\GetBool()
 			PPM2.EditorPhongPanels(@, 'LowerMane', 'gui.ppm2.editor.mane.down.phong') if ADVANCED_MODE\GetBool()
 

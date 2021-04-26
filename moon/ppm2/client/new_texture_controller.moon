@@ -289,18 +289,29 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			table.insert(output, @BatWingsMaterial) if @BatWingsMaterial
 			table.insert(output, @BatWingsSkinMaterial) if @BatWingsSkinMaterial
 
+		if not @GrabData('SeparateMane') and not @GrabData('SeparateManePhong')
+			table.insert(output, {@UpperManeColor1, false, false}) if @UpperManeColor1
+			table.insert(output, {@UpperManeColor2, false, false}) if @UpperManeColor2
+			table.insert(output, {@LowerManeColor1, false, false}) if @LowerManeColor1
+			table.insert(output, {@LowerManeColor2, false, false}) if @LowerManeColor2
+
 	UpdatePhongData: =>
 		super()
 
 		if @GrabData('SeparateWingsPhong')
-			@ApplyPhongData(@BatWingsMaterial, 'Wings')
-			@ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin')
+			@ApplyPhongData(@BatWingsMaterial, 'Wings') if @BatWingsMaterial
+			@ApplyPhongData(@BatWingsSkinMaterial, 'BatWingsSkin') if @BatWingsSkinMaterial
 
-		if @GrabData('SeparateManePhong')
-			@ApplyPhongData(@UpperManeColor1, 'UpperMane')
-			@ApplyPhongData(@UpperManeColor2, 'UpperMane')
-			@ApplyPhongData(@LowerManeColor1, 'LowerMane')
-			@ApplyPhongData(@LowerManeColor2, 'LowerMane')
+		if @GrabData('SeparateMane')
+			@ApplyPhongData(@UpperManeColor1, 'UpperMane') if @UpperManeColor1
+			@ApplyPhongData(@UpperManeColor2, 'UpperMane') if @UpperManeColor2
+			@ApplyPhongData(@LowerManeColor1, 'LowerMane') if @LowerManeColor1
+			@ApplyPhongData(@LowerManeColor2, 'LowerMane') if @LowerManeColor2
+		elseif @GrabData('SeparateManePhong')
+			@ApplyPhongData(@UpperManeColor1, 'Mane') if @UpperManeColor1
+			@ApplyPhongData(@UpperManeColor2, 'Mane') if @UpperManeColor2
+			@ApplyPhongData(@LowerManeColor1, 'Mane') if @LowerManeColor1
+			@ApplyPhongData(@LowerManeColor2, 'Mane') if @LowerManeColor2
 
 		@ApplyPhongData(@TeethMaterial, 'Teeth') if @TeethMaterial
 		@ApplyPhongData(@MouthMaterial, 'Mouth') if @MouthMaterial
