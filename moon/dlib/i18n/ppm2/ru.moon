@@ -497,3 +497,4 @@ gui.ppm2.editor.size.back = 'Длина спины: ~%s'
 gui.ppm2.editor.size.neck = 'Длина шеи: ~%s'
 
 gui.ppm2.editor.generic.quicksearch = 'Быстрый поиск'
+gui.ppm2.busy = 'PPM/2 занят'

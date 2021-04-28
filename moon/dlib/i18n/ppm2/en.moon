@@ -500,3 +500,4 @@ gui.ppm2.editor.size.back = 'Length of spine: ~%s'
 gui.ppm2.editor.size.neck = 'Length of neck: ~%s'
 
 gui.ppm2.editor.generic.quicksearch = 'Quicksearch'
+gui.ppm2.busy = 'PPM/2 is busy'

@@ -112,17 +112,32 @@ coroutine_yield = coroutine.yield
 coroutine_resume = coroutine.resume
 coroutine_status = coroutine.status
 
+PPM2.MAX_TASKS = 0
+PPM2.COMPLETED_TASKS = 0
+PPM2.LAST_TASK = 0
+
 PPM2.TextureCompileWorker = ->
 	while true
 		name, task = next(PPM2.TEXTURE_TASKS)
 
 		if not name
 			coroutine_yield()
+
+			if not next(PPM2.TEXTURE_TASKS_EDITOR)
+				DLib.Util.PopProgress('ppm2_busy')
+
+				if PPM2.LAST_TASK < SysTime()
+					PPM2.MAX_TASKS = 0
+					PPM2.COMPLETED_TASKS = 0
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
+			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
 			task[1](task[2], false, task[3], task[4]) if IsValid(task[2])
 			task[2].texture_tasks -= 1
+			PPM2.COMPLETED_TASKS += 1
+			PPM2.LAST_TASK = SysTime() + 5
+			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
@@ -335,12 +350,15 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 		if coroutine_status(thread) == 'dead'
 			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
 			self.texture_tasks -= 1
+			PPM2.COMPLETED_TASKS += 1
+			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
 		else
 			status, err = coroutine_resume(thread, self, true, lock, release)
 
 			if not status
 				PPM2.TEXTURE_TASKS_EDITOR[name] = nil
 				self.texture_tasks -= 1
+				PPM2.COMPLETED_TASKS += 1
 				error(name .. ' editor texture task failed: ' .. err)
 
 hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
@@ -675,10 +693,14 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			thread = coroutine.create(@[func])
 			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, lock, release}
 			@texture_tasks += 1
+			PPM2.MAX_TASKS += 1
+			PPM2.LAST_TASK = SysTime() + 5
 		else
 			return if PPM2.TEXTURE_TASKS[index]
 			PPM2.TEXTURE_TASKS[index] = {@[func], @, lock, release}
 			@texture_tasks += 1
+			PPM2.MAX_TASKS += 1
+			PPM2.LAST_TASK = SysTime() + 5
 
 	DataChanges: (state) =>
 		return unless @isValid
