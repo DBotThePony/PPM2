@@ -651,6 +651,7 @@ PPM2.EditorBuildNewFilesPanel = =>
 
 					if not recomputed
 						recomputed = true
+
 						if file.Exists('ppm2/thumbnails/' .. fil2 .. '.png', 'DATA')
 							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
 							line.png\Recompute()
@@ -665,16 +666,17 @@ PPM2.EditorBuildNewFilesPanel = =>
 						surface.DrawTexturedRect(x, y, 512, 512)
 					else
 						if not @genPreview
-							PPM2.PonyDataInstance(fil2)\WriteThumbnail()
-							@genPreview = true
-							timer.Simple 1, ->
-								@png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
+							PPM2.PonyDataInstance(fil2)\WriteThumbnail()\Catch(print)\Then (path) ->
+								@png = Material('data/' .. path)
 								@png\Recompute()
 								@png\GetTexture('$basetexture')\Download()
+
+							@genPreview = true
 
 						surface.SetDrawColor(0, 0, 0)
 						surface.DrawRect(x, y, 512, 512)
 						DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
+
 	@rebuildFileList()
 	list.rebuildFileList = @rebuildFileList
 
@@ -705,6 +707,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 			@unsavedChanges = true
 			@frame.unsavedChanges = true
 			@frame\SetTitle('gui.ppm2.editor.generic.title_file_unsaved', newData\GetFilename())
+
 		if @unsavedChanges
 			Derma_Query(
 				'gui.ppm2.editor.io.warn.text',
@@ -737,6 +740,7 @@ PPM2.EditorBuildOldFilesPanel = =>
 
 					if not recomputed
 						recomputed = true
+
 						if file.Exists('ppm2/thumbnails/' .. fil2 .. '_imported.png', 'DATA')
 							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
 							line.png\Recompute()
@@ -751,12 +755,12 @@ PPM2.EditorBuildOldFilesPanel = =>
 						surface.DrawTexturedRect(x, y, 512, 512)
 					else
 						if not @genPreview
-							PPM2.ReadFromOldData(fil2)\WriteThumbnail()
-							@genPreview = true
-							timer.Simple 1, ->
-								@png = Material('data/ppm2/thumbnails/' .. fil2 .. '_imported.png')
+							PPM2.ReadFromOldData(fil2)\WriteThumbnail()\Catch(print)\Then (path) ->
+								@png = Material('data/' .. path)
 								@png\Recompute()
 								@png\GetTexture('$basetexture')\Download()
+
+							@genPreview = true
 
 						surface.SetDrawColor(0, 0, 0)
 						surface.DrawRect(x, y, 512, 512)

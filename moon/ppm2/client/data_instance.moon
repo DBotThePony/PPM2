@@ -287,60 +287,55 @@ class PonyDataInstance
 		return buf
 
 	WriteThumbnail: (path = @thumbnailPath) =>
-		buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
-		buildingModel\SetNoDraw(true)
-		buildingModel\SetModelScale(0.9)
-		model = ClientsideModel('models/ppm/player_default_base_new_nj.mdl')
-
-		with model
-			\SetNoDraw(true)
+		thread = coroutine.create (resolve) ->
+			buildingModel = ClientsideModel('models/ppm/ppm2_stage.mdl', RENDERGROUP_OTHER)
+			buildingModel\SetNoDraw(true)
+			buildingModel\SetModelScale(0.9)
+			model = ClientsideModel('models/ppm/player_default_base_new_nj.mdl')
 			data = @CreateCustomController(model)
-			\SetPonyData(data)
-			ctrl = data\GetRenderController()
 
-			if bg = data\GetBodygroupController()
-				bg\ApplyBodygroups()
+			with model
+				\SetNoDraw(true)
+				\SetPonyData(data)
+				\SetSequence(22)
+				\FrameAdvance(0)
+
+			data\GetBodygroupController()\ApplyBodygroups()
 
 			with model\PPMBonesModifier()
 				\ResetBones()
 				hook.Call('PPM2.SetupBones', nil, model, data)
 				\Think(true)
 
-			\SetSequence(22)
-			\FrameAdvance(0)
+			ctrl = data\GetRenderController()
+			textures = ctrl\GetTextureController()
 
-		timer.Simple 0.5, ->
-			renderTarget = GetRenderTarget('ppm2_save_thumbnailPath_generate2', 1024, 1024, false)
-			renderTarget\Download()
+			textures\CompileTextures()
+
+			while textures\HasActiveTasks()
+				coroutine.yield()
+
+			renderTarget = GetRenderTarget('ppm2_thumbnail', 1024, 1024, false)
 			render.PushRenderTarget(renderTarget)
 			--render.SuppressEngineLighting(true)
 			render.Clear(0, 0, 0, 255, true, true)
 			cam.Start3D(Vector(49.373046875, -35.021484375, 58.332901000977), Angle(0, 141, 0), 90, 0, 0, 1024, 1024)
 
 			buildingModel\DrawModel()
+			data\GetBodygroupController()\ApplyBodygroups()
 
-			with model
-				data = \GetPonyData()
-				ctrl = data\GetRenderController()
+			with model\PPMBonesModifier()
+				\ResetBones()
+				hook.Call('PPM2.SetupBones', nil, model, data)
+				\Think(true)
 
-				if textures = ctrl\GetTextureController()
-					textures\CompileTextures()
+			with ctrl
+				\DrawModels()
+				\HideModels(true)
+				\PreDraw(model, true)
 
-				if bg = data\GetBodygroupController()
-					bg\ApplyBodygroups()
-
-				with model\PPMBonesModifier()
-					\ResetBones()
-					hook.Call('PPM2.SetupBones', nil, model, data)
-					\Think(true)
-
-				with ctrl
-					\DrawModels()
-					\HideModels(true)
-					\PreDraw(model, true)
-
-				\DrawModel()
-				ctrl\PostDraw(model, true)
+			model\DrawModel()
+			ctrl\PostDraw(model, true)
 
 			cam.End3D()
 
@@ -360,6 +355,10 @@ class PonyDataInstance
 
 			--render.SuppressEngineLighting(false)
 			render.PopRenderTarget()
+
+			return path
+
+		return DLib.Promise thread
 
 	Save: (doBackup = true, saveThumbnail = true) =>
 		file.Rename(@fullPath, @GetBackupPath()) if doBackup and @exists

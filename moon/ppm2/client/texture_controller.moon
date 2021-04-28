@@ -121,7 +121,8 @@ PPM2.TextureCompileWorker = ->
 		else
 			PPM2.TEXTURE_TASKS[name] = nil
 			PPM2.TEXTURE_TASK_CURRENT = name
-			task[1](task[2], task[3], task[4], task[5]) if IsValid(task[2])
+			task[1](task[2], false, task[3], task[4]) if IsValid(task[2])
+			task[2].texture_tasks -= 1
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
@@ -330,14 +331,16 @@ hook.Add 'Think', 'PPM2 Material Tasks', ->
 		PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
 		error('Texture task thread failed: ' .. err)
 
-	for name, {thread, self, isEditor, lock, release} in pairs(PPM2.TEXTURE_TASKS_EDITOR)
+	for name, {thread, self, lock, release} in pairs(PPM2.TEXTURE_TASKS_EDITOR)
 		if coroutine_status(thread) == 'dead'
 			PPM2.TEXTURE_TASKS_EDITOR[name] = nil
+			self.texture_tasks -= 1
 		else
-			status, err = coroutine_resume(thread, self, isEditor, lock, release)
+			status, err = coroutine_resume(thread, self, true, lock, release)
 
 			if not status
 				PPM2.TEXTURE_TASKS_EDITOR[name] = nil
+				self.texture_tasks -= 1
 				error(name .. ' editor texture task failed: ' .. err)
 
 hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
@@ -651,6 +654,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@id = @@NEXT_GENERATED_ID
 			@@NEXT_GENERATED_ID += 1
 
+		@texture_tasks = 0
+
 		@compiled = false
 		@lastMaterialUpdate = 0
 		@lastMaterialUpdateEnt = NULL
@@ -658,7 +663,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@processing_first = true
 		@CompileTextures() if compile
 		hook.Add('InvalidateMaterialCache', @, @InvalidateMaterialCache, 100)
-		PPM2.DebugPrint('Created new texture controller for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @id)
+
+	HasActiveTasks: => @texture_tasks > 0
 
 	CreateRenderTask: (func = '', ...) =>
 		index = string.format('%p%s', @, func)
@@ -667,10 +673,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		if isEditor
 			return if PPM2.TEXTURE_TASKS_EDITOR[index]
 			thread = coroutine.create(@[func])
-			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, isEditor, lock, release} if coroutine_status(thread) ~= 'dead'
+			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, lock, release}
+			@texture_tasks += 1
 		else
 			return if PPM2.TEXTURE_TASKS[index]
-			PPM2.TEXTURE_TASKS[index] = {@[func], @, isEditor, lock, release}
+			PPM2.TEXTURE_TASKS[index] = {@[func], @, lock, release}
+			@texture_tasks += 1
 
 	DataChanges: (state) =>
 		return unless @isValid
