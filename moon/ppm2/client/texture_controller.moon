@@ -1879,12 +1879,15 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		{:r, :g, :b} = @GrabData('NewSocksColor1')
 		@NewSocksColor1\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+		@NewSocksColor1\SetTexture('$basetexture', 'models/debug/debugwhite')
 
 		{:r, :g, :b} = @GrabData('NewSocksColor2')
 		@NewSocksColor2\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+		@NewSocksColor2\SetTexture('$basetexture', 'models/debug/debugwhite')
 
 		{:r, :g, :b} = @GrabData('NewSocksColor3')
 		@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
+		@NewSocksBase\SetTexture('$basetexture', 'models/debug/debugwhite')
 
 	CompileEyelashes: (isEditor, lock, release) =>
 		return unless @isValid
