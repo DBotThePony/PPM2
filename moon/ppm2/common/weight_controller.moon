@@ -94,7 +94,6 @@ class PonyWeightController extends PPM2.ControllerChildren
 		@SetWeight(controller\GetWeight())
 		@Remap()
 		@UpdateWeight() if IsValid(@GetEntity()) and applyWeight
-		PPM2.DebugPrint('Created new weight controller for ', @GetEntity(), ' as part of ', data, '; internal ID is ', @objID)
 
 	__tostring: => "[#{@@__name}:#{@objID}|#{@GetData()}]"
 	IsValid: => IsValid(@GetEntity()) and @isValid

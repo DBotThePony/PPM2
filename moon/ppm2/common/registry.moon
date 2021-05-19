@@ -165,6 +165,16 @@ PPM2.AvailableHorns = {
 	'KIRIN'
 }
 
+PPM2.HornMappings = {}
+
+for i, value in ipairs({'EMPTY', 'CUSTOM', 'CLASSIC_SHARP', 'CLASSIC', 'BROKEN', 'LONG', 'LONG_CURLED', 'POISON_JOKE', 'CHANGELING', 'CHANGELING_QUEEN', 'KIRIN'})
+	PPM2.HornMappings[value] = {
+		model: 'models/ppm/horns/ppm_hornset01.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
+
 PPM2.AvaliableUpperManes = {
 	'MAILCALL'
 	'FLOOFEH'
@@ -452,6 +462,24 @@ PPM2.AvaliableUpperManesNew = {
 	'NONE'
 }
 
+PPM2.UpperManeMapping = {}
+
+for i, value in ipairs({'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'RADICAL', 'SPIKED', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'INSTRUCTOR', 'TIMID'})
+	PPM2.UpperManeMapping[value] = {
+		model: 'models/ppm/hair/ppm_manesetupper01.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
+
+for i, value in ipairs({'FILLY', 'MECHANIC', 'MOON', 'CLOUD', 'DRUNK', 'EMO', 'AZU', 'BRAIDS', 'CYBERPUNK', 'GLASS', 'SECRETARY', 'SIA', 'NONE'})
+	PPM2.UpperManeMapping[value] = {
+		model: 'models/ppm/hair/ppm_manesetupper02.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
+
 PPM2.AvaliableLowerManesNew = {
 	'MAILCALL'
 	'FLOOFEH'
@@ -478,6 +506,24 @@ PPM2.AvaliableLowerManesNew = {
 	'NONE'
 }
 
+PPM2.LowerManeMapping = {}
+
+for i, value in ipairs {'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE', 'BOLD', 'STUMPY', 'HIPPIE', 'SPEEDSTER', 'BOOKWORM', 'BUMPKIN', 'CURLY', 'TIMID', 'MOON', 'BUN', 'CLOUD'}
+	PPM2.LowerManeMapping[value] = {
+		model: 'models/ppm/hair/ppm_manesetlower01.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
+
+for i, value in ipairs {'EMO', 'AZU', 'BRAIDS', 'CYBERPUNK', 'GLASS', 'SIA', 'NONE'}
+	PPM2.LowerManeMapping[value] = {
+		model: 'models/ppm/hair/ppm_manesetlower02.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
+
 PPM2.AvaliableTailsNew = {
 	'MAILCALL'
 	'FLOOFEH'
@@ -495,6 +541,16 @@ PPM2.AvaliableTailsNew = {
 	'CURLY'
 	'NONE'
 }
+
+PPM2.TailMapping = {}
+
+for i, value in ipairs({'MAILCALL', 'FLOOFEH', 'ADVENTUROUS', 'SHOWBOAT', 'ASSERTIVE', 'BOLD', 'STUMPY', 'SPEEDSTER', 'EDGY', 'RADICAL', 'BOOKWORM', 'BUMPKIN', 'POOFEH', 'CURLY', 'NONE'})
+	PPM2.TailMapping[value] = {
+		model: 'models/ppm/hair/ppm_tailset01.mdl'
+		bodygroups: {
+			[1]: i - 1
+		}
+	}
 
 PPM2.AvaliableEyeTypes = {
 	'DEFAULT'

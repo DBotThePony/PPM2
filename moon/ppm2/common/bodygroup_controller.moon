@@ -162,18 +162,26 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	@ATTACHMENT_EYES = 4
 	@ATTACHMENT_EYES_NAME = 'eyes'
 
-	CreateGenericModel: (force, fModelIndex, mIndex, mName, mTranslateModelName, mCallType) =>
+	CreateGenericModel: (force, fModelIndex, mIndex, mName, mTranslateModelName, mDataName) =>
 		return @[mIndex] or NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
 		return @[mIndex] if IsValid(@[mIndex])
+
+		local model, bodygroups
+		{:model, :bodygroups} = istable(mTranslateModelName) and mTranslateModelName[@GrabData(mDataName)] or isfunction(mTranslateModelName) and mTranslateModelName(@GrabData(mDataName)) if mDataName
+		{:model, :bodygroups} = istable(mTranslateModelName) and mTranslateModelName or isfunction(mTranslateModelName) and mTranslateModelName() if not mDataName
 
 		for _, ent in ipairs ents_GetAll()
 			if ent.isPonyPropModel and ent[fModelIndex] and ent.manePlayer == @GetEntity()
 				@[mIndex] = ent
 
 				with ent
+					\SetModel(model) if model ~= \GetModel()
 					\DrawShadow(true)
 					\SetPos(@GetEntity()\EyePos())
-					\SetBodygroup(1, bodygroupID) if bodygroupID
+
+					if bodygroups
+						\SetBodygroup(k, v) for k, v in pairs(bodygroups)
+
 					\SetNoDraw(true)
 					\SetParent(@GetEntity())
 					\AddEffects(EF_BONEMERGE)
@@ -182,14 +190,15 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 				return ent
 
-		model, modelID, bodygroupID = mTranslateModelName(@GrabDataRef(mCallType)) if mCallType
-		model = mTranslateModelName() if not mCallType
 		with @[mIndex] = ClientsideModel(model)
 			.isPonyPropModel = true
 			.manePlayer = @GetEntity()
 			\DrawShadow(true)
 			\SetPos(@GetEntity()\EyePos())
-			\SetBodygroup(1, bodygroupID) if bodygroupID
+
+			if bodygroups
+				\SetBodygroup(k, v) for k, v in pairs(bodygroups)
+
 			\Spawn()
 			\Activate()
 			\SetNoDraw(true)
@@ -198,36 +207,40 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 
 		@[mIndex][fModelIndex] = true
 
-		PPM2.DebugPrint('Creating new ', mName, ' for ', @GetEntity(), ' as ', @[mIndex])
 		@SetData(mName, @[mIndex])
 		return @[mIndex]
 
-	UpdateGenericModel: (force, fcallNone, mIndex, mName, mTranslateModelName, mCallType) =>
+	UpdateGenericModel: (force, fcallNone, mIndex, mName, mTranslateModelName, mDataName) =>
 		return @[mIndex] or NULL if SERVER or not @isValid or not IsValid(@GetEntity()) or not force and @GetEntity()\IsDormant() or not @GetEntity()\IsPony()
 		@[mIndex] = @[fcallNone](@, force) if not IsValid(@[mIndex])
 		return NULL if not IsValid(@[mIndex])
 
-		model, modelID, bodygroupID = mTranslateModelName(@GrabDataRef(mCallType)) if mCallType
-		model, modelID, bodygroupID = mTranslateModelName() if not mCallType
+		local model, bodygroups
+		{:model, :bodygroups} = istable(mTranslateModelName) and mTranslateModelName[@GrabData(mDataName)] or isfunction(mTranslateModelName) and mTranslateModelName(@GrabData(mDataName)) if mDataName
+		{:model, :bodygroups} = istable(mTranslateModelName) and mTranslateModelName or isfunction(mTranslateModelName) and mTranslateModelName() if not mDataName
+
 		with @[mIndex]
 			\SetModel(model) if model ~= \GetModel()
-			\SetBodygroup(1, bodygroupID) if bodygroupID and \GetBodygroup(1) ~= bodygroupID
+
+			if bodygroups
+				\SetBodygroup(k, v) for k, v in pairs(bodygroups)
+
 			\SetParent(@GetEntity()) if \GetParent() ~= @GetEntity() and IsValid(@GetEntity())
 
 		@SetData(mName, @[mIndex])
 		return @[mIndex]
 
-	UpdateHornModel: (force = false) => @UpdateGenericModel(force, 'CreateHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
+	UpdateHornModel: (force = false) => @UpdateGenericModel(force, 'CreateHornModel', 'hornModel', 'HornModel', PPM2.HornMappings, 'NewHornType')
 	UpdateSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateSocksModel', 'socksModel', 'SocksModel', @_SocksModelName)
 	UpdateNewSocksModel: (force = false) => @UpdateGenericModel(force, 'CreateNewSocksModel', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
 
-	_SocksModelName: => 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'
-	_NewSocksModelName: => 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'
-	_ClothesModelname: => 'models/ppm/player_default_clothes1.mdl'
+	_SocksModelName: => {model: 'models/props_pony/ppm/cosmetics/ppm_socks.mdl'}
+	_NewSocksModelName: => {model: 'models/props_pony/ppm/cosmetics/ppm2_socks.mdl'}
+	_ClothesModelname: => {model: 'models/ppm/player_default_clothes1.mdl'}
 
 	CreateSocksModel: (force = false) => @CreateGenericModel(force, 'isSocks', 'socksModel', 'SocksModel', @_SocksModelName)
 	CreateNewSocksModel: (force = false) => @CreateGenericModel(force, 'isNewSocks', 'newSocksModel', 'NewSocksModel', @_NewSocksModelName)
-	CreateHornModel: (force = false) => @CreateGenericModel(force, 'isHornModel', 'hornModel', 'HornModel', PPM2.GetHornModelName, 'NewHornType')
+	CreateHornModel: (force = false) => @CreateGenericModel(force, 'isHornModel', 'hornModel', 'HornModel', PPM2.HornMappings, 'NewHornType')
 	CreateClothesModel: (force = false) => @CreateGenericModel(force, 'isClothesModel', 'clothesModel', 'ClothesModel', @_ClothesModelname)
 
 	CreateClothesModelIfNotExist: (force = false) =>
@@ -608,9 +621,9 @@ class NewBodygroupController extends DefaultBodygroupController
 			if not @[name]
 				@validSkeleton = false
 
-	CreateUpperManeModel: (force = false) => @CreateGenericModel(force, 'isUpperMane', 'maneModelUpper', 'UpperManeModel', PPM2.GetUpperManeModelName, 'ManeTypeNew')
-	CreateLowerManeModel: (force = false) => @CreateGenericModel(force, 'isLowerMane', 'maneModelLower', 'LowerManeModel', PPM2.GetLowerManeModelName, 'ManeTypeLowerNew')
-	CreateTailModel: (force = false) => @CreateGenericModel(force, 'isTailModel', 'tailModel', 'TailModel', PPM2.GetTailModelName, 'TailTypeNew')
+	CreateUpperManeModel: (force = false) => @CreateGenericModel(force, 'isUpperMane', 'maneModelUpper', 'UpperManeModel', PPM2.UpperManeMapping, 'ManeTypeNew')
+	CreateLowerManeModel: (force = false) => @CreateGenericModel(force, 'isLowerMane', 'maneModelLower', 'LowerManeModel', PPM2.LowerManeMapping, 'ManeTypeLowerNew')
+	CreateTailModel: (force = false) => @CreateGenericModel(force, 'isTailModel', 'tailModel', 'TailModel', PPM2.TailMapping, 'TailTypeNew')
 
 	CreateUpperManeModelIfNotExists: (force = false) =>
 		return @maneModelUpper if IsValid(@maneModelUpper)
@@ -624,9 +637,9 @@ class NewBodygroupController extends DefaultBodygroupController
 		return @tailModel if IsValid(@tailModel)
 		return @CreateTailModel()
 
-	UpdateUpperMane: (force = false) => @UpdateGenericModel(force, 'CreateUpperManeModel', 'maneModelUpper', 'UpperManeModel', PPM2.GetUpperManeModelName, 'ManeTypeNew')
-	UpdateLowerMane: (force = false) => @UpdateGenericModel(force, 'CreateLowerManeModel', 'maneModelLower', 'LowerManeModel', PPM2.GetLowerManeModelName, 'ManeTypeLowerNew')
-	UpdateTailModel: (force = false) => @UpdateGenericModel(force, 'CreateTailModel', 'tailModel', 'TailModel', PPM2.GetTailModelName, 'TailTypeNew')
+	UpdateUpperMane: (force = false) => @UpdateGenericModel(force, 'CreateUpperManeModel', 'maneModelUpper', 'UpperManeModel', PPM2.UpperManeMapping, 'ManeTypeNew')
+	UpdateLowerMane: (force = false) => @UpdateGenericModel(force, 'CreateLowerManeModel', 'maneModelLower', 'LowerManeModel', PPM2.LowerManeMapping, 'ManeTypeLowerNew')
+	UpdateTailModel: (force = false) => @UpdateGenericModel(force, 'CreateTailModel', 'tailModel', 'TailModel', PPM2.TailMapping, 'TailTypeNew')
 
 	GetUpperMane: => @maneModelUpper or NULL
 	GetLowerMane: => @maneModelLower or NULL

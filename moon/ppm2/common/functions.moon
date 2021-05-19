@@ -21,49 +21,6 @@
 
 
 DLib.CMessage(PPM2, 'PPM2')
-DEBUG_LEVEL = CreateConVar('ppm2_debug', '0', {}, 'Enables debug printing. LOTS OF IT. 1 - simple messages; 2 - messages with traceback.')
-
-PPM2.DebugPrint = (...) ->
-	return if DEBUG_LEVEL\GetInt() <= 0
-	frmt = PPM2.formatMessage(DEBUG_COLOR, ...)
-	MsgC(DEBUG_COLOR, PREFIX_DEBUG, unpack(frmt))
-	MsgC('\n')
-	if DEBUG_LEVEL\GetInt() >= 2
-		MsgC(DEBUG_COLOR, debug.traceback())
-		MsgC('\n')
-	return frmt
-
-PPM2.TransformNewModelID = (id = 0) ->
-	bgID = id % 16
-	maneModelID = math.floor(id / 16) + 1
-	maneModelID = 1 if maneModelID == 0
-	return maneModelID, bgID
-
-PPM2.GetUpperManeModelName = (id = 0) ->
-	modelID, bodygroupID = PPM2.TransformNewModelID(id)
-	modelID = "0" .. modelID if modelID < 10
-	return "models/ppm/hair/ppm_manesetupper#{modelID}.mdl", modelID, bodygroupID
-
-PPM2.GetLowerManeModelName = (id = 0) ->
-	modelID, bodygroupID = PPM2.TransformNewModelID(id)
-	modelID = "0" .. modelID if modelID < 10
-	return "models/ppm/hair/ppm_manesetlower#{modelID}.mdl", modelID, bodygroupID
-
-PPM2.GetTailModelName = (id = 0) ->
-	modelID, bodygroupID = PPM2.TransformNewModelID(id)
-	modelID = "0" .. modelID if modelID < 10
-	return "models/ppm/hair/ppm_tailset#{modelID}.mdl", modelID, bodygroupID
-
-PPM2.TransformHornModelID = (id = 0) ->
-	bgID = id % 16
-	hornModelID = math.floor(id / 16) + 1
-	hornModelID = 1 if hornModelID == 0
-	return hornModelID, bgID
-
-PPM2.GetHornModelName = (id = 0) ->
-	modelID, bodygroupID = PPM2.TransformHornModelID(id)
-	modelID = "0" .. modelID if modelID < 10
-	return "models/ppm/horns/ppm_hornset#{modelID}.mdl", modelID, bodygroupID
 
 do
 	randomColor = (a = 255) -> Color(math.random(0, 255), math.random(0, 255), math.random(0, 255), a)

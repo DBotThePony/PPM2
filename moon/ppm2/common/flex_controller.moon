@@ -975,7 +975,6 @@ class PonyFlexController extends PPM2.ControllerChildren
 		@Hook('PlayerStartVoice', @PlayerStartVoice)
 		@Hook('PlayerEndVoice', @PlayerEndVoice)
 		@ResetSequences()
-		PPM2.DebugPrint('Created new flex controller for ', @GetEntity(), ' as part of ', data, '; internal ID is ', @fid)
 
 	IsValid: => @isValid
 

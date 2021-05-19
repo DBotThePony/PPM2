@@ -424,7 +424,6 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 		@Hook('PPM2_EmoteAnimation', @PPM2_EmoteAnimation)
 		@Hook('OnPlayerChat', @OnPlayerChat)
 		@ResetSequences()
-		PPM2.DebugPrint('Created new PonyExpressionsController for ', @GetEntity(), ' as part of ', controller, '; internal ID is ', @objID)
 
 	PPM2_HurtAnimation: (ply = NULL) =>
 		return if ply ~= @GetEntity()
