@@ -832,7 +832,6 @@ for _, {internal, publicName} in ipairs {{'_left', 'Left'}, {'_right', 'Right'},
 		min: PPM2.MIN_IRIS
 		max: PPM2.MAX_IRIS
 		type: 'FLOAT'
-		modifiers: true
 	}
 
 	PPM2.PonyDataRegistry["DerpEyes#{publicName}"] = {

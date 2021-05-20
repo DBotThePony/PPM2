@@ -221,7 +221,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			'repeat': false
 			'time': 4
 			'reset': =>
-				@SetControllerModifier('IrisSize', -0.3)
+				@SetControllerModifier('IrisSizeInternal', -0.3)
 		}
 
 		{
@@ -323,7 +323,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			'repeat': false
 			'time': 4
 			'reset': =>
-				@SetControllerModifier('IrisSize', -0.2)
+				@SetControllerModifier('IrisSizeInternal', -0.2)
 		}
 
 		{
@@ -390,7 +390,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			'repeat': false
 			'time': 3
 			'reset': =>
-				@SetControllerModifier('IrisSize', -1)
+				@SetControllerModifier('IrisSizeInternal', -0.5)
 				@PlayBonesSequence(math.random(1, 100) > 50 and 'neck_left' or 'neck_right')
 		}
 
@@ -400,7 +400,7 @@ class PPM2.PonyExpressionsController extends PPM2.ControllerChildren
 			'autostart': false
 			'repeat': false
 			'time': 8
-			'reset': => @SetControllerModifier('IrisSize', math.Rand(0.3, 0.4))
+			'reset': => @SetControllerModifier('IrisSizeInternal', math.Rand(0.1, 0.3))
 		}
 
 		{

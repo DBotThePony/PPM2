@@ -138,6 +138,10 @@ PPM2.TextureCompileWorker = ->
 			PPM2.COMPLETED_TASKS += 1
 			PPM2.LAST_TASK = SysTime() + 5
 			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
+
+			if not next(PPM2.TEXTURE_TASKS)
+				DLib.Util.PopProgress('ppm2_busy')
+
 			PPM2.TEXTURE_TASK_CURRENT = nil
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
@@ -424,7 +428,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@BODY_UPDATE_TRIGGER = {}
 	@MANE_UPDATE_TRIGGER = {'ManeType': true, 'ManeTypeLower': true}
 	@TAIL_UPDATE_TRIGGER = {'TailType': true}
-	@EYE_UPDATE_TRIGGER = {'SeparateEyes': true}
+	@EYE_UPDATE_TRIGGER = {'SeparateEyes': true, 'IrisSizeInternal': true}
 	@PHONG_UPDATE_TRIGGER = {
 		'SeparateHornPhong': true
 		'SeparateWingsPhong': true
@@ -701,6 +705,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@texture_tasks += 1
 			PPM2.MAX_TASKS += 1
 			PPM2.LAST_TASK = SysTime() + 5
+
+			if not PPM2.TEXTURE_TASK_CURRENT
+				coroutine.resume(PPM2.TextureCompileThread)
 
 	DataChanges: (state) =>
 		return unless @isValid
@@ -2480,6 +2487,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		EyeLineDirection =  @GrabData("EyeLineDirection#{prefixData}")
 		EyeGlossyStrength = @GrabData("EyeGlossyStrength#{prefixData}")
 		PonySize =          @GrabData('PonySize')
+		IrisSizeInternal =  @GrabData('IrisSizeInternal')
 		PonySize = 1        if IsValid(@GetEntity()) and @GetEntity()\IsRagdoll()
 
 		texSize = (PPM2.USE_HIGHRES_TEXTURES\GetInt()\Clamp(0, 1) + 1) * @@QUAD_SIZE_EYES
@@ -2521,6 +2529,13 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@["EyeMaterial#{prefixUpper}"] = createdMaterial
 		@UpdatePhongData()
 
+		if IrisSizeInternal\abs() <= 0.02
+			createdMaterial\SetInt('$irisframe', 0)
+		elseif IrisSizeInternal > 0
+			createdMaterial\SetInt('$irisframe', math.clamp(IrisSizeInternal\progression(0, 0.2) * 4 + 2, 2, 6)\round() - 1)
+		else
+			createdMaterial\SetInt('$irisframe', math.clamp((1 - IrisSizeInternal\progression(-0.5, 0)) * 13 + 7, 7, 20)\round() - 1)
+
 		createdMaterial\SetFloat('$glossiness', EyeGlossyStrength)
 
 		IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
@@ -2532,6 +2547,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
 		calcHoleX = HolePos - holeX + holeX * HoleShiftX + shiftX
 		calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
+
+		{:r, :g, :b} = EyeBackground
 
 		if EyeRefract
 			if EyeCornerA
@@ -2576,7 +2593,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			return
 
 		hash = PPM2.TextureTableHash({
-			'eye',
+			'eye frames'
 			prefixUpper
 			EyeType
 			grind_down_color(EyeBackground)
@@ -2613,48 +2630,73 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			{:r, :g, :b, :a} = EyeBackground
 			lock(@, 'eye_' .. prefixUpper, texSize, texSize, r, g, b)
 
-			render.PushFilterMag(TEXFILTER.ANISOTROPIC)
-			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+			_IrisSize = IrisSize
 
-			surface.SetDrawColor(EyeIris1)
-			surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
-			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+			render_frame = (mult = 1) ->
+				IrisSize = _IrisSize * mult
 
-			surface.SetDrawColor(EyeIris2)
-			surface.SetMaterial(@@EYE_GRAD)
-			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+				IrisPos = texSize / 2 - texSize * IrisSize * PonySize / 2
+				IrisQuadSize = texSize * IrisSize * PonySize
 
-			if EyeLines
-				lprefix = prefixUpper
-				lprefix = prefixUpperR if not EyeLineDirection
-				surface.SetDrawColor(EyeIrisLine1)
-				surface.SetMaterial(@@["EYE_LINE_#{lprefix}_1"])
+				HoleQuadSize = texSize * IrisSize * HoleSize * PonySize
+				HolePos = texSize / 2
+				holeX = HoleQuadSize * HoleWidth / 2
+				holeY = texSize * (IrisSize * HoleSize * HoleHeight * PonySize) / 2
+				calcHoleX = HolePos - holeX + holeX * HoleShiftX + shiftX
+				calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
+
+				render.Clear(r, g, b, 255, true, true)
+
+				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
+				surface.SetDrawColor(EyeIris1)
+				surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
 				DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-				surface.SetDrawColor(EyeIrisLine2)
-				surface.SetMaterial(@@["EYE_LINE_#{lprefix}_2"])
+				surface.SetDrawColor(EyeIris2)
+				surface.SetMaterial(@@EYE_GRAD)
 				DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-			surface.SetDrawColor(EyeHole)
-			surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
-			DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
+				if EyeLines
+					lprefix = prefixUpper
+					lprefix = prefixUpperR if not EyeLineDirection
+					surface.SetDrawColor(EyeIrisLine1)
+					surface.SetMaterial(@@["EYE_LINE_#{lprefix}_1"])
+					DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-			surface.SetDrawColor(EyeEffect)
-			surface.SetMaterial(@@EYE_EFFECT)
-			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+					surface.SetDrawColor(EyeIrisLine2)
+					surface.SetMaterial(@@["EYE_LINE_#{lprefix}_2"])
+					DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
 
-			surface.SetDrawColor(EyeReflection)
-			surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType])
-			DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+				surface.SetDrawColor(EyeHole)
+				surface.SetMaterial(@@EYE_OVALS[EyeType] or @EYE_OVAL)
+				DrawTexturedRectRotated(calcHoleX, calcHoleY, HoleQuadSize * HoleWidth * IrisWidth, HoleQuadSize * HoleHeight * IrisHeight, EyeRotation)
 
-			render.PopFilterMag()
-			render.PopFilterMin()
+				surface.SetDrawColor(EyeEffect)
+				surface.SetMaterial(@@EYE_EFFECT)
+				DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+
+				surface.SetDrawColor(EyeReflection)
+				surface.SetMaterial(PPM2.MaterialsRegistry.EYE_REFLECTIONS[EyeReflectionType])
+				DrawTexturedRectRotated(IrisPos + shiftX, IrisPos + shiftY, IrisQuadSize * IrisWidth, IrisQuadSize * IrisHeight, EyeRotation)
+
+				render.PopFilterMag()
+				render.PopFilterMin()
 
 			if isEditor
+				render_frame()
 				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
 			else
-				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine()
+				-- 1 - base frame
+				-- 2 - 6 - enlarge
+				-- 7 - 20 - shrink
+				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2, frames: 20})
+
+				for i, mult in ipairs({1, 1.04, 1.08, 1.12, 1.16, 1.20, 1, 0.96153846153846, 0.92307692307692, 0.88461538461538, 0.84615384615385, 0.80769230769231, 0.76923076923077, 0.73076923076923, 0.69230769230769, 0.65384615384615, 0.61538461538462, 0.57692307692308, 0.53846153846154, 0.5})
+					render_frame(mult)
+					vtf\CaptureRenderTargetCoroutine({frame: i})
+
 				@@ReleaseRenderTarget(texSize, texSize)
 
 				vtf\AutoGenerateMips(false)

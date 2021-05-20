@@ -385,6 +385,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 	@GetSet('HornModel', 'm_hornmodel')
 	@GetSet('ClothesModel', 'm_clothesmodel')
 	@GetSet('NewSocksModel', 'm_newSocksModel')
+	@GetSet('IrisSizeInternal', '_NW_IrisSizeInternal')
 
 	@AddNetworkVar('DisableTask',          rBool,   wBool,                 false)
 	@AddNetworkVar('UseFlexLerp',          rBool,   wBool,                  true)
@@ -400,6 +401,10 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 				funcLerp = 'Calculate' .. key
 				@__base['Get' .. key] = => @[funcLerp](@, @[strName])
 
+		@RegisterModifier('IrisSizeInternal', 0, 0)
+		@SetupLerpTables('IrisSizeInternal')
+		@__base['GetIrisSizeInternal'] = => @CalculateIrisSizeInternal(@_NW_IrisSizeInternal)
+
 	for key, value in SortedPairs PPM2.PonyDataRegistry
 		@AddNetworkVar(key, value.read, value.write, value.default, value.enum_runtime_map)
 
@@ -411,6 +416,8 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@m_tailModel            = NULL
 		@m_socksModel           = NULL
 		@m_newSocksModel        = NULL
+
+		@_NW_IrisSizeInternal = 0
 
 		@lastLerpThink = RealTimeL()
 
@@ -641,7 +648,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@lastLerpThink = time
 
 		if @isValid and IsValid(@ent)
-			for _, change in ipairs @TriggerLerpAll(delta * 5)
+			for change in *@TriggerLerpAll(delta * 5)
 				state = PPM2.NetworkChangeState('_NW_' .. change[1], change[1], change[2] + @['_NW_' .. change[1]], @)
 				state\SetCantApply(true)
 				@GenericDataChange(state)
