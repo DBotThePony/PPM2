@@ -835,6 +835,17 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		@WriteNetworkData()
 		net.Send(targets)
 
+	CreateOrNetworkAll: =>
+		if @NETWORKED
+			net.Start(@@NW_Create)
+			net.WriteUInt32(@netID)
+			net.WriteEntity(@ent)
+			@WriteNetworkData()
+			net.Broadcast()
+			return
+
+		@Create()
+
 	NetworkAll: =>
 		net.Start(@@NW_Create)
 		net.WriteUInt32(@netID)
