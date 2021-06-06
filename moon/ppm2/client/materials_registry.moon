@@ -20,7 +20,8 @@
 -- DEALINGS IN THE SOFTWARE.
 
 PPM2.USE_HIGHRES_TEXTURES = CreateConVar('ppm2_cl_hires', '0', {FCVAR_ARCHIVE}, 'Double the texture resolution. Can take ages at texture encoding if CPU is slow, and require a lot of RAM for encoding and a lot of VRAM for textures!')
-PPM2.NO_COMPRESSION = CreateConVar('ppm2_cl_use_rgba', '0', {FCVAR_ARCHIVE}, 'Use RGB888/RGBA8888 instead of DXT1/DXT5. This option is experimental and is VERY memory/videomemory hungry!')
+PPM2.NO_COMPRESSION = CreateConVar('ppm2_cl_use_rgba', '0', {FCVAR_ARCHIVE}, 'Use RGB888/RGBA8888 instead of DXT1/DXT5. This option is experimental and is VERY memory/video memory hungry!')
+PPM2.NO_ENCODING = CreateConVar('ppm2_cl_disable_encoding', '0', {FCVAR_ARCHIVE}, 'Disable texture encoding completely. This is same as ppm2_cl_use_rgba, except it will use even more video memory! This option is unsupported and will break some features.')
 PPM2.FORCE_PRECACHE = CreateConVar('ppm2_cl_force_precache', '0', {FCVAR_ARCHIVE}, 'Force precache render textures instead of precaching them when required')
 
 _Material = Material

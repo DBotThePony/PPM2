@@ -209,7 +209,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor1"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine({fuck: true})
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, prefix .. '_hair_1_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -272,7 +272,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, prefix .. '_hair_2_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -395,7 +395,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'bat_wing', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -481,7 +481,7 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'bat_wing_skin', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())

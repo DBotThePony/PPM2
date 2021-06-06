@@ -558,10 +558,42 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	@LOCKED_RENDERTARGETS_MASK = LOCKED_RENDERTARGETS_MASK or {}
 
 	SelectLockFuncs: =>
+		if PPM2.NO_ENCODING\GetBool()
+			return true, @LockRenderTargetHungry, @ReleaseRenderTargetHungry
+
 		if @GrabData('IsEditor')
 			return true, @LockRenderTargetEditor, @ReleaseRenderTargetEditor
 
 		return false, @LockRenderTarget, @ReleaseRenderTarget
+
+	LockRenderTargetHungry: (name, width, height, r = 0, g = 0, b = 0, a = 255) =>
+		index = string.format('ppm2_rt_%s_%s_%d_%d', @GetID(), name, width, height)
+		rt = GetRenderTarget(index, width, height)
+
+		render.PushRenderTarget(rt)
+		render.Clear(r, g, b, a, true, true)
+
+		cam.Start2D()
+
+		surface.SetDrawColor(r, g, b, a)
+
+		mat = CreateMaterial(index .. '_m', 'UnlitGeneric', {
+			'$basetexture': '!' .. index,
+			'$translucent': '1',
+		})
+
+		mat\SetTexture('$basetexture', rt)
+
+		return rt, mat
+
+	ReleaseRenderTargetHungry: (name, width, height, no_pop = false) =>
+		index = string.format('ppm2_rt_%s_%s_%d_%d', @GetID(), name, width, height)
+
+		if not no_pop
+			cam.End2D()
+			render.PopRenderTarget()
+
+		return GetRenderTarget(index, width, height)
 
 	LockRenderTargetEditor: (name, width, height, r = 0, g = 0, b = 0, a = 255) =>
 		index = string.format('PPM2_editor_%s_%d_%d', name, width, height)
@@ -690,9 +722,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 	CreateRenderTask: (func = '', ...) =>
 		index = string.format('%p%s', @, func)
-		isEditor, lock, release = @SelectLockFuncs()
+		isRenderTarget, lock, release = @SelectLockFuncs()
 
-		if isEditor
+		if isRenderTarget
 			return if PPM2.TEXTURE_TASKS_EDITOR[index]
 			thread = coroutine.create(@[func])
 			PPM2.TEXTURE_TASKS_EDITOR[index] = {thread, @, lock, release}
@@ -1137,7 +1169,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@ApplyPhongData(@EyeMaterialL, 'BEyes', true)
 			@ApplyPhongData(@EyeMaterialR, 'BEyes', true)
 
-	CompileBody: (isEditor, lock, release) =>
+	CompileBody: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -1291,12 +1323,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@BodyMaterial\SetTexture('$basetexture', release(@, 'body', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'body', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 
@@ -1329,12 +1361,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@BodyMaterial\SetTexture('$bumpmap', release(@, 'body_bump', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'body_bump', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash_bump, vtf\ToString())
@@ -1406,12 +1438,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'body_illum', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash_glow, vtf\ToString())
@@ -1421,7 +1453,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 	@BUMP_COLOR = Color(127, 127, 255)
 
-	CompileHorn: (isEditor, lock, release) =>
+	CompileHorn: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -1561,12 +1593,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@HornMaterial\SetTexture('$basetexture', release(@, 'horn', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'horn', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1602,12 +1634,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'horn_illum', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1637,12 +1669,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@HornMaterial\SetTexture('$bumpmap', release(@, 'horn_bump', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'horn_bump', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -1650,7 +1682,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@HornMaterial\SetTexture('$bumpmap', path)
 				@HornMaterial\GetTexture('$bumpmap')\Download()
 
-	CompileClothPart: (iName, matregistry, indexregistry, rtsize, opaque = true, isEditor, lock, release) =>
+	CompileClothPart: (iName, matregistry, indexregistry, rtsize, opaque = true, isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		data = {
@@ -1798,12 +1830,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					render.PopFilterMag()
 					render.PopFilterMin()
 
-					if isEditor
+					if isRenderTarget
 						mat\SetTexture('$basetexture', release(@, 'cloth_' .. iName, rtsize, rtsize))
 					else
 						vtf = DLib.VTF.Create(2, rtsize, rtsize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
-						@@ReleaseRenderTarget(rtsize, rtsize)
+						release(@, 'cloth_' .. iName, rtsize, rtsize)
 
 						vtf\AutoGenerateMips(false)
 						path = @@SetCacheH(hash, vtf\ToString())
@@ -1817,12 +1849,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		@UpdateClothes(nil, @clothesModel) if IsValid(@clothesModel)
 
-	CompileHeadClothes: (isEditor, lock, release) => @CompileClothPart('Head', PPM2.MaterialsRegistry.HEAD_CLOTHES, PPM2.MaterialsRegistry.HEAD_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_HEAD, true, isEditor, lock, release)
-	CompileBodyClothes: (isEditor, lock, release) => @CompileClothPart('Body', PPM2.MaterialsRegistry.BODY_CLOTHES, PPM2.MaterialsRegistry.BODY_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_BODY, true, isEditor, lock, release)
-	CompileNeckClothes: (isEditor, lock, release) => @CompileClothPart('Neck', PPM2.MaterialsRegistry.NECK_CLOTHES, PPM2.MaterialsRegistry.NECK_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_NECK, true, isEditor, lock, release)
-	CompileEyeClothes: (isEditor, lock, release) => @CompileClothPart('Eye', PPM2.MaterialsRegistry.EYE_CLOTHES, PPM2.MaterialsRegistry.EYE_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_EYES, false, isEditor, lock, release)
+	CompileHeadClothes: (isRenderTarget, lock, release) => @CompileClothPart('Head', PPM2.MaterialsRegistry.HEAD_CLOTHES, PPM2.MaterialsRegistry.HEAD_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_HEAD, true, isRenderTarget, lock, release)
+	CompileBodyClothes: (isRenderTarget, lock, release) => @CompileClothPart('Body', PPM2.MaterialsRegistry.BODY_CLOTHES, PPM2.MaterialsRegistry.BODY_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_BODY, true, isRenderTarget, lock, release)
+	CompileNeckClothes: (isRenderTarget, lock, release) => @CompileClothPart('Neck', PPM2.MaterialsRegistry.NECK_CLOTHES, PPM2.MaterialsRegistry.NECK_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_NECK, true, isRenderTarget, lock, release)
+	CompileEyeClothes: (isRenderTarget, lock, release) => @CompileClothPart('Eye', PPM2.MaterialsRegistry.EYE_CLOTHES, PPM2.MaterialsRegistry.EYE_CLOTHES_INDEX, @@QUAD_SIZE_CLOTHES_EYES, false, isRenderTarget, lock, release)
 
-	CompileNewSocks: (isEditor, lock, release) =>
+	CompileNewSocks: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		data = {
@@ -1896,7 +1928,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@NewSocksBase\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 		@NewSocksBase\SetTexture('$basetexture', 'models/debug/debugwhite')
 
-	CompileEyelashes: (isEditor, lock, release) =>
+	CompileEyelashes: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -1931,7 +1963,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@Eyelashes\SetVector('$color', Vector(r / 255, g / 255, b / 255))
 		@Eyelashes\SetVector('$color2', Vector(r / 255, g / 255, b / 255))
 
-	CompileSocks: (isEditor, lock, release) =>
+	CompileSocks: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -2013,12 +2045,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				render.PopFilterMag()
 				render.PopFilterMin()
 
-				if isEditor
+				if isRenderTarget
 					@SocksMaterial\SetTexture('$basetexture', release(@, 'sock', texSize, texSize))
 				else
 					vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
-					@@ReleaseRenderTarget(texSize, texSize)
+					release(@, 'sock', texSize, texSize)
 
 					vtf\AutoGenerateMips(false)
 					path = @@SetCacheH(hash, vtf\ToString())
@@ -2026,7 +2058,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					@SocksMaterial\SetTexture('$basetexture', path)
 					@SocksMaterial\GetTexture('$basetexture')\Download()
 
-	CompileWings: (isEditor, lock, release) =>
+	CompileWings: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
@@ -2100,12 +2132,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@WingsMaterial\SetTexture('$basetexture', release(@, 'wings', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'wings', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2117,7 +2149,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 	GetManeTypeLower: => @GrabData('ManeTypeLower')
 	GetTailType: => @GrabData('TailType')
 
-	CompileHair: (isEditor, lock, release) =>
+	CompileHair: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureFirst = {
@@ -2203,12 +2235,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@HairColor1Material\SetTexture('$basetexture', release(@, 'hair_1_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'hair_1_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2265,12 +2297,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@HairColor2Material\SetTexture('$basetexture', release(@, 'hair_2_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'hair_2_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2278,7 +2310,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				@HairColor2Material\SetTexture('$basetexture', path)
 				@HairColor2Material\GetTexture('$basetexture')\Download()
 
-	CompileTail: (isEditor, lock, release) =>
+	CompileTail: (isRenderTarget, lock, release) =>
 		return unless @isValid
 		textureFirst = {
 			'name': "PPM2_#{@GetID()}_Tail_1"
@@ -2364,12 +2396,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@TailColor1Material\SetTexture('$basetexture', release(@, 'tail_1_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'tail_1_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2426,12 +2458,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			render.PopFilterMag()
 			render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				@TailColor2Material\SetTexture('$basetexture', release(@, 'tail_2_color', texSize, texSize))
 			else
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'tail_2_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2445,10 +2477,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return @REFLECT_RENDER_SIZE if val % 2 ~= 0
 		return val
 
-	CompileLeftEye: (isEditor, lock, release) => @CompileEye(true, isEditor, lock, release)
-	CompileRightEye: (isEditor, lock, release) => @CompileEye(false, isEditor, lock, release)
+	CompileLeftEye: (isRenderTarget, lock, release) => @CompileEye(true, isRenderTarget, lock, release)
+	CompileRightEye: (isRenderTarget, lock, release) => @CompileEye(false, isRenderTarget, lock, release)
 
-	CompileEye: (left = false, isEditor, lock, release) =>
+	CompileEye: (left = false, isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		prefix = left and 'l' or 'r'
@@ -2571,12 +2603,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					surface.SetDrawColor(255, 255, 255)
 					DrawTexturedRectRotated(IrisPos + shiftX - texSize / 16, IrisPos + shiftY - texSize / 16, IrisQuadSize * IrisWidth * 1.5, IrisQuadSize * IrisHeight * 1.5, EyeRotation)
 
-					if isEditor
+					if isRenderTarget
 						createdMaterial\SetTexture('$corneatexture', release(@, 'eye_cornera', texSize, texSize))
 					else
 						vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
-						@@ReleaseRenderTarget(texSize, texSize)
+						release(@, 'eye_cornera', texSize, texSize)
 
 						vtf\AutoGenerateMips(false)
 						path = @@SetCacheH(hash, vtf\ToString())
@@ -2684,7 +2716,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				render.PopFilterMag()
 				render.PopFilterMin()
 
-			if isEditor
+			if isRenderTarget
 				render_frame()
 				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
 			else
@@ -2697,7 +2729,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					render_frame(mult)
 					vtf\CaptureRenderTargetCoroutine({frame: i})
 
-				@@ReleaseRenderTarget(texSize, texSize)
+				release(@, 'eye_' .. prefixUpper, texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
@@ -2754,7 +2786,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 		@ReleaseRenderTargetMask(texSize, texSize)
 
-	CompileCMark: (isEditor, lock, release) =>
+	CompileCMark: (isRenderTarget, lock, release) =>
 		return unless @isValid
 
 		textureData = {
