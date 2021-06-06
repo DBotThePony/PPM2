@@ -135,6 +135,7 @@ PPM2.TextureCompileWorker = ->
 			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
 			task[1](task[2], false, task[3], task[4]) if IsValid(task[2])
 			task[2].texture_tasks -= 1
+			task[2]._once = true
 			PPM2.COMPLETED_TASKS += 1
 			PPM2.LAST_TASK = SysTime() + 5
 			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
@@ -738,7 +739,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			PPM2.MAX_TASKS += 1
 			PPM2.LAST_TASK = SysTime() + 5
 
-			if not PPM2.TEXTURE_TASK_CURRENT
+			if not PPM2.TEXTURE_TASK_CURRENT and @_once
 				coroutine.resume(PPM2.TextureCompileThread)
 
 	DataChanges: (state) =>
@@ -2634,8 +2635,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			math.round(IrisSize * 100)
 			grind_down_color(EyeIris1)
 			grind_down_color(EyeIris2)
-			EyeLines and grind_down_color(EyeIrisLine1)
-			EyeLines and grind_down_color(EyeIrisLine2)
+			EyeLines and grind_down_color(EyeIrisLine1) or '-'
+			EyeLines and grind_down_color(EyeIrisLine2) or '-'
 			math.round(HoleSize * 100)
 			math.round(EyeGlossyStrength * 100)
 			grind_down_color(EyeReflection)
