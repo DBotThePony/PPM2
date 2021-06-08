@@ -147,9 +147,9 @@ PPM2.TextureCompileWorker = ->
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
 
-null_texrure = GetRenderTarget('ppm2_null', 1, 1)
+null_texrure = GetRenderTarget('ppm2__null', 4, 4)
 render.PushRenderTarget(null_texrure)
-render.Clear(255, 255, 255, 0, true, true)
+render.Clear(0, 0, 0, 0, true, true)
 render.PopRenderTarget()
 
 PPM2.URLThreadWorker = ->
@@ -382,9 +382,9 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS_MASK)
 	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
 	PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
-	null_texrure = GetRenderTarget('ppm2_null', 1, 1)
+	null_texrure = GetRenderTarget('ppm2__null', 4, 4)
 	render.PushRenderTarget(null_texrure)
-	render.Clear(255, 255, 255, 0, true, true)
+	render.Clear(0, 0, 0, 0, true, true)
 	render.PopRenderTarget()
 
 PPM2.TextureTableHash = (input) ->
