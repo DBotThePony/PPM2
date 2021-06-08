@@ -141,7 +141,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 		else
 			tab.writeMapped = writeFunc
 
-		@__base["Set#{getName}"] = (val = defFunc(), networkNow = networkByDefault) =>
+		@__base["Set#{getName}"] = (val = defFunc(), networkNow = true) =>
 			local refvalue, setvalue
 
 			if enum_runtime_map
@@ -172,7 +172,7 @@ class PPM2.NetworkedPonyData extends PPM2.ModifierBase
 			net.SendToServer() if CLIENT
 			net.Broadcast() if SERVER
 
-		@__base["Set#{getName}Safe"] = (val = defFunc(), networkNow = networkByDefault) =>
+		@__base["Set#{getName}Safe"] = (val = defFunc(), networkNow = true) =>
 			local refvalue, setvalue
 
 			if enum_runtime_map
