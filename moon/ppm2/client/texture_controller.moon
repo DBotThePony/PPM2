@@ -147,6 +147,11 @@ PPM2.TextureCompileWorker = ->
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
 
+null_texrure = GetRenderTarget('ppm2_null', 1, 1)
+render.PushRenderTarget(null_texrure)
+render.Clear(255, 255, 255, 0, true, true)
+render.PopRenderTarget()
+
 PPM2.URLThreadWorker = ->
 	while true
 		if not PPM2.HTML_MATERIAL_QUEUE[1]
@@ -183,6 +188,8 @@ PPM2.URLThreadWorker = ->
 						'$nolod': 1
 						'$translucent': 1
 					})
+
+					newMat\SetTexture('$basetexture', null_texrure)
 
 					PPM2.FAILED_TO_DOWNLOAD[data.index] = {
 						texture: newMat\GetTexture('$basetexture')
@@ -375,6 +382,10 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 	table.Empty(PPM2.PonyTextureController.LOCKED_RENDERTARGETS_MASK)
 	PPM2.URLThread = coroutine.create(PPM2.URLThreadWorker)
 	PPM2.TextureCompileThread = coroutine.create(PPM2.TextureCompileWorker)
+	null_texrure = GetRenderTarget('ppm2_null', 1, 1)
+	render.PushRenderTarget(null_texrure)
+	render.Clear(255, 255, 255, 0, true, true)
+	render.PopRenderTarget()
 
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
@@ -1630,7 +1641,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				surface.SetMaterial(@@HORN_DETAIL_COLOR)
 				surface.DrawTexturedRect(0, 0, texSize, texSize)
 			else
-				@HornMaterial2\SetTexture('$selfillummask', 'null')
+				@HornMaterial2\SetTexture('$selfillummask', null_texrure)
 
 			render.PopFilterMag()
 			render.PopFilterMin()
@@ -2617,7 +2628,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 						createdMaterial\SetTexture('$corneatexture', path)
 						createdMaterial\SetTexture('$corneatexture')\Download()
 			else
-				createdMaterial\SetTexture('$corneatexture', 'null')
+				createdMaterial\SetTexture('$corneatexture', null_texrure)
 
 		if url = PPM2.IsValidURL(EyeURL)
 			texture = PPM2.GetURLMaterial(url, texSize, texSize)\Await()
@@ -2817,8 +2828,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		@CMarkTextureGUI = CreateMaterial(textureDataGUI.name, textureDataGUI.shader, textureDataGUI.data)
 
 		unless @GrabData('CMark')
-			@CMarkTexture\SetTexture('$basetexture', 'null')
-			@CMarkTextureGUI\SetTexture('$basetexture', 'null')
+			@CMarkTexture\SetTexture('$basetexture', null_texrure)
+			@CMarkTextureGUI\SetTexture('$basetexture', null_texrure)
 			return
 
 		URL = @GrabData('CMarkURL')
@@ -2852,8 +2863,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			@CMarkTexture\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
 			@CMarkTextureGUI\SetTexture('$basetexture', mark\GetTexture('$basetexture'))
 		else
-			@CMarkTexture\SetTexture('$basetexture', 'null')
-			@CMarkTextureGUI\SetTexture('$basetexture', 'null')
+			@CMarkTexture\SetTexture('$basetexture', null_texrure)
+			@CMarkTextureGUI\SetTexture('$basetexture', null_texrure)
 
 PPM2.GetTextureController = (model = 'models/ppm/player_default_base.mdl') ->
 	PPM2.PonyTextureController.AVALIABLE_CONTROLLERS[model\lower()] or PPM2.PonyTextureController
