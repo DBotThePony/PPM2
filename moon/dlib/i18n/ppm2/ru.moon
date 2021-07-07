@@ -99,6 +99,7 @@ gui.ppm2.editor.io.failed = 'Ошибка импорта.'
 gui.ppm2.editor.io.warn.oldfile = '[!] Это может или сработать или нет. Есть шанс аннигиляции.'
 gui.ppm2.editor.io.warn.text = "В данный момент вы не сохранили свои изменения.\nВы действительно хотите открыть другой файл?"
 gui.ppm2.editor.io.warn.header = 'Несохраненные изменения!'
+gui.ppm2.editor.io.load.button = 'Загрузить'
 gui.ppm2.editor.io.save.button = 'Сохранить'
 gui.ppm2.editor.io.save.text = 'Введите имя файла без ppm2/ и .dat\nПодсказка: что бы сохранить файл как авто-загружаемый, введите "_current" (без кавычек)'
 gui.ppm2.editor.io.wear = 'Применить изменения'

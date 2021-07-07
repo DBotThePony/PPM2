@@ -194,6 +194,12 @@ class PonyDataInstance
 		@exists = file.Exists(@fullPath, 'DATA')
 		return @exists
 
+	SetDataPath: (path) =>
+		@fullPath = path
+		@absolutePath = "data/#{path}.dat"
+		@exists = file.Exists(@fullPath, 'DATA')
+		return @exists
+
 	SetNetworkObject: (nwObj) => @nwObj = nwObj
 	SetNetworkOnChange: (newVal = true) => @networkNWObject = newVal
 	SetUpdateOnChange: (newVal = true) => @updateNWObject = newVal

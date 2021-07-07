@@ -1801,24 +1801,57 @@ local cl_playermodel
 PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 	oldPerformLayout = @PerformLayout or (->)
 
-	saveAs = (callback = (->)) ->
-		confirm = (txt = '') ->
-			txt = txt\Trim()
-			return if txt == ''
-			@data\SetFilename(txt)
-			@data\Save()
-			@unsavedChanges = false
-			@model.unsavedChanges = false if IsValid(@model)
-			@SetTitle('gui.ppm2.editor.generic.title_file', @data\GetFilename() or '%ERRNAME%')
-			@panels.saves.rebuildFileList() if @panels and @panels.saves and @panels.saves.rebuildFileList
-			@saves.rebuildFileList() if @saves and @saves.rebuildFileList
-			callback(txt)
-		Derma_StringRequest('gui.ppm2.editor.io.save.button', 'gui.ppm2.editor.io.save.text', @data\GetFilename(), confirm)
-
 	with @saveButton = vgui.Create('DButton', @)
 		\SetText('gui.ppm2.editor.io.save.button')
 		\SetSize(90, 20)
-		.DoClick = -> saveAs()
+		.DoClick = ->
+			manager = vgui.Create('DLib_FileManager')
+			manager\SetPathString('ppm2/')
+			manager\SetFileMode(manager.MODE_WIRTE)
+			manager\SetAutoExtension('dat')
+			manager\SetFilenameBar(@data\GetFilename())
+
+			manager.CallSelectFile = (_, path, stripped_ext, stripped, stripped_dir) ->
+				@data\SetFilename(stripped_ext)
+				@data\SetDataPath(path)
+				@data\Save()
+				@unsavedChanges = false
+				@model.unsavedChanges = false if IsValid(@model)
+				@SetTitle('gui.ppm2.editor.generic.title_file', @data\GetFilename() or '%ERRNAME%')
+				return true
+
+	with @loadButton = vgui.Create('DButton', @)
+		\SetText('gui.ppm2.editor.io.load.button')
+		\SetSize(90, 20)
+		.DoClick = ->
+			confirm = ->
+				manager = vgui.Create('DLib_FileManager')
+				manager\SetPathString('ppm2/')
+				manager\SetFileMode(manager.MODE_READ_WRITE)
+				manager\SetAutoExtension('dat')
+
+				manager.CallSelectFile = (_, path, stripped_ext, stripped, stripped_dir) ->
+					@data\SetFilename(stripped_ext)
+					@data\SetDataPath(path)
+					@data\ReadFromDisk()
+					@data\UpdateController()
+					@DoUpdate()
+
+					@unsavedChanges = false
+					@model.unsavedChanges = false if IsValid(@model)
+					@SetTitle('gui.ppm2.editor.generic.title_file', stripped_ext)
+					return true
+
+			if @unsavedChanges
+				Derma_Query(
+					'gui.ppm2.editor.io.warn.text',
+					'gui.ppm2.editor.io.warn.header',
+					'gui.ppm2.editor.generic.yes',
+					confirm,
+					'gui.ppm2.editor.generic.no'
+				)
+			else
+				confirm()
 
 	with @wearButton = vgui.Create('DButton', @)
 		\SetText('gui.ppm2.editor.io.wear')
@@ -1887,9 +1920,10 @@ PPM2.EditorCreateTopButtons = (isNewEditor = false, addFullbright = false) =>
 
 	@PerformLayout = (W = 0, H = 0) =>
 		oldPerformLayout(@, w, h)
-		@wearButton\SetPos(W - 350, 5)
+		@wearButton\SetPos(W - 445, 5)
 		@saveButton\SetPos(W - 205, 5)
-		@enableAdvanced\SetPos(W - 590, 7)
+		@loadButton\SetPos(W - 295, 5)
+		@enableAdvanced\SetPos(W - 610, 7)
 		@fullbrightSwitch\SetPos(W - 700, 7) if IsValid(@fullbrightSwitch)
 		@selectModelBox\SetPos(W - 475, 5) if IsValid(@selectModelBox)
 

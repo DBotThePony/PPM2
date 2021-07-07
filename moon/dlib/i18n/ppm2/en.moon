@@ -99,6 +99,7 @@ gui.ppm2.editor.io.failed = 'Failed to import.'
 gui.ppm2.editor.io.warn.oldfile = '[!] It may or may not work. You might get annihilated.'
 gui.ppm2.editor.io.warn.text = "Currently, you did not stated your changes.\nDo you really want to open another file?"
 gui.ppm2.editor.io.warn.header = 'Unsaved changes!'
+gui.ppm2.editor.io.load.button = 'Load'
 gui.ppm2.editor.io.save.button = 'Save'
 gui.ppm2.editor.io.save.text = 'Enter file name without ppm2/ and .dat\nTip: to save as autoload, type "_current" (without quotes)'
 gui.ppm2.editor.io.wear = 'Apply changes (wear)'
