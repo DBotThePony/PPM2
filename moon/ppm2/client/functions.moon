@@ -35,7 +35,7 @@ IMPORT_TABLE = {
 		name: 'Gender'
 		func: (arg = 0) ->
 			num = tonumber(arg)
-			return num == 0 and 'MALE' or 'FEMALE'
+			return num == 2
 	}
 
 	'coatcolor': {
@@ -153,6 +153,7 @@ PPM2.ReadFromOldData = (filename = '_current') ->
 		continue if not IMPORT_TABLE[varID]
 		dt = IMPORT_TABLE[varID]
 		value = line\sub(#varID + 2)
+
 		if type(dt.name) ~= 'table'
 			outputData[dt.name] = dt.func(value)
 		else
@@ -160,8 +161,10 @@ PPM2.ReadFromOldData = (filename = '_current') ->
 			outputData[name] = get for _, name in ipairs dt.name
 
 	data = PPM2.PonyDataInstance("#{filename}_imported", nil, false)
+
 	for key, value in pairs outputData
-		data["Set#{key}"](data, value, false)
+		data["Set#{key}Safe"](data, value, false)
+
 	return data, outputData
 
 _G.LocalPonyData = ->
