@@ -594,92 +594,6 @@ TATTOO_INPUT_GRABBER = {
 
 vgui.Register('PPM2TattooEditor', TATTOO_INPUT_GRABBER, 'EditablePanel')
 
-PPM2.EditorBuildNewFilesPanel = =>
-	@Label('gui.ppm2.editor.io.hint')
-	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
-
-	quicksearch = vgui.Create('DTextEntry', @)
-	quicksearch\Dock(TOP)
-	quicksearch.OnValueChange = -> @rebuildFileList()
-	quicksearch\SetUpdateOnType(true)
-	quicksearch\SetPlaceholderText(DLib.i18n.localize('gui.ppm2.editor.generic.quicksearch'))
-
-	list = vgui.Create('DListView', @)
-	list\Dock(FILL)
-	list\SetMultiSelect(false)
-
-	openFile = (fil) ->
-		confirm = ->
-			@frame.data\SetFilename(fil)
-			@frame.data\ReadFromDisk()
-			@frame.data\UpdateController()
-			@frame.DoUpdate()
-			@unsavedChanges = false
-			@frame.unsavedChanges = false
-			@frame\SetTitle('gui.ppm2.editor.generic.title_file', fil)
-
-		if @unsavedChanges
-			Derma_Query(
-				'gui.ppm2.editor.io.warn.text',
-				'gui.ppm2.editor.io.warn.header',
-				'gui.ppm2.editor.generic.yes',
-				confirm,
-				'gui.ppm2.editor.generic.no'
-			)
-		else
-			confirm()
-
-	PPM2.EditorFileManipFuncs(list, 'ppm2', openFile)
-	list\AddColumn('gui.ppm2.editor.io.filename')
-
-	@rebuildFileList = ->
-		list\Clear()
-		files, dirs = file.Find('ppm2/*.dat', 'DATA')
-		matchBak = '.bak.dat'
-		text = string.lower(quicksearch\GetValue() or '')
-
-		for _, fil in ipairs files
-			if not fil\endsWith(matchBak) and (text == '' or fil\lower()\find(text, 1, false))
-				fil2 = fil\sub(1, #fil - 4)
-				line = list\AddLine(fil2)
-				line.file = fil
-
-				recomputed = false
-
-				hook.Add 'PostRenderVGUI', line, =>
-					return if not @IsVisible() or not @IsHovered()
-
-					if not recomputed
-						recomputed = true
-
-						if file.Exists('ppm2/thumbnails/' .. fil2 .. '.png', 'DATA')
-							line.png = Material('data/ppm2/thumbnails/' .. fil2 .. '.png')
-							line.png\Recompute()
-							line.png\GetTexture('$basetexture')\Download()
-
-					parent = @GetParent()\GetParent()
-					x, y = parent\LocalToScreen(parent\GetWide(), 0)
-
-					if @png
-						surface.SetMaterial(@png)
-						surface.SetDrawColor(255, 255, 255)
-						surface.DrawTexturedRect(x, y, 512, 512)
-					else
-						if not @genPreview
-							PPM2.PonyDataInstance(fil2)\WriteThumbnail()\Catch(print)\Then (path) ->
-								@png = Material('data/' .. path)
-								@png\Recompute()
-								@png\GetTexture('$basetexture')\Download()
-
-							@genPreview = true
-
-						surface.SetDrawColor(0, 0, 0)
-						surface.DrawRect(x, y, 512, 512)
-						DLib.HUDCommons.DrawLoading(x + 40, y + 40, 432, color_white)
-
-	@rebuildFileList()
-	list.rebuildFileList = @rebuildFileList
-
 PPM2.EditorBuildOldFilesPanel = =>
 	@Label('gui.ppm2.editor.io.warn.oldfile')
 	@Button 'gui.ppm2.editor.io.reload', -> @rebuildFileList()
@@ -1716,13 +1630,6 @@ EditorPages = {
 			@Hr()
 			@Label('gui.ppm2.editor.cutiemark.input')\DockMargin(5, 10, 5, 10)
 			@URLInput('CMarkURL')
-	}
-
-	{
-		'name': 'gui.ppm2.editor.tabs.files'
-		'internal': 'saves'
-		'func': PPM2.EditorBuildNewFilesPanel
-
 	}
 
 	{

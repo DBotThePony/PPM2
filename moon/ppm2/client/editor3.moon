@@ -747,7 +747,6 @@ EDIT_TREE = {
 				@CheckBox("Disable #{flex} control", "DisableFlex#{flex}")\SetParent(flexes) if active
 			flexes\SizeToContents()
 
-		'gui.ppm2.editor.tabs.files': PPM2.EditorBuildNewFilesPanel
 		'gui.ppm2.editor.tabs.old_files': PPM2.EditorBuildOldFilesPanel
 
 		'gui.ppm2.editor.tabs.about': =>
