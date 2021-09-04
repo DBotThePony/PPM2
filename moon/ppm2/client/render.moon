@@ -203,6 +203,8 @@ PPM2.PreDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					data\GetRenderController()\DrawLegs()
 					IN_DRAW = false
 
+	return
+
 PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	if LEGS_RENDER_TYPE\GetBool()
 		with LocalPlayer()
@@ -211,6 +213,8 @@ PPM2.PostDrawTranslucentRenderables = (bDrawingDepth, bDrawingSkybox) ->
 					IN_DRAW = true
 					data\GetRenderController()\DrawLegs()
 					IN_DRAW = false
+
+	return
 
 PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 	return if IN_DRAW or PPM2.__RENDERING_REFLECTIONS
@@ -242,6 +246,8 @@ PPM2.PostDrawOpaqueRenderables = (bDrawingDepth, bDrawingSkybox) ->
 							rag\DrawModel()
 							IN_DRAW = false
 							renderController\PostDraw(rag)
+
+	return
 
 Think = ->
 	for _, task in ipairs PPM2.NetworkedPonyData.RenderTasks
@@ -287,6 +293,8 @@ PPM2.PrePlayerDraw = =>
 			hook.Call('PPM2.SetupBones', nil, @, data) if data
 			bones\Think()
 			@_ppmBonesModified = true
+
+	return
 
 PPM2.PostPlayerDraw = =>
 	return if PPM2.__RENDERING_REFLECTIONS
