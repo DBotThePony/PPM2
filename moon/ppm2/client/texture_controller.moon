@@ -669,10 +669,6 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		index = string.format('PPM2_buffer_%d_%d', width, height)
 		@LOCKED_RENDERTARGETS[index] = false
 
-		if not no_pop
-			cam.End2D()
-			render.PopRenderTarget()
-
 		return GetRenderTarget(index, width, height)
 
 	LockRenderTargetMask: (name, ...) => @@LockRenderTargetMask(...)
@@ -1338,6 +1334,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@BodyMaterial\SetTexture('$basetexture', release(@, 'body', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'body', texSize, texSize)
@@ -1376,6 +1374,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@BodyMaterial\SetTexture('$bumpmap', release(@, 'body_bump', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'body_bump', texSize, texSize)
@@ -1453,6 +1453,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@BodyMaterial\SetTexture('$selfillummask', release(@, 'body_illum', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'body_illum', texSize, texSize)
@@ -1608,6 +1610,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@HornMaterial\SetTexture('$basetexture', release(@, 'horn', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'horn', texSize, texSize)
@@ -1649,6 +1653,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@HornMaterial\SetTexture('$selfillummask', release(@, 'horn_illum', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, IMAGE_FORMAT_I8, {fill: Color(0, 0, 0), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'horn_illum', texSize, texSize)
@@ -1684,6 +1690,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@HornMaterial\SetTexture('$bumpmap', release(@, 'horn_bump', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(127, 127, 255), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'horn_bump', texSize, texSize)
@@ -1845,6 +1853,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if isRenderTarget
 						mat\SetTexture('$basetexture', release(@, 'cloth_' .. iName, rtsize, rtsize))
 					else
+						cam.End2D()
+
 						vtf = DLib.VTF.Create(2, rtsize, rtsize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
 						release(@, 'cloth_' .. iName, rtsize, rtsize)
@@ -2060,6 +2070,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				if isRenderTarget
 					@SocksMaterial\SetTexture('$basetexture', release(@, 'sock', texSize, texSize))
 				else
+					cam.End2D()
+
 					vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 					vtf\CaptureRenderTargetCoroutine()
 					release(@, 'sock', texSize, texSize)
@@ -2147,6 +2159,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@WingsMaterial\SetTexture('$basetexture', release(@, 'wings', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'wings', texSize, texSize)
@@ -2250,6 +2264,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@HairColor1Material\SetTexture('$basetexture', release(@, 'hair_1_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'hair_1_color', texSize, texSize)
@@ -2312,6 +2328,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@HairColor2Material\SetTexture('$basetexture', release(@, 'hair_2_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'hair_2_color', texSize, texSize)
@@ -2411,6 +2429,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@TailColor1Material\SetTexture('$basetexture', release(@, 'tail_1_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'tail_1_color', texSize, texSize)
@@ -2473,6 +2493,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if isRenderTarget
 				@TailColor2Material\SetTexture('$basetexture', release(@, 'tail_2_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'tail_2_color', texSize, texSize)
@@ -2618,6 +2640,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if isRenderTarget
 						createdMaterial\SetTexture('$corneatexture', release(@, 'eye_cornera', texSize, texSize))
 					else
+						cam.End2D()
+
 						vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 						vtf\CaptureRenderTargetCoroutine()
 						release(@, 'eye_cornera', texSize, texSize)
@@ -2672,7 +2696,10 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			createdMaterial\GetTexture('$iris')\Download() if developer\GetBool()
 		else
 			{:r, :g, :b, :a} = EyeBackground
-			lock(@, 'eye_' .. prefixUpper, texSize, texSize, r, g, b)
+			renderTarget = lock(@, 'eye_' .. prefixUpper, texSize, texSize, r, g, b)
+
+			-- we render multiple frames, one 2D isnt enough
+			cam.End2D()
 
 			_IrisSize = IrisSize
 
@@ -2690,6 +2717,12 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				calcHoleY = HolePos - holeY + holeY * HoleShiftY + shiftY
 
 				render.Clear(r, g, b, 255, true, true)
+
+				cam.Start2D()
+
+				-- Inte HD graphics
+				surface.SetDrawColor(r, g, b, 255)
+				surface.DrawRect(0, 0, ScrW() + 1, ScrH() + 1)
 
 				render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
@@ -2728,6 +2761,8 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				render.PopFilterMag()
 				render.PopFilterMin()
 
+				cam.End2D()
+
 			if isRenderTarget
 				render_frame()
 				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
@@ -2737,9 +2772,19 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				-- 7 - 20 - shrink
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2, frames: 20})
 
+				pushFrame = FrameNumber()
+
 				for i, mult in ipairs({1, 1.04, 1.08, 1.12, 1.16, 1.20, 1, 0.96153846153846, 0.92307692307692, 0.88461538461538, 0.84615384615385, 0.80769230769231, 0.76923076923077, 0.73076923076923, 0.69230769230769, 0.65384615384615, 0.61538461538462, 0.57692307692308, 0.53846153846154, 0.5})
+					if pushFrame ~= FrameNumber()
+						render.PushRenderTarget(renderTarget)
+						pushFrame = FrameNumber()
+
 					render_frame(mult)
+
 					vtf\CaptureRenderTargetCoroutine({frame: i})
+
+					if pushFrame == FrameNumber()
+						render.PopRenderTarget()
 
 				release(@, 'eye_' .. prefixUpper, texSize, texSize)
 

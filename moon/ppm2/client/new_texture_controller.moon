@@ -207,6 +207,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor1Material\SetTexture('$basetexture', release(@, prefix .. '_hair_1_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor1"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine({fuck: true})
 				release(@, prefix .. '_hair_1_color', texSize, texSize)
@@ -270,6 +272,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				HairColor2Material\SetTexture('$basetexture', release(@, prefix .. '_hair_2_color', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor2"), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, prefix .. '_hair_2_color', texSize, texSize)
@@ -393,6 +397,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				@BatWingsMaterial\SetTexture('$basetexture', release(@, 'bat_wing', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'bat_wing', texSize, texSize)
@@ -479,6 +485,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 			if isEditor
 				@BatWingsSkinMaterial\SetTexture('$basetexture', release(@, 'bat_wing_skin', texSize, texSize))
 			else
+				cam.End2D()
+
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
 				vtf\CaptureRenderTargetCoroutine()
 				release(@, 'bat_wing_skin', texSize, texSize)
