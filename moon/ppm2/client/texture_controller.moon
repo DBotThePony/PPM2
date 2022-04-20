@@ -298,7 +298,7 @@ PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
 PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
-	index = url .. '__' .. width .. '_' .. height .. '_clamp'
+	index = url .. '__' .. width .. '_' .. height .. '_clamp_f'
 	index ..= '_rgba8888' if PPM2.NO_COMPRESSION\GetBool()
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
