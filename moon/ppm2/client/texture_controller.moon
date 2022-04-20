@@ -234,6 +234,8 @@ PPM2.URLThreadWorker = ->
 						flags: TEXTUREFLAGS_CLAMPS\bor(TEXTUREFLAGS_CLAMPT)
 					})
 
+					cam.End2D()
+
 					vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
 
 					if select('#', render.ReadPixel(0, 0)) == 3
