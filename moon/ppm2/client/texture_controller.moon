@@ -391,6 +391,7 @@ hook.Add 'InvalidateMaterialCache', 'PPM2.WebTexturesCache', ->
 PPM2.TextureTableHash = (input) ->
 	hash = DLib.Util.SHA1()
 	hash\Update('post intel fix')
+	hash\Update('post intel fix 2')
 	hash\Update('post sampling fix')
 	hash\Update('rgba8888') if PPM2.NO_COMPRESSION\GetBool()
 	hash\Update(' ' .. tostring(value) .. ' ') for value in *input
@@ -2776,16 +2777,9 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 				pushFrame = FrameNumber()
 
 				for i, mult in ipairs({1, 1.04, 1.08, 1.12, 1.16, 1.20, 1, 0.96153846153846, 0.92307692307692, 0.88461538461538, 0.84615384615385, 0.80769230769231, 0.76923076923077, 0.73076923076923, 0.69230769230769, 0.65384615384615, 0.61538461538462, 0.57692307692308, 0.53846153846154, 0.5})
-					if pushFrame ~= FrameNumber()
-						render.PushRenderTarget(renderTarget)
-						pushFrame = FrameNumber()
-
+					render.PushRenderTarget(renderTarget)
 					render_frame(mult)
-
 					vtf\CaptureRenderTargetCoroutine({frame: i, pop_rendertarget: true})
-
-					if pushFrame == FrameNumber()
-						render.PopRenderTarget()
 
 				release(@, 'eye_' .. prefixUpper, texSize, texSize)
 
