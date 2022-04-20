@@ -2783,7 +2783,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 					if not first
 						render.PushRenderTarget(renderTarget)
 					else
-						first = true
+						first = false
 
 					render_frame(mult)
 					vtf\CaptureRenderTargetCoroutine({frame: i, pop_rendertarget: true})
