@@ -669,7 +669,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		return rt, mat
 
 	ReleaseRenderTarget: (name, ...) => @@ReleaseRenderTarget(...)
-	@ReleaseRenderTarget = (width, height, no_pop = false) =>
+	@ReleaseRenderTarget = (width, height) =>
 		index = string.format('PPM2_buffer_%d_%d', width, height)
 		@LOCKED_RENDERTARGETS[index] = false
 
@@ -2769,21 +2769,26 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 
 			if isRenderTarget
 				render_frame()
-				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize))
+				createdMaterial\SetTexture('$iris', release(@, 'eye_' .. prefixUpper, texSize, texSize, true))
+				render.PopRenderTarget()
 			else
 				-- 1 - base frame
 				-- 2 - 6 - enlarge
 				-- 7 - 20 - shrink
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2, frames: 20})
 
-				pushFrame = FrameNumber()
+				first = true
 
 				for i, mult in ipairs({1, 1.04, 1.08, 1.12, 1.16, 1.20, 1, 0.96153846153846, 0.92307692307692, 0.88461538461538, 0.84615384615385, 0.80769230769231, 0.76923076923077, 0.73076923076923, 0.69230769230769, 0.65384615384615, 0.61538461538462, 0.57692307692308, 0.53846153846154, 0.5})
-					render.PushRenderTarget(renderTarget)
+					if not first
+						render.PushRenderTarget(renderTarget)
+					else
+						first = true
+
 					render_frame(mult)
 					vtf\CaptureRenderTargetCoroutine({frame: i, pop_rendertarget: true})
 
-				release(@, 'eye_' .. prefixUpper, texSize, texSize)
+				release(@, 'eye_' .. prefixUpper, texSize, texSize, true)
 
 				vtf\AutoGenerateMips(false)
 				path = @@SetCacheH(hash, vtf\ToString())
