@@ -210,7 +210,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				cam.End2D()
 
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor1"), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+
+				if PPM2.USE_HIGHRES_TEXTURES\GetBool()
+					vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+				else
+					vtf\CaptureRenderTarget()
+					render.PopRenderTarget()
+
+					coroutine.yield()
+
 				release(@, prefix .. '_hair_1_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
@@ -275,7 +283,15 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				cam.End2D()
 
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: @GrabData("#{prefixColor}ManeColor2"), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+
+				if PPM2.USE_HIGHRES_TEXTURES\GetBool()
+					vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+				else
+					vtf\CaptureRenderTarget()
+					render.PopRenderTarget()
+
+					coroutine.yield()
+
 				release(@, prefix .. '_hair_2_color', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
@@ -400,7 +416,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				cam.End2D()
 
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+				vtf\CaptureRenderTarget()
+				render.PopRenderTarget()
 				release(@, 'bat_wing', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
@@ -488,7 +505,8 @@ class PPM2.NewPonyTextureController extends PPM2.PonyTextureController
 				cam.End2D()
 
 				vtf = DLib.VTF.Create(2, texSize, texSize, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGB888 or IMAGE_FORMAT_DXT1, {fill: Color(r, g, b), mipmap_count: -2})
-				vtf\CaptureRenderTargetCoroutine({pop_rendertarget: true})
+				vtf\CaptureRenderTarget()
+				render.PopRenderTarget()
 				release(@, 'bat_wing_skin', texSize, texSize)
 
 				vtf\AutoGenerateMips(false)
