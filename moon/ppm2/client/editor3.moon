@@ -961,6 +961,8 @@ EDIT_TREE = {
 							@CheckBox('gui.ppm2.editor.mouth.claw', 'ClawTeeth')
 							@NumSlider('gui.ppm2.editor.mouth.claw', 'ClawTeethStrength', 2) if ADVANCED_MODE\GetBool()
 
+							@CheckBox('gui.ppm2.editor.face.new_muzzle', 'NewMuzzle')
+
 							@Hr()
 
 							@ColorBox('gui.ppm2.editor.mouth.teeth', 'TeethColor')

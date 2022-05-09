@@ -179,7 +179,7 @@ gui.ppm2.editor.face.eyelashes = 'Ресницы'
 gui.ppm2.editor.face.eyelashes_color = 'Цвет ресниц'
 gui.ppm2.editor.face.eyelashes_phong = 'Фонг параметры ресниц'
 gui.ppm2.editor.face.eyebrows_color = 'Цвет бровей'
-gui.ppm2.editor.face.new_muzzle = 'Использовать новую мордочку'
+gui.ppm2.editor.face.new_muzzle = 'Использовать новую мордочку жеребцов'
 
 gui.ppm2.editor.face.nose = 'Цвет ноздрей'
 gui.ppm2.editor.face.lips = 'Цвет губ'

@@ -1085,6 +1085,7 @@ EditorPages = {
 			@ComboBox('gui.ppm2.editor.misc.race', 'Race')
 			@ComboBox('gui.ppm2.editor.misc.wings', 'WingsType')
 			@CheckBox('gui.ppm2.editor.misc.gender', 'Gender')
+			@CheckBox('gui.ppm2.editor.face.new_muzzle', 'NewMuzzle')
 			@NumSlider('gui.ppm2.editor.misc.chest', 'MaleBuff', 2)
 			@NumSlider('gui.ppm2.editor.misc.weight', 'Weight', 2)
 			@NumSlider('gui.ppm2.editor.misc.size', 'PonySize', 2)
@@ -1329,6 +1330,8 @@ EditorPages = {
 		'internal': 'face'
 		'func': (sheet) =>
 			@ScrollPanel()
+
+			@CheckBox('gui.ppm2.editor.face.new_muzzle', 'NewMuzzle')
 
 			@ComboBox('gui.ppm2.editor.face.eyelashes', 'EyelashType')
 			@ColorBox('gui.ppm2.editor.face.eyelashes_color', 'EyelashesColor')
