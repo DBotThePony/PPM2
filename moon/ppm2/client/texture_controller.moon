@@ -229,7 +229,7 @@ PPM2.URLThreadWorker = ->
 					render.PopFilterMag()
 					render.PopFilterMin()
 
-					vtf = DLib.VTF.Create(2, data.width, data.height, PPM2.NO_COMPRESSION\GetBool() and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {
+					vtf = DLib.VTF.Create(2, data.width, data.height, (data.force_rgba or PPM2.NO_COMPRESSION\GetBool()) and IMAGE_FORMAT_RGBA8888 or IMAGE_FORMAT_DXT5, {
 						fill: Color(0, 0, 0, 0)
 						flags: TEXTUREFLAGS_CLAMPS\bor(TEXTUREFLAGS_CLAMPT)
 					})
@@ -295,11 +295,11 @@ PPM2.URLThreadWorker = ->
 
 PPM2.URLThread = PPM2.URLThread or coroutine.create(PPM2.URLThreadWorker)
 
-PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
+PPM2.GetURLMaterial = (url, width = 512, height = 512, force_rgba = false) ->
 	assert(isstring(url) and url\trim() ~= '', 'Must specify valid URL', 2)
 
 	index = url .. '__' .. width .. '_' .. height .. '_clamp_f'
-	index ..= '_rgba8888' if PPM2.NO_COMPRESSION\GetBool()
+	index ..= '_rgba' if force_rgba or PPM2.NO_COMPRESSION\GetBool()
 
 	if data = PPM2.FAILED_TO_DOWNLOAD[index]
 		return DLib.Promise (resolve) -> resolve(data.texture, data.material)
@@ -340,6 +340,7 @@ PPM2.GetURLMaterial = (url, width = 512, height = 512) ->
 			:width
 			:height
 			:index
+			:force_rgba
 			hash: DLib.Util.QuickSHA1(index)
 			resolve: {resolve}
 		}
@@ -1111,7 +1112,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 		if LightwarpURL
 			ticket = @PutTicket(prefix .. '_phong')
 
-			PPM2.GetURLMaterial(LightwarpURL, 256, 16)\Then (tex, mat) ->
+			PPM2.GetURLMaterial(LightwarpURL, 256, 16, true)\Then (tex, mat) ->
 				return if not @CheckTicket(prefix .. '_phong', ticket)
 				matTarget\SetTexture('$lightwarptexture', tex)
 		else
@@ -1122,7 +1123,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			if BumpmapURL
 				ticket = @PutTicket(prefix .. '_bump')
 
-			    PPM2.GetURLMaterial(BumpmapURL, matTarget\Width(), matTarget\Height())\Then (tex, mat) ->
+			    PPM2.GetURLMaterial(BumpmapURL, matTarget\Width(), matTarget\Height(), true)\Then (tex, mat) ->
 			        return if not @CheckTicket(prefix .. '_bump', ticket)
 			        matTarget\SetTexture('$bumpmap', tex)
 			else
