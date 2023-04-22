@@ -722,6 +722,7 @@ class NewBodygroupController extends DefaultBodygroupController
 				\ManipulateBonePosition(@WING_OPEN_RIGHT, rightPos)
 
 	UpdateEars: =>
+		return if not @validSkeleton
 		size = @GrabData('EarsSize')
 		if diff(size)
 			vec = vector_one * size
@@ -729,6 +730,7 @@ class NewBodygroupController extends DefaultBodygroupController
 			@GetEntity()\ManipulateBoneScale(@EAR_R, vec)
 
 	ResetEars: =>
+		return if not @validSkeleton
 		ang, vec1, vec2 = Angle(0, 0, 0), vector_one, vector_origin
 		for _, part in ipairs {@EAR_L, @EAR_R}
 			with @GetEntity()
