@@ -117,33 +117,39 @@ PPM2.COMPLETED_TASKS = 0
 PPM2.LAST_TASK = 0
 
 PPM2.TextureCompileWorker = ->
-	while true
-		name, task = next(PPM2.TEXTURE_TASKS)
+	handler = (err) ->
+		PPM2.MessageError('Exception on texture compilation thread: ', err, '\n', debug.traceback())
 
-		if not name
-			coroutine_yield()
+	closure = ->
+		while true
+			name, task = next(PPM2.TEXTURE_TASKS)
 
-			if not next(PPM2.TEXTURE_TASKS_EDITOR)
-				DLib.Util.PopProgress('ppm2_busy')
+			if not name
+				coroutine_yield()
 
-				if PPM2.LAST_TASK < SysTime()
-					PPM2.MAX_TASKS = 0
-					PPM2.COMPLETED_TASKS = 0
-		else
-			PPM2.TEXTURE_TASKS[name] = nil
-			PPM2.TEXTURE_TASK_CURRENT = name
-			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
-			task[1](task[2], false, task[3], task[4]) if IsValid(task[2])
-			task[2].texture_tasks -= 1
-			task[2]._once = true
-			PPM2.COMPLETED_TASKS += 1
-			PPM2.LAST_TASK = SysTime() + 5
-			DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
+				if not next(PPM2.TEXTURE_TASKS_EDITOR)
+					DLib.Util.PopProgress('ppm2_busy')
 
-			if not next(PPM2.TEXTURE_TASKS)
-				DLib.Util.PopProgress('ppm2_busy')
+					if PPM2.LAST_TASK < SysTime()
+						PPM2.MAX_TASKS = 0
+						PPM2.COMPLETED_TASKS = 0
+			else
+				PPM2.TEXTURE_TASKS[name] = nil
+				PPM2.TEXTURE_TASK_CURRENT = name
+				DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
+				task[1](task[2], false, task[3], task[4]) if IsValid(task[2])
+				task[2].texture_tasks -= 1
+				task[2]._once = true
+				PPM2.COMPLETED_TASKS += 1
+				PPM2.LAST_TASK = SysTime() + 5
+				DLib.Util.PushProgress('ppm2_busy', DLib.I18n.Localize('gui.ppm2.busy'), PPM2.COMPLETED_TASKS / PPM2.MAX_TASKS)
 
-			PPM2.TEXTURE_TASK_CURRENT = nil
+				if not next(PPM2.TEXTURE_TASKS)
+					DLib.Util.PopProgress('ppm2_busy')
+
+				PPM2.TEXTURE_TASK_CURRENT = nil
+
+	xpcall(closure, handler)
 
 PPM2.TextureCompileThread = PPM2.TextureCompileThread or coroutine.create(PPM2.TextureCompileWorker)
 
