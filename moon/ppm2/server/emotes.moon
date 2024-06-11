@@ -55,9 +55,10 @@ killGrin = =>
 	net.Start('PPM2.KillAnimation', true)
 	net.WriteEntity(@)
 	net.Broadcast()
+	return nil
 
-hook.Add 'OnNPCKilled', 'PPM2.Emotes', (npc = NULL, attacker = NULL, weapon = NULL) => killGrin(attacker)
-hook.Add 'DoPlayerDeath', 'PPM2.Emotes', (ply = NULL, attacker = NULL) => killGrin(attacker)
+hook.Add 'OnNPCKilled', 'PPM2.Emotes', (npc = NULL, attacker = NULL, weapon = NULL) -> killGrin(attacker) if attacker ~= npc
+hook.Add 'DoPlayerDeath', 'PPM2.Emotes', (ply = NULL, attacker = NULL) -> killGrin(attacker) if attacker ~= ply
 
 net.ReceiveAntispam('PPM2.PlayEmote', 0.5)
 net.Receive 'PPM2.PlayEmote', (len = 0, ply = NULL) ->
