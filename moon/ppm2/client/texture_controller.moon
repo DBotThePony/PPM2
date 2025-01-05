@@ -2949,6 +2949,7 @@ class PPM2.PonyTextureController extends PPM2.ControllerChildren
 			'data': {
 				'$basetexture': '__error'
 				'$translucent': '1'
+				'$halflambert': '1'
 				'$vertexalpha': '1' -- this is required for DXT3/DXT5 textures
 				'$lightwarptexture': 'models/ppm2/base/lightwrap'
 			}
