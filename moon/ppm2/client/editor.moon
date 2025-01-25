@@ -778,6 +778,7 @@ PANEL_SETTINGS_BASE = {
 
 	NumSlider: (name = 'Slider', option = '', decimals = 0, parent = @scroll or @) =>
 		@createdPanels += 3
+		ignoreUpdates = false
 		with withPanel = vgui.Create('DNumSlider', parent)
 			@CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
@@ -792,17 +793,18 @@ PANEL_SETTINGS_BASE = {
 			\SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.TextArea\SetTextColor(color_white)
 			.Label\SetTextColor(color_white)
-			.DoUpdate = -> \SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.OnValueChanged = (pnl, newVal = 1) ->
-				return if option == ''
+				return if option == '' or ignoreUpdates
 				data = @GetTargetData()
 				return if not data
 				data["Set#{option}"](data, newVal, @GetShouldSaveData())
 				@ValueChanges(option, newVal, pnl)
 			table.insert @updateFuncs, ->
+				ignoreUpdates = true
 				\SetMin(@GetTargetData()["GetMin#{option}"](@GetTargetData())) if @GetTargetData()
 				\SetMax(@GetTargetData()["GetMax#{option}"](@GetTargetData())) if @GetTargetData()
 				\SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+				ignoreUpdates = false
 			@scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
 	Label: (text = '', parent = @scroll or @) =>
 		@createdPanels += 1
@@ -884,6 +886,7 @@ PANEL_SETTINGS_BASE = {
 			.DoClick = -> doClick()
 	CheckBox: (name = 'Label', option = '', parent = @scroll or @) =>
 		@createdPanels += 3
+		ignoreUpdates = false
 		with withPanel = vgui.Create('DCheckBoxLabel', parent)
 			@CreateResetButton(name, option, withPanel)
 			\Dock(TOP)
@@ -893,13 +896,15 @@ PANEL_SETTINGS_BASE = {
 			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
 			\SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.OnChange = (pnl, newVal = false) ->
-				return if option == ''
+				return if option == '' or ignoreUpdates
 				data = @GetTargetData()
 				return if not data
 				data["Set#{option}"](data, newVal and 1 or 0, @GetShouldSaveData())
 				@ValueChanges(option, newVal and 1 or 0, pnl)
 			table.insert @updateFuncs, ->
+				ignoreUpdates = true
 				\SetChecked(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+				ignoreUpdates = false
 			@scroll\AddItem(withPanel) if IsValid(@scroll) and parent == @scroll
 	ColorBox: (name = 'Colorful Box', option = '', parent = @scroll or @) =>
 		@createdPanels += 7
@@ -907,21 +912,23 @@ PANEL_SETTINGS_BASE = {
 		box = vgui.Create('DLibColorMixer', collapse)
 		box\SetTallLayout(true)
 		collapse.box = box
+		ignoreUpdates = false
 
 		with box
 			\SetSize(250, 270)
 			\SetTooltip('gui.ppm2.editor.generic.datavalue', name, option)
 			\SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
 			.ValueChanged = (pnl) ->
-				timer.Simple 0, ->
-					return if option == ''
-					data = @GetTargetData()
-					return if not data
-					newVal = pnl\GetColor()
-					data["Set#{option}"](data, newVal, @GetShouldSaveData())
-					@ValueChanges(option, newVal, pnl)
+				return if option == '' or ignoreUpdates
+				data = @GetTargetData()
+				return if not data
+				newVal = pnl\GetColor()
+				data["Set#{option}"](data, newVal, @GetShouldSaveData())
+				@ValueChanges(option, newVal, pnl)
 			table.insert @updateFuncs, ->
+				ignoreUpdates = true
 				\SetColor(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+				ignoreUpdates = false
 
 		with collapse
 			\SetContents(box)
@@ -952,6 +959,7 @@ PANEL_SETTINGS_BASE = {
 		return canvas, collapse
 	ComboBox: (name = 'Combo Box', option = '', choices, parent = @scroll or @) =>
 		@createdPanels += 4
+		ignoreUpdates = false
 		with label = vgui.Create('DLabel', parent)
 			\SetText(name)
 			\SetTextColor(color_white)
@@ -971,13 +979,16 @@ PANEL_SETTINGS_BASE = {
 				else
 					\AddChoice(choice) for _, choice in ipairs @GetTargetData()["Get#{option}Types"](@GetTargetData()) if @GetTargetData() and @GetTargetData()["Get#{option}Types"]
 				.OnSelect = (pnl = box, index = 1, value = '', data = value) ->
+					return if ignoreUpdates
 					index -= 1
 					data = @GetTargetData()
 					return if not data
 					data["Set#{option}"](data, index, @GetShouldSaveData())
 					@ValueChanges(option, index, pnl)
 				table.insert @updateFuncs, ->
+					ignoreUpdates = true
 					\SetValue(@GetTargetData()["Get#{option}"](@GetTargetData())) if @GetTargetData()
+					ignoreUpdates = false
 			@CreateResetButton(name, option, label)
 		return box, label
 	URLInput: (option = '', parent = @scroll or @) =>
