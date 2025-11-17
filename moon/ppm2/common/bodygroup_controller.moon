@@ -423,7 +423,6 @@ class DefaultBodygroupController extends PPM2.ControllerChildren
 	UpdateBack: (ent = @GetEntity()) =>
 		return if not CLIENT
 		return if ent\IsRagdoll()
-		return if ent\IsNJPony()
 		return if @GetEntity().Alive and not @GetEntity()\Alive()
 		return if not @validSkeleton
 		return if not diff(@GrabData('BackSize'))
